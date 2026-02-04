@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>keypadc.h &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/design-tabs.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="CE C Toolchain Specific Headers" href="../headers/index.html" />
+    <link rel="prev" title="graphx.h" href="graphx.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v9.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to the CE C Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../static/printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">CE C Libraries</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="fileioc.html">fileioc.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fontlibc.html">fontlibc.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="graphx.html">graphx.h</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">keypadc.h</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#helpful-key-dection">Helpful key dection</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#detecting-a-single-press">Detecting a single press</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#detecting-a-single-release">Detecting a single release</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/index.html">CE C Toolchain Specific Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/makefile-options.html">Makefile Options</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../static/contributing.html">Contributing to the CE C Toolchain</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">CE C Libraries</a> &raquo;</li>
+      <li>keypadc.h</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="keypadc-h">
+<span id="id1"></span><h1>keypadc.h<a class="headerlink" href="#keypadc-h" title="Permalink to this headline"></a></h1>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;keypadc.h&gt;</span>
+</pre></div>
+</div>
+<p>The keypadc library is used for quickly polling the status of the keys in the keypad.
+It supports multi-key presses, and can be used for extremely responsive input compared to OS routines such as <code class="code docutils literal notranslate"><span class="pre">os_GetCSC()</span></code>.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#helpful-key-dection" id="id2">Helpful key dection</a></p>
+<ul>
+<li><p><a class="reference internal" href="#detecting-a-single-press" id="id3">Detecting a single press</a></p></li>
+<li><p><a class="reference internal" href="#detecting-a-single-release" id="id4">Detecting a single release</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#api-documentation" id="id5">API Documentation</a></p></li>
+</ul>
+</div>
+<div class="section" id="helpful-key-dection">
+<h2><a class="toc-backref" href="#id2">Helpful key dection</a><a class="headerlink" href="#helpful-key-dection" title="Permalink to this headline"></a></h2>
+<p>Handling key detection properly is a major requirement for a lot of programs.
+Detecting a hold can be rather straightforward, but things like a press, release, can sometimes be rather confusing at first.</p>
+<div class="section" id="detecting-a-single-press">
+<h3><a class="toc-backref" href="#id3">Detecting a single press</a><a class="headerlink" href="#detecting-a-single-press" title="Permalink to this headline"></a></h3>
+<p>When a key is first pressed, we only want to trigger on that event.
+The following code sets up a simple rising edge detector to catch this.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">bool</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">prevkey</span><span class="p">;</span>
+<span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">kb_Data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">kb_2nd</span><span class="p">;</span>
+
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">key</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">prevkey</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="p">}</span>
+<span class="n">prevkey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">key</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="detecting-a-single-release">
+<h3><a class="toc-backref" href="#id4">Detecting a single release</a><a class="headerlink" href="#detecting-a-single-release" title="Permalink to this headline"></a></h3>
+<p>When a key is released we only want to trigger on that event.
+The following code sets up a simple falling edge detector to catch this.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">bool</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">prevkey</span><span class="p">;</span>
+<span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">kb_Data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">kb_2nd</span><span class="p">;</span>
+
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">key</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">prevkey</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="p">}</span>
+<span class="n">prevkey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">key</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="api-documentation">
+<h2><a class="toc-backref" href="#id5">API Documentation</a><a class="headerlink" href="#api-documentation" title="Permalink to this headline"></a></h2>
+<p>keypadc is a simple direct-input keypad library. </p>
+<p><dl class="simple">
+<dt><strong>Author</strong></dt><dd><p>Matt “MateoConLechuga” Waltz </p>
+</dd>
+<dt><strong>Author</strong></dt><dd><p>Shaun “Merthsoft” McFall </p>
+</dd>
+</dl>
+</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.kb_SetMode">
+<span class="target" id="keypadc_8h_1a78a8a521b5502b248979a97e48947345"></span><span class="sig-name descname"><span class="n"><span class="pre">kb_SetMode</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">mode</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.kb_SetMode" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets the keypad scanning mode. </p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#keypadc_8h_1af86f29e15b4b14d3aa66ced481a63424"><span class="std std-ref">kb_scan_mode_t</span></a> </p>
+</div>
+</p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.kb_GetMode">
+<span class="target" id="keypadc_8h_1ad3001e9ec2a0bd6fab1a68680641eb53"></span><span class="sig-name descname"><span class="n"><span class="pre">kb_GetMode</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.kb_GetMode" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the keypad scanning mode. </p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#keypadc_8h_1af86f29e15b4b14d3aa66ced481a63424"><span class="std std-ref">kb_scan_mode_t</span></a> </p>
+</div>
+</p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.kb_EnableInt">
+<span class="target" id="keypadc_8h_1abef173d3e47568a2a1bce9eab3e5abae"></span><span class="sig-name descname"><span class="n"><span class="pre">kb_EnableInt</span></span></span><a class="headerlink" href="#c.kb_EnableInt" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Enabled keypad interrupt signals. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.kb_IntAcknowledge">
+<span class="target" id="keypadc_8h_1a6809cbd5aafa31f19e4c3d9735db6e93"></span><span class="sig-name descname"><span class="n"><span class="pre">kb_IntAcknowledge</span></span></span><a class="headerlink" href="#c.kb_IntAcknowledge" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Acknowledege keypad interrupt signals. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.kb_IntStatus">
+<span class="target" id="keypadc_8h_1a623c6f07055016813677fac3aa89b9ec"></span><span class="sig-name descname"><span class="n"><span class="pre">kb_IntStatus</span></span></span><a class="headerlink" href="#c.kb_IntStatus" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Status of keypad interrupt signals. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.kb_Config">
+<span class="target" id="keypadc_8h_1ace3745777da79bd73318ae9e5722dd6d"></span><span class="sig-name descname"><span class="n"><span class="pre">kb_Config</span></span></span><a class="headerlink" href="#c.kb_Config" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Configuration of keypad controller. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.kb_IsDown">
+<span class="target" id="keypadc_8h_1a131ac75acf182051fe82d518b75109d8"></span><span class="sig-name descname"><span class="n"><span class="pre">kb_IsDown</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">lkey</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.kb_IsDown" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Checks if a key is pressed. This uses the long key type, which includes the group as well. It can be used in place of reading directly from <code class="docutils literal notranslate"><span class="pre">kb_Data</span></code>.</p>
+<p>Long key types have the same name as the normal key types, but are prefixed with kb_Key* rather than kb_*. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.kb_Data">
+<span class="target" id="keypadc_8h_1a4a4296b5cbbc1f0cd963a36abd456e97"></span><span class="sig-name descname"><span class="n"><span class="pre">kb_Data</span></span></span><a class="headerlink" href="#c.kb_Data" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Keypad Data registers</p>
+<p><table class="docutils align-default">
+<colgroup>
+<col style="width: 8%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Offset</p></th>
+<th class="head"><p>Bit 0</p></th>
+<th class="head"><p>Bit 1</p></th>
+<th class="head"><p>Bit 2</p></th>
+<th class="head"><p>Bit 3</p></th>
+<th class="head"><p>Bit 4</p></th>
+<th class="head"><p>Bit 5</p></th>
+<th class="head"><p>Bit 6</p></th>
+<th class="head"><p>Bit 7</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>kb_Graph</p></td>
+<td><p>kb_Trace</p></td>
+<td><p>kb_Zoom</p></td>
+<td><p>kb_Window</p></td>
+<td><p>kb_Yequ</p></td>
+<td><p>kb_2nd</p></td>
+<td><p>kb_Mode</p></td>
+<td><p>kb_Del</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td></td>
+<td><p>kb_Sto</p></td>
+<td><p>kb_Ln</p></td>
+<td><p>kb_Log</p></td>
+<td><p>kb_Square</p></td>
+<td><p>kb_Recip</p></td>
+<td><p>kb_Math</p></td>
+<td><p>kb_Alpha</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>kb_0</p></td>
+<td><p>kb_1</p></td>
+<td><p>kb_4</p></td>
+<td><p>kb_7</p></td>
+<td><p>kb_Comma</p></td>
+<td><p>kb_Sin</p></td>
+<td><p>kb_Apps</p></td>
+<td><p>kb_GraphVar</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p>kb_DecPnt</p></td>
+<td><p>kb_2</p></td>
+<td><p>kb_5</p></td>
+<td><p>kb_8</p></td>
+<td><p>kb_LParen</p></td>
+<td><p>kb_Cos</p></td>
+<td><p>kb_Prgm</p></td>
+<td><p>kb_Stat</p></td>
+</tr>
+<tr class="row-even"><td><p>5</p></td>
+<td><p>kb_Chs</p></td>
+<td><p>kb_3</p></td>
+<td><p>kb_6</p></td>
+<td><p>kb_9</p></td>
+<td><p>kb_RParen</p></td>
+<td><p>kb_Tan</p></td>
+<td><p>kb_Vars</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>6</p></td>
+<td><p>kb_Enter</p></td>
+<td><p>kb_Add</p></td>
+<td><p>kb_Sub</p></td>
+<td><p>kb_Mul</p></td>
+<td><p>kb_Div</p></td>
+<td><p>kb_Power</p></td>
+<td><p>kb_Clear</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>7</p></td>
+<td><p>kb_Down</p></td>
+<td><p>kb_Left</p></td>
+<td><p>kb_Right</p></td>
+<td><p>kb_Up</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</p>
+<p>These data registers can be indexed as a normal array. For example, to check the status of the ‘2nd’ key: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="n">kb_Data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">kb_2nd</span><span class="p">)</span> <span class="p">{</span>
+    <span class="o">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+ <div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#keypadc_8h_1aefead9ca152e96406af497bb3f7a20e7"><span class="std std-ref">kb_On</span></a> </p>
+</div>
+</p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.kb_On">
+<span class="target" id="keypadc_8h_1aefead9ca152e96406af497bb3f7a20e7"></span><span class="sig-name descname"><span class="n"><span class="pre">kb_On</span></span></span><a class="headerlink" href="#c.kb_On" title="Permalink to this definition"></a><br /></dt>
+<dd><p>ON key signal. <div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#keypadc_8h_1ad5e1693dfac50389f67005242a3ebe71"><span class="std std-ref">kb_DisableOnLatch</span></a> <a class="reference internal" href="#keypadc_8h_1a2fa5f7d791ab9995e5b7045a49fde25d"><span class="std std-ref">kb_EnableOnLatch</span></a> <a class="reference internal" href="#keypadc_8h_1ad45ec00dab415b6a0c5256ca8e11609c"><span class="std std-ref">kb_ClearOnLatch</span></a> </p>
+</div>
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Scanning mode does not matter. </p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The ON key is not wired as part of the normal key matrix. The ON key must be checked separately from the other keys with kb_On: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">main</span><span class="p">(</span><span class="n">void</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">kb_DisableOnLatch</span><span class="p">();</span>
+    <span class="o">...</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">kb_On</span><span class="p">)</span> <span class="p">{</span>
+        <span class="o">...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+ </p>
+</div>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.kb_EnableOnLatch">
+<span class="target" id="keypadc_8h_1a2fa5f7d791ab9995e5b7045a49fde25d"></span><span class="sig-name descname"><span class="n"><span class="pre">kb_EnableOnLatch</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.kb_EnableOnLatch" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Causes kb_On to latch when the ON is key pressed: once the ON key is pressed, kb_On will remain true until reset with <a class="reference internal" href="#keypadc_8h_1ad45ec00dab415b6a0c5256ca8e11609c"><span class="std std-ref">kb_ClearOnLatch()</span></a>. This may be useful if you want to check the ON key occasionally, for example as a break signal. <div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#keypadc_8h_1ad5e1693dfac50389f67005242a3ebe71"><span class="std std-ref">kb_DisableOnLatch</span></a> <a class="reference internal" href="#keypadc_8h_1ad45ec00dab415b6a0c5256ca8e11609c"><span class="std std-ref">kb_ClearOnLatch</span></a> </p>
+</div>
+</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This defaults to whatever the last program set this to, so be sure to set it explicitly. </p>
+</div>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.kb_DisableOnLatch">
+<span class="target" id="keypadc_8h_1ad5e1693dfac50389f67005242a3ebe71"></span><span class="sig-name descname"><span class="n"><span class="pre">kb_DisableOnLatch</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.kb_DisableOnLatch" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Disables ON key latching behavior. <div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#keypadc_8h_1a2fa5f7d791ab9995e5b7045a49fde25d"><span class="std std-ref">kb_EnableOnLatch</span></a> </p>
+</div>
+</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This defaults to whatever the last program set this to, so be sure to set it explicitly. </p>
+</div>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.kb_ClearOnLatch">
+<span class="target" id="keypadc_8h_1ad45ec00dab415b6a0c5256ca8e11609c"></span><span class="sig-name descname"><span class="n"><span class="pre">kb_ClearOnLatch</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.kb_ClearOnLatch" title="Permalink to this definition"></a><br /></dt>
+<dd><p>When ON key latching has been enabled with <a class="reference internal" href="#keypadc_8h_1a2fa5f7d791ab9995e5b7045a49fde25d"><span class="std std-ref">kb_EnableOnLatch()</span></a>, this will reset kb_On back to false (assuming the user is no longer pressing ON). <div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#keypadc_8h_1a2fa5f7d791ab9995e5b7045a49fde25d"><span class="std std-ref">kb_EnableOnLatch</span></a> </p>
+</div>
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This may persist between program runs, so be to sure to disable as needed. </p>
+</div>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv48kb_key_t">
+<span id="_CPPv38kb_key_t"></span><span id="_CPPv28kb_key_t"></span><span id="kb_key_t"></span><span class="target" id="keypadc_8h_1a8bdbf527b2c99f741e6ced1cf1c7a880"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kb_key_t</span></span></span><a class="headerlink" href="#_CPPv48kb_key_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Normal key type. </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv49kb_lkey_t">
+<span id="_CPPv39kb_lkey_t"></span><span id="_CPPv29kb_lkey_t"></span><span id="kb_lkey_t"></span><span class="target" id="keypadc_8h_1a9161bee6ca17720bffe98f0da5a3c9c8"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kb_lkey_t</span></span></span><a class="headerlink" href="#_CPPv49kb_lkey_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Long key type. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-enums">Enums</p>
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv414kb_scan_mode_t">
+<span id="_CPPv314kb_scan_mode_t"></span><span id="_CPPv214kb_scan_mode_t"></span><span class="target" id="keypadc_8h_1af86f29e15b4b14d3aa66ced481a63424"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kb_scan_mode_t</span></span></span><a class="headerlink" href="#_CPPv414kb_scan_mode_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Different available scanning modes. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N14kb_scan_mode_t11MODE_0_IDLEE">
+<span id="_CPPv3N14kb_scan_mode_t11MODE_0_IDLEE"></span><span id="_CPPv2N14kb_scan_mode_t11MODE_0_IDLEE"></span><span class="target" id="keypadc_8h_1af86f29e15b4b14d3aa66ced481a63424a80bc2d19c0dcae62e391b46134f63b47"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MODE_0_IDLE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N14kb_scan_mode_t11MODE_0_IDLEE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Keypad scanning is idle. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N14kb_scan_mode_t21MODE_1_INDISCRIMINATEE">
+<span id="_CPPv3N14kb_scan_mode_t21MODE_1_INDISCRIMINATEE"></span><span id="_CPPv2N14kb_scan_mode_t21MODE_1_INDISCRIMINATEE"></span><span class="target" id="keypadc_8h_1af86f29e15b4b14d3aa66ced481a63424aed87e811fb621ebe07f303a28b1e9f5e"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MODE_1_INDISCRIMINATE</span></span></span><a class="headerlink" href="#_CPPv4N14kb_scan_mode_t21MODE_1_INDISCRIMINATEE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Indiscriminate key detection. Data registers are invalid, but when any key is pressed, interrupt KB_MODE_1_PRESS is set (and cannot be cleared until the key is released). </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N14kb_scan_mode_t13MODE_2_SINGLEE">
+<span id="_CPPv3N14kb_scan_mode_t13MODE_2_SINGLEE"></span><span id="_CPPv2N14kb_scan_mode_t13MODE_2_SINGLEE"></span><span class="target" id="keypadc_8h_1af86f29e15b4b14d3aa66ced481a63424ab79420dfbec0f787f896b02d753b1bd7"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MODE_2_SINGLE</span></span></span><a class="headerlink" href="#_CPPv4N14kb_scan_mode_t13MODE_2_SINGLEE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Single scan. The keypad is scanned once, and then the mode returns to MODE_0_IDLE. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N14kb_scan_mode_t17MODE_3_CONTINUOUSE">
+<span id="_CPPv3N14kb_scan_mode_t17MODE_3_CONTINUOUSE"></span><span id="_CPPv2N14kb_scan_mode_t17MODE_3_CONTINUOUSE"></span><span class="target" id="keypadc_8h_1af86f29e15b4b14d3aa66ced481a63424ab1c43d362b2ffc7e1b5b16f2abb7e1cb"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MODE_3_CONTINUOUS</span></span></span><a class="headerlink" href="#_CPPv4N14kb_scan_mode_t17MODE_3_CONTINUOUSE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Continuous scan. When scanning completes, it just starts over again after a delay. </p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv415kb_int_signal_t">
+<span id="_CPPv315kb_int_signal_t"></span><span id="_CPPv215kb_int_signal_t"></span><span class="target" id="keypadc_8h_1a563ca39e35b2a344a3ecef7f1c990e66"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kb_int_signal_t</span></span></span><a class="headerlink" href="#_CPPv415kb_int_signal_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Different available interrupt signals </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N15kb_int_signal_t16KB_SCAN_COMPLETEE">
+<span id="_CPPv3N15kb_int_signal_t16KB_SCAN_COMPLETEE"></span><span id="_CPPv2N15kb_int_signal_t16KB_SCAN_COMPLETEE"></span><span class="target" id="keypadc_8h_1a563ca39e35b2a344a3ecef7f1c990e66a00291a05f50f5e096d81e5bed54f0e3b"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">KB_SCAN_COMPLETE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N15kb_int_signal_t16KB_SCAN_COMPLETEE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Interrupt set when keypad is done scanning </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N15kb_int_signal_t15KB_DATA_CHANGEDE">
+<span id="_CPPv3N15kb_int_signal_t15KB_DATA_CHANGEDE"></span><span id="_CPPv2N15kb_int_signal_t15KB_DATA_CHANGEDE"></span><span class="target" id="keypadc_8h_1a563ca39e35b2a344a3ecef7f1c990e66a462e5c3f6ce21b0b4734f03bec1445ee"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">KB_DATA_CHANGED</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N15kb_int_signal_t15KB_DATA_CHANGEDE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Interrupt set when data is changed on a press or a release </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N15kb_int_signal_t15KB_MODE_1_PRESSE">
+<span id="_CPPv3N15kb_int_signal_t15KB_MODE_1_PRESSE"></span><span id="_CPPv2N15kb_int_signal_t15KB_MODE_1_PRESSE"></span><span class="target" id="keypadc_8h_1a563ca39e35b2a344a3ecef7f1c990e66a2aae3e5b9909b0da4fd1524b484fb17b"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">KB_MODE_1_PRESS</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">4</span></span><a class="headerlink" href="#_CPPv4N15kb_int_signal_t15KB_MODE_1_PRESSE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Interrupt set when a key is pressed in MODE_1_INDISCRIMINATE </p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv47kb_Scanv">
+<span id="_CPPv37kb_Scanv"></span><span id="_CPPv27kb_Scanv"></span><span id="kb_Scan__void"></span><span class="target" id="keypadc_8h_1a8cea914fc7256292713f6cd915e111ac"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kb_Scan</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47kb_Scanv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Scans the keyboard to update data values. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Disables interrupts. </p>
+</div>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412kb_ScanGroup7uint8_t">
+<span id="_CPPv312kb_ScanGroup7uint8_t"></span><span id="_CPPv212kb_ScanGroup7uint8_t"></span><span id="kb_ScanGroup__uint8_t"></span><span class="target" id="keypadc_8h_1a3e36569b5a313cc743612929dcbc55f4"></span><a class="reference internal" href="#_CPPv48kb_key_t" title="kb_key_t"><span class="n"><span class="pre">kb_key_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kb_ScanGroup</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">row</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412kb_ScanGroup7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Scans the given keyboard row and returns the row value. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Disables interrupts. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>row</strong> – Row to scan. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49kb_AnyKeyv">
+<span id="_CPPv39kb_AnyKeyv"></span><span id="_CPPv29kb_AnyKeyv"></span><span id="kb_AnyKey__void"></span><span class="target" id="keypadc_8h_1ac02ee9014609d6b1fead0c10b02b6419"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kb_AnyKey</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49kb_AnyKeyv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Scans the keyboard quickly to tell if any key was pressed. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Disables interrupts. </p>
+</div>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv48kb_Resetv">
+<span id="_CPPv38kb_Resetv"></span><span id="_CPPv28kb_Resetv"></span><span id="kb_Reset__void"></span><span class="target" id="keypadc_8h_1a6432b4b1d55539eb5cedbad14a00267b"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kb_Reset</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48kb_Resetv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Resets the keyboard before returning to the OS. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only use if the keyboard timers or number of rows have been modified. </p>
+</div>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="graphx.html" class="btn btn-neutral float-left" title="graphx.h" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../headers/index.html" class="btn btn-neutral float-right" title="CE C Toolchain Specific Headers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v9.0
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+            
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+             </strong> 
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

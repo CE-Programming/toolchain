@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Using the Toolchain in an IDE &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/design-tabs.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Using Git For Revision Control" href="git.html" />
+    <link rel="prev" title="tice.h" href="../headers/tice.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v13.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to the CE C/C++ Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hardware.html">Calculator Hardware Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="makefile-options.html">Makefile Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="asm.html">Assembly Routines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Libraries/Headers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../libraries/index.html">CE Library Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/sys/index.html">CE Hardware Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/ti/index.html">TI Operating System Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/index.html">Miscellaneous Headers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Helpful Resources</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Using the Toolchain in an IDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="git.html">Using Git For Revision Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coding-guidelines.html">General Coding Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to the CE Toolchain</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Using the Toolchain in an IDE</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="using-the-toolchain-in-an-ide">
+<span id="ides"></span><h1>Using the Toolchain in an IDE<a class="headerlink" href="#using-the-toolchain-in-an-ide" title="Permalink to this headline"></a></h1>
+<p>The CE Toolchain can be used in a variety of Integrated Development Enviornments (IDEs).
+The below are currently supported - Raise an issue or pull request on <a class="reference external" href="https://github.com/CE-Programming/toolchain">GitHub</a> if you would like to see a different one, or if an IDE update changes the current flow.</p>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+CLion<div class="sd-summary-down docutils">
+<svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-down" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M5.22 8.72a.75.75 0 000 1.06l6.25 6.25a.75.75 0 001.06 0l6.25-6.25a.75.75 0 00-1.06-1.06L12 14.44 6.28 8.72a.75.75 0 00-1.06 0z"></path></svg></div>
+<div class="sd-summary-up docutils">
+<svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-up" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M18.78 15.28a.75.75 0 000-1.06l-6.25-6.25a.75.75 0 00-1.06 0l-6.25 6.25a.75.75 0 101.06 1.06L12 9.56l5.72 5.72a.75.75 0 001.06 0z"></path></svg></div>
+</summary><div class="sd-summary-content sd-card-body docutils">
+<p class="sd-card-text">CLion is a C/C++ IDE made by JetBrains.
+Open your project in CLion.
+If you’re making a new one, make a copy of the <code class="code docutils literal notranslate"><span class="pre">examples/standalone_examples/template</span></code> folder to get a boilerplate Makefile.</p>
+<p class="rubric">Open IDE settings</p>
+<p class="sd-card-text">This is found under the drop-down option (<code class="code docutils literal notranslate"><span class="pre">File</span> <span class="pre">&gt;</span> <span class="pre">Settings</span></code>).</p>
+<img alt="../_images/ides_clion_1.png" class="align-center" src="../_images/ides_clion_1.png" />
+<p class="rubric">Configure the make executable</p>
+<p class="sd-card-text"><strong>WINDOWS ONLY</strong>: Set the <code class="code docutils literal notranslate"><span class="pre">make</span></code> executable (<code class="code docutils literal notranslate"><span class="pre">Build,</span> <span class="pre">Execution,</span> <span class="pre">Deployment</span> <span class="pre">&gt;</span> <span class="pre">Build</span> <span class="pre">Tools</span> <span class="pre">&gt;</span> <span class="pre">Make</span></code>) to your CEdev <code class="code docutils literal notranslate"><span class="pre">bin/make.exe</span></code> file.</p>
+<img alt="../_images/ides_clion_2.png" class="align-center" src="../_images/ides_clion_2.png" />
+<p class="rubric">Create CEdev Toolchain</p>
+<p class="sd-card-text">Navigate to the options <code class="code docutils literal notranslate"><span class="pre">Build,</span> <span class="pre">Execution,</span> <span class="pre">Deployment</span> <span class="pre">&gt;</span> <span class="pre">Toolchains</span></code>, <code class="code docutils literal notranslate"><span class="pre">+</span></code>, <code class="code docutils literal notranslate"><span class="pre">System</span></code></p>
+<img alt="../_images/ides_clion_3.png" class="align-center" src="../_images/ides_clion_3.png" />
+<p class="sd-card-text">On Windows, set the “Build Tool” to <code class="code docutils literal notranslate"><span class="pre">CEdev/bin/make.exe</span></code> and both C compilers to <code class="code docutils literal notranslate"><span class="pre">CEdev/bin/ez80-clang.exe</span></code></p>
+<p class="sd-card-text">On MacOS/Linux, set both C compilers to <code class="code docutils literal notranslate"><span class="pre">CEdev/bin/ez80-clang</span></code>.
+MacOS/Linux come with their own system <code class="code docutils literal notranslate"><span class="pre">make</span></code> executable, and the default system one can be used.</p>
+<img alt="../_images/ides_clion_4.png" class="align-center" src="../_images/ides_clion_4.png" />
+<p class="sd-card-text">CLion will likely warn that “Test CMake run finished with errors”.
+This is safe to ignore.</p>
+<p class="rubric">Enable CEdev Toolchain</p>
+<p class="sd-card-text">Set the Makefile Toolchain (<code class="code docutils literal notranslate"><span class="pre">Build,</span> <span class="pre">Execution,</span> <span class="pre">Deployment</span> <span class="pre">&gt;</span> <span class="pre">Makefile</span></code>) to your newly created toolchain.</p>
+<img alt="../_images/ides_clion_5.png" class="align-center" src="../_images/ides_clion_5.png" />
+<p class="sd-card-text">Code assistance should be working now.
+If you opened a demo project, you should be able to hover over the functions to see documentation/usage.</p>
+<p class="rubric">Build</p>
+<p class="sd-card-text">Before this step, make sure you added your CEdev <code class="code docutils literal notranslate"><span class="pre">bin</span></code> folder to your system’s PATH environment variable, otherwise <code class="code docutils literal notranslate"><span class="pre">make</span></code> won’t be able to find the compiler.</p>
+<p class="sd-card-text">At the top right, 5 Run Configurations are auto-generated.</p>
+<ul class="simple">
+<li><p class="sd-card-text">Select “all” for the standard build.</p></li>
+<li><p class="sd-card-text">Select “debug” for a debug build for use with the <a class="reference external" href="https://ce-programming.github.io/toolchain/static/debugging.html">CEmu debugging toolchain</a>.</p></li>
+<li><p class="sd-card-text">Only use the Build (the hammer icon) button with these.
+The Run icon tries to run the generated executables, which fails since .8xp files can’t be run natively on PC.</p></li>
+</ul>
+</div>
+</details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+Visual Studio Code<div class="sd-summary-down docutils">
+<svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-down" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M5.22 8.72a.75.75 0 000 1.06l6.25 6.25a.75.75 0 001.06 0l6.25-6.25a.75.75 0 00-1.06-1.06L12 14.44 6.28 8.72a.75.75 0 00-1.06 0z"></path></svg></div>
+<div class="sd-summary-up docutils">
+<svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-up" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M18.78 15.28a.75.75 0 000-1.06l-6.25-6.25a.75.75 0 00-1.06 0l-6.25 6.25a.75.75 0 101.06 1.06L12 9.56l5.72 5.72a.75.75 0 001.06 0z"></path></svg></div>
+</summary><div class="sd-summary-content sd-card-body docutils">
+<p class="sd-card-text">Open the project using <code class="code docutils literal notranslate"><span class="pre">File</span> <span class="pre">&gt;</span> <span class="pre">Open</span> <span class="pre">Folder</span></code>.</p>
+<p class="rubric">Install Extensions</p>
+<p class="sd-card-text">From the Extensions tab, on the left, install the C/C++, C/C++ Extension Pack, and Makefile Tools extensions.</p>
+<p class="rubric">Open IntelliSense Configurations Screen</p>
+<p class="sd-card-text">Open the Command Palette (<code class="code docutils literal notranslate"><span class="pre">Ctrl+Shift+P</span></code>) and select <code class="code docutils literal notranslate"><span class="pre">C/C++:</span> <span class="pre">Edit</span> <span class="pre">configurations</span> <span class="pre">(UI)</span></code>.</p>
+<p class="rubric">Set Compiler Options</p>
+<p class="sd-card-text">Set the value of the “Compiler path” option to be the path to the <code class="code docutils literal notranslate"><span class="pre">ez80-clang</span></code> executable in the <code class="code docutils literal notranslate"><span class="pre">bin</span></code> directory of your toolchain installation, e.g. <code class="code docutils literal notranslate"><span class="pre">/home/john/CEdev/bin/ez80-clang</span></code>.
+Also set the “Include path” option to the path to the <code class="code docutils literal notranslate"><span class="pre">include</span></code> directory (e.g. <code class="code docutils literal notranslate"><span class="pre">/home/john/CEdev/include</span></code>). Make sure to remove/replace the original value of <code class="code docutils literal notranslate"><span class="pre">${default}</span></code>, rather than just adding the path at the end.</p>
+</div>
+</details></div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../headers/tice.html" class="btn btn-neutral float-left" title="tice.h" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="git.html" class="btn btn-neutral float-right" title="Using Git For Revision Control" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v13.0
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+             </strong> 
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

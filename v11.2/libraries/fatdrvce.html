@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fatdrvce.h &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/design-tabs.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="CE Hardware Headers" href="../headers/sys/index.html" />
+    <link rel="prev" title="msddrvce.h" href="msddrvce.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v11.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to the CE C/C++ Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/hardware.html">Calculator Hardware Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../static/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/makefile-options.html">Makefile Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/ides.html">Using the Toolchain in an IDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/debugging.html">Debugging Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/asm.html">Assembly Routines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Libraries/Headers</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">CE Library Headers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="graphx.html">graphx.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fontlibc.html">fontlibc.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fileioc.html">fileioc.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="keypadc.html">keypadc.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="libload.html">libload.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usbdrvce.html">usbdrvce.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="srldrvce.html">srldrvce.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="msddrvce.html">msddrvce.h</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">fatdrvce.h</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#physical-drive-usage">Physical Drive Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#known-limitations">Known Limitations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#general-information">General Information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/sys/index.html">CE Hardware Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/ti/index.html">TI Operating System Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/index.html">Miscellaneous Headers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Helpful Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../static/git.html">Using Git For Revision Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/coding-guidelines.html">General Coding Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/contributing.html">Contributing to the CE Toolchain</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">CE Library Headers</a> &raquo;</li>
+      <li>fatdrvce.h</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="fatdrvce-h">
+<span id="id1"></span><h1>fatdrvce.h<a class="headerlink" href="#fatdrvce-h" title="Permalink to this headline"></a></h1>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;fatdrvce.h&gt;</span>
+</pre></div>
+</div>
+<p>The <strong>fatdrvce</strong> library implements routines for working with a FAT32 based filesystem.
+The read and write functions are implemented as user-provided callbacks, allowing for any underlying storage to be used.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#physical-drive-usage" id="id2">Physical Drive Usage</a></p></li>
+<li><p><a class="reference internal" href="#known-limitations" id="id3">Known Limitations</a></p></li>
+<li><p><a class="reference internal" href="#general-information" id="id4">General Information</a></p></li>
+<li><p><a class="reference internal" href="#api-documentation" id="id5">API Documentation</a></p></li>
+</ul>
+</div>
+<div class="section" id="physical-drive-usage">
+<h2><a class="toc-backref" href="#id2">Physical Drive Usage</a><a class="headerlink" href="#physical-drive-usage" title="Permalink to this headline"></a></h2>
+<p>This library can be integrated with <strong>msddrvce</strong> in order to access physical devices such as a flash drive.</p>
+<p>For best performance, the “cluster allocation size” should be set to the maximum allowed.
+On Linux this can be accomplished with the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkfs.vfat<span class="w"> </span>-F<span class="w"> </span><span class="m">32</span><span class="w"> </span>-s<span class="w"> </span><span class="m">128</span><span class="w"> </span>-S<span class="w"> </span><span class="m">512</span><span class="w"> </span>-v<span class="w"> </span>/dev/&lt;drive<span class="w"> </span>partition,<span class="w"> </span>e.g.<span class="w"> </span>sda1&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="known-limitations">
+<h2><a class="toc-backref" href="#id3">Known Limitations</a><a class="headerlink" href="#known-limitations" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>The filesystem must use 512 byte logical blocks.</p></li>
+<li><p>The filesystem must be formatted as FAT32 (no support for FAT12, FAT16, or exFAT)</p></li>
+<li><p>Long name support is not currently implemented.</p></li>
+</ul>
+</div>
+<div class="section" id="general-information">
+<h2><a class="toc-backref" href="#id4">General Information</a><a class="headerlink" href="#general-information" title="Permalink to this headline"></a></h2>
+<p>The root directory is <code class="code docutils literal notranslate"><span class="pre">/</span></code>.
+For example, accessing the <code class="code docutils literal notranslate"><span class="pre">ROOT.BIN</span></code> file in the root directory would look like <code class="code docutils literal notranslate"><span class="pre">fat_OpenFile(fat,</span> <span class="pre">&quot;/ROOT.BIN&quot;,</span> <span class="pre">&amp;file);</span></code>.</p>
+</div>
+<div class="section" id="api-documentation">
+<h2><a class="toc-backref" href="#id5">API Documentation</a><a class="headerlink" href="#api-documentation" title="Permalink to this headline"></a></h2>
+<p>FAT Filesystem Driver. </p>
+<p><dl class="simple">
+<dt><strong>Author</strong></dt><dd><p>Matt “MateoConLechuga” Waltz </p>
+</dd>
+<dt><strong>Author</strong></dt><dd><p>Jacob “jacobly” Young </p>
+</dd>
+</dl>
+</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.FAT_BLOCK_SIZE">
+<span class="target" id="fatdrvce_8h_1ae8eb66230d7ff8d63dfeb59db540e098"></span><span class="sig-name descname"><span class="n"><span class="pre">FAT_BLOCK_SIZE</span></span></span><a class="headerlink" href="#c.FAT_BLOCK_SIZE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Block size in bytes. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.fat_callback_usr_t">
+<span class="target" id="fatdrvce_8h_1a7c602ff95d2c8e16bdc830343f070fae"></span><span class="sig-name descname"><span class="n"><span class="pre">fat_callback_usr_t</span></span></span><a class="headerlink" href="#c.fat_callback_usr_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>A pointer to <code class="docutils literal notranslate"><span class="pre">fat_callback_usr_t</span></code> is passed to the user provided callback functions for reading and writing. </p>
+<p>The default is void *, but this can be changed by doing: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#define fat_callback_usr_t struct my_fat_callback_data</span>
+<span class="c1">#include &lt;fatdrvce.h&gt;</span>
+</pre></div>
+</div>
+ </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv419fat_read_callback_t">
+<span id="_CPPv319fat_read_callback_t"></span><span id="_CPPv219fat_read_callback_t"></span><span id="fat_read_callback_t"></span><span class="target" id="fatdrvce_8h_1a6b5118112323fd998d554acf9f751a08"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">fat_read_callback_t</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">usr</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">lba</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="n"><span class="pre">count</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">buffer</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv419fat_read_callback_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Callback for reading logical blocks. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Param usr</dt>
+<dd class="field-odd"><p><strong>[in]</strong> User defined data pointer. </p>
+</dd>
+<dt class="field-even">Param lba</dt>
+<dd class="field-even"><p><strong>[in]</strong> Local block address (LBA) to read. </p>
+</dd>
+<dt class="field-odd">Param count</dt>
+<dd class="field-odd"><p><strong>[in]</strong> Number of logical blocks to read. </p>
+</dd>
+<dt class="field-even">Param buffer</dt>
+<dd class="field-even"><p><strong>[in]</strong> Buffer to store read data into. </p>
+</dd>
+<dt class="field-odd">Return</dt>
+<dd class="field-odd"><p>Number of logical blocks read. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv420fat_write_callback_t">
+<span id="_CPPv320fat_write_callback_t"></span><span id="_CPPv220fat_write_callback_t"></span><span id="fat_write_callback_t"></span><span class="target" id="fatdrvce_8h_1ae57ad1484e52e43c2b163a04bd9094c9"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">fat_write_callback_t</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">usr</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">lba</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="n"><span class="pre">count</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">buffer</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv420fat_write_callback_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Callback for writing logical blocks. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Param usr</dt>
+<dd class="field-odd"><p><strong>[in]</strong> User defined data pointer. </p>
+</dd>
+<dt class="field-even">Param lba</dt>
+<dd class="field-even"><p><strong>[in]</strong> Local block address (LBA) to write. </p>
+</dd>
+<dt class="field-odd">Param count</dt>
+<dd class="field-odd"><p><strong>[in]</strong> Number of logical blocks to write. </p>
+</dd>
+<dt class="field-even">Param buffer</dt>
+<dd class="field-even"><p><strong>[in]</strong> Buffer to fetch write data from. </p>
+</dd>
+<dt class="field-odd">Return</dt>
+<dd class="field-odd"><p>Number of logical blocks written. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-enums">Enums</p>
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv411fat_error_t">
+<span id="_CPPv311fat_error_t"></span><span id="_CPPv211fat_error_t"></span><span class="target" id="fatdrvce_8h_1a93b4eb50620f3a3e5f90828a0b44d566"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fat_error_t</span></span></span><a class="headerlink" href="#_CPPv411fat_error_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>FAT Driver return codes. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11fat_error_t11FAT_SUCCESSE">
+<span id="_CPPv3N11fat_error_t11FAT_SUCCESSE"></span><span id="_CPPv2N11fat_error_t11FAT_SUCCESSE"></span><span class="target" id="fatdrvce_8h_1a93b4eb50620f3a3e5f90828a0b44d566a39cb618a837cf6fa54554747d24edddc"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FAT_SUCCESS</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N11fat_error_t11FAT_SUCCESSE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Operation was successful. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11fat_error_t23FAT_ERROR_INVALID_PARAME">
+<span id="_CPPv3N11fat_error_t23FAT_ERROR_INVALID_PARAME"></span><span id="_CPPv2N11fat_error_t23FAT_ERROR_INVALID_PARAME"></span><span class="target" id="fatdrvce_8h_1a93b4eb50620f3a3e5f90828a0b44d566a8c578d26725e3cd4a95acf61bd2d6ecc"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FAT_ERROR_INVALID_PARAM</span></span></span><a class="headerlink" href="#_CPPv4N11fat_error_t23FAT_ERROR_INVALID_PARAME" title="Permalink to this definition"></a><br /></dt>
+<dd><p>An invalid argument was provided. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11fat_error_t25FAT_ERROR_INVALID_CLUSTERE">
+<span id="_CPPv3N11fat_error_t25FAT_ERROR_INVALID_CLUSTERE"></span><span id="_CPPv2N11fat_error_t25FAT_ERROR_INVALID_CLUSTERE"></span><span class="target" id="fatdrvce_8h_1a93b4eb50620f3a3e5f90828a0b44d566a70177e2aa8ec5bb95f54ee82fbb0c169"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FAT_ERROR_INVALID_CLUSTER</span></span></span><a class="headerlink" href="#_CPPv4N11fat_error_t25FAT_ERROR_INVALID_CLUSTERE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>An invalid FAT cluster was accessed. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11fat_error_t26FAT_ERROR_INVALID_POSITIONE">
+<span id="_CPPv3N11fat_error_t26FAT_ERROR_INVALID_POSITIONE"></span><span id="_CPPv2N11fat_error_t26FAT_ERROR_INVALID_POSITIONE"></span><span class="target" id="fatdrvce_8h_1a93b4eb50620f3a3e5f90828a0b44d566a69b13d8a4ebefec540b1045b7e2d9fa8"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FAT_ERROR_INVALID_POSITION</span></span></span><a class="headerlink" href="#_CPPv4N11fat_error_t26FAT_ERROR_INVALID_POSITIONE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>An invalid position in the file. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11fat_error_t19FAT_ERROR_NOT_FOUNDE">
+<span id="_CPPv3N11fat_error_t19FAT_ERROR_NOT_FOUNDE"></span><span id="_CPPv2N11fat_error_t19FAT_ERROR_NOT_FOUNDE"></span><span class="target" id="fatdrvce_8h_1a93b4eb50620f3a3e5f90828a0b44d566ac2eaf4b76dc23804d83d64ef24cf93ef"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FAT_ERROR_NOT_FOUND</span></span></span><a class="headerlink" href="#_CPPv4N11fat_error_t19FAT_ERROR_NOT_FOUNDE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>The partition, file, or entry does not exist. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11fat_error_t16FAT_ERROR_EXISTSE">
+<span id="_CPPv3N11fat_error_t16FAT_ERROR_EXISTSE"></span><span id="_CPPv2N11fat_error_t16FAT_ERROR_EXISTSE"></span><span class="target" id="fatdrvce_8h_1a93b4eb50620f3a3e5f90828a0b44d566a8bf7771fb80b8e7f017ce1a7c0d2c19b"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FAT_ERROR_EXISTS</span></span></span><a class="headerlink" href="#_CPPv4N11fat_error_t16FAT_ERROR_EXISTSE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>The file or entry already exists. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11fat_error_t22FAT_ERROR_INVALID_PATHE">
+<span id="_CPPv3N11fat_error_t22FAT_ERROR_INVALID_PATHE"></span><span id="_CPPv2N11fat_error_t22FAT_ERROR_INVALID_PATHE"></span><span class="target" id="fatdrvce_8h_1a93b4eb50620f3a3e5f90828a0b44d566aa4d5457151873d13c99683fc8581633d"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FAT_ERROR_INVALID_PATH</span></span></span><a class="headerlink" href="#_CPPv4N11fat_error_t22FAT_ERROR_INVALID_PATHE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>An invalid path was provided. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11fat_error_t22FAT_ERROR_FAILED_ALLOCE">
+<span id="_CPPv3N11fat_error_t22FAT_ERROR_FAILED_ALLOCE"></span><span id="_CPPv2N11fat_error_t22FAT_ERROR_FAILED_ALLOCE"></span><span class="target" id="fatdrvce_8h_1a93b4eb50620f3a3e5f90828a0b44d566a453d2c169229878da5bd39367160201b"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FAT_ERROR_FAILED_ALLOC</span></span></span><a class="headerlink" href="#_CPPv4N11fat_error_t22FAT_ERROR_FAILED_ALLOCE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Allocation of a cluster or file failed. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11fat_error_t23FAT_ERROR_CLUSTER_CHAINE">
+<span id="_CPPv3N11fat_error_t23FAT_ERROR_CLUSTER_CHAINE"></span><span id="_CPPv2N11fat_error_t23FAT_ERROR_CLUSTER_CHAINE"></span><span class="target" id="fatdrvce_8h_1a93b4eb50620f3a3e5f90828a0b44d566abc92f585dd39335d4b537b6ea4326aa5"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FAT_ERROR_CLUSTER_CHAIN</span></span></span><a class="headerlink" href="#_CPPv4N11fat_error_t23FAT_ERROR_CLUSTER_CHAINE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>The cluster chain was corrupted. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11fat_error_t29FAT_ERROR_DIRECTORY_NOT_EMPTYE">
+<span id="_CPPv3N11fat_error_t29FAT_ERROR_DIRECTORY_NOT_EMPTYE"></span><span id="_CPPv2N11fat_error_t29FAT_ERROR_DIRECTORY_NOT_EMPTYE"></span><span class="target" id="fatdrvce_8h_1a93b4eb50620f3a3e5f90828a0b44d566a88507b9728f7d42b4084ec9304480b23"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FAT_ERROR_DIRECTORY_NOT_EMPTY</span></span></span><a class="headerlink" href="#_CPPv4N11fat_error_t29FAT_ERROR_DIRECTORY_NOT_EMPTYE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>The directory is not empty. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11fat_error_t25FAT_ERROR_NO_VOLUME_LABELE">
+<span id="_CPPv3N11fat_error_t25FAT_ERROR_NO_VOLUME_LABELE"></span><span id="_CPPv2N11fat_error_t25FAT_ERROR_NO_VOLUME_LABELE"></span><span class="target" id="fatdrvce_8h_1a93b4eb50620f3a3e5f90828a0b44d566a9f77802eb182a42a33298b96bf9eabc9"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FAT_ERROR_NO_VOLUME_LABEL</span></span></span><a class="headerlink" href="#_CPPv4N11fat_error_t25FAT_ERROR_NO_VOLUME_LABELE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>No volume label found for partition. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11fat_error_t16FAT_ERROR_RDONLYE">
+<span id="_CPPv3N11fat_error_t16FAT_ERROR_RDONLYE"></span><span id="_CPPv2N11fat_error_t16FAT_ERROR_RDONLYE"></span><span class="target" id="fatdrvce_8h_1a93b4eb50620f3a3e5f90828a0b44d566ab4f2e7bc923ab0c58d700ef4dbff156f"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FAT_ERROR_RDONLY</span></span></span><a class="headerlink" href="#_CPPv4N11fat_error_t16FAT_ERROR_RDONLYE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>The file or entry is read-only. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11fat_error_t19FAT_ERROR_RW_FAILEDE">
+<span id="_CPPv3N11fat_error_t19FAT_ERROR_RW_FAILEDE"></span><span id="_CPPv2N11fat_error_t19FAT_ERROR_RW_FAILEDE"></span><span class="target" id="fatdrvce_8h_1a93b4eb50620f3a3e5f90828a0b44d566aa3c3766084d4310058fc6d2f4eceaacc"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FAT_ERROR_RW_FAILED</span></span></span><a class="headerlink" href="#_CPPv4N11fat_error_t19FAT_ERROR_RW_FAILEDE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>The read or write callback failed (count != return) </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11fat_error_t28FAT_ERROR_INVALID_FILESYSTEME">
+<span id="_CPPv3N11fat_error_t28FAT_ERROR_INVALID_FILESYSTEME"></span><span id="_CPPv2N11fat_error_t28FAT_ERROR_INVALID_FILESYSTEME"></span><span class="target" id="fatdrvce_8h_1a93b4eb50620f3a3e5f90828a0b44d566a5363829006eb2194d48c5f51e5f2402b"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FAT_ERROR_INVALID_FILESYSTEM</span></span></span><a class="headerlink" href="#_CPPv4N11fat_error_t28FAT_ERROR_INVALID_FILESYSTEME" title="Permalink to this definition"></a><br /></dt>
+<dd><p>A non-FAT filesystem detected. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11fat_error_t22FAT_ERROR_INVALID_SIZEE">
+<span id="_CPPv3N11fat_error_t22FAT_ERROR_INVALID_SIZEE"></span><span id="_CPPv2N11fat_error_t22FAT_ERROR_INVALID_SIZEE"></span><span class="target" id="fatdrvce_8h_1a93b4eb50620f3a3e5f90828a0b44d566a27eae0b009fabdfb624616ca03a8fb18"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FAT_ERROR_INVALID_SIZE</span></span></span><a class="headerlink" href="#_CPPv4N11fat_error_t22FAT_ERROR_INVALID_SIZEE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>An invalid size was detected. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11fat_error_t23FAT_ERROR_INVALID_MAGICE">
+<span id="_CPPv3N11fat_error_t23FAT_ERROR_INVALID_MAGICE"></span><span id="_CPPv2N11fat_error_t23FAT_ERROR_INVALID_MAGICE"></span><span class="target" id="fatdrvce_8h_1a93b4eb50620f3a3e5f90828a0b44d566a3d3cd2bcc89a3612a6bb17698f99a032"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FAT_ERROR_INVALID_MAGIC</span></span></span><a class="headerlink" href="#_CPPv4N11fat_error_t23FAT_ERROR_INVALID_MAGICE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Some invalid magic bytes were detected. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11fat_error_t27FAT_ERROR_INVALID_SIGNATUREE">
+<span id="_CPPv3N11fat_error_t27FAT_ERROR_INVALID_SIGNATUREE"></span><span id="_CPPv2N11fat_error_t27FAT_ERROR_INVALID_SIGNATUREE"></span><span class="target" id="fatdrvce_8h_1a93b4eb50620f3a3e5f90828a0b44d566a47caddecd5bb7a2a2a21e551644f74a4"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FAT_ERROR_INVALID_SIGNATURE</span></span></span><a class="headerlink" href="#_CPPv4N11fat_error_t27FAT_ERROR_INVALID_SIGNATUREE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Some invalid signature was detected. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11fat_error_t25FAT_ERROR_NO_MORE_ENTRIESE">
+<span id="_CPPv3N11fat_error_t25FAT_ERROR_NO_MORE_ENTRIESE"></span><span id="_CPPv2N11fat_error_t25FAT_ERROR_NO_MORE_ENTRIESE"></span><span class="target" id="fatdrvce_8h_1a93b4eb50620f3a3e5f90828a0b44d566a2db3a76a1d822889b73c815e104b76e5"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FAT_ERROR_NO_MORE_ENTRIES</span></span></span><a class="headerlink" href="#_CPPv4N11fat_error_t25FAT_ERROR_NO_MORE_ENTRIESE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>No more entries in the directory. </p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv415fat_file_attrib">
+<span id="_CPPv315fat_file_attrib"></span><span id="_CPPv215fat_file_attrib"></span><span class="target" id="fatdrvce_8h_1a839288c530186708f9bd18f3cb334b89"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fat_file_attrib</span></span></span><a class="headerlink" href="#_CPPv415fat_file_attrib" title="Permalink to this definition"></a><br /></dt>
+<dd><p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N15fat_file_attrib10FAT_RDONLYE">
+<span id="_CPPv3N15fat_file_attrib10FAT_RDONLYE"></span><span id="_CPPv2N15fat_file_attrib10FAT_RDONLYE"></span><span class="target" id="fatdrvce_8h_1a839288c530186708f9bd18f3cb334b89a62aab24a323a63099e087ab7bf100465"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FAT_RDONLY</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="m"><span class="pre">1</span></span><span class="w"> </span><span class="o"><span class="pre">&lt;&lt;</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N15fat_file_attrib10FAT_RDONLYE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Entry is read-only. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N15fat_file_attrib10FAT_HIDDENE">
+<span id="_CPPv3N15fat_file_attrib10FAT_HIDDENE"></span><span id="_CPPv2N15fat_file_attrib10FAT_HIDDENE"></span><span class="target" id="fatdrvce_8h_1a839288c530186708f9bd18f3cb334b89acf77594e05c689e9b97872e4c587b976"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FAT_HIDDEN</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="m"><span class="pre">1</span></span><span class="w"> </span><span class="o"><span class="pre">&lt;&lt;</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N15fat_file_attrib10FAT_HIDDENE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Entry is hidden. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N15fat_file_attrib10FAT_SYSTEME">
+<span id="_CPPv3N15fat_file_attrib10FAT_SYSTEME"></span><span id="_CPPv2N15fat_file_attrib10FAT_SYSTEME"></span><span class="target" id="fatdrvce_8h_1a839288c530186708f9bd18f3cb334b89a7970bcf1379f852c83c47219fda7b8e3"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FAT_SYSTEM</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="m"><span class="pre">1</span></span><span class="w"> </span><span class="o"><span class="pre">&lt;&lt;</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N15fat_file_attrib10FAT_SYSTEME" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Entry is a system file / directory. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N15fat_file_attrib12FAT_VOLLABELE">
+<span id="_CPPv3N15fat_file_attrib12FAT_VOLLABELE"></span><span id="_CPPv2N15fat_file_attrib12FAT_VOLLABELE"></span><span class="target" id="fatdrvce_8h_1a839288c530186708f9bd18f3cb334b89a7a034c797b4fb98bbe24219e02af7df5"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FAT_VOLLABEL</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="m"><span class="pre">1</span></span><span class="w"> </span><span class="o"><span class="pre">&lt;&lt;</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N15fat_file_attrib12FAT_VOLLABELE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Entry is a volume label. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N15fat_file_attrib7FAT_DIRE">
+<span id="_CPPv3N15fat_file_attrib7FAT_DIRE"></span><span id="_CPPv2N15fat_file_attrib7FAT_DIRE"></span><span class="target" id="fatdrvce_8h_1a839288c530186708f9bd18f3cb334b89a3a1ba16e902558258f7c37e49cdc9747"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FAT_DIR</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="m"><span class="pre">1</span></span><span class="w"> </span><span class="o"><span class="pre">&lt;&lt;</span></span><span class="w"> </span><span class="m"><span class="pre">4</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N15fat_file_attrib7FAT_DIRE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Entry is a directory (or subdirectory) </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N15fat_file_attrib11FAT_ARCHIVEE">
+<span id="_CPPv3N15fat_file_attrib11FAT_ARCHIVEE"></span><span id="_CPPv2N15fat_file_attrib11FAT_ARCHIVEE"></span><span class="target" id="fatdrvce_8h_1a839288c530186708f9bd18f3cb334b89ab22b0d8fb74a6e7ac682a020257af4b6"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FAT_ARCHIVE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="m"><span class="pre">1</span></span><span class="w"> </span><span class="o"><span class="pre">&lt;&lt;</span></span><span class="w"> </span><span class="m"><span class="pre">5</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N15fat_file_attrib11FAT_ARCHIVEE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Entry is changed (created/modified) </p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv48fat_OpenP5fat_t19fat_read_callback_t20fat_write_callback_tPvK8uint32_t">
+<span id="_CPPv38fat_OpenP5fat_t19fat_read_callback_t20fat_write_callback_tPvK8uint32_t"></span><span id="_CPPv28fat_OpenP5fat_t19fat_read_callback_t20fat_write_callback_tPvK8uint32_t"></span><span id="fat_Open__fat_tP.fat_read_callback_t.fat_write_callback_t.voidP.uint32_tC"></span><span class="target" id="fatdrvce_8h_1aea3c8495cf220b7fa90a8523e368541f"></span><a class="reference internal" href="#_CPPv411fat_error_t" title="fat_error_t"><span class="n"><span class="pre">fat_error_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fat_Open</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv45fat_t" title="fat_t"><span class="n"><span class="pre">fat_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">fat</span></span>, <a class="reference internal" href="#_CPPv419fat_read_callback_t" title="fat_read_callback_t"><span class="n"><span class="pre">fat_read_callback_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">read</span></span>, <a class="reference internal" href="#_CPPv420fat_write_callback_t" title="fat_write_callback_t"><span class="n"><span class="pre">fat_write_callback_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">write</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">usr</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">base_lba</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48fat_OpenP5fat_t19fat_read_callback_t20fat_write_callback_tPvK8uint32_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Initializes the FAT filesystem and allows other FAT functions to be used. </p>
+<p>This function will attempt to read and verify that a valid FAT filesystem is being accessed. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fat</strong> – <strong>[out]</strong> Uninitialized FAT structure type. </p></li>
+<li><p><strong>read</strong> – <strong>[in]</strong> Callback for reading logical blocks. </p></li>
+<li><p><strong>write</strong> – <strong>[in]</strong> Callback for writing logical blocks. </p></li>
+<li><p><strong>usr</strong> – <strong>[in]</strong> Pointer to user-provided data structure that is passed to the relevant read/write callback functions. This can be used to store context information with different storage mechanisms. </p></li>
+<li><p><strong>base_lba</strong> – <strong>[in]</strong> LBA added to every FAT access for ease of use. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>FAT_SUCCESS on success, otherwise error. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49fat_CloseP5fat_t">
+<span id="_CPPv39fat_CloseP5fat_t"></span><span id="_CPPv29fat_CloseP5fat_t"></span><span id="fat_Close__fat_tP"></span><span class="target" id="fatdrvce_8h_1a9b01046425b51a55f1ece16187498950"></span><a class="reference internal" href="#_CPPv411fat_error_t" title="fat_error_t"><span class="n"><span class="pre">fat_error_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fat_Close</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv45fat_t" title="fat_t"><span class="n"><span class="pre">fat_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">fat</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49fat_CloseP5fat_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Closes the FAT filesystem. </p>
+<p>This is not required to be called, however it will clear the filesystem dirty bit so other OSes don’t see the filesystem with potential errors. You cannot use the FAT structure after this call, and should call <a class="reference internal" href="#fatdrvce_8h_1aea3c8495cf220b7fa90a8523e368541f"><span class="std std-ref">fat_Open()</span></a> if you need to modify the filesystem again. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fat</strong> – <strong>[in]</strong> Initialized FAT structure type. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>FAT_SUCCESS on success, otherwise error. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv411fat_OpenDirP5fat_tPKcP9fat_dir_t">
+<span id="_CPPv311fat_OpenDirP5fat_tPKcP9fat_dir_t"></span><span id="_CPPv211fat_OpenDirP5fat_tPKcP9fat_dir_t"></span><span id="fat_OpenDir__fat_tP.cCP.fat_dir_tP"></span><span class="target" id="fatdrvce_8h_1abd18f6fa1918128b95c4051e1ef35141"></span><a class="reference internal" href="#_CPPv411fat_error_t" title="fat_error_t"><span class="n"><span class="pre">fat_error_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fat_OpenDir</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv45fat_t" title="fat_t"><span class="n"><span class="pre">fat_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">fat</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">path</span></span>, <a class="reference internal" href="#_CPPv49fat_dir_t" title="fat_dir_t"><span class="n"><span class="pre">fat_dir_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">dir</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411fat_OpenDirP5fat_tPKcP9fat_dir_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Opens a directory for reading contents. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fat</strong> – <strong>[in]</strong> Initialized FAT structure. </p></li>
+<li><p><strong>path</strong> – <strong>[in]</strong> Directory path to get list from. </p></li>
+<li><p><strong>dir</strong> – <strong>[out]</strong> Pointer to store opaque directory handle. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>FAT_SUCCESS on success, otherwise error. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv411fat_ReadDirP9fat_dir_tP15fat_dir_entry_t">
+<span id="_CPPv311fat_ReadDirP9fat_dir_tP15fat_dir_entry_t"></span><span id="_CPPv211fat_ReadDirP9fat_dir_tP15fat_dir_entry_t"></span><span id="fat_ReadDir__fat_dir_tP.fat_dir_entry_tP"></span><span class="target" id="fatdrvce_8h_1a629d670ab6786a1dffe558f75797153a"></span><a class="reference internal" href="#_CPPv411fat_error_t" title="fat_error_t"><span class="n"><span class="pre">fat_error_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fat_ReadDir</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv49fat_dir_t" title="fat_dir_t"><span class="n"><span class="pre">fat_dir_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">dir</span></span>, <a class="reference internal" href="#_CPPv415fat_dir_entry_t" title="fat_dir_entry_t"><span class="n"><span class="pre">fat_dir_entry_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">entry</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411fat_ReadDirP9fat_dir_tP15fat_dir_entry_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the next directory entry. </p>
+<p>If <code class="docutils literal notranslate"><span class="pre">entry.name[0]</span> <span class="pre">=</span> <span class="pre">0</span></code>, then there are no more entries to fetch. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dir</strong> – <strong>[in]</strong> Initialized directory handle from <a class="reference internal" href="#fatdrvce_8h_1abd18f6fa1918128b95c4051e1ef35141"><span class="std std-ref">fat_OpenDir()</span></a>. </p></li>
+<li><p><strong>entry</strong> – <strong>[out]</strong> Pointer to store entry information. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Number of entries found. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412fat_CloseDirP9fat_dir_t">
+<span id="_CPPv312fat_CloseDirP9fat_dir_t"></span><span id="_CPPv212fat_CloseDirP9fat_dir_t"></span><span id="fat_CloseDir__fat_dir_tP"></span><span class="target" id="fatdrvce_8h_1a21c68512910d2f2187e0b924d136c5b8"></span><a class="reference internal" href="#_CPPv411fat_error_t" title="fat_error_t"><span class="n"><span class="pre">fat_error_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fat_CloseDir</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv49fat_dir_t" title="fat_dir_t"><span class="n"><span class="pre">fat_dir_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">dir</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412fat_CloseDirP9fat_dir_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Closes an open directory handle. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dir</strong> – <strong>[in]</strong> Directory handle. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>FAT_SUCCESS on success, otherwise error. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv418fat_GetVolumeLabelP5fat_tPc">
+<span id="_CPPv318fat_GetVolumeLabelP5fat_tPc"></span><span id="_CPPv218fat_GetVolumeLabelP5fat_tPc"></span><span id="fat_GetVolumeLabel__fat_tP.cP"></span><span class="target" id="fatdrvce_8h_1ac83475dd5f358c327d9fb854a83db571"></span><a class="reference internal" href="#_CPPv411fat_error_t" title="fat_error_t"><span class="n"><span class="pre">fat_error_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fat_GetVolumeLabel</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv45fat_t" title="fat_t"><span class="n"><span class="pre">fat_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">fat</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">label</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418fat_GetVolumeLabelP5fat_tPc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the volume label of the drive if it exists. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fat</strong> – <strong>[in]</strong> Initialized FAT structure type. </p></li>
+<li><p><strong>label</strong> – <strong>[out]</strong> Storage for returning label, must be &gt;= 13 bytes. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>FAT_SUCCESS on success, FAT_ERROR_NO_VOLUME_LABEL if no label, otherwise a different error. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410fat_CreateP5fat_tPKcPKc7uint8_t">
+<span id="_CPPv310fat_CreateP5fat_tPKcPKc7uint8_t"></span><span id="_CPPv210fat_CreateP5fat_tPKcPKc7uint8_t"></span><span id="fat_Create__fat_tP.cCP.cCP.uint8_t"></span><span class="target" id="fatdrvce_8h_1a6f0a7505b28d9472faddc37ff625da29"></span><a class="reference internal" href="#_CPPv411fat_error_t" title="fat_error_t"><span class="n"><span class="pre">fat_error_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fat_Create</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv45fat_t" title="fat_t"><span class="n"><span class="pre">fat_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">fat</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">path</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">attrib</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410fat_CreateP5fat_tPKcPKc7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Creates new files or directories in the filesystem. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fat</strong> – <strong>[in]</strong> Initialized FAT structure. </p></li>
+<li><p><strong>path</strong> – <strong>[in]</strong> Path in which to create. Does not create subdirectories. </p></li>
+<li><p><strong>name</strong> – <strong>[in]</strong> Name of new file or directory. </p></li>
+<li><p><strong>attrib</strong> – <strong>[in]</strong> New entry attributes (<a class="reference internal" href="#fatdrvce_8h_1a839288c530186708f9bd18f3cb334b89"><span class="std std-ref">fat_file_attrib</span></a> mask). </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>FAT_SUCCESS on success, otherwise error. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410fat_DeleteP5fat_tPKc">
+<span id="_CPPv310fat_DeleteP5fat_tPKc"></span><span id="_CPPv210fat_DeleteP5fat_tPKc"></span><span id="fat_Delete__fat_tP.cCP"></span><span class="target" id="fatdrvce_8h_1a8ebf24bb11eb412a347f87a3f2893a81"></span><a class="reference internal" href="#_CPPv411fat_error_t" title="fat_error_t"><span class="n"><span class="pre">fat_error_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fat_Delete</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv45fat_t" title="fat_t"><span class="n"><span class="pre">fat_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">fat</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">filepath</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410fat_DeleteP5fat_tPKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Deletes a file or directory and deallocates the spaced used by it on disk. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Directories must be empty in order to be deleted. </p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Do not use this function on open files. The file must be closed before attempting to delete it. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fat</strong> – <strong>[in]</strong> Initialized FAT structure. </p></li>
+<li><p><strong>filepath</strong> – <strong>[in]</strong> Absolute path to file or directory to delete. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>FAT_SUCCESS on success, otherwise error. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413fat_SetAttribP5fat_tPKc7uint8_t">
+<span id="_CPPv313fat_SetAttribP5fat_tPKc7uint8_t"></span><span id="_CPPv213fat_SetAttribP5fat_tPKc7uint8_t"></span><span id="fat_SetAttrib__fat_tP.cCP.uint8_t"></span><span class="target" id="fatdrvce_8h_1a9c2acfd48956d10d197e5e572242df9e"></span><a class="reference internal" href="#_CPPv411fat_error_t" title="fat_error_t"><span class="n"><span class="pre">fat_error_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fat_SetAttrib</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv45fat_t" title="fat_t"><span class="n"><span class="pre">fat_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">fat</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">filepath</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">attrib</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413fat_SetAttribP5fat_tPKc7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets the attributes (read only, hidden, etc) of the file. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fat</strong> – <strong>[in]</strong> Initialized FAT structure. </p></li>
+<li><p><strong>filepath</strong> – <strong>[in]</strong> Absolute file path. </p></li>
+<li><p><strong>attrib</strong> – <strong>[in]</strong> FAT attributes to set file to (<a class="reference internal" href="#fatdrvce_8h_1a839288c530186708f9bd18f3cb334b89"><span class="std std-ref">fat_file_attrib</span></a> mask). </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>FAT_SUCCESS on success, otherwise error. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413fat_GetAttribP5fat_tPKc">
+<span id="_CPPv313fat_GetAttribP5fat_tPKc"></span><span id="_CPPv213fat_GetAttribP5fat_tPKc"></span><span id="fat_GetAttrib__fat_tP.cCP"></span><span class="target" id="fatdrvce_8h_1ac714092ecebff4ea80f3d86d592d37f3"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fat_GetAttrib</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv45fat_t" title="fat_t"><span class="n"><span class="pre">fat_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">fat</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">filepath</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413fat_GetAttribP5fat_tPKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the attributes (read only, hidden, etc) of the file. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fat</strong> – <strong>[in]</strong> Initialized FAT structure. </p></li>
+<li><p><strong>filepath</strong> – <strong>[in]</strong> Absolute file path. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>File attributes, or 255 if an error. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412fat_OpenFileP5fat_tPKc7uint8_tP10fat_file_t">
+<span id="_CPPv312fat_OpenFileP5fat_tPKc7uint8_tP10fat_file_t"></span><span id="_CPPv212fat_OpenFileP5fat_tPKc7uint8_tP10fat_file_t"></span><span id="fat_OpenFile__fat_tP.cCP.uint8_t.fat_file_tP"></span><span class="target" id="fatdrvce_8h_1ab3006d275e451805c46459e118c3b43a"></span><a class="reference internal" href="#_CPPv411fat_error_t" title="fat_error_t"><span class="n"><span class="pre">fat_error_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fat_OpenFile</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv45fat_t" title="fat_t"><span class="n"><span class="pre">fat_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">fat</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">filepath</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">flags</span></span>, <a class="reference internal" href="#_CPPv410fat_file_t" title="fat_file_t"><span class="n"><span class="pre">fat_file_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412fat_OpenFileP5fat_tPKc7uint8_tP10fat_file_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Opens a file for either reading or writing, or both. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fat</strong> – <strong>[in]</strong> Initialized FAT structure. </p></li>
+<li><p><strong>filepath</strong> – <strong>[in]</strong> Absolute file path. </p></li>
+<li><p><strong>flags</strong> – <strong>[in]</strong> File open flags (currently no flags available, set to 0) </p></li>
+<li><p><strong>file</strong> – <strong>[out]</strong> Uninitialized structure to store working file information. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>FAT_SUCCESS on success, otherwise error. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415fat_SetFileSizeP10fat_file_t8uint32_t">
+<span id="_CPPv315fat_SetFileSizeP10fat_file_t8uint32_t"></span><span id="_CPPv215fat_SetFileSizeP10fat_file_t8uint32_t"></span><span id="fat_SetFileSize__fat_file_tP.uint32_t"></span><span class="target" id="fatdrvce_8h_1acbd6a35c61538833cbde80277d5136b4"></span><a class="reference internal" href="#_CPPv411fat_error_t" title="fat_error_t"><span class="n"><span class="pre">fat_error_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fat_SetFileSize</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410fat_file_t" title="fat_file_t"><span class="n"><span class="pre">fat_file_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415fat_SetFileSizeP10fat_file_t8uint32_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets the size of the file, allocating or deallocating space as needed. </p>
+<p>This function should be called before attempting to read/write in a file that does not have a large enough current file size, (i.e. a newly created file). This function may take a long time to run as it will allocate/deallocate the clusters required for storing to the file. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function always resets the block position to 0. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file</strong> – <strong>[in]</strong> FAT file structure. </p></li>
+<li><p><strong>size</strong> – <strong>[in]</strong> New file size. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>FAT_SUCCESS on success, otherwise error. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415fat_GetFileSizeP10fat_file_t">
+<span id="_CPPv315fat_GetFileSizeP10fat_file_t"></span><span id="_CPPv215fat_GetFileSizeP10fat_file_t"></span><span id="fat_GetFileSize__fat_file_tP"></span><span class="target" id="fatdrvce_8h_1a3dcc92db419c88898160588d807b3633"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fat_GetFileSize</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410fat_file_t" title="fat_file_t"><span class="n"><span class="pre">fat_file_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415fat_GetFileSizeP10fat_file_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the size of a file. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file</strong> – <strong>[in]</strong> FAT file structure. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>File size in bytes. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv422fat_SetFileBlockOffsetP10fat_file_t8uint24_t">
+<span id="_CPPv322fat_SetFileBlockOffsetP10fat_file_t8uint24_t"></span><span id="_CPPv222fat_SetFileBlockOffsetP10fat_file_t8uint24_t"></span><span id="fat_SetFileBlockOffset__fat_file_tP.uint24_t"></span><span class="target" id="fatdrvce_8h_1a7e232ccf4ec36e77291b4723f93de3ff"></span><a class="reference internal" href="#_CPPv411fat_error_t" title="fat_error_t"><span class="n"><span class="pre">fat_error_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fat_SetFileBlockOffset</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410fat_file_t" title="fat_file_t"><span class="n"><span class="pre">fat_file_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">block</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422fat_SetFileBlockOffsetP10fat_file_t8uint24_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets the block offset position in the file. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file</strong> – <strong>[in]</strong> File handle returned from <a class="reference internal" href="#fatdrvce_8h_1ab3006d275e451805c46459e118c3b43a"><span class="std std-ref">fat_OpenFile()</span></a>. </p></li>
+<li><p><strong>block</strong> – <strong>[in]</strong> Block offset into file. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>FAT_SUCCESS on success, otherwise error. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv422fat_GetFileBlockOffsetP10fat_file_t">
+<span id="_CPPv322fat_GetFileBlockOffsetP10fat_file_t"></span><span id="_CPPv222fat_GetFileBlockOffsetP10fat_file_t"></span><span id="fat_GetFileBlockOffset__fat_file_tP"></span><span class="target" id="fatdrvce_8h_1af5b49858c118c5cc20ba960b5d0de482"></span><span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fat_GetFileBlockOffset</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410fat_file_t" title="fat_file_t"><span class="n"><span class="pre">fat_file_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422fat_GetFileBlockOffsetP10fat_file_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the sector offset position in the file. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file</strong> – <strong>[in]</strong> File handle returned from <a class="reference internal" href="#fatdrvce_8h_1ab3006d275e451805c46459e118c3b43a"><span class="std std-ref">fat_OpenFile()</span></a>. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>File block offset. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412fat_ReadFileP10fat_file_t8uint24_tPv">
+<span id="_CPPv312fat_ReadFileP10fat_file_t8uint24_tPv"></span><span id="_CPPv212fat_ReadFileP10fat_file_t8uint24_tPv"></span><span id="fat_ReadFile__fat_file_tP.uint24_t.voidP"></span><span class="target" id="fatdrvce_8h_1ab6570435b86470621854f9a75bee2b7c"></span><span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fat_ReadFile</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410fat_file_t" title="fat_file_t"><span class="n"><span class="pre">fat_file_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">buffer</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412fat_ReadFileP10fat_file_t8uint24_tPv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Read from a file. </p>
+<p>Advances file block offset position. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file</strong> – <strong>[in]</strong> File handle returned from <a class="reference internal" href="#fatdrvce_8h_1ab3006d275e451805c46459e118c3b43a"><span class="std std-ref">fat_OpenFile()</span></a>. </p></li>
+<li><p><strong>count</strong> – <strong>[in]</strong> Number of blocks to read. </p></li>
+<li><p><strong>buffer</strong> – <strong>[out]</strong> Data read from FAT file. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Returns number of blocks read, should equal <code class="docutils literal notranslate"><span class="pre">count</span></code> if success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413fat_WriteFileP10fat_file_t8uint24_tPKv">
+<span id="_CPPv313fat_WriteFileP10fat_file_t8uint24_tPKv"></span><span id="_CPPv213fat_WriteFileP10fat_file_t8uint24_tPKv"></span><span id="fat_WriteFile__fat_file_tP.uint24_t.voidCP"></span><span class="target" id="fatdrvce_8h_1a10a9e516d85c771dc525af24a18067ec"></span><span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fat_WriteFile</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410fat_file_t" title="fat_file_t"><span class="n"><span class="pre">fat_file_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span>, <span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">buffer</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413fat_WriteFileP10fat_file_t8uint24_tPKv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Write to a file. </p>
+<p>Advances file block offset position. Does not extend file size if at last block in file, <a class="reference internal" href="#fatdrvce_8h_1acbd6a35c61538833cbde80277d5136b4"><span class="std std-ref">fat_SetFileSize()</span></a> must be used instead. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file</strong> – <strong>[in]</strong> File handle returned from <a class="reference internal" href="#fatdrvce_8h_1ab3006d275e451805c46459e118c3b43a"><span class="std std-ref">fat_OpenFile()</span></a>. </p></li>
+<li><p><strong>count</strong> – <strong>[in]</strong> Number of blocks to write to file. </p></li>
+<li><p><strong>buffer</strong> – <strong>[in]</strong> Data to write to FAT file. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Returns number of blocks written, should equal <code class="docutils literal notranslate"><span class="pre">count</span></code> if success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413fat_CloseFileP10fat_file_t">
+<span id="_CPPv313fat_CloseFileP10fat_file_t"></span><span id="_CPPv213fat_CloseFileP10fat_file_t"></span><span id="fat_CloseFile__fat_file_tP"></span><span class="target" id="fatdrvce_8h_1a1f2a7a5cb628defd64d3b40b93b8dfd2"></span><a class="reference internal" href="#_CPPv411fat_error_t" title="fat_error_t"><span class="n"><span class="pre">fat_error_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fat_CloseFile</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv410fat_file_t" title="fat_file_t"><span class="n"><span class="pre">fat_file_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413fat_CloseFileP10fat_file_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Closes an open file handle. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>file</strong> – <strong>[in]</strong> File handle returned from <a class="reference internal" href="#fatdrvce_8h_1ab3006d275e451805c46459e118c3b43a"><span class="std std-ref">fat_OpenFile()</span></a>. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>FAT_SUCCESS on success, otherwise error. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv45fat_t">
+<span id="_CPPv35fat_t"></span><span id="_CPPv25fat_t"></span><span id="fat_t"></span><span class="target" id="structfat__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fat_t</span></span></span><a class="headerlink" href="#_CPPv45fat_t" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;fatdrvce.h&gt;</em></div>
+<p>FAT structure. </p>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv410fat_file_t">
+<span id="_CPPv310fat_file_t"></span><span id="_CPPv210fat_file_t"></span><span id="fat_file_t"></span><span class="target" id="structfat__file__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fat_file_t</span></span></span><a class="headerlink" href="#_CPPv410fat_file_t" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;fatdrvce.h&gt;</em></div>
+<p>FAT file structure. </p>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv49fat_dir_t">
+<span id="_CPPv39fat_dir_t"></span><span id="_CPPv29fat_dir_t"></span><span id="fat_dir_t"></span><span class="target" id="structfat__dir__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fat_dir_t</span></span></span><a class="headerlink" href="#_CPPv49fat_dir_t" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;fatdrvce.h&gt;</em></div>
+<p>FAT directory structure. </p>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv415fat_dir_entry_t">
+<span id="_CPPv315fat_dir_entry_t"></span><span id="_CPPv215fat_dir_entry_t"></span><span id="fat_dir_entry_t"></span><span class="target" id="structfat__dir__entry__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fat_dir_entry_t</span></span></span><a class="headerlink" href="#_CPPv415fat_dir_entry_t" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;fatdrvce.h&gt;</em></div>
+<p>FAT directory entry structure. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N15fat_dir_entry_t4nameE">
+<span id="_CPPv3N15fat_dir_entry_t4nameE"></span><span id="_CPPv2N15fat_dir_entry_t4nameE"></span><span id="fat_dir_entry_t::name__cA"></span><span class="target" id="structfat__dir__entry__t_1ae0965f97687c19cf5dc483ceb9d6d1d7"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">13</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#_CPPv4N15fat_dir_entry_t4nameE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Name in 8.3 format. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N15fat_dir_entry_t6attribE">
+<span id="_CPPv3N15fat_dir_entry_t6attribE"></span><span id="_CPPv2N15fat_dir_entry_t6attribE"></span><span id="fat_dir_entry_t::attrib__uint8_t"></span><span class="target" id="structfat__dir__entry__t_1a2cbd11f2e084160f0eb87779a1059585"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">attrib</span></span></span><a class="headerlink" href="#_CPPv4N15fat_dir_entry_t6attribE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>File attributes. </p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#fatdrvce_8h_1a839288c530186708f9bd18f3cb334b89"><span class="std std-ref">fat_file_attrib</span></a> </p>
+</div>
+</p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N15fat_dir_entry_t4sizeE">
+<span id="_CPPv3N15fat_dir_entry_t4sizeE"></span><span id="_CPPv2N15fat_dir_entry_t4sizeE"></span><span id="fat_dir_entry_t::size__uint32_t"></span><span class="target" id="structfat__dir__entry__t_1a3979edc84e8b4eedcad07d4d2e24e1da"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size</span></span></span><a class="headerlink" href="#_CPPv4N15fat_dir_entry_t4sizeE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Size of file in bytes. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="msddrvce.html" class="btn btn-neutral float-left" title="msddrvce.h" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../headers/sys/index.html" class="btn btn-neutral float-right" title="CE Hardware Headers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v11.2
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+             </strong> 
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

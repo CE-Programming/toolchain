@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Debugging Features &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/design-tabs.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Using printf Functions" href="printf.html" />
+    <link rel="prev" title="Makefile Options" href="makefile-options.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v13.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to the CE C/C++ Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hardware.html">Calculator Hardware Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="makefile-options.html">Makefile Options</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Debugging Features</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#emulator-console">Emulator Console</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#debug-h">debug.h</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="asm.html">Assembly Routines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Libraries/Headers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../libraries/index.html">CE Library Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/sys/index.html">CE Hardware Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/ti/index.html">TI Operating System Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/index.html">Miscellaneous Headers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Helpful Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ides.html">Using the Toolchain in an IDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="git.html">Using Git For Revision Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coding-guidelines.html">General Coding Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to the CE Toolchain</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Debugging Features</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="debugging-features">
+<span id="debugging"></span><h1>Debugging Features<a class="headerlink" href="#debugging-features" title="Permalink to this headline"></a></h1>
+<p>The toolchain offers the ability to debug your programs using the <a class="reference external" href="https://ce-programming.github.io/CEmu">CEmu emulator</a>.</p>
+<p>Add <code class="code docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;debug.h&gt;</span></code> to a source file, and use <code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">debug</span></code> instead of <code class="code docutils literal notranslate"><span class="pre">make</span></code> to build a debug program.
+You may need to run <code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">clean</span></code> beforehand in order to ensure all source files are rebuilt.</p>
+<div class="section" id="emulator-console">
+<h2>Emulator Console<a class="headerlink" href="#emulator-console" title="Permalink to this headline"></a></h2>
+<p>Printing is a classic debugging technique. <code class="code docutils literal notranslate"><span class="pre">dbg_printf()</span></code> allows you to print variables and strings to the CEmu console.
+It uses the <a class="reference external" href="http://www.cplusplus.com/reference/cstdio/printf/">standard printf format specifiers</a>.</p>
+<p>Here are some examples:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="n">var</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<span class="kt">unsigned</span><span class="w"> </span><span class="n">code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+
+<span class="n">dbg_printf</span><span class="p">(</span><span class="s">&quot;Initialized some things...</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="n">dbg_printf</span><span class="p">(</span><span class="s">&quot;var value: %d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">var</span><span class="p">);</span>
+<span class="n">dbg_printf</span><span class="p">(</span><span class="s">&quot;PROGRAM ABORTED (code = %u)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">code</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To view the output of these functions within <a class="reference external" href="https://ce-programming.github.io/CEmu">CEmu</a>, enable the console using <strong>Docks &gt; Console</strong>.</p>
+</div>
+</div>
+<div class="section" id="debug-h">
+<h2>debug.h<a class="headerlink" href="#debug-h" title="Permalink to this headline"></a></h2>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;debug.h&gt;</span>
+</pre></div>
+</div>
+<div class="section" id="api-documentation">
+<h3>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline"></a></h3>
+<p>These debug functions are provided to help in the process of debugging an application. </p>
+<p>To enable them, use <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">debug</span></code> when compiling a program. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.dbgout">
+<span class="target" id="debug_8h_1abcef947c4a3149ea1f210246056d3e07"></span><span class="sig-name descname"><span class="n"><span class="pre">dbgout</span></span></span><a class="headerlink" href="#c.dbgout" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Standard debug output. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.dbgerr">
+<span class="target" id="debug_8h_1a64265a45d563179807cf3098c5ee71ff"></span><span class="sig-name descname"><span class="n"><span class="pre">dbgerr</span></span></span><a class="headerlink" href="#c.dbgerr" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Standard error debug output. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.DBG_WATCHPOINT_READ">
+<span class="target" id="debug_8h_1a0e9453477399e697cd176b488af1ade3"></span><span class="sig-name descname"><span class="n"><span class="pre">DBG_WATCHPOINT_READ</span></span></span><a class="headerlink" href="#c.DBG_WATCHPOINT_READ" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Break on read. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.DBG_WATCHPOINT_WRITE">
+<span class="target" id="debug_8h_1aa987f05a24c69816f5d478285802303a"></span><span class="sig-name descname"><span class="n"><span class="pre">DBG_WATCHPOINT_WRITE</span></span></span><a class="headerlink" href="#c.DBG_WATCHPOINT_WRITE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Break on write. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.DBG_WATCHPOINT_EXECUTE">
+<span class="target" id="debug_8h_1a4a46c6c5e299b966c5c3701a3717ec87"></span><span class="sig-name descname"><span class="n"><span class="pre">DBG_WATCHPOINT_EXECUTE</span></span></span><a class="headerlink" href="#c.DBG_WATCHPOINT_EXECUTE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Break on execute. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.DBG_WATCHPOINT_ALL">
+<span class="target" id="debug_8h_1a54c6cd3132e2554345331aedc5395415"></span><span class="sig-name descname"><span class="n"><span class="pre">DBG_WATCHPOINT_ALL</span></span></span><a class="headerlink" href="#c.DBG_WATCHPOINT_ALL" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Break on read, write, or execute. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.DBG_WATCHPOINT_NONE">
+<span class="target" id="debug_8h_1afa903cfac162901af6a96703f73e8116"></span><span class="sig-name descname"><span class="n"><span class="pre">DBG_WATCHPOINT_NONE</span></span></span><a class="headerlink" href="#c.DBG_WATCHPOINT_NONE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Remove watchpoint. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.dbg_printf">
+<span class="target" id="debug_8h_1a77fb48bbde8dd7a8e941f5e3c0a994e5"></span><span class="sig-name descname"><span class="n"><span class="pre">dbg_printf</span></span></span><span class="sig-paren">(</span><span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.dbg_printf" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Used to print to the emulator console. </p>
+<p>See the syntax for ‘printf’ for format specifiers. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Does not support floats unless <code class="docutils literal notranslate"><span class="pre">HAS_PRINTF</span> <span class="pre">=</span> <span class="pre">YES</span></code>. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>...</strong> – <strong>[in]</strong> Uses printf-formated specifier string. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.dbg_sprintf">
+<span class="target" id="debug_8h_1ae2683849723a8bd3f9c8fc9d819412a4"></span><span class="sig-name descname"><span class="n"><span class="pre">dbg_sprintf</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">out</span></span>, <span class="p"><span class="pre">...</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.dbg_sprintf" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Used to print to the emulator console. </p>
+<p>See the syntax for ‘printf’ for format specifiers. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Does not support floats unless <code class="docutils literal notranslate"><span class="pre">HAS_PRINTF</span> <span class="pre">=</span> <span class="pre">YES</span></code>. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>out</strong> – <strong>[in]</strong> Use <code class="docutils literal notranslate"><span class="pre">dbgout</span></code> for normal output and <code class="docutils literal notranslate"><span class="pre">dbgerr</span></code> for errors. </p></li>
+<li><p><strong>...</strong> – <strong>[in]</strong> Uses printf-formated specifier string. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.dbg_ClearConsole">
+<span class="target" id="debug_8h_1a047dc1f9673c5b3757fe2caa0b7a9994"></span><span class="sig-name descname"><span class="n"><span class="pre">dbg_ClearConsole</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.dbg_ClearConsole" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Clears the emulation console. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412dbg_Debuggerv">
+<span id="_CPPv312dbg_Debuggerv"></span><span id="_CPPv212dbg_Debuggerv"></span><span id="dbg_Debugger__void"></span><span class="target" id="debug_8h_1a4a2a29de41d421710026489dccb3fa43"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dbg_Debugger</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412dbg_Debuggerv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Opens the emulator’s debugger immediately. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417dbg_WatchpointSetPv6size_t7uint8_t">
+<span id="_CPPv317dbg_WatchpointSetPv6size_t7uint8_t"></span><span id="_CPPv217dbg_WatchpointSetPv6size_t7uint8_t"></span><span id="dbg_WatchpointSet__voidP.s.uint8_t"></span><span class="target" id="debug_8h_1ab8b28541948268e6f3492f956dcb4d6e"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dbg_WatchpointSet</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">address</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">mask</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417dbg_WatchpointSetPv6size_t7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets a watchpoint to open the debugger when an address is read, written, or executed. </p>
+<p>Use the masks DBG_WATCHPOINT_READ, DBG_WATCHPOINT_WRITE, and DBG_WATCHPOINT_EXECUTE respectively to configure the watchpoint.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>address</strong> – <strong>[in]</strong> Watchpoint address. </p></li>
+<li><p><strong>size</strong> – <strong>[in]</strong> Watchpoint size in bytes. Currently must be 1. </p></li>
+<li><p><strong>mask</strong> – <strong>[in]</strong> Watchpoint mask, use DBG_WATCHPOINT_NONE to remove the watchpoint. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv423dbg_WatchpointRemoveAllv">
+<span id="_CPPv323dbg_WatchpointRemoveAllv"></span><span id="_CPPv223dbg_WatchpointRemoveAllv"></span><span id="dbg_WatchpointRemoveAll__void"></span><span class="target" id="debug_8h_1af9bd8a05ae6eb1abfb313106530b4ee4"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dbg_WatchpointRemoveAll</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423dbg_WatchpointRemoveAllv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Removes all watchpoints. </p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="makefile-options.html" class="btn btn-neutral float-left" title="Makefile Options" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="printf.html" class="btn btn-neutral float-right" title="Using printf Functions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v13.0
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+             </strong> 
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

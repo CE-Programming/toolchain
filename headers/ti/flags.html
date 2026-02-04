@@ -1,0 +1,1737 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ti/flags.h &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/design-tabs.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="ti/getcsc.h" href="getcsc.html" />
+    <link rel="prev" title="ti/error.h" href="error.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v14.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Welcome to the CE C/C++ Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/hardware.html">Calculator Hardware Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../static/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/makefile-options.html">Makefile Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/debugging.html">Debugging Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/asm.html">Assembly Routines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Libraries/Headers</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../libraries/index.html">CE Library Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sys/index.html">CE Hardware Headers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">TI Operating System Headers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="error.html">ti/error.h</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">ti/flags.h</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="getcsc.html">ti/getcsc.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getkey.html">ti/getkey.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="screen.html">ti/screen.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="info.html">ti/info.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python.html">ti/python.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="real.html">ti/real.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sprintf.html">ti/sprintf.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tokens.html">ti/tokens.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ui.html">ti/ui.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vars.html">ti/vars.h</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Miscellaneous Headers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Helpful Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../static/ides.html">Using the Toolchain in an IDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/git.html">Using Git For Revision Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/coding-guidelines.html">General Coding Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/contributing.html">Contributing to the CE Toolchain</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">TI Operating System Headers</a> &raquo;</li>
+      <li>ti/flags.h</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="ti-flags-h">
+<span id="flags-h"></span><h1>ti/flags.h<a class="headerlink" href="#ti-flags-h" title="Permalink to this headline"></a></h1>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;ti/flags.h&gt;</span>
+</pre></div>
+</div>
+<p>TI’s operating system has a lot of simple states it keeps track of, such as whether 2nd has been pressed.
+These settings are stored in a structure called the system flags, and can be accessed quickly by the OS.
+Most of these flags are useful only if you need to access OS mathematical or UI functions.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#api-documentation" id="id1">API Documentation</a></p></li>
+</ul>
+</div>
+<div class="section" id="api-documentation">
+<h2><a class="toc-backref" href="#id1">API Documentation</a><a class="headerlink" href="#api-documentation" title="Permalink to this headline"></a></h2>
+<p>TI CE OS flags. </p>
+<p><dl class="simple">
+<dt><strong>Authors</strong></dt><dd><p><p>Matt “MateoConLechuga” Waltz</p>
+<p>Jacob “jacobly” Young</p>
+</p>
+</dd>
+</dl>
+</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAG_ID">
+<span class="target" id="flags_8h_1a329748084950d739b6a53f5c9e41f95b"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAG_ID</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">GROUP</span></span>, <span class="n"><span class="pre">MEMBER</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.OS_FLAG_ID" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Converts a flag group name and member ID to a literal. </p>
+<p>The <code class="docutils literal notranslate"><span class="pre">flag_</span></code> prefix is automatically taken care of.</p>
+<p>For example, <code class="docutils literal notranslate"><a class="reference internal" href="#flags_8h_1a329748084950d739b6a53f5c9e41f95b"><span class="std std-ref"><span class="pre">OS_FLAG_ID(INDIC,</span> <span class="pre">ENABLE)</span></span></a></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>GROUP</strong> – <strong>[in]</strong> Flag group name without the <code class="docutils literal notranslate"><span class="pre">OS_FLAG_</span></code> prefix </p></li>
+<li><p><strong>MEMBER</strong> – <strong>[in]</strong> Flag item name without the <code class="docutils literal notranslate"><span class="pre">OS_FLAG_GROUP_</span></code> prefix </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_SetFlag">
+<span class="target" id="flags_8h_1aeef79a19c4342500cc8fe6c2e95d9b69"></span><span class="sig-name descname"><span class="n"><span class="pre">os_SetFlag</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">GROUP</span></span>, <span class="n"><span class="pre">MEMBER</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.os_SetFlag" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets an OS flag to 1. </p>
+<p>The <code class="docutils literal notranslate"><span class="pre">OS_FLAGS_</span></code> prefix and group prefix are added automatically for you.</p>
+<p>For example, instead of:</p>
+<p><div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">os_SetFlagByte</span><span class="p">(</span><span class="n">OS_FLAGS_INDIC</span><span class="p">,</span><span class="w"> </span><span class="n">OS_FLAGS_INDIC_ENABLE</span><span class="p">);</span>
+</pre></div>
+</div>
+</p>
+<p>you can do:</p>
+<p><div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">os_SetFlag</span><span class="p">(</span><span class="n">INDIC</span><span class="p">,</span><span class="w"> </span><span class="n">ENABLE</span><span class="p">);</span>
+</pre></div>
+</div>
+ </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_ResetFlag">
+<span class="target" id="flags_8h_1abb137c3afb1481d0545aa50a8b83eed6"></span><span class="sig-name descname"><span class="n"><span class="pre">os_ResetFlag</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">GROUP</span></span>, <span class="n"><span class="pre">MEMBER</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.os_ResetFlag" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Clears an OS flag to 0. </p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#flags_8h_1aeef79a19c4342500cc8fe6c2e95d9b69"><span class="std std-ref">os_SetFlag</span></a> </p>
+</div>
+</p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_TestFlag">
+<span class="target" id="flags_8h_1a34e99909fdfe1b156ecf854f6cd0bea7"></span><span class="sig-name descname"><span class="n"><span class="pre">os_TestFlag</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">GROUP</span></span>, <span class="n"><span class="pre">MEMBER</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.os_TestFlag" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Checks if an OS flag is set. </p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#flags_8h_1aeef79a19c4342500cc8fe6c2e95d9b69"><span class="std std-ref">os_SetFlag</span></a> </p>
+</div>
+</p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_TRIG">
+<span class="target" id="flags_8h_1a5549aaa4894df39e9c6b34d693652265"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_TRIG</span></span></span><a class="headerlink" href="#c.OS_FLAGS_TRIG" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Trig-related. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_TRIG_DEGREES">
+<span class="target" id="flags_8h_1ac01300b30b322c41a47d5f525d69647e"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_TRIG_DEGREES</span></span></span><a class="headerlink" href="#c.OS_FLAGS_TRIG_DEGREES" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Set for degrees, reset for radians. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_KBD">
+<span class="target" id="flags_8h_1a7c544418990c996a3e3b91cf339243eb"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_KBD</span></span></span><a class="headerlink" href="#c.OS_FLAGS_KBD" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Keyboard scan control. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_KBD_SCR">
+<span class="target" id="flags_8h_1afda257e71ea5921c7158bec31770d18e"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_KBD_SCR</span></span></span><a class="headerlink" href="#c.OS_FLAGS_KBD_SCR" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Scan Code Read. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_KBD_KEYPRESS">
+<span class="target" id="flags_8h_1ab1401f3f18c04afecad1e03b96d3f5f4"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_KBD_KEYPRESS</span></span></span><a class="headerlink" href="#c.OS_FLAGS_KBD_KEYPRESS" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Set if a key press is in the key press buffer. </p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><code class="docutils literal notranslate"><a class="reference internal" href="getcsc.html#getcsc_8h_1a1961f212f475638d54f1d00fb5af2e81"><span class="std std-ref"><span class="pre">os_KbdScanCode</span></span></a></code> in <code class="docutils literal notranslate"><span class="pre">&lt;</span><span class="pre">ti/getcsc.h</span><span class="pre">&gt;</span></code> </p>
+</div>
+</p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_DONE">
+<span class="target" id="flags_8h_1a6bd762da1e33114ca36084ca449ca495"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_DONE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_DONE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: “Done”. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_DONE_PRGM">
+<span class="target" id="flags_8h_1aee4b89bd996d73b3b5a179e3e0d32700"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_DONE_PRGM</span></span></span><a class="headerlink" href="#c.OS_FLAGS_DONE_PRGM" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Show “Done” after program exits. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_EDIT">
+<span class="target" id="flags_8h_1adf5998e6185970a801c8af56288c705a"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_EDIT</span></span></span><a class="headerlink" href="#c.OS_FLAGS_EDIT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: OS edit buffer. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_EDIT_OPEN">
+<span class="target" id="flags_8h_1a297099ebd0da9fa43c0340e698545ce7"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_EDIT_OPEN</span></span></span><a class="headerlink" href="#c.OS_FLAGS_EDIT_OPEN" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Set if an edit buffer is open. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_ANS">
+<span class="target" id="flags_8h_1aeadb4a1fa19c30abedfb6e40bbadf924"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_ANS</span></span></span><a class="headerlink" href="#c.OS_FLAGS_ANS" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Ans variable flags. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_ANS_SCROLL">
+<span class="target" id="flags_8h_1ac0111348362c5f1a34720e544b808df0"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_ANS_SCROLL</span></span></span><a class="headerlink" href="#c.OS_FLAGS_ANS_SCROLL" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Set if viewing Ans can scroll, must be reset to move cursor in edit buffer. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_MON">
+<span class="target" id="flags_8h_1a5aabf6a0d9efd1a859a0fe382bbd31c5"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_MON</span></span></span><a class="headerlink" href="#c.OS_FLAGS_MON" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: System monitor. </p>
+<p>You generally should not mess with the system monitor unless you’re writing a flash application that integrates with the OS. And we can’t sign flash applications. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_MON_ABANDON">
+<span class="target" id="flags_8h_1a8d3c8d07a51439f8db702ad811930bbe"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_MON_ABANDON</span></span></span><a class="headerlink" href="#c.OS_FLAGS_MON_ABANDON" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Don’t start any long process in put away routine. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_PLOT">
+<span class="target" id="flags_8h_1a20f9cc49c50525cd1f8c3bedf72876a8"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_PLOT</span></span></span><a class="headerlink" href="#c.OS_FLAGS_PLOT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Plot screen. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_PLOT_LOC">
+<span class="target" id="flags_8h_1acc751468a7cab2ecf87614225bb3797c"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_PLOT_LOC</span></span></span><a class="headerlink" href="#c.OS_FLAGS_PLOT_LOC" title="Permalink to this definition"></a><br /></dt>
+<dd><p>0=bkup and display, 1=display only. </p>
+<p>By default, this memory is part of the C heap. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_PLOT_DISP">
+<span class="target" id="flags_8h_1ab865b39e473fcc47ec7c5aa03fbe7eae"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_PLOT_DISP</span></span></span><a class="headerlink" href="#c.OS_FLAGS_PLOT_DISP" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1=plot is in display, 0=text in display, this also indicates whether graph is being shown or not </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_GRFMODE">
+<span class="target" id="flags_8h_1a3e88778b88690387638b7a0fc921d556"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_GRFMODE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_GRFMODE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Graph mode. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_GRFMODE_FUNC">
+<span class="target" id="flags_8h_1a4113c131ea6ae3fd793a59d725f89702"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_GRFMODE_FUNC</span></span></span><a class="headerlink" href="#c.OS_FLAGS_GRFMODE_FUNC" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Standard function graph Y=f(x) </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_GRFMODE_POLAR">
+<span class="target" id="flags_8h_1af179572d4a99f018bdb8c7aedb4aaed8"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_GRFMODE_POLAR</span></span></span><a class="headerlink" href="#c.OS_FLAGS_GRFMODE_POLAR" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Polar graph mode. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_GRFMODE_PARAM">
+<span class="target" id="flags_8h_1a8d079f0a7c79cf8f6a558902b368382b"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_GRFMODE_PARAM</span></span></span><a class="headerlink" href="#c.OS_FLAGS_GRFMODE_PARAM" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Parametric graph mode. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_GRFMODE_RECUR">
+<span class="target" id="flags_8h_1ada1a3f1b1bff3203664c609b5a781ae5"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_GRFMODE_RECUR</span></span></span><a class="headerlink" href="#c.OS_FLAGS_GRFMODE_RECUR" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sequence graph mode. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_GRAPH">
+<span class="target" id="flags_8h_1a4fffecb9878fc56e06cd35ba01264cf9"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_GRAPH</span></span></span><a class="headerlink" href="#c.OS_FLAGS_GRAPH" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Graph screen. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_GRAPH_DRAW">
+<span class="target" id="flags_8h_1aa98fd06f346e14df6d7eb0f841f923d1"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_GRAPH_DRAW</span></span></span><a class="headerlink" href="#c.OS_FLAGS_GRAPH_DRAW" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Redraw graph screen. </p>
+<p>On exit, this is automatically set by the C runtime. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_GRAPH_CURSOR">
+<span class="target" id="flags_8h_1ada9e213c666a25af346e560ab4c47b05"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_GRAPH_CURSOR</span></span></span><a class="headerlink" href="#c.OS_FLAGS_GRAPH_CURSOR" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_GRF">
+<span class="target" id="flags_8h_1ae51ea2b055e344e8ad1eaa442dabd26b"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_GRF</span></span></span><a class="headerlink" href="#c.OS_FLAGS_GRF" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Graph screen format. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_GRF_DOT">
+<span class="target" id="flags_8h_1afd697ccd49c732ec78ca1cffe9c287ff"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_GRF_DOT</span></span></span><a class="headerlink" href="#c.OS_FLAGS_GRF_DOT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Draw dots instead of connecting points. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_GRF_SIMUL">
+<span class="target" id="flags_8h_1a757a1d12aa73cb3f1b546e066c6215ab"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_GRF_SIMUL</span></span></span><a class="headerlink" href="#c.OS_FLAGS_GRF_SIMUL" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Draw all graphs simultaneously. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_GRF_GRID">
+<span class="target" id="flags_8h_1a2c1b2a4ddb6a7689c2de5792caf13869"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_GRF_GRID</span></span></span><a class="headerlink" href="#c.OS_FLAGS_GRF_GRID" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Display grid. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_GRF_POLAR">
+<span class="target" id="flags_8h_1a1ec7aa930dd0d9bf20de93d707f0f98a"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_GRF_POLAR</span></span></span><a class="headerlink" href="#c.OS_FLAGS_GRF_POLAR" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Display polar coordinates. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_GRF_NOCOORD">
+<span class="target" id="flags_8h_1a8027663b2ee460e4f56b90d1988fdd26"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_GRF_NOCOORD</span></span></span><a class="headerlink" href="#c.OS_FLAGS_GRF_NOCOORD" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Hide coordinates. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_GRF_NOAXIS">
+<span class="target" id="flags_8h_1a05b344b80aadc898d77c4b3d34d14a2c"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_GRF_NOAXIS</span></span></span><a class="headerlink" href="#c.OS_FLAGS_GRF_NOAXIS" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Hide X and Y axes. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_GRF_LABEL">
+<span class="target" id="flags_8h_1abdab36be6b68a1a26a74bbc66b2f8575"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_GRF_LABEL</span></span></span><a class="headerlink" href="#c.OS_FLAGS_GRF_LABEL" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Show axis labels. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_TEXT">
+<span class="target" id="flags_8h_1a7d484de84ac586f9e049b0d3036c775c"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_TEXT</span></span></span><a class="headerlink" href="#c.OS_FLAGS_TEXT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Text display. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_TEXT_ERASEBELOW">
+<span class="target" id="flags_8h_1abcafda3ea55faa20ecdcfb1a60224aea"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_TEXT_ERASEBELOW</span></span></span><a class="headerlink" href="#c.OS_FLAGS_TEXT_ERASEBELOW" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Erase line below small char. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_TEXT_SCROLLED">
+<span class="target" id="flags_8h_1a799116936cb6cf97ad8a0bd826d0d139"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_TEXT_SCROLLED</span></span></span><a class="headerlink" href="#c.OS_FLAGS_TEXT_SCROLLED" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Screen has scrolled. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_TEXT_INVERSE">
+<span class="target" id="flags_8h_1a9886a594f14d4aba16ecf07ceb16994b"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_TEXT_INVERSE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_TEXT_INVERSE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Text in inverse color. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_TEXT_INSMODE">
+<span class="target" id="flags_8h_1ac6d7633641127969588bebd00c053b48"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_TEXT_INSMODE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_TEXT_INSMODE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Insert mode. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_PARSER">
+<span class="target" id="flags_8h_1acbb849712f226adee7afbf514f4b0313"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_PARSER</span></span></span><a class="headerlink" href="#c.OS_FLAGS_PARSER" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Parser (for BASIC and equations). </p>
+<p>No useful equates for C programs. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_PARSER2">
+<span class="target" id="flags_8h_1a6d18d914d50ca86d07db58e5769eb4ec"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_PARSER2</span></span></span><a class="headerlink" href="#c.OS_FLAGS_PARSER2" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Parser. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_PARSER2_NUMOP1">
+<span class="target" id="flags_8h_1a757ecfe987a142ed26d34482c7a1dfae"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_PARSER2_NUMOP1</span></span></span><a class="headerlink" href="#c.OS_FLAGS_PARSER2_NUMOP1" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Signals a result in OP1. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_NEWDISPF">
+<span class="target" id="flags_8h_1a2ffc7e0d10c58517dd1ab8409ad21c4e"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_NEWDISPF</span></span></span><a class="headerlink" href="#c.OS_FLAGS_NEWDISPF" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Derivative mode. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_NEWDISPF_PRECLRFORMODE">
+<span class="target" id="flags_8h_1a52991aeda258a3874f3a6261ea8440c3"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_NEWDISPF_PRECLRFORMODE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_NEWDISPF_PRECLRFORMODE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1=HELP BLINK ON MODE SCREEN </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_NEWDISPF_ALLOWPROGTOKENS">
+<span class="target" id="flags_8h_1a4c94e2d4721eb476afef0296f2b408b1"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_NEWDISPF_ALLOWPROGTOKENS</span></span></span><a class="headerlink" href="#c.OS_FLAGS_NEWDISPF_ALLOWPROGTOKENS" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1=allow programming tokens to be parsed in BASIC programs </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_APD">
+<span class="target" id="flags_8h_1a84914b1cd1573d65e34ba1a60b87da6b"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_APD</span></span></span><a class="headerlink" href="#c.OS_FLAGS_APD" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Automatic Power-Down. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_APD_ABLE">
+<span class="target" id="flags_8h_1a512be50c2ea659f46d4e5c4fd9c445dc"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_APD_ABLE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_APD_ABLE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Enable APD. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_APD_RUNNING">
+<span class="target" id="flags_8h_1af1e846148180dfb131fea0abc74c55f6"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_APD_RUNNING</span></span></span><a class="headerlink" href="#c.OS_FLAGS_APD_RUNNING" title="Permalink to this definition"></a><br /></dt>
+<dd><p>APD timer active. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_APD_WARMSTART">
+<span class="target" id="flags_8h_1a46eeea579195803db4e6077434778cd8"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_APD_WARMSTART</span></span></span><a class="headerlink" href="#c.OS_FLAGS_APD_WARMSTART" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1=calculator is turning on from APD or power loss </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_ON">
+<span class="target" id="flags_8h_1ab67a32693dd03ebf62c9041987262da1"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_ON</span></span></span><a class="headerlink" href="#c.OS_FLAGS_ON" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: On key. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_ON_PARSEINPUT">
+<span class="target" id="flags_8h_1a34b5fa2e66102bbfe33cba16958c18a2"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_ON_PARSEINPUT</span></span></span><a class="headerlink" href="#c.OS_FLAGS_ON_PARSEINPUT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1=parse input when done </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_ON_RUNNING">
+<span class="target" id="flags_8h_1aa6a8b1dd0940f12c16f5c1c4cb85f9ac"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_ON_RUNNING</span></span></span><a class="headerlink" href="#c.OS_FLAGS_ON_RUNNING" title="Permalink to this definition"></a><br /></dt>
+<dd><p>“1=calculator is running” is literally all TI wrote </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_ON_INTERRUPT">
+<span class="target" id="flags_8h_1ab42dac4e861c4021c42c763bbcbc6ad9"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_ON_INTERRUPT</span></span></span><a class="headerlink" href="#c.OS_FLAGS_ON_INTERRUPT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>On key has been pressed at some point. </p>
+<p>If this is set, ERR:BREAK will be displayed when the program exits. This is automatically cleared by the C runtime on exit. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_STATS">
+<span class="target" id="flags_8h_1a2f2a4f083371a481bc1e129cae7825bb"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_STATS</span></span></span><a class="headerlink" href="#c.OS_FLAGS_STATS" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Statistics. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_STATS_VALID">
+<span class="target" id="flags_8h_1adbf770e38f4e1a03cedcf48ad07633d3"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_STATS_VALID</span></span></span><a class="headerlink" href="#c.OS_FLAGS_STATS_VALID" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Reset to recompute stat vars. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_FMT">
+<span class="target" id="flags_8h_1a9e0e214cb5211786e8bad5aa0c75f1b7"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_FMT</span></span></span><a class="headerlink" href="#c.OS_FLAGS_FMT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Numeric format. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_FMT_EXPONENT">
+<span class="target" id="flags_8h_1aa2544966e136881104ba69ef860ff242"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_FMT_EXPONENT</span></span></span><a class="headerlink" href="#c.OS_FLAGS_FMT_EXPONENT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1=show exponent, 0=no exponent </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_FMT_ENG">
+<span class="target" id="flags_8h_1a20c82f49f6bb5e9cfa57b98d4626358e"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_FMT_ENG</span></span></span><a class="headerlink" href="#c.OS_FLAGS_FMT_ENG" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Engineering notation instead of scientific. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_NUMMODE">
+<span class="target" id="flags_8h_1a45fdc0c88fca3c3cad38eee322a2d330"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_NUMMODE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_NUMMODE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: numMode. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_FMT_REAL">
+<span class="target" id="flags_8h_1ab1e9cb3e6c12910a31346c7a7ddcc9ab"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_FMT_REAL</span></span></span><a class="headerlink" href="#c.OS_FLAGS_FMT_REAL" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_FMT_RECT">
+<span class="target" id="flags_8h_1a433eb763ca57ec7e6be0e4f79746f1cf"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_FMT_RECT</span></span></span><a class="headerlink" href="#c.OS_FLAGS_FMT_RECT" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_FMT_POLAR">
+<span class="target" id="flags_8h_1aee32365bf199ef0eed6e0298d5edabeb"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_FMT_POLAR</span></span></span><a class="headerlink" href="#c.OS_FLAGS_FMT_POLAR" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_FMTOVERRIDE">
+<span class="target" id="flags_8h_1a75cf8476125c2d02c7e770ef39428598"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_FMTOVERRIDE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_FMTOVERRIDE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: copy of fmtFlags with conversion override. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_CURSOR">
+<span class="target" id="flags_8h_1af87ad767db4f9bf10bf08dfca807567c"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_CURSOR</span></span></span><a class="headerlink" href="#c.OS_FLAGS_CURSOR" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Homescreen cursor. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_CURSOR_ABLE">
+<span class="target" id="flags_8h_1aec9f7354cf0dec3851f28f7a5f8e4b5c"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_CURSOR_ABLE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_CURSOR_ABLE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Cursor blinking enabled. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_CURSOR_ON">
+<span class="target" id="flags_8h_1ad0dbad0fb932c3c74e02bac0f708f919"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_CURSOR_ON</span></span></span><a class="headerlink" href="#c.OS_FLAGS_CURSOR_ON" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Cursor is actually being shown this moment. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_CURSOR_LOCK">
+<span class="target" id="flags_8h_1a857a99b313dbadffb368309b0074b5fc"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_CURSOR_LOCK</span></span></span><a class="headerlink" href="#c.OS_FLAGS_CURSOR_LOCK" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1=cursor is locked off </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_CMD">
+<span class="target" id="flags_8h_1adb0f96a797743f06570ef7539f04419a"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_CMD</span></span></span><a class="headerlink" href="#c.OS_FLAGS_CMD" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Command editor. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_CMD_VIRGIN">
+<span class="target" id="flags_8h_1ad4d9756df59e29614cd5fc49ba94abf0"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_CMD_VIRGIN</span></span></span><a class="headerlink" href="#c.OS_FLAGS_CMD_VIRGIN" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Nothing has been typed so far. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_CMD_EXEC">
+<span class="target" id="flags_8h_1aec739e2d8d0b98f63e8f2e9a580050dd"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_CMD_EXEC</span></span></span><a class="headerlink" href="#c.OS_FLAGS_CMD_EXEC" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Need to execute a command. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_APP">
+<span class="target" id="flags_8h_1a4f35baabba4d7e8831ccd68b6c3bb619"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_APP</span></span></span><a class="headerlink" href="#c.OS_FLAGS_APP" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Application stuff. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_APP_WANTINTERRUPT">
+<span class="target" id="flags_8h_1a93e74c2b9575e875d498ccc478608224"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_APP_WANTINTERRUPT</span></span></span><a class="headerlink" href="#c.OS_FLAGS_APP_WANTINTERRUPT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Want ON key interrupts. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_APP_TEXTSAVE">
+<span class="target" id="flags_8h_1aaa81173ea4f3c90454dbc18cf45c9bda"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_APP_TEXTSAVE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_APP_TEXTSAVE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1=save characters in textShadow </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_APP_AUTOSCROLL">
+<span class="target" id="flags_8h_1a8d9db99354dd95617d4e055aff77c22c"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_APP_AUTOSCROLL</span></span></span><a class="headerlink" href="#c.OS_FLAGS_APP_AUTOSCROLL" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1=auto-scroll text on last line </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_APP_MENUS">
+<span class="target" id="flags_8h_1a0dac58f737d36acea4fca36de8d97b76"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_APP_MENUS</span></span></span><a class="headerlink" href="#c.OS_FLAGS_APP_MENUS" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1=process keys that bring up menus, 0=check Lock menu flag </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_APP_LOCKMENUS">
+<span class="target" id="flags_8h_1aadc3c8747da49f3a2c48a03c3e4717aa"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_APP_LOCKMENUS</span></span></span><a class="headerlink" href="#c.OS_FLAGS_APP_LOCKMENUS" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1=ignore menu keys, 0=switch to home screen and bring up menu </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_APP_CURGRAPHIC">
+<span class="target" id="flags_8h_1aa4e11aff9a1365ad6b4807922d03e85e"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_APP_CURGRAPHIC</span></span></span><a class="headerlink" href="#c.OS_FLAGS_APP_CURGRAPHIC" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1=graphic cursor </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_APP_CURWORD">
+<span class="target" id="flags_8h_1aeecc5f798ecd5b8f73be4375a5fa74f5"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_APP_CURWORD</span></span></span><a class="headerlink" href="#c.OS_FLAGS_APP_CURWORD" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1=text cursor covers entire word </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_APP_EXIT">
+<span class="target" id="flags_8h_1a59d3afc7ed6537d9435b504fa039db30"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_APP_EXIT</span></span></span><a class="headerlink" href="#c.OS_FLAGS_APP_EXIT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1=application handles [EXIT] key itself </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_RCL">
+<span class="target" id="flags_8h_1a6a22f515a2b035d12327c568da016054"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_RCL</span></span></span><a class="headerlink" href="#c.OS_FLAGS_RCL" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Recall queue. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_RCL_ENABLEQUEUE">
+<span class="target" id="flags_8h_1ae19ea5e7ee17c05a02d8a3590ce702f4"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_RCL_ENABLEQUEUE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_RCL_ENABLEQUEUE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Enable recall queue. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_SEQ">
+<span class="target" id="flags_8h_1a7c4591e516808fbaf444c366e32456a1"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_SEQ</span></span></span><a class="headerlink" href="#c.OS_FLAGS_SEQ" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Sequential graph. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_SEQ_WEBMODE">
+<span class="target" id="flags_8h_1aa03b944f25a0bb1ba95bfdce26de5242"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_SEQ_WEBMODE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_SEQ_WEBMODE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>0 = NORMAL SEQ MODE, 1 = WEB MODE </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_SEQ_WEBVERT">
+<span class="target" id="flags_8h_1a6dd80512122936fdf80fc01a505e692c"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_SEQ_WEBVERT</span></span></span><a class="headerlink" href="#c.OS_FLAGS_SEQ_WEBVERT" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_SEQ_UV">
+<span class="target" id="flags_8h_1a30e7a28d4d8e95a25b266a87239d7847"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_SEQ_UV</span></span></span><a class="headerlink" href="#c.OS_FLAGS_SEQ_UV" title="Permalink to this definition"></a><br /></dt>
+<dd><p>U vs. </p>
+<p>V </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_SEQ_VW">
+<span class="target" id="flags_8h_1afaa0263a7c9b201c357fdc3be201122e"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_SEQ_VW</span></span></span><a class="headerlink" href="#c.OS_FLAGS_SEQ_VW" title="Permalink to this definition"></a><br /></dt>
+<dd><p>V vs. </p>
+<p>W </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_SEQ_UW">
+<span class="target" id="flags_8h_1a2078e8a23d9f57392fcd923ba9f3c4d6"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_SEQ_UW</span></span></span><a class="headerlink" href="#c.OS_FLAGS_SEQ_UW" title="Permalink to this definition"></a><br /></dt>
+<dd><p>U vs. </p>
+<p>W </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_PROMPT">
+<span class="target" id="flags_8h_1a24c998dec2d05a96b6256ef79628b30c"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_PROMPT</span></span></span><a class="headerlink" href="#c.OS_FLAGS_PROMPT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Prompt line. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_PROMPT_EDIT">
+<span class="target" id="flags_8h_1af9f8700221d9446d6ba90657667d5ebb"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_PROMPT_EDIT</span></span></span><a class="headerlink" href="#c.OS_FLAGS_PROMPT_EDIT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Editing in prompt buffer. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_INDIC">
+<span class="target" id="flags_8h_1aff47a1ef302357ea8071f7c09de63751"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_INDIC</span></span></span><a class="headerlink" href="#c.OS_FLAGS_INDIC" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Run indicator. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_INDIC_ENABLE">
+<span class="target" id="flags_8h_1a4bfb0e0f8f215a9625996ecf742dfcc8"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_INDIC_ENABLE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_INDIC_ENABLE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Set to enable run indicator. </p>
+<p>The C runtime resets this automatically. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_INDIC_INUSE">
+<span class="target" id="flags_8h_1aeb27ced20c8653b567b3ad3012855db2"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_INDIC_INUSE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_INDIC_INUSE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>indicator save area in use=1, free=0 </p>
+<p>resetting will disable 2nd while in _getkey </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_SHIFT">
+<span class="target" id="flags_8h_1a5842ea2c05375f6b57b4b9fdb6127234"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_SHIFT</span></span></span><a class="headerlink" href="#c.OS_FLAGS_SHIFT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: [2nd] and [ALPHA]. </p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="getkey.html#getkey_8h_1a2fe1d4602b3181350157d3c5cec287a7"><span class="std std-ref">os_GetKey</span></a> </p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>sys/getkey.h </p>
+</div>
+</p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_SHIFT_2ND">
+<span class="target" id="flags_8h_1ad7a2b72992e0b813b62b405a5bb3540b"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_SHIFT_2ND</span></span></span><a class="headerlink" href="#c.OS_FLAGS_SHIFT_2ND" title="Permalink to this definition"></a><br /></dt>
+<dd><p>[2nd] has been pressed </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_SHIFT_ALPHA">
+<span class="target" id="flags_8h_1a113e24b688bd28ac07d19ba5b5b56d24"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_SHIFT_ALPHA</span></span></span><a class="headerlink" href="#c.OS_FLAGS_SHIFT_ALPHA" title="Permalink to this definition"></a><br /></dt>
+<dd><p>[ALPHA] has been pressed </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_SHIFT_LOWERCASE">
+<span class="target" id="flags_8h_1a1d69ad84250bb9c247a9910241961ccd"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_SHIFT_LOWERCASE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_SHIFT_LOWERCASE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Little-a mode. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_SHIFT_ALPHALOCK">
+<span class="target" id="flags_8h_1a9410cbbe6f1c0deb3df167e38c16ffc3"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_SHIFT_ALPHALOCK</span></span></span><a class="headerlink" href="#c.OS_FLAGS_SHIFT_ALPHALOCK" title="Permalink to this definition"></a><br /></dt>
+<dd><p>[2nd]+[ALPHA] </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_SHIFT_KEEPALPHA">
+<span class="target" id="flags_8h_1aaac3a0212d7e97748264c095692eb3bd"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_SHIFT_KEEPALPHA</span></span></span><a class="headerlink" href="#c.OS_FLAGS_SHIFT_KEEPALPHA" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1=cannot cancel alpha shift </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_TABLE">
+<span class="target" id="flags_8h_1a307dcbee1ad8832f5f1cf9a57a03bb3c"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_TABLE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_TABLE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Graph table screen. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_TABLE_AUTOFILL">
+<span class="target" id="flags_8h_1acfe1edf3a07c646f50b8eb1493dbf117"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_TABLE_AUTOFILL</span></span></span><a class="headerlink" href="#c.OS_FLAGS_TABLE_AUTOFILL" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1=prompt, 0=fillAuto </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_TABLE_AUTOCALC">
+<span class="target" id="flags_8h_1a65b5b9d6e85f0ce791c094a6298fd6dc"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_TABLE_AUTOCALC</span></span></span><a class="headerlink" href="#c.OS_FLAGS_TABLE_AUTOCALC" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1=prompt, 0=CalcAuto </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_TABLE_RETABLE">
+<span class="target" id="flags_8h_1a3ed2bf6e84feeb1aef84678d5d5afe5c"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_TABLE_RETABLE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_TABLE_RETABLE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>0=table is okay, 1=must recompute table. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_TRACE">
+<span class="target" id="flags_8h_1a4f438da304ea6f580a340050f6c3aa84"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_TRACE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_TRACE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Trace. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_TRACE_EXPRESSION">
+<span class="target" id="flags_8h_1ada0739857677e58294ed4b46ab3e26d7"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_TRACE_EXPRESSION</span></span></span><a class="headerlink" href="#c.OS_FLAGS_TRACE_EXPRESSION" title="Permalink to this definition"></a><br /></dt>
+<dd><p>set to hide expression while tracing </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_STATS2">
+<span class="target" id="flags_8h_1a51393f02d5651664ef50ef52684afe53"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_STATS2</span></span></span><a class="headerlink" href="#c.OS_FLAGS_STATS2" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: More stats. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_STATS2_DIAGNOSTICS">
+<span class="target" id="flags_8h_1abe263fb367030352e30c83a7af5842f5"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_STATS2_DIAGNOSTICS</span></span></span><a class="headerlink" href="#c.OS_FLAGS_STATS2_DIAGNOSTICS" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = stat diagnostics on </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_STATS2_NODEL">
+<span class="target" id="flags_8h_1a18db5391f00e3742338f8bc6aae35598"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_STATS2_NODEL</span></span></span><a class="headerlink" href="#c.OS_FLAGS_STATS2_NODEL" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = don’t delete stats </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_GRAPH2">
+<span class="target" id="flags_8h_1a1e552ad3fa012aac416aec17243ede99"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_GRAPH2</span></span></span><a class="headerlink" href="#c.OS_FLAGS_GRAPH2" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Graph screen. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_GRAPH2_SPLITOVERRIDE">
+<span class="target" id="flags_8h_1ab92a33438a7287795a2e6f3a514cdee4"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_GRAPH2_SPLITOVERRIDE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_GRAPH2_SPLITOVERRIDE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>0 = force full screen with ParseInp, or something </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_ASM1">
+<span class="target" id="flags_8h_1a08bc98da8a31bd2004575b3132091d5e"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_ASM1</span></span></span><a class="headerlink" href="#c.OS_FLAGS_ASM1" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Intentionally unused by TI, available for programs! </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_ASM2">
+<span class="target" id="flags_8h_1a1178f3aedadeb83716b94a8771e5c342"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_ASM2</span></span></span><a class="headerlink" href="#c.OS_FLAGS_ASM2" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Intentionally unused by TI, available for programs! </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_ARCHIVE">
+<span class="target" id="flags_8h_1ada1e358ef2f451f2c1688b388c5df3f2"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_ARCHIVE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_ARCHIVE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Archive stuff. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_ARCHIVE_CHECKBATTERY">
+<span class="target" id="flags_8h_1a2e84c64fccfab22574c6846500a2d0d9"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_ARCHIVE_CHECKBATTERY</span></span></span><a class="headerlink" href="#c.OS_FLAGS_ARCHIVE_CHECKBATTERY" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = check battery levels in Arc_Unarc first and throw error if low </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_GETSEND">
+<span class="target" id="flags_8h_1aa6491637fdb318eab1983bed39ab25cf"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_GETSEND</span></span></span><a class="headerlink" href="#c.OS_FLAGS_GETSEND" title="Permalink to this definition"></a><br /></dt>
+<dd><p>FLAGS. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_GETSEND_COMFAILED">
+<span class="target" id="flags_8h_1ac92ffd8698a94d737a5bdedeb449bbb0"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_GETSEND_COMFAILED</span></span></span><a class="headerlink" href="#c.OS_FLAGS_GETSEND_COMFAILED" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = Get/Send Communication Failed </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_SELFTEST">
+<span class="target" id="flags_8h_1a827df8186f4116f9f0466af82c987ee4"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_SELFTEST</span></span></span><a class="headerlink" href="#c.OS_FLAGS_SELFTEST" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Self-test screen. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_SELFTEST_RESETONPOWERON">
+<span class="target" id="flags_8h_1a16c678f7003e15fd8c5ddc39357a82d9"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_SELFTEST_RESETONPOWERON</span></span></span><a class="headerlink" href="#c.OS_FLAGS_SELFTEST_RESETONPOWERON" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = Force RAM reset when APD disabled on next power on </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_LOWERCASE">
+<span class="target" id="flags_8h_1a2c5dbbc8a59dfa9d414508bfc0f48d13"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_LOWERCASE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_LOWERCASE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Enable lowercase flag. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_LOWERCASE_ENABLE">
+<span class="target" id="flags_8h_1a7925f73aefc97de5922bd77558b81d75"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_LOWERCASE_ENABLE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_LOWERCASE_ENABLE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Enable lowercase flag. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_CONTEXT">
+<span class="target" id="flags_8h_1a0c0b516135fdd787b63cf0470219d504"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_CONTEXT</span></span></span><a class="headerlink" href="#c.OS_FLAGS_CONTEXT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Context vectors. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_CONTEXT_NOCXPUTAWAY">
+<span class="target" id="flags_8h_1aa0859eed10c136f7e086f6dcfc8fadc4"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_CONTEXT_NOCXPUTAWAY</span></span></span><a class="headerlink" href="#c.OS_FLAGS_CONTEXT_NOCXPUTAWAY" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = do not call cxPutAway routine </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_STATUSBAR">
+<span class="target" id="flags_8h_1a17bf1d24904ae16dc311c976cdfb502c"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_STATUSBAR</span></span></span><a class="headerlink" href="#c.OS_FLAGS_STATUSBAR" title="Permalink to this definition"></a><br /></dt>
+<dd><p>FLAGS. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_STATUSBAR_NOBARMODE">
+<span class="target" id="flags_8h_1ab42f3edb2482a7350f99d5dbf5d7a749"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_STATUSBAR_NOBARMODE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_STATUSBAR_NOBARMODE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = abort drawing of statusbar mode, like “TEST MODE ENABLED </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_API1">
+<span class="target" id="flags_8h_1a6fb1298ec97090b760cda6675d5125af"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_API1</span></span></span><a class="headerlink" href="#c.OS_FLAGS_API1" title="Permalink to this definition"></a><br /></dt>
+<dd><p>FLAGS. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_API1_APPALLOWCONTEXT">
+<span class="target" id="flags_8h_1ad500cb34e6a4a2b3febba550947b2d61"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_API1_APPALLOWCONTEXT</span></span></span><a class="headerlink" href="#c.OS_FLAGS_API1_APPALLOWCONTEXT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>app wants context changes to happen </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_API1_APPRUNNING">
+<span class="target" id="flags_8h_1a11a3c1621b60aa0ef6306fc10b240dbc"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_API1_APPRUNNING</span></span></span><a class="headerlink" href="#c.OS_FLAGS_API1_APPRUNNING" title="Permalink to this definition"></a><br /></dt>
+<dd><p>app is currently running </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_API1_APPRETKEYOFF">
+<span class="target" id="flags_8h_1a7e804c093a7ba4eda093156678f0cbbd"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_API1_APPRETKEYOFF</span></span></span><a class="headerlink" href="#c.OS_FLAGS_API1_APPRETKEYOFF" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = GetKey returns kOff when [2nd]+[ON] pressed </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_API2">
+<span class="target" id="flags_8h_1a97f0a82f6528d3e634d85cc8d0676f26"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_API2</span></span></span><a class="headerlink" href="#c.OS_FLAGS_API2" title="Permalink to this definition"></a><br /></dt>
+<dd><p>FLAGS. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_API3">
+<span class="target" id="flags_8h_1a193a62feabc7d2e1838e87b152830d6f"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_API3</span></span></span><a class="headerlink" href="#c.OS_FLAGS_API3" title="Permalink to this definition"></a><br /></dt>
+<dd><p>FLAGS. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_API4">
+<span class="target" id="flags_8h_1a4d0663cafb6d841683f08d3f2e6b88dc"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_API4</span></span></span><a class="headerlink" href="#c.OS_FLAGS_API4" title="Permalink to this definition"></a><br /></dt>
+<dd><p>FLAGS. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_API4_CELLOVERRIDE">
+<span class="target" id="flags_8h_1a01c81db77ee23897b62c9eae0f1037a9"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_API4_CELLOVERRIDE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_API4_CELLOVERRIDE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>use cell override </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_API4_FULLSCRNDRAW">
+<span class="target" id="flags_8h_1a49693274d95f597612208496db554e65"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_API4_FULLSCRNDRAW</span></span></span><a class="headerlink" href="#c.OS_FLAGS_API4_FULLSCRNDRAW" title="Permalink to this definition"></a><br /></dt>
+<dd><p>DRAW INTO LAST ROW/COL OF SCREEN. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_XAP0">
+<span class="target" id="flags_8h_1a364bf6c4cdceac24ba05b51c5b618246"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_XAP0</span></span></span><a class="headerlink" href="#c.OS_FLAGS_XAP0" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: External apps. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_XAP0_MOUSE">
+<span class="target" id="flags_8h_1a2bd346f4ef0a8f7337f1643671484701"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_XAP0_MOUSE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_XAP0_MOUSE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Used by mouse cursor routines. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_XAP1">
+<span class="target" id="flags_8h_1a705d6fd75b64cb05fcc0095ef40cbf93"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_XAP1</span></span></span><a class="headerlink" href="#c.OS_FLAGS_XAP1" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: External apps. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_XAP2">
+<span class="target" id="flags_8h_1a234131365dbc550c258ffc21c5c39be5"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_XAP2</span></span></span><a class="headerlink" href="#c.OS_FLAGS_XAP2" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: External apps. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_XAP3">
+<span class="target" id="flags_8h_1a9c3a203b107347095166a669666b87e9"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_XAP3</span></span></span><a class="headerlink" href="#c.OS_FLAGS_XAP3" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: External apps. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_FONT">
+<span class="target" id="flags_8h_1ab81f09c22357a921034c304f6cc37781"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_FONT</span></span></span><a class="headerlink" href="#c.OS_FLAGS_FONT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>FLAGS. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_FONT_FRACDRAWLFONT">
+<span class="target" id="flags_8h_1ab8c097f3dc82352a6cc478f0cd0e885e"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_FONT_FRACDRAWLFONT</span></span></span><a class="headerlink" href="#c.OS_FLAGS_FONT_FRACDRAWLFONT" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_FONT_FRACTALLLFONT">
+<span class="target" id="flags_8h_1a62dd5c4cdaef9e4accfff474ce5d063a"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_FONT_FRACTALLLFONT</span></span></span><a class="headerlink" href="#c.OS_FLAGS_FONT_FRACTALLLFONT" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_FONT_CUSTOMFONT">
+<span class="target" id="flags_8h_1a19bb422cc7a21c8dcb08a68ffa203426"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_FONT_CUSTOMFONT</span></span></span><a class="headerlink" href="#c.OS_FLAGS_FONT_CUSTOMFONT" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS1">
+<span class="target" id="flags_8h_1ae6b913fb33f63845fc46e2d389d26cca"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS1</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS1" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: OS hooks, also scriptFlag, rclFlag2, backGroundLink. </p>
+<p>You should generally not touch these. The SDK does not have any explicit OS hook support. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS1_ALT_ON">
+<span class="target" id="flags_8h_1a49a51dc0b98f070bd0858a43812436c7"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS1_ALT_ON</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS1_ALT_ON" title="Permalink to this definition"></a><br /></dt>
+<dd><p>run ONSCRPT at startup </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS1_ALT_OFF">
+<span class="target" id="flags_8h_1a83f6e75f519368d37705618322c48aad"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS1_ALT_OFF</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS1_ALT_OFF" title="Permalink to this definition"></a><br /></dt>
+<dd><p>run OFFSCRPT at shutdown </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS1_USERCLQUEUEEND">
+<span class="target" id="flags_8h_1acb77d55476ee92914d7f8d9b2ff35b39"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS1_USERCLQUEUEEND</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS1_USERCLQUEUEEND" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = external mode </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS1_IGNOREBPLINK">
+<span class="target" id="flags_8h_1a7ac1d85f1e4f2f3b2fc874cd0e191e33"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS1_IGNOREBPLINK</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS1_IGNOREBPLINK" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = override flag for link activity hook </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS1_BPLINKON">
+<span class="target" id="flags_8h_1a0653d32ab74ddca3be315d1a9a817a42"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS1_BPLINKON</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS1_BPLINKON" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = link activity hook active </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS1_ENABLEKEYECHO">
+<span class="target" id="flags_8h_1a52bbf353b6ab07edc9087d86cf185ed7"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS1_ENABLEKEYECHO</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS1_ENABLEKEYECHO" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = sends keypresses back to connected calc as remote control packets (with GetCSC vs. </p>
+<p>GetKey codes…really dumb, TI) </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS1_NOTEMPDELETE">
+<span class="target" id="flags_8h_1a6c8a8b51c6f586756724029843a52fdb"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS1_NOTEMPDELETE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS1_NOTEMPDELETE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = do not delete temporary programs at homescreen </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS2">
+<span class="target" id="flags_8h_1aa6f6591235680a765ce03145502d53c3"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS2</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS2" title="Permalink to this definition"></a><br /></dt>
+<dd><p>FLAGS; also sysHookFlg. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS2_GETCSC">
+<span class="target" id="flags_8h_1af4560dfaee673517fbd764ef1f83e11c"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS2_GETCSC</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS2_GETCSC" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = GetCSC hook active </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS2_LIBRARY">
+<span class="target" id="flags_8h_1a3cfc89be68cd31c9ccdfb852e573f92b"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS2_LIBRARY</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS2_LIBRARY" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = library hook active </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS2_HOMESCREEN">
+<span class="target" id="flags_8h_1a6e5c940ad8b80bdcddf243c662a75689"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS2_HOMESCREEN</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS2_HOMESCREEN" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = homescreen hook active </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS2_RAWKEY">
+<span class="target" id="flags_8h_1a04b0f8f96b1ed79e21015ca32af3c92f"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS2_RAWKEY</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS2_RAWKEY" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = raw key hook active </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS2_CATALOG2">
+<span class="target" id="flags_8h_1ab9908a82f938f42583634ec416993cfe"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS2_CATALOG2</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS2_CATALOG2" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = catalog 2 hook active </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS2_CURSOR">
+<span class="target" id="flags_8h_1abee61535bbce88b21e050edf68f60edc"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS2_CURSOR</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS2_CURSOR" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = cursor hook active </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS3">
+<span class="target" id="flags_8h_1a98649e101da4710714a00e1bcf785822"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS3</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS3" title="Permalink to this definition"></a><br /></dt>
+<dd><p>FLAGS; also sysHookFlg1. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS3_TOKEN">
+<span class="target" id="flags_8h_1a49f4ff520e676cf34170bd4250d10f0f"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS3_TOKEN</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS3_TOKEN" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = token hook active </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS3_LOCALIZE">
+<span class="target" id="flags_8h_1ac577dd448ca2822c459dc86dafd2d1df"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS3_LOCALIZE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS3_LOCALIZE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = localize hook active </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS3_WINDOW">
+<span class="target" id="flags_8h_1a69a753f4d55207c0ea14c186648d8afc"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS3_WINDOW</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS3_WINDOW" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = window hook active </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS3_GRAPH">
+<span class="target" id="flags_8h_1aa92170475da68d86dc19146266c2dbaf"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS3_GRAPH</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS3_GRAPH" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = graph hook active </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS3_YEQU">
+<span class="target" id="flags_8h_1af0f6bff5f73dcdd293c6ae01811143e3"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS3_YEQU</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS3_YEQU" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = Y= hook active </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS3_FONT">
+<span class="target" id="flags_8h_1a5d4ad62552717fefadad480c34f2d5a5"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS3_FONT</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS3_FONT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = font hook active </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS3_REGRAPH">
+<span class="target" id="flags_8h_1ae86b37955afcb304d165dd400bd8b397"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS3_REGRAPH</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS3_REGRAPH" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = regraph hook active </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS3_DRAWING">
+<span class="target" id="flags_8h_1afa046d88cc0f55412af290575fec9ca1"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS3_DRAWING</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS3_DRAWING" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = drawing hook active </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS4">
+<span class="target" id="flags_8h_1aa46b63d0eabc89e4693ffa6ffd643c4a"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS4</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS4" title="Permalink to this definition"></a><br /></dt>
+<dd><p>FLAGS; also sysHookFlag2. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS4_TRACE">
+<span class="target" id="flags_8h_1a1c0452a1bb8167bb9c089670889c3c5e"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS4_TRACE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS4_TRACE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = trace hook active </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS4_PARSER">
+<span class="target" id="flags_8h_1a08b1b5178e5e67f324dc2d7dbf00bc87"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS4_PARSER</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS4_PARSER" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = parser hook active </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS4_APPCHANGE">
+<span class="target" id="flags_8h_1ada1dbd3da4b5f8da5d8f8ff69f25f9c3"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS4_APPCHANGE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS4_APPCHANGE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = app change hook active </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS4_CATALOG1">
+<span class="target" id="flags_8h_1ad2c064d4cc676277023cfa180845eda2"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS4_CATALOG1</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS4_CATALOG1" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = catalog 1 hook active </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS4_HELP">
+<span class="target" id="flags_8h_1a4085f68501be5bdc3d1b0167a04514ec"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS4_HELP</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS4_HELP" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = help hook active </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS4_CXREDISP">
+<span class="target" id="flags_8h_1a6a838c61ae6f624fb1a2d195a31df7cf"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS4_CXREDISP</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS4_CXREDISP" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = cxRedisp hook active </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS4_MENU">
+<span class="target" id="flags_8h_1ad83878a34c049a0b9fec22fb405f3d26"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS4_MENU</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS4_MENU" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = menu hook active </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS4_SILENTLINK">
+<span class="target" id="flags_8h_1aebd6928cb15c187555959d276066e903"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS4_SILENTLINK</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS4_SILENTLINK" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = silent link hook active </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS5">
+<span class="target" id="flags_8h_1a74eb7486c6c2025f0326ab77175f9156"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS5</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS5" title="Permalink to this definition"></a><br /></dt>
+<dd><p>FLAGS. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_HOOKS5_USBACTIVITY">
+<span class="target" id="flags_8h_1a09a546453462c811a73f7fdb0e631dc8"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_HOOKS5_USBACTIVITY</span></span></span><a class="headerlink" href="#c.OS_FLAGS_HOOKS5_USBACTIVITY" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = USB activity hook active </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_PLOT3">
+<span class="target" id="flags_8h_1a3bd429be6086a4cf14f42c45995d86c7"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_PLOT3</span></span></span><a class="headerlink" href="#c.OS_FLAGS_PLOT3" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Plot screen. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_PLOT3_BUFFERONLY">
+<span class="target" id="flags_8h_1a95432abd024e8fab65bc4dab8e761cf8"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_PLOT3_BUFFERONLY</span></span></span><a class="headerlink" href="#c.OS_FLAGS_PLOT3_BUFFERONLY" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Draw commands only draw to buffer, not screen. </p>
+<p>Will corrupt heap in default configuration. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_PLOT3_USEFASTCIRC">
+<span class="target" id="flags_8h_1a271368fcdcc98cdca18ff94ac1da6f7c"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_PLOT3_USEFASTCIRC</span></span></span><a class="headerlink" href="#c.OS_FLAGS_PLOT3_USEFASTCIRC" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Use fast circle routine, which does not pay attention to the aspect ratio of X/Y min/max. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_KEYBOARD">
+<span class="target" id="flags_8h_1a64f454bf38816fdb6901e3dedbbbda47"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_KEYBOARD</span></span></span><a class="headerlink" href="#c.OS_FLAGS_KEYBOARD" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Originally TI-Keyboard accessory, probably now USB keyboards. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_KEYBOARD_DEFAULTS">
+<span class="target" id="flags_8h_1a778c69fe8d1365b8140cbc3e00d41d1d"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_KEYBOARD_DEFAULTS</span></span></span><a class="headerlink" href="#c.OS_FLAGS_KEYBOARD_DEFAULTS" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = GetKey returns extended keycodes with TI-Keyboard </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_SILENTLINK">
+<span class="target" id="flags_8h_1a805f1c9d353cad67454469c1c8a8d709"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_SILENTLINK</span></span></span><a class="headerlink" href="#c.OS_FLAGS_SILENTLINK" title="Permalink to this definition"></a><br /></dt>
+<dd><p>FLAGS. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_SILENTLINK_ACTIVE">
+<span class="target" id="flags_8h_1a182eadb7267173f57f4563b46ef04172"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_SILENTLINK_ACTIVE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_SILENTLINK_ACTIVE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>SE/84+ silent link is active. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_EXTRAHOOKS">
+<span class="target" id="flags_8h_1ace0ffe148e29dd64a71d856963e6f830"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_EXTRAHOOKS</span></span></span><a class="headerlink" href="#c.OS_FLAGS_EXTRAHOOKS" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Even more hooks. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_EXTRAHOOKS_CHECKCAT2VER">
+<span class="target" id="flags_8h_1a03aa9decf3c3808e6d012665b22a2b28"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_EXTRAHOOKS_CHECKCAT2VER</span></span></span><a class="headerlink" href="#c.OS_FLAGS_EXTRAHOOKS_CHECKCAT2VER" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = check catalog 2 hook’s version before executing it (and error or take other action if so) </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_EXTRAHOOKS_OPENLIBACTIVE">
+<span class="target" id="flags_8h_1a9c37d4ebd2afa1c9c4ec4ab7aa43c042"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_EXTRAHOOKS_OPENLIBACTIVE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_EXTRAHOOKS_OPENLIBACTIVE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = OpenLib( was successfully called on a Flash application (ExecLib will error if zero) </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_CLOCK">
+<span class="target" id="flags_8h_1acac7060fd92812a2262b8f0a4987feca"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_CLOCK</span></span></span><a class="headerlink" href="#c.OS_FLAGS_CLOCK" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: Clock. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_CLOCK_NOTMDYMODE">
+<span class="target" id="flags_8h_1a0e53811e0bf176f1df8931b6e91fddd1"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_CLOCK_NOTMDYMODE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_CLOCK_NOTMDYMODE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>0 = M/D/Y format </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_CLOCK_ISYMDMODE">
+<span class="target" id="flags_8h_1a192dfeadb930d9d93f53721e47bf5d05"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_CLOCK_ISYMDMODE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_CLOCK_ISYMDMODE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = Y/M/D format </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_CLOCK_IS24HOUR">
+<span class="target" id="flags_8h_1a79cf462e7458c918b5e453ee922472d9"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_CLOCK_IS24HOUR</span></span></span><a class="headerlink" href="#c.OS_FLAGS_CLOCK_IS24HOUR" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = clock in 24 hour mode </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_CLOCK_INAFTERNOON">
+<span class="target" id="flags_8h_1a1dd2f50444b23413ed6ace70118b9d82"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_CLOCK_INAFTERNOON</span></span></span><a class="headerlink" href="#c.OS_FLAGS_CLOCK_INAFTERNOON" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = current time is in afternoon (PM) (I think) </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_CLOCK_USETOKENSINSTRING">
+<span class="target" id="flags_8h_1a704ff9d8a005ee1e912b2a86e2a19f66"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_CLOCK_USETOKENSINSTRING</span></span></span><a class="headerlink" href="#c.OS_FLAGS_CLOCK_USETOKENSINSTRING" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = use tokens instead of characters when displaying clock as string (for getTmStr and getDtStr vs. </p>
+<p>MODE screen) (keep this reset) </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_CLOCK_DISPLAYCLOCK">
+<span class="target" id="flags_8h_1a31fe5e3f57f7509511930af845858ed8"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_CLOCK_DISPLAYCLOCK</span></span></span><a class="headerlink" href="#c.OS_FLAGS_CLOCK_DISPLAYCLOCK" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = display clock (this is set every second, reset otherwise) </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_CLOCK_CLOCKON">
+<span class="target" id="flags_8h_1a486e64f0e49ba997dc5d0fd0bd7e35a5"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_CLOCK_CLOCKON</span></span></span><a class="headerlink" href="#c.OS_FLAGS_CLOCK_CLOCKON" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = clock on </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_MATHPRINT">
+<span class="target" id="flags_8h_1aaf15cddc627c11ff065f9d2bef8940a9"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_MATHPRINT</span></span></span><a class="headerlink" href="#c.OS_FLAGS_MATHPRINT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: MathPrint. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_MATHPRINT_ENABLED">
+<span class="target" id="flags_8h_1aca2b80e448abe121227aab42f09a0f8a"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_MATHPRINT_ENABLED</span></span></span><a class="headerlink" href="#c.OS_FLAGS_MATHPRINT_ENABLED" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = use mathprint styling </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_BOOTMENU">
+<span class="target" id="flags_8h_1ae7563b11846d264388103d2039574eab"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_BOOTMENU</span></span></span><a class="headerlink" href="#c.OS_FLAGS_BOOTMENU" title="Permalink to this definition"></a><br /></dt>
+<dd><p>FLAGS. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_BOOTMENU_DISPINITIALMENU">
+<span class="target" id="flags_8h_1a183fe3bd3f6ce2d8f4c63093db3a25ec"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_BOOTMENU_DISPINITIALMENU</span></span></span><a class="headerlink" href="#c.OS_FLAGS_BOOTMENU_DISPINITIALMENU" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = don’t display the initial boot menu </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_BACKLIGHT">
+<span class="target" id="flags_8h_1a7ed312e82193a7b4f9a6a93cdffcc1b9"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_BACKLIGHT</span></span></span><a class="headerlink" href="#c.OS_FLAGS_BACKLIGHT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>FLAGS. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_BACKLIGHT_RESTORE">
+<span class="target" id="flags_8h_1a4d630386c72024df5b02ab9569f9de60"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_BACKLIGHT_RESTORE</span></span></span><a class="headerlink" href="#c.OS_FLAGS_BACKLIGHT_RESTORE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = restore lcd brightness when needed </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_GRAPH3">
+<span class="target" id="flags_8h_1abb4767f26b102729d6e728df25069b59"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_GRAPH3</span></span></span><a class="headerlink" href="#c.OS_FLAGS_GRAPH3" title="Permalink to this definition"></a><br /></dt>
+<dd><p>FLAGS. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_GRAPH3_DRAWLABELS">
+<span class="target" id="flags_8h_1a0db12228c701ff84ec63b6885c636e62"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_GRAPH3_DRAWLABELS</span></span></span><a class="headerlink" href="#c.OS_FLAGS_GRAPH3_DRAWLABELS" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = don’t draw Graph Labels (this is usually reset anyway) </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_PUTMAP">
+<span class="target" id="flags_8h_1a0b193dc76fdec322aa0f7451e6534866"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_PUTMAP</span></span></span><a class="headerlink" href="#c.OS_FLAGS_PUTMAP" title="Permalink to this definition"></a><br /></dt>
+<dd><p>GROUP: putMap. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_PUTMAP_USEPIXELSHADOW2">
+<span class="target" id="flags_8h_1ac5fd4a07c4290c9b1a66d4415c0a9fec"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_PUTMAP_USEPIXELSHADOW2</span></span></span><a class="headerlink" href="#c.OS_FLAGS_PUTMAP_USEPIXELSHADOW2" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = use pixelshadow2, not pixelshadow </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_PUTMAP_USECOLOR">
+<span class="target" id="flags_8h_1a0e06889e0ae84d21e4421fb8c909e9b9"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_PUTMAP_USECOLOR</span></span></span><a class="headerlink" href="#c.OS_FLAGS_PUTMAP_USECOLOR" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = use custom color </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_GRAPHDISP">
+<span class="target" id="flags_8h_1aa1c94fcb68ddc6f9699073f661b3d617"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_GRAPHDISP</span></span></span><a class="headerlink" href="#c.OS_FLAGS_GRAPHDISP" title="Permalink to this definition"></a><br /></dt>
+<dd><p>FLAGS. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_FLAGS_GRAPHDISP_BACKGROUNDVALID">
+<span class="target" id="flags_8h_1a267f2784e725460172db5dcdb48c68c1"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_FLAGS_GRAPHDISP_BACKGROUNDVALID</span></span></span><a class="headerlink" href="#c.OS_FLAGS_GRAPHDISP_BACKGROUNDVALID" title="Permalink to this definition"></a><br /></dt>
+<dd><p>1 = items in graph background are still valid </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_Flags">
+<span class="target" id="flags_8h_1a2154fd1ad61478b92571b82d19b57e72"></span><span class="sig-name descname"><span class="n"><span class="pre">os_Flags</span></span></span><a class="headerlink" href="#c.os_Flags" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414os_SetFlagBytei7uint8_t">
+<span id="_CPPv314os_SetFlagBytei7uint8_t"></span><span id="_CPPv214os_SetFlagBytei7uint8_t"></span><span id="os_SetFlagByte__i.uint8_t"></span><span class="target" id="flags_8h_1ae4fc41906c9e93c4e1b64a2ba56e80c5"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_SetFlagByte</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">offset</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">set</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414os_SetFlagBytei7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Set a particular OS flag. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>offset</strong> – <strong>[in]</strong> Offset to particular flag in list </p></li>
+<li><p><strong>set</strong> – <strong>[in]</strong> Bitmask of flag to set </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414os_GetFlagBytei">
+<span id="_CPPv314os_GetFlagBytei"></span><span id="_CPPv214os_GetFlagBytei"></span><span id="os_GetFlagByte__i"></span><span class="target" id="flags_8h_1a3b4341e60ac25d890127813aa441406d"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_GetFlagByte</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">offset</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414os_GetFlagBytei" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Get a particular OS flag. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>offset</strong> – <strong>[in]</strong> Offset to particular flag in list </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Bitmask of flag </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415os_TestFlagBits8uint16_t">
+<span id="_CPPv315os_TestFlagBits8uint16_t"></span><span id="_CPPv215os_TestFlagBits8uint16_t"></span><span id="os_TestFlagBits__uint16_t"></span><span class="target" id="flags_8h_1a0bd74157b99a61df8b9c654ea90bfa5f"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_TestFlagBits</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">offset_pattern</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415os_TestFlagBits8uint16_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Check OS flag bits. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>offset_pattern</strong> – High 8 is unsigned offset, low 8 is bits to test </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>1 if set, 0 if not set </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414os_SetFlagBits7int16_t">
+<span id="_CPPv314os_SetFlagBits7int16_t"></span><span id="_CPPv214os_SetFlagBits7int16_t"></span><span id="os_SetFlagBits__int16_t"></span><span class="target" id="flags_8h_1aec5a81a6c03dbc646ff9c1e9ae5a87cd"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_SetFlagBits</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int16_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">offset_pattern</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414os_SetFlagBits7int16_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Set OS flag bits. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>offset_pattern</strong> – High 8 is unsigned offset, low 8 is bits to test </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416os_ResetFlagBits7int16_t">
+<span id="_CPPv316os_ResetFlagBits7int16_t"></span><span id="_CPPv216os_ResetFlagBits7int16_t"></span><span id="os_ResetFlagBits__int16_t"></span><span class="target" id="flags_8h_1a09150f9c29d58f46ee8dfaaa0cc5f3b9"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_ResetFlagBits</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int16_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">offset_pattern</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416os_ResetFlagBits7int16_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Clear OS flag bits. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>offset_pattern</strong> – High 8 is unsigned offset, low 8 is bits to test </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv419os_TestFlagBitsFast8uint16_t">
+<span id="_CPPv319os_TestFlagBitsFast8uint16_t"></span><span id="_CPPv219os_TestFlagBitsFast8uint16_t"></span><span id="os_TestFlagBitsFast__uint16_t"></span><span class="target" id="flags_8h_1a254ba005532375e9f44b3c42e04592c2"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_TestFlagBitsFast</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">offset_pattern</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419os_TestFlagBitsFast8uint16_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Faster (and worse) test of OS flag bits. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is only available on OS 5.3.6 or later. </p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Has a bug if bits and flags are all set! </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>offset_pattern</strong> – High 8 is unsigned offset, low 8 is bits to test </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="error.html" class="btn btn-neutral float-left" title="ti/error.h" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="getcsc.html" class="btn btn-neutral float-right" title="ti/getcsc.h" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v14.2
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+             <strong> 
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+             </strong> 
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

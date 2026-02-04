@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fileioc.h &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/design-tabs.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="fontlibc.h" href="fontlibc.html" />
+    <link rel="prev" title="CE C Libraries" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v9.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to the CE C Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../static/printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">CE C Libraries</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">fileioc.h</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="fontlibc.html">fontlibc.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="graphx.html">graphx.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="keypadc.html">keypadc.h</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/index.html">CE C Toolchain Specific Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/makefile-options.html">Makefile Options</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../static/contributing.html">Contributing to the CE C Toolchain</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">CE C Libraries</a> &raquo;</li>
+      <li>fileioc.h</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="fileioc-h">
+<span id="id1"></span><h1>fileioc.h<a class="headerlink" href="#fileioc-h" title="Permalink to this headline"></a></h1>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;fileioc.h&gt;</span>
+</pre></div>
+</div>
+<p>The fileioc library is used for writing and reading program data to files.
+File support is implemented with the use of AppVars.
+Additionally, the library supports accessing program data and various OS variable manipulation.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#api-documentation" id="id2">API Documentation</a></p></li>
+</ul>
+</div>
+<div class="section" id="api-documentation">
+<h2><a class="toc-backref" href="#id2">API Documentation</a><a class="headerlink" href="#api-documentation" title="Permalink to this headline"></a></h2>
+<p>fileioc implements OS variable access routines. </p>
+<p><dl class="simple">
+<dt><strong>Author</strong></dt><dd><p>Matt “MateoConLechuga” Waltz </p>
+</dd>
+</dl>
+</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.TI_PRGM_TYPE">
+<span class="target" id="fileioc_8h_1a042725b820b49caf2501cab98dea1922"></span><span class="sig-name descname"><span class="n"><span class="pre">TI_PRGM_TYPE</span></span></span><a class="headerlink" href="#c.TI_PRGM_TYPE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Normal unprotect program type. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.TI_PPRGM_TYPE">
+<span class="target" id="fileioc_8h_1a10fb36573054c5bc3f5ebe4f6d8e94eb"></span><span class="sig-name descname"><span class="n"><span class="pre">TI_PPRGM_TYPE</span></span></span><a class="headerlink" href="#c.TI_PPRGM_TYPE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Normal protected program type. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.TI_TPRGM_TYPE">
+<span class="target" id="fileioc_8h_1a7df46d9e0906bb0770fdde798e37b272"></span><span class="sig-name descname"><span class="n"><span class="pre">TI_TPRGM_TYPE</span></span></span><a class="headerlink" href="#c.TI_TPRGM_TYPE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Normal temporary program type. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.TI_APPVAR_TYPE">
+<span class="target" id="fileioc_8h_1a4210393b01fb71ca4a155c29801de40a"></span><span class="sig-name descname"><span class="n"><span class="pre">TI_APPVAR_TYPE</span></span></span><a class="headerlink" href="#c.TI_APPVAR_TYPE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>AppVar type. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.TI_STRING_TYPE">
+<span class="target" id="fileioc_8h_1a3c593dfcd972c0098e8a054e180295f4"></span><span class="sig-name descname"><span class="n"><span class="pre">TI_STRING_TYPE</span></span></span><a class="headerlink" href="#c.TI_STRING_TYPE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>String type. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.TI_EQU_TYPE">
+<span class="target" id="fileioc_8h_1a400447e289c5c433cf72f279904d9bee"></span><span class="sig-name descname"><span class="n"><span class="pre">TI_EQU_TYPE</span></span></span><a class="headerlink" href="#c.TI_EQU_TYPE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Equation type. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.TI_MAX_SIZE">
+<span class="target" id="fileioc_8h_1a849fc10227e9e30c0a4269d98338cff3"></span><span class="sig-name descname"><span class="n"><span class="pre">TI_MAX_SIZE</span></span></span><a class="headerlink" href="#c.TI_MAX_SIZE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Maximum object size in bytes </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.ti_MallocReal">
+<span class="target" id="fileioc_8h_1ab110aae235a51761234627502a7650f4"></span><span class="sig-name descname"><span class="n"><span class="pre">ti_MallocReal</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.ti_MallocReal" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Allocates space for a real variable. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Pointer to variable. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.ti_MallocCplx">
+<span class="target" id="fileioc_8h_1a957b019beae37acf80108e1bac3e2c17"></span><span class="sig-name descname"><span class="n"><span class="pre">ti_MallocCplx</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.ti_MallocCplx" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Allocates space for a complex variable. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Pointer to variable. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.ti_MallocString">
+<span class="target" id="fileioc_8h_1aa9d259056c67884d8e9a7f30ba9bf535"></span><span class="sig-name descname"><span class="n"><span class="pre">ti_MallocString</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">len</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ti_MallocString" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Allocates space for a string variable. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>len</strong> – Length of string. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pointer to variable. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.ti_MallocList">
+<span class="target" id="fileioc_8h_1a77fbbc5586c498bcccf73b130618522c"></span><span class="sig-name descname"><span class="n"><span class="pre">ti_MallocList</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">dim</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ti_MallocList" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Allocates space for a list variable. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dim</strong> – Dimension of list. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pointer to variable. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.ti_MallocMatrix">
+<span class="target" id="fileioc_8h_1acb6dc9a4c914da38f1c5cb70f63349c8"></span><span class="sig-name descname"><span class="n"><span class="pre">ti_MallocMatrix</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">rows</span></span>, <span class="n"><span class="pre">cols</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ti_MallocMatrix" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Allocates space for a matrix variable. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rows</strong> – Rows in matrix. </p></li>
+<li><p><strong>cols</strong> – Columns in matrix. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pointer to variable. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.ti_MallocCplxList">
+<span class="target" id="fileioc_8h_1a68a8f269eb09ca7de947dd395f9876f4"></span><span class="sig-name descname"><span class="n"><span class="pre">ti_MallocCplxList</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">dim</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ti_MallocCplxList" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Allocates space for a complex list variable. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dim</strong> – Dimension of complex list. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pointer to variable. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.ti_MallocEqu">
+<span class="target" id="fileioc_8h_1a19829b25dd3e105054b9856ebbcf78e0"></span><span class="sig-name descname"><span class="n"><span class="pre">ti_MallocEqu</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">len</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ti_MallocEqu" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Allocates space for an equation variable. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>len</strong> – Length of equation variable. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pointer to variable. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv48ti_var_t">
+<span id="_CPPv38ti_var_t"></span><span id="_CPPv28ti_var_t"></span><span id="ti_var_t"></span><span class="target" id="fileioc_8h_1afb77b0fc25eeb275fae79d607430fbc0"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_var_t</span></span></span><a class="headerlink" href="#_CPPv48ti_var_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Variable slot type. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv411ti_CloseAllv">
+<span id="_CPPv311ti_CloseAllv"></span><span id="_CPPv211ti_CloseAllv"></span><span id="ti_CloseAll__void"></span><span class="target" id="fileioc_8h_1a2a9a88c6c2200809894fdab31ffef226"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_CloseAll</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411ti_CloseAllv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Closes all open slots.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Call before you use any variable functions </p>
+</div>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv47ti_OpenPKcPKc">
+<span id="_CPPv37ti_OpenPKcPKc"></span><span id="_CPPv27ti_OpenPKcPKc"></span><span id="ti_Open__cCP.cCP"></span><span class="target" id="fileioc_8h_1a2842e9d72ce53bca7b41c22838881775"></span><a class="reference internal" href="#_CPPv48ti_var_t" title="ti_var_t"><span class="n"><span class="pre">ti_var_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_Open</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">mode</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47ti_OpenPKcPKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Opens a file.</p>
+<p>An AppVar is used as default file storage.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If there isn’t enough memory to create the variable, or a slot isn’t open, zero (0) is returned </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – Name of file to open </p></li>
+<li><p><strong>mode</strong> – <p>“r” - Opens a file for reading. The file must exist. Keeps file in archive if in archive.</p>
+<p>”w” - Creates an empty file for writing. Overwrites file if already exists.</p>
+<p>”a” - Appends to a file. Writing operations, append data at the end of the file. The file is created if it does not exist.</p>
+<p>”r+” - Opens a file to update both reading and writing. The file must exist. Moves file from archive to RAM if in archive.</p>
+<p>”w+” - Creates an empty file for both reading and writing. Overwrites file if already exists.</p>
+<p>”a+” - Opens a file for reading and appending. Moves file from archive to RAM if in archive. Created if it does not exist.</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Slot variable </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410ti_OpenVarPKcPKc7uint8_t">
+<span id="_CPPv310ti_OpenVarPKcPKc7uint8_t"></span><span id="_CPPv210ti_OpenVarPKcPKc7uint8_t"></span><span id="ti_OpenVar__cCP.cCP.uint8_t"></span><span class="target" id="fileioc_8h_1a75e6644985670553ff3e479d61ec788b"></span><a class="reference internal" href="#_CPPv48ti_var_t" title="ti_var_t"><span class="n"><span class="pre">ti_var_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_OpenVar</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">varname</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">mode</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">type</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410ti_OpenVarPKcPKc7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Opens a variable</p>
+<p>Can open any type of program or appvar variable </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If there isn’t enough memory to create the variable, or a slot isn’t open, zero (0) is returned </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>varname</strong> – Name of variable to open </p></li>
+<li><p><strong>mode</strong> – <p>“r” - Opens a file for reading. The file must exist. Keeps file in archive if in archive.</p>
+<p>”w” - Creates an empty file for writing. Overwrites file if already exists.</p>
+<p>”a” - Appends to a file. Writing operations, append data at the end of the file. The file is created if it does not exist.</p>
+<p>”r+” - Opens a file to update both reading and writing. The file must exist. Moves file from archive to RAM if in archive.</p>
+<p>”w+” - Creates an empty file for both reading and writing. Overwrites file if already exists.</p>
+<p>”a+” - Opens a file for reading and appending. Moves file from archive to RAM if in archive. Created if it does not exist.</p>
+</p></li>
+<li><p><strong>type</strong> – Specifies the type of variable to open </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Slot variable </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv48ti_CloseK8ti_var_t">
+<span id="_CPPv38ti_CloseK8ti_var_t"></span><span id="_CPPv28ti_CloseK8ti_var_t"></span><span id="ti_Close__ti_var_tC"></span><span class="target" id="fileioc_8h_1a939e6eb809618c4dc4bdf0e9e12838fa"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_Close</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48ti_var_t" title="ti_var_t"><span class="n"><span class="pre">ti_var_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">slot</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48ti_CloseK8ti_var_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Frees an open variable slot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Zero if closing failed. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49ti_DetectPPvPKc">
+<span id="_CPPv39ti_DetectPPvPKc"></span><span id="_CPPv29ti_DetectPPvPKc"></span><span id="ti_Detect__voidPP.cCP"></span><span class="target" id="fileioc_8h_1a6d6a527c178d510caf7ceddd564cef1a"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">ti_Detect</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">curr_search_posistion</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">detection_string</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49ti_DetectPPvPKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the name of the file(s) that contains the string as the first part of the variable; which can then be used with ti_Open and other functions.</p>
+<p><code class="docutils literal notranslate"><span class="pre">seach_pos</span></code> should be set to NULL to begin a search, and is updated with each call.</p>
+<p><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">char</span> <span class="o">*</span><span class="n">var_name</span><span class="p">;</span>
+<span class="n">uint8_t</span> <span class="o">*</span><span class="n">search_pos</span> <span class="o">=</span> <span class="n">NULL</span><span class="p">;</span>
+<span class="k">while</span><span class="p">((</span><span class="n">var_name</span> <span class="o">=</span> <span class="n">ti_Detect</span><span class="p">(</span><span class="o">&amp;</span><span class="n">search_pos</span><span class="p">,</span> <span class="s2">&quot;my_data&quot;</span><span class="p">))</span> <span class="o">!=</span> <span class="n">NULL</span><span class="p">)</span> <span class="p">{</span>
+  <span class="o">...</span><span class="n">do</span> <span class="n">something</span> <span class="k">with</span> <span class="n">the</span> <span class="n">name</span> <span class="ow">or</span> <span class="n">search_pos</span><span class="o">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the return value is NULL, there are no more variables to find. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>curr_search_posistion</strong> – Current offset in the VAT. </p></li>
+<li><p><strong>detection_string</strong> – String to search for (NULL to search for all). </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412ti_DetectVarPPvPKc7uint8_t">
+<span id="_CPPv312ti_DetectVarPPvPKc7uint8_t"></span><span id="_CPPv212ti_DetectVarPPvPKc7uint8_t"></span><span id="ti_DetectVar__voidPP.cCP.uint8_t"></span><span class="target" id="fileioc_8h_1a557c290f7aba02eb2b82234f0aa97447"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">ti_DetectVar</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">curr_search_posistion</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">detection_string</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">var_type</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412ti_DetectVarPPvPKc7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the name of the file(s) that contains the string as the first part of the variable; which can then be used with ti_OpenVar and other functions.</p>
+<p><code class="docutils literal notranslate"><span class="pre">seach_pos</span></code> should be set to NULL to begin a search, and is updated with each call.</p>
+<p><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">char</span> <span class="o">*</span><span class="n">var_name</span><span class="p">;</span>
+<span class="n">uint8_t</span> <span class="o">*</span><span class="n">search_pos</span> <span class="o">=</span> <span class="n">NULL</span><span class="p">;</span>
+<span class="k">while</span><span class="p">((</span><span class="n">var_name</span> <span class="o">=</span> <span class="n">ti_DetectVar</span><span class="p">(</span><span class="o">&amp;</span><span class="n">search_pos</span><span class="p">,</span> <span class="s2">&quot;my_data&quot;</span><span class="p">,</span> <span class="n">TI_PRGM_TYPE</span><span class="p">))</span> <span class="o">!=</span> <span class="n">NULL</span><span class="p">)</span> <span class="p">{</span>
+  <span class="o">...</span><span class="n">do</span> <span class="n">something</span> <span class="k">with</span> <span class="n">the</span> <span class="n">name</span> <span class="ow">or</span> <span class="n">search_pos</span><span class="o">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the return value is NULL, there are no more variables to find. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>curr_search_posistion</strong> – Current offset in the VAT. </p></li>
+<li><p><strong>detection_string</strong> – String to search for (NULL to search for all). </p></li>
+<li><p><strong>var_type</strong> – Type of variable to detect. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412ti_DetectAnyPPvPKcP7uint8_t">
+<span id="_CPPv312ti_DetectAnyPPvPKcP7uint8_t"></span><span id="_CPPv212ti_DetectAnyPPvPKcP7uint8_t"></span><span id="ti_DetectAny__voidPP.cCP.uint8_tP"></span><span class="target" id="fileioc_8h_1a9f30cd5063b58ed8ecaa7e4a3bb855dc"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">ti_DetectAny</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">curr_search_posistion</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">detection_string</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">var_type</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412ti_DetectAnyPPvPKcP7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the name of the file(s) that contains the string as the first part of the variable; which can then be used with ti_OpenVar and other functions.</p>
+<p><code class="docutils literal notranslate"><span class="pre">seach_pos</span></code> should be set to NULL to begin a search, and is updated with each call.</p>
+<p><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">char</span> <span class="o">*</span><span class="n">var_name</span><span class="p">;</span>
+<span class="n">uint8_t</span> <span class="o">*</span><span class="n">search_pos</span> <span class="o">=</span> <span class="n">NULL</span><span class="p">;</span>
+<span class="n">uint8_t</span> <span class="nb">type</span><span class="p">;</span>
+<span class="k">while</span><span class="p">((</span><span class="n">var_name</span> <span class="o">=</span> <span class="n">ti_DetectVar</span><span class="p">(</span><span class="o">&amp;</span><span class="n">search_pos</span><span class="p">,</span> <span class="s2">&quot;my_data&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="nb">type</span><span class="p">))</span> <span class="o">!=</span> <span class="n">NULL</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nb">type</span> <span class="o">==</span> <span class="n">TI_PRGM_TYPE</span> <span class="o">||</span> <span class="nb">type</span> <span class="o">==</span> <span class="n">TI_PPRGM_TYPE</span><span class="p">)</span> <span class="p">{</span>
+   <span class="o">...</span><span class="n">do</span> <span class="n">something</span> <span class="k">with</span> <span class="n">the</span> <span class="n">name</span> <span class="ow">or</span> <span class="n">search_pos</span><span class="o">...</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the return value is NULL, there are no more variables to find. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>curr_search_posistion</strong> – Current offset in the VAT. </p></li>
+<li><p><strong>detection_string</strong> – String to search for (NULL to search for all). </p></li>
+<li><p><strong>var_type</strong> – Type of variable found. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv48ti_WritePKv6size_t6size_tK8ti_var_t">
+<span id="_CPPv38ti_WritePKv6size_t6size_tK8ti_var_t"></span><span id="_CPPv28ti_WritePKv6size_t6size_tK8ti_var_t"></span><span id="ti_Write__voidCP.s.s.ti_var_tC"></span><span class="target" id="fileioc_8h_1a77a62881f0d97425482ce3b49efd683e"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_Write</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48ti_var_t" title="ti_var_t"><span class="n"><span class="pre">ti_var_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">slot</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48ti_WritePKv6size_t6size_tK8ti_var_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Writes to the current variable slot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – Pointer to data to write. </p></li>
+<li><p><strong>size</strong> – Size (in bytes) of a single data chunk. </p></li>
+<li><p><strong>count</strong> – Number of data chunks to write to the variable slot. </p></li>
+<li><p><strong>slot</strong> – Variable slot to write the data to.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The number of chunks written (should be equal to count) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv47ti_ReadPv6size_t6size_tK8ti_var_t">
+<span id="_CPPv37ti_ReadPv6size_t6size_tK8ti_var_t"></span><span id="_CPPv27ti_ReadPv6size_t6size_tK8ti_var_t"></span><span id="ti_Read__voidP.s.s.ti_var_tC"></span><span class="target" id="fileioc_8h_1a29b599b71ad87aea0a584a7ceb4a3c81"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_Read</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48ti_var_t" title="ti_var_t"><span class="n"><span class="pre">ti_var_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">slot</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47ti_ReadPv6size_t6size_tK8ti_var_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Reads from the current variable pointer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – Pointer to data to read into. </p></li>
+<li><p><strong>size</strong> – Size (in bytes) of a single data chunk. </p></li>
+<li><p><strong>count</strong> – Number of data chunks to read from the variable slot. </p></li>
+<li><p><strong>slot</strong> – Variable slot to read the data from.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The number of chunks read (should be equal to count). </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv47ti_PutCKcK8ti_var_t">
+<span id="_CPPv37ti_PutCKcK8ti_var_t"></span><span id="_CPPv27ti_PutCKcK8ti_var_t"></span><span id="ti_PutC__cC.ti_var_tC"></span><span class="target" id="fileioc_8h_1a5e4f8e1c166bd14e339c8d8457419343"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_PutC</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">c</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48ti_var_t" title="ti_var_t"><span class="n"><span class="pre">ti_var_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">slot</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47ti_PutCKcK8ti_var_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Writes a character directly into the slot data pointer, and increments the offset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>c</strong> – Character to write. </p></li>
+<li><p><strong>slot</strong> – Variable slot to put the character to. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The input c is returned if no error.</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>‘EOF’ if current offset is larger than file size, or memory isn’t large enough. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv47ti_GetCK8ti_var_t">
+<span id="_CPPv37ti_GetCK8ti_var_t"></span><span id="_CPPv27ti_GetCK8ti_var_t"></span><span id="ti_GetC__ti_var_tC"></span><span class="target" id="fileioc_8h_1a6388c3a5a6e7134de97b308df1f8f40e"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_GetC</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48ti_var_t" title="ti_var_t"><span class="n"><span class="pre">ti_var_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">slot</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47ti_GetCK8ti_var_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Pulls a character directly from the slot data pointer, and increments the offset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>slot</strong> – Variable slot to get the character from. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>1 byte character at the current variable offset. </p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>‘EOF’ if current offset is larger than file size. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv47ti_SeekijK8ti_var_t">
+<span id="_CPPv37ti_SeekijK8ti_var_t"></span><span id="_CPPv27ti_SeekijK8ti_var_t"></span><span id="ti_Seek__i.unsigned-i.ti_var_tC"></span><span class="target" id="fileioc_8h_1aeade963f1ba3ee1cdd09522fb8215cc6"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_Seek</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">offset</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">origin</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48ti_var_t" title="ti_var_t"><span class="n"><span class="pre">ti_var_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">slot</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47ti_SeekijK8ti_var_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Seeks to an offset in the file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>offset</strong> – Number of bytes to offest from (can be negative). </p></li>
+<li><p><strong>origin</strong> – <p>SEEK_SET (0) - Seek from beginning of file</p>
+<p>SEEK_CUR (1) - Seek from current offset in file</p>
+
+ SEEK_END (2) - Seek from end of file </p></li>
+<li><p><strong>slot</strong> – Variable slot seeking in.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>‘EOF’ on seek failure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49ti_RewindK8ti_var_t">
+<span id="_CPPv39ti_RewindK8ti_var_t"></span><span id="_CPPv29ti_RewindK8ti_var_t"></span><span id="ti_Rewind__ti_var_tC"></span><span class="target" id="fileioc_8h_1ae13786d7a50cfa328291102d024d1998"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_Rewind</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48ti_var_t" title="ti_var_t"><span class="n"><span class="pre">ti_var_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">slot</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49ti_RewindK8ti_var_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Seeks to the start of a slot.</p>
+<p>Same functionality as <code class="docutils literal notranslate"><span class="pre">ti_Seek(0,</span> <span class="pre">SEEK_SET,</span> <span class="pre">slot)</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>slot</strong> – Variable slot to rewind</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>‘EOF’ on rewind failure </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv47ti_TellK8ti_var_t">
+<span id="_CPPv37ti_TellK8ti_var_t"></span><span id="_CPPv27ti_TellK8ti_var_t"></span><span id="ti_Tell__ti_var_tC"></span><span class="target" id="fileioc_8h_1a33f35c518ff3e533caa9ff2c03c68e80"></span><span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_Tell</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48ti_var_t" title="ti_var_t"><span class="n"><span class="pre">ti_var_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">slot</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47ti_TellK8ti_var_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the offset in a slot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>slot</strong> – Slot to test. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The value of the current slot offset. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410ti_GetSizeK8ti_var_t">
+<span id="_CPPv310ti_GetSizeK8ti_var_t"></span><span id="_CPPv210ti_GetSizeK8ti_var_t"></span><span id="ti_GetSize__ti_var_tC"></span><span class="target" id="fileioc_8h_1a52e4f847fe66929ccfa14ab52bcf80c1"></span><span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_GetSize</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48ti_var_t" title="ti_var_t"><span class="n"><span class="pre">ti_var_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">slot</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410ti_GetSizeK8ti_var_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the size of a slot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>slot</strong> – Slot to test. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The size of the slot variable. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49ti_Resize6size_tK8ti_var_t">
+<span id="_CPPv39ti_Resize6size_tK8ti_var_t"></span><span id="_CPPv29ti_Resize6size_tK8ti_var_t"></span><span id="ti_Resize__s.ti_var_tC"></span><span class="target" id="fileioc_8h_1a226c894f6a87148634b2a06314f96e8c"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_Resize</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">new_size</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48ti_var_t" title="ti_var_t"><span class="n"><span class="pre">ti_var_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">slot</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49ti_Resize6size_tK8ti_var_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Resizes the slot variable.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The variable offset is set to the beginning of the file. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>slot</strong> – Slot to resize. </p></li>
+<li><p><strong>new_size</strong> – New size of slot.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Resized size on success, 0 on failure, or -1 if the slot cannot be opened.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413ti_IsArchivedK8ti_var_t">
+<span id="_CPPv313ti_IsArchivedK8ti_var_t"></span><span id="_CPPv213ti_IsArchivedK8ti_var_t"></span><span id="ti_IsArchived__ti_var_tC"></span><span class="target" id="fileioc_8h_1a856864cab001e242c56aa00a962bf2e3"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_IsArchived</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48ti_var_t" title="ti_var_t"><span class="n"><span class="pre">ti_var_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">slot</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413ti_IsArchivedK8ti_var_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Tests if a slot is in the archive.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>slot</strong> – Slot to test.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>0 if the slot is not in the archive. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv419ti_SetArchiveStatusbK8ti_var_t">
+<span id="_CPPv319ti_SetArchiveStatusbK8ti_var_t"></span><span id="_CPPv219ti_SetArchiveStatusbK8ti_var_t"></span><span id="ti_SetArchiveStatus__b.ti_var_tC"></span><span class="target" id="fileioc_8h_1aa5138d0e2a0a9e78cc1153df1a8cf36c"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_SetArchiveStatus</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">archived</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48ti_var_t" title="ti_var_t"><span class="n"><span class="pre">ti_var_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">slot</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419ti_SetArchiveStatusbK8ti_var_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sends the variable into either the archive or RAM if needed.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Archiving a variable can cause a garbage collection cycle. You should use ti_SetGCBehavior in the case of this event.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>archived</strong> – <p>True - Send to Archive.</p>
+<p>False - Send to RAM.</p>
+</p></li>
+<li><p><strong>slot</strong> – Slot to send.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>0 if the operation fails from not enough memory. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49ti_DeletePKc">
+<span id="_CPPv39ti_DeletePKc"></span><span id="_CPPv29ti_DeletePKc"></span><span id="ti_Delete__cCP"></span><span class="target" id="fileioc_8h_1a226e1d9967372ee94b9d4dbd53dcc72a"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_Delete</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49ti_DeletePKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Deletes an AppVar.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> – Name of AppVar to delete.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>0 if an error is encountered. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412ti_DeleteVarPKcK7uint8_t">
+<span id="_CPPv312ti_DeleteVarPKcK7uint8_t"></span><span id="_CPPv212ti_DeleteVarPKcK7uint8_t"></span><span id="ti_DeleteVar__cCP.uint8_tC"></span><span class="target" id="fileioc_8h_1af0837fa1501a93caf6fd387a9f8504ad"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_DeleteVar</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">varname</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">type</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412ti_DeleteVarPKcK7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Deletes a variable given the name and type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>varname</strong> – Name of variable to delete. </p></li>
+<li><p><strong>type</strong> – Type of variable to delete.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>0 if an error is encountered. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417ti_GetTokenStringPPvP7uint8_tPj">
+<span id="_CPPv317ti_GetTokenStringPPvP7uint8_tPj"></span><span id="_CPPv217ti_GetTokenStringPPvP7uint8_tPj"></span><span id="ti_GetTokenString__voidPP.uint8_tP.unsigned-iP"></span><span class="target" id="fileioc_8h_1a62bf9f463135d51dc23731eed99e2210"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">ti_GetTokenString</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">read_pointer</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">length_of_token</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">length_of_string</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417ti_GetTokenStringPPvP7uint8_tPj" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the string used for displaying a TI token.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>read_pointer is updated to the next token, depending on if it is 1 or 2 bytes in length </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>length_of_string</strong> – Pointer to variable to hold length of resulting string (Can be NULL if you don’t care). </p></li>
+<li><p><strong>length_of_token</strong> – Pointer to variable to hold length of the token, used for determining the next read location (Can be NULL if you don’t care). </p></li>
+<li><p><strong>read_pointer</strong> – Address of pointer to data to read.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A pointer to string used for displaying a TI token. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413ti_GetDataPtrK8ti_var_t">
+<span id="_CPPv313ti_GetDataPtrK8ti_var_t"></span><span id="_CPPv213ti_GetDataPtrK8ti_var_t"></span><span id="ti_GetDataPtr__ti_var_tC"></span><span class="target" id="fileioc_8h_1aa2d593d6985f969cbac12374ad13b11e"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">ti_GetDataPtr</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48ti_var_t" title="ti_var_t"><span class="n"><span class="pre">ti_var_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">slot</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413ti_GetDataPtrK8ti_var_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets a pointer to the data located at the current posistion in the slot, a good way for fast reading of data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>slot</strong> – Slot variable to get pointer of.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pointer to variable data </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412ti_GetVATPtrK8ti_var_t">
+<span id="_CPPv312ti_GetVATPtrK8ti_var_t"></span><span id="_CPPv212ti_GetVATPtrK8ti_var_t"></span><span id="ti_GetVATPtr__ti_var_tC"></span><span class="target" id="fileioc_8h_1a8a425a3b68faf1737d9e95cab1f34a1b"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">ti_GetVATPtr</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48ti_var_t" title="ti_var_t"><span class="n"><span class="pre">ti_var_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">slot</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412ti_GetVATPtrK8ti_var_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the VAT location of the slot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>slot</strong> – Slot variable to get VAT location of. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>VAT location of slot variable. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410ti_GetNamePcK8ti_var_t">
+<span id="_CPPv310ti_GetNamePcK8ti_var_t"></span><span id="_CPPv210ti_GetNamePcK8ti_var_t"></span><span id="ti_GetName__cP.ti_var_tC"></span><span class="target" id="fileioc_8h_1a1e602e3314a2f7732c72dd27c94b6892"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_GetName</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48ti_var_t" title="ti_var_t"><span class="n"><span class="pre">ti_var_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">slot</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410ti_GetNamePcK8ti_var_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the variable name of an already opened slot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>slot</strong> – Slot variable to get name of. </p></li>
+<li><p><strong>name</strong> – Buffer to store name in, allocate at least 10 bytes. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49ti_RenamePKcPKc">
+<span id="_CPPv39ti_RenamePKcPKc"></span><span id="_CPPv29ti_RenamePKcPKc"></span><span id="ti_Rename__cCP.cCP"></span><span class="target" id="fileioc_8h_1aab2318e59b2617e30191be01c0f76bd5"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_Rename</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">old_name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">new_name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49ti_RenamePKcPKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Renames an AppVar.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>It is potentially hazardous to rename an open AppVar. Close the AppVar before renaming. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>old_name</strong> – Old name of AppVar. </p></li>
+<li><p><strong>new_name</strong> – New name of AppVar.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>0 if success, 1 if AppVar already exists, 2 any other error occurs. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412ti_RenameVarPKcPKcK7uint8_t">
+<span id="_CPPv312ti_RenameVarPKcPKcK7uint8_t"></span><span id="_CPPv212ti_RenameVarPKcPKcK7uint8_t"></span><span id="ti_RenameVar__cCP.cCP.uint8_tC"></span><span class="target" id="fileioc_8h_1a2f1f60704e2ff1c9268f86e4e1428384"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_RenameVar</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">old_name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">new_name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">type</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412ti_RenameVarPKcPKcK7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Renames a variable.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>It is potentially hazardous to rename an open variable. Close the variable before renaming. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>old_name</strong> – Old name of variable. </p></li>
+<li><p><strong>new_name</strong> – New name of variable. </p></li>
+<li><p><strong>type</strong> – Type of variable.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>0 if success, 1 if variable already exists, 2 any other error occurs. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49ti_SetVarK8ti_var_tPKcPv">
+<span id="_CPPv39ti_SetVarK8ti_var_tPKcPv"></span><span id="_CPPv29ti_SetVarK8ti_var_tPKcPv"></span><span id="ti_SetVar__ti_var_tC.cCP.voidP"></span><span class="target" id="fileioc_8h_1a2c3d4f47d22e805d679cbacc0293cb8b"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_SetVar</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48ti_var_t" title="ti_var_t"><span class="n"><span class="pre">ti_var_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">var_type</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49ti_SetVarK8ti_var_tPKcPv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Stores data or values to an OS variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>var_type</strong> – Type of variable to set. </p></li>
+<li><p><strong>name</strong> – Pointer to name of variable. </p></li>
+<li><p><strong>data</strong> – Pointer to data to set.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>0 if success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49ti_StoVarK8ti_var_tPvK8ti_var_tPv">
+<span id="_CPPv39ti_StoVarK8ti_var_tPvK8ti_var_tPv"></span><span id="_CPPv29ti_StoVarK8ti_var_tPvK8ti_var_tPv"></span><span id="ti_StoVar__ti_var_tC.voidP.ti_var_tC.voidP"></span><span class="target" id="fileioc_8h_1a747cc0d2bb36c7c52f7acff10da3a3f0"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_StoVar</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48ti_var_t" title="ti_var_t"><span class="n"><span class="pre">ti_var_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">var_type_to</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">to</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv48ti_var_t" title="ti_var_t"><span class="n"><span class="pre">ti_var_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">var_type_from</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">from</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49ti_StoVarK8ti_var_tPvK8ti_var_tPv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Stores an OS variable to another variable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>var_type_to</strong> – Type of variable to store to. </p></li>
+<li><p><strong>to</strong> – Pointer to data to store to. </p></li>
+<li><p><strong>var_type_from</strong> – Type of variable to get from. </p></li>
+<li><p><strong>from</strong> – Pointer to data to get from.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>0 if success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49ti_RclVarK7uint8_tPKcPPv">
+<span id="_CPPv39ti_RclVarK7uint8_tPKcPPv"></span><span id="_CPPv29ti_RclVarK7uint8_tPKcPPv"></span><span id="ti_RclVar__uint8_tC.cCP.voidPP"></span><span class="target" id="fileioc_8h_1ab568cd59ad586f34b6a36b0d80c7b0f6"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_RclVar</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">var_type</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">var_name</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">data_struct</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49ti_RclVarK7uint8_tPKcPPv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Recalls a variable.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>data_struct is set to the variable’s data. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>var_type</strong> – Type of variable to recall. </p></li>
+<li><p><strong>var_name</strong> – Pointer to name of variable to recall. </p></li>
+<li><p><strong>data_struct</strong> – Address of pointer to variable structure. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>0 if success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417ti_ArchiveHasRoom8uint24_t">
+<span id="_CPPv317ti_ArchiveHasRoom8uint24_t"></span><span id="_CPPv217ti_ArchiveHasRoom8uint24_t"></span><span id="ti_ArchiveHasRoom__uint24_t"></span><span class="target" id="fileioc_8h_1aeb52ff3f53ba053cae25ef4ff8ca390e"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_ArchiveHasRoom</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_bytes</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417ti_ArchiveHasRoom8uint24_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Checks to see if there is room in the archive for storing <code class="docutils literal notranslate"><span class="pre">num_bytes</span></code>, without needing to execute a Garbage Collect.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>num_bytes</strong> – Number of bytes to be stored to the archive. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>true if the bytes can be stored to the archive without a Garbage Collect. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416ti_SetGCBehaviorPFvvEPFvvE">
+<span id="_CPPv316ti_SetGCBehaviorPFvvEPFvvE"></span><span id="_CPPv216ti_SetGCBehaviorPFvvEPFvvE"></span><span class="target" id="fileioc_8h_1a1acc3249334b606dd3337a846268af6a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_SetGCBehavior</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">before</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">)</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">after</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">)</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416ti_SetGCBehaviorPFvvEPFvvE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Set routines to run before and after a garbage collect would be triggered.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If your program uses graphx, use gfx_End and gfx_Begin to reset graphics before, and setup graphics after the garbage collect. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>before</strong> – Routine to run before a garbage collect. NULL sets it to do nothing. </p></li>
+<li><p><strong>after</strong> – Routine to run following a garbage collect. NULL sets it to do nothing. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="CE C Libraries" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="fontlibc.html" class="btn btn-neutral float-right" title="fontlibc.h" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v9.1
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+             </strong> 
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

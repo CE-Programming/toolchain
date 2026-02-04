@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting Started &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/design-tabs.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Frequently Asked Questions" href="faq.html" />
+    <link rel="prev" title="Calculator Hardware Overview" href="hardware.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v10.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to the CE C/C++ Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hardware.html">Calculator Hardware Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installing-the-ce-toolchain">Installing the CE Toolchain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#building-programs">Building Programs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="makefile-options.html">Makefile Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Libraries/Headers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../libraries/index.html">CE Libraries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/sys/index.html">CE Hardware Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/ti/index.html">TI Operating System Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/index.html">Miscellaneous Headers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Helpful Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="git.html">Using Git For Revision Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coding-guidelines.html">General Coding Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ides.html">Using the Toolchain in an IDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to the CE Toolchain</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Getting Started</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="getting-started">
+<span id="id1"></span><h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline"></a></h1>
+<div class="section" id="installing-the-ce-toolchain">
+<h2>Installing the CE Toolchain<a class="headerlink" href="#installing-the-ce-toolchain" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>Download the latest stable toolchain release for your OS <a class="reference external" href="https://github.com/CE-Programming/toolchain/releases/latest">by clicking here</a>.</p></li>
+<li><p>An additional “nightly” development build is available <a class="reference external" href="https://github.com/CE-Programming/toolchain/releases/tag/nightly">here</a>, which includes the  latest features and support before an official  stable release.</p></li>
+</ul>
+<p><strong>On Windows</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Extract the archive to a path <strong>without any spaces</strong>, e.g. <code class="code docutils literal notranslate"><span class="pre">C:\CEdev</span></code>.</p></li>
+<li><p>Double click <code class="code docutils literal notranslate"><span class="pre">cedev.bat</span></code> inside the extracted folder to launch the toolchain environment.
+You may have to allow the script to be run depending on the user account control.</p></li>
+<li><p>If you want to avoid using the <code class="code docutils literal notranslate"><span class="pre">cedev.bat</span></code> script, you can extend the PATH environment variable to point to the <code class="code docutils literal notranslate"><span class="pre">CEdev/bin</span></code> directory.
+<a class="reference external" href="https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/">Here is a description</a>.</p></li>
+</ul>
+</div></blockquote>
+<p><strong>On Linux or Mac</strong></p>
+<blockquote>
+<div><ul>
+<li><p>Extract the archive to a path <strong>without any spaces</strong>, e.g. <code class="code docutils literal notranslate"><span class="pre">/home/user/CEdev</span></code>.</p></li>
+<li><p>Extend the PATH environment variable to point to <code class="code docutils literal notranslate"><span class="pre">CEdev/bin</span></code> by modifying <em>.bashrc</em>, <em>.zshrc</em>, or whatever flavor your OS uses.
+An example command may be:</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span>/&lt;insert<span class="w"> </span>path<span class="w"> </span>here&gt;/CEdev/bin:<span class="nv">$PATH</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The toolchain requires the installation folder and any project folders to not contain any spaces.
+This is due to a limitation of the <code class="code docutils literal notranslate"><span class="pre">make</span></code> command.</p>
+</div>
+</div>
+<div class="section" id="building-programs">
+<h2>Building Programs<a class="headerlink" href="#building-programs" title="Permalink to this headline"></a></h2>
+<p>Programs are built with the <code class="code docutils literal notranslate"><span class="pre">make</span></code> command, executed from a terminal session.
+This tutorial explains how to use the CE Toolchain to build programs using <code class="code docutils literal notranslate"><span class="pre">make</span></code>.</p>
+<p>Locate the installed <em>CEdev</em> folder, and open a build session by double-clicking <code class="code docutils literal notranslate"><span class="pre">cedev.bat</span></code> on Windows or launching your favorite terminal on Linux/macOS.
+Navigate to the <em>examples</em> folder using the <code class="code docutils literal notranslate"><span class="pre">cd</span> <span class="pre">examples</span></code> command.
+This folder contains example projects that you can build and modify to learn how to write various programs.
+Navigate the to the <em>hello_world</em> example inside this folder using the command <code class="code docutils literal notranslate"><span class="pre">cd</span> <span class="pre">hello_world</span></code>.</p>
+<p>Type <code class="code docutils literal notranslate"><span class="pre">make</span></code> and press enter.
+This command invokes the compiler, assembler, and linker creating the file <code class="code docutils literal notranslate"><span class="pre">bin/DEMO.8xp</span></code>.
+The file stores the machine code of the program in a format fit for the calculator.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>On Windows, you may need to install the latest Microsoft Visual C++ Redistributable package if you encounter errors such as <code class="code docutils literal notranslate"><span class="pre">Missing</span> <span class="pre">vcruntime140.dll</span></code>.
+The download can be found <a class="reference external" href="https://support.microsoft.com/en-us/topic/the-latest-supported-visual-c-downloads-2647da03-1eea-4433-9aff-95f26a218cc0">at this link</a>, depending on your computer you will need to install one of <em>vc_redist.x86.exe</em>, <em>vc_redist.x64.exe</em>, or <em>vc_redist.arm64.exe</em>.</p>
+</div>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>On Windows, your antivirus software (e.g. Windows Defender) may flag binaries in the <code class="code docutils literal notranslate"><span class="pre">CEdev/bin</span></code> directory as false positives, and either quarantine/remove the files or prevent them from running.
+This may result in errors such as being unable find/run the <cite>fasmg</cite> program when building.
+It is recommended you whitelist or disable scanning in <code class="code docutils literal notranslate"><span class="pre">CEdev/bin</span></code> to prevent these false positives from occurring.</p>
+</div>
+<p>The <a class="reference external" href="https://ce-programming.github.io/CEmu">CEmu</a> emulator can be used to run the program, or you can transfer it to a real calculator using the cross-platform <a class="reference external" href="https://education.ti.com/en/us/products/computer_software/connectivity-software/ti-connect-ce-software/tabs/overview">TI Connect CE</a>.</p>
+<div class="figure align-center" id="id2">
+<img alt="Building the Hello World example" src="../_images/hello_world.png" />
+<p class="caption"><span class="caption-text">Building the Hello World example</span><a class="headerlink" href="#id2" title="Permalink to this image"></a></p>
+</div>
+<p>Each CE Toolchain project has the following folder structure:</p>
+<ul class="simple">
+<li><p><strong>src</strong></p>
+<ul>
+<li><p>This is the directory where all source files can be placed.</p></li>
+<li><p>Sources are built automatically if they end in a <code class="docutils literal notranslate"><span class="pre">.c</span></code>/<code class="docutils literal notranslate"><span class="pre">.cpp</span></code> extension, and can be edited with any text editor or IDE.</p></li>
+<li><p>Subdirectories are allowed as long as they do not contain spaces.</p></li>
+</ul>
+</li>
+<li><p><strong>obj</strong></p>
+<ul>
+<li><p>Compiled C/C++ files are placed here, and contain intermediate assembly output.</p></li>
+</ul>
+</li>
+<li><p><strong>bin</strong></p>
+<ul>
+<li><p>This is where the final linked calculator program will be placed, ending with a <code class="docutils literal notranslate"><span class="pre">.8xp</span></code> extension.</p></li>
+</ul>
+</li>
+<li><p><strong>makefile</strong></p>
+<ul>
+<li><p>A text file used by <code class="code docutils literal notranslate"><span class="pre">make</span></code> to build the program.</p></li>
+<li><p>There are options for setting the program name, description, and more.</p></li>
+</ul>
+</li>
+<li><p><strong>icon.png</strong></p>
+<ul>
+<li><p>This is a 16x16 icon that is displayed in shells such as <a class="reference external" href="https://github.com/mateoconlechuga/cesium/releases/latest">Cesium</a>.</p></li>
+</ul>
+</li>
+<li><p><strong>readme.md</strong></p>
+<ul>
+<li><p>A text file that describes the program’s operation.</p></li>
+</ul>
+</li>
+<li><p><strong>autotest.json</strong></p>
+<ul>
+<li><p>This file can be loaded into <a class="reference external" href="https://ce-programming.github.io/CEmu">CEmu’s Autotester</a> to test and validate the program.</p></li>
+<li><p>This feature is not required, but can be useful for creating testable code coverage.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="hardware.html" class="btn btn-neutral float-left" title="Calculator Hardware Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="faq.html" class="btn btn-neutral float-right" title="Frequently Asked Questions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v10.0
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+             </strong> 
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

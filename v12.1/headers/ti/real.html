@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ti/real.h &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/design-tabs.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="ti/tokens.h" href="tokens.html" />
+    <link rel="prev" title="ti/python.h" href="python.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v12.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Welcome to the CE C/C++ Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/hardware.html">Calculator Hardware Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../static/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/makefile-options.html">Makefile Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/debugging.html">Debugging Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/asm.html">Assembly Routines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Libraries/Headers</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../libraries/index.html">CE Library Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sys/index.html">CE Hardware Headers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">TI Operating System Headers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="error.html">ti/error.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flags.html">ti/flags.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getcsc.html">ti/getcsc.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getkey.html">ti/getkey.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="screen.html">ti/screen.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="info.html">ti/info.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python.html">ti/python.h</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">ti/real.h</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tokens.html">ti/tokens.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ui.html">ti/ui.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vars.html">ti/vars.h</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Miscellaneous Headers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Helpful Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../static/ides.html">Using the Toolchain in an IDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/git.html">Using Git For Revision Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/coding-guidelines.html">General Coding Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/contributing.html">Contributing to the CE Toolchain</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">TI Operating System Headers</a> &raquo;</li>
+      <li>ti/real.h</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="ti-real-h">
+<span id="real-h"></span><h1>ti/real.h<a class="headerlink" href="#ti-real-h" title="Permalink to this headline"></a></h1>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;ti/real.h&gt;</span>
+</pre></div>
+</div>
+<p>Surprisingly, the TI-84 Plus CE is actually sold to students as a calculator and not a gaming console.
+TI actually even implemented an entire highly-accurate floating-point package!</p>
+<p>TI’s floating-point routines use binary-coded decimal, in which each hexadecimal nibble represents one decimal digit.
+Each <code class="code docutils literal notranslate"><span class="pre">real_t</span></code> has 14 digits (7 bytes) in the significand, an 8-bit exponent which the OS limits to +/- 99, and a sign byte.
+They provide precision similar to a standard <code class="code docutils literal notranslate"><span class="pre">double</span></code> on a PC, albeit with a smaller exponent range.
+Using <code class="code docutils literal notranslate"><span class="pre">real_t</span></code> is much slower than <code class="code docutils literal notranslate"><span class="pre">float</span></code> because of the vastly greater precision.
+(Remember that the C SDK implements <code class="code docutils literal notranslate"><span class="pre">double</span></code> as <code class="code docutils literal notranslate"><span class="pre">float</span></code>, which is allowed by the C standard.)</p>
+<p>The SDK calls them <code class="code docutils literal notranslate"><span class="pre">real_t</span></code> because <code class="code docutils literal notranslate"><span class="pre">float</span></code> is already taken.
+The OS floating-point routines also support complex numbers quite well and transparently, but SDK support is not implemented.</p>
+<p>A C++ wrapper is available as <code class="code docutils literal notranslate"><span class="pre">&lt;ti/real&gt;</span></code> but no documentation has been written.
+Please see the examples in the <code class="code docutils literal notranslate"><span class="pre">standalone</span></code> folder and consult the header itself.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#api-documentation" id="id1">API Documentation</a></p></li>
+</ul>
+</div>
+<div class="section" id="api-documentation">
+<h2><a class="toc-backref" href="#id1">API Documentation</a><a class="headerlink" href="#api-documentation" title="Permalink to this headline"></a></h2>
+<p>TI’s decimal floating-point library. </p>
+<p><dl class="simple">
+<dt><strong>Authors</strong></dt><dd><p><p>Matt “MateoConLechuga” Waltz</p>
+<p>Jacob “jacobly” Young</p>
+</p>
+</dd>
+</dl>
+</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_OP1">
+<span class="target" id="real_8h_1afd0ee65ef148f595560c98fc2e4b023a"></span><span class="sig-name descname"><span class="n"><span class="pre">os_OP1</span></span></span><a class="headerlink" href="#c.os_OP1" title="Permalink to this definition"></a><br /></dt>
+<dd><p>OP1 Variable. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_OP2">
+<span class="target" id="real_8h_1aea7e22c5e0edbee268c718eab9e1aacf"></span><span class="sig-name descname"><span class="n"><span class="pre">os_OP2</span></span></span><a class="headerlink" href="#c.os_OP2" title="Permalink to this definition"></a><br /></dt>
+<dd><p>OP2 Variable. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_OP3">
+<span class="target" id="real_8h_1a07ea703291a7b2212b95621bbb952def"></span><span class="sig-name descname"><span class="n"><span class="pre">os_OP3</span></span></span><a class="headerlink" href="#c.os_OP3" title="Permalink to this definition"></a><br /></dt>
+<dd><p>OP3 Variable. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_OP4">
+<span class="target" id="real_8h_1ac03454a82ac8abc8c0d89ca30c5865f5"></span><span class="sig-name descname"><span class="n"><span class="pre">os_OP4</span></span></span><a class="headerlink" href="#c.os_OP4" title="Permalink to this definition"></a><br /></dt>
+<dd><p>OP4 Variable. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_OP5">
+<span class="target" id="real_8h_1a231d95d39e94c45daf5d2ce8ec095f0a"></span><span class="sig-name descname"><span class="n"><span class="pre">os_OP5</span></span></span><a class="headerlink" href="#c.os_OP5" title="Permalink to this definition"></a><br /></dt>
+<dd><p>OP5 Variable. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_OP6">
+<span class="target" id="real_8h_1a1973b57a9ca1398d0e3dc68235e49a7d"></span><span class="sig-name descname"><span class="n"><span class="pre">os_OP6</span></span></span><a class="headerlink" href="#c.os_OP6" title="Permalink to this definition"></a><br /></dt>
+<dd><p>OP6 Variable. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_OP7">
+<span class="target" id="real_8h_1a5aa2d855066534e0477d5aedcf987b21"></span><span class="sig-name descname"><span class="n"><span class="pre">os_OP7</span></span></span><a class="headerlink" href="#c.os_OP7" title="Permalink to this definition"></a><br /></dt>
+<dd><p>OP7 Variable. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_StatVars">
+<span class="target" id="real_8h_1a6df9597f0397cef14398aa408eaa6fb8"></span><span class="sig-name descname"><span class="n"><span class="pre">os_StatVars</span></span></span><a class="headerlink" href="#c.os_StatVars" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Contains data used by the statistics package. </p>
+<p>If you use this area, mark it invalid:</p>
+<p><div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;ti/vars.h&gt;</span>
+<span class="c1">// . . .</span>
+<span class="n">os_DelRes</span><span class="p">();</span>
+</pre></div>
+</div>
+</p>
+<p>Type: <code class="docutils literal notranslate"><span class="pre">uint8_t[531]</span></code> </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv46real_t">
+<span id="_CPPv36real_t"></span><span id="_CPPv26real_t"></span><span id="real_t"></span><span class="target" id="real_8h_1ad836a3b63d8a822ccee31e123cca0ef8"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">real_t</span></span></span><a class="headerlink" href="#_CPPv46real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Structure of real variable type. </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv46cplx_t">
+<span id="_CPPv36cplx_t"></span><span id="_CPPv26cplx_t"></span><span id="cplx_t"></span><span class="target" id="real_8h_1a20bfcf599037fe7d145ecd1a27b912fe"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46cplx_t" title="cplx_t"><span class="n"><span class="pre">cplx_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cplx_t</span></span></span><a class="headerlink" href="#_CPPv46cplx_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Structure of complex variable type. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv411os_RealCopyPK6real_t">
+<span id="_CPPv311os_RealCopyPK6real_t"></span><span id="_CPPv211os_RealCopyPK6real_t"></span><span id="os_RealCopy__real_tCP"></span><span class="target" id="real_8h_1a1e6b19531259bccf09f0f07565d6803f"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealCopy</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">src</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411os_RealCopyPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Copies a <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a> type. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>src</strong> – <strong>[in]</strong> Pointer to original <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a> </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Copied <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a> </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414os_RealAcosRadPK6real_t">
+<span id="_CPPv314os_RealAcosRadPK6real_t"></span><span id="_CPPv214os_RealAcosRadPK6real_t"></span><span id="os_RealAcosRad__real_tCP"></span><span class="target" id="real_8h_1a8c5d0e925ec9cde41547068ea66b54e6"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealAcosRad</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414os_RealAcosRadPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Takes the arccosine of a <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a>, giving the answer in radians. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Ensure -1 &lt;= *arg &lt;= 1, or program will crash. </p>
+</div>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414os_RealAsinRadPK6real_t">
+<span id="_CPPv314os_RealAsinRadPK6real_t"></span><span id="_CPPv214os_RealAsinRadPK6real_t"></span><span id="os_RealAsinRad__real_tCP"></span><span class="target" id="real_8h_1abd0de87b59547692a8077a3273c38b9c"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealAsinRad</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414os_RealAsinRadPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Takes the arcsine of a <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a>, giving the answer in radians. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Ensure -1 &lt;= *arg &lt;= 1, or program will crash. </p>
+</div>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414os_RealAtanRadPK6real_t">
+<span id="_CPPv314os_RealAtanRadPK6real_t"></span><span id="_CPPv214os_RealAtanRadPK6real_t"></span><span id="os_RealAtanRad__real_tCP"></span><span class="target" id="real_8h_1a53df4d64e3c99d75ddc01ee9b3f32f03"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealAtanRad</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414os_RealAtanRadPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Takes the arctangent of a <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a>, giving the answers in radians. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413os_RealCosRadPK6real_t">
+<span id="_CPPv313os_RealCosRadPK6real_t"></span><span id="_CPPv213os_RealCosRadPK6real_t"></span><span id="os_RealCosRad__real_tCP"></span><span class="target" id="real_8h_1aaf13fee9c0d2f4bbc14bca1df9ec296b"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealCosRad</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413os_RealCosRadPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Takes the cosine of a <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a> given in radians. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415os_RealRadToDegPK6real_t">
+<span id="_CPPv315os_RealRadToDegPK6real_t"></span><span id="_CPPv215os_RealRadToDegPK6real_t"></span><span id="os_RealRadToDeg__real_tCP"></span><span class="target" id="real_8h_1adeced7ffc903b927466e900f774a82b9"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealRadToDeg</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415os_RealRadToDegPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Converts a <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a> from radians to degrees. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410os_RealExpPK6real_t">
+<span id="_CPPv310os_RealExpPK6real_t"></span><span id="_CPPv210os_RealExpPK6real_t"></span><span id="os_RealExp__real_tCP"></span><span class="target" id="real_8h_1ae6bc469dab695c654b16dbfe37ba34a8"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealExp</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410os_RealExpPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Evaluates the exponential function (e^x, where e=2.717..) of a <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a>. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412os_RealFloorPK6real_t">
+<span id="_CPPv312os_RealFloorPK6real_t"></span><span id="_CPPv212os_RealFloorPK6real_t"></span><span id="os_RealFloor__real_tCP"></span><span class="target" id="real_8h_1ac624006aae9cbcc5ce45fe1a497221b4"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealFloor</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412os_RealFloorPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Takes the floor of a <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a>. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv411os_RealFracPK6real_t">
+<span id="_CPPv311os_RealFracPK6real_t"></span><span id="_CPPv211os_RealFracPK6real_t"></span><span id="os_RealFrac__real_tCP"></span><span class="target" id="real_8h_1a68cc21ed5672f91d2c0baf7bb2b27108"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealFrac</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411os_RealFracPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Extracts the fractional part of a <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a>. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415os_RealRoundIntPK6real_t">
+<span id="_CPPv315os_RealRoundIntPK6real_t"></span><span id="_CPPv215os_RealRoundIntPK6real_t"></span><span id="os_RealRoundInt__real_tCP"></span><span class="target" id="real_8h_1afeb88cd32ffdee0086d31c14465924b4"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealRoundInt</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415os_RealRoundIntPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Rounds a <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a> to the nearest integer. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410os_RealLogPK6real_t">
+<span id="_CPPv310os_RealLogPK6real_t"></span><span id="_CPPv210os_RealLogPK6real_t"></span><span id="os_RealLog__real_tCP"></span><span class="target" id="real_8h_1aad6164802d170ef6536d2cf49590ffd6"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealLog</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410os_RealLogPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Takes the natural logarithm of a <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a>. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To take log base 10, divide this value by ln(10) </p>
+</div>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410os_RealNegPK6real_t">
+<span id="_CPPv310os_RealNegPK6real_t"></span><span id="_CPPv210os_RealNegPK6real_t"></span><span id="os_RealNeg__real_tCP"></span><span class="target" id="real_8h_1a6d42712be23fd6b3faf05b9cd3c7518a"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealNeg</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410os_RealNegPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Negates a <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a>. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415os_RealDegToRadPK6real_t">
+<span id="_CPPv315os_RealDegToRadPK6real_t"></span><span id="_CPPv215os_RealDegToRadPK6real_t"></span><span id="os_RealDegToRad__real_tCP"></span><span class="target" id="real_8h_1a6e5e2f9de82eb7b7d4fe814713f6039a"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealDegToRad</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415os_RealDegToRadPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Converts a <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a> from degrees to radians. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410os_RealInvPK6real_t">
+<span id="_CPPv310os_RealInvPK6real_t"></span><span id="_CPPv210os_RealInvPK6real_t"></span><span id="os_RealInv__real_tCP"></span><span class="target" id="real_8h_1ae58ace2c4c823821a6b000e4454aef75"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealInv</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410os_RealInvPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Takes the reciprocal of a <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a>. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413os_RealSinRadPK6real_t">
+<span id="_CPPv313os_RealSinRadPK6real_t"></span><span id="_CPPv213os_RealSinRadPK6real_t"></span><span id="os_RealSinRad__real_tCP"></span><span class="target" id="real_8h_1a52c0d6cc93e18ca96ba662018e3cd86c"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealSinRad</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413os_RealSinRadPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Takes the sine of a <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a> given in radians. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv411os_RealSqrtPK6real_t">
+<span id="_CPPv311os_RealSqrtPK6real_t"></span><span id="_CPPv211os_RealSqrtPK6real_t"></span><span id="os_RealSqrt__real_tCP"></span><span class="target" id="real_8h_1afc0f2e79e884de62967e9a8a5f192f26"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealSqrt</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411os_RealSqrtPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Takes the square root of a <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a>. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413os_RealTanRadPK6real_t">
+<span id="_CPPv313os_RealTanRadPK6real_t"></span><span id="_CPPv213os_RealTanRadPK6real_t"></span><span id="os_RealTanRad__real_tCP"></span><span class="target" id="real_8h_1a5fad40465e9d4b20f7825a7fef747229"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealTanRad</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413os_RealTanRadPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Takes the tangent of a <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a> given in radians. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410os_RealIntPK6real_t">
+<span id="_CPPv310os_RealIntPK6real_t"></span><span id="_CPPv210os_RealIntPK6real_t"></span><span id="os_RealInt__real_tCP"></span><span class="target" id="real_8h_1a8ab2232f8c933e590bf5d2f98ba3bede"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealInt</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410os_RealIntPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Extracts the integer part of a <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a>. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413os_CplxSquarePK6cplx_t">
+<span id="_CPPv313os_CplxSquarePK6cplx_t"></span><span id="_CPPv213os_CplxSquarePK6cplx_t"></span><span id="os_CplxSquare__cplx_tCP"></span><span class="target" id="real_8h_1a8b361cf308ab9a345f1b886c652515d1"></span><a class="reference internal" href="#_CPPv46cplx_t" title="cplx_t"><span class="n"><span class="pre">cplx_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_CplxSquare</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46cplx_t" title="cplx_t"><span class="n"><span class="pre">cplx_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413os_CplxSquarePK6cplx_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Calculates the square of a <a class="reference internal" href="#structcplx__t"><span class="std std-ref">cplx_t</span></a>. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410os_RealAddPK6real_tPK6real_t">
+<span id="_CPPv310os_RealAddPK6real_tPK6real_t"></span><span id="_CPPv210os_RealAddPK6real_tPK6real_t"></span><span id="os_RealAdd__real_tCP.real_tCP"></span><span class="target" id="real_8h_1a0e2c8044f070e6d6e2469899fcb12538"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealAdd</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg2</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410os_RealAddPK6real_tPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Adds two <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a> values. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410os_RealDivPK6real_tPK6real_t">
+<span id="_CPPv310os_RealDivPK6real_tPK6real_t"></span><span id="_CPPv210os_RealDivPK6real_tPK6real_t"></span><span id="os_RealDiv__real_tCP.real_tCP"></span><span class="target" id="real_8h_1a4f208c842e0da3a02e0d05f6500c4b30"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealDiv</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg2</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410os_RealDivPK6real_tPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Divides two <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a> values. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410os_RealGcdPK6real_tPK6real_t">
+<span id="_CPPv310os_RealGcdPK6real_tPK6real_t"></span><span id="_CPPv210os_RealGcdPK6real_tPK6real_t"></span><span id="os_RealGcd__real_tCP.real_tCP"></span><span class="target" id="real_8h_1abb0cd44d49d132aefefe222fcd71a5e2"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealGcd</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg2</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410os_RealGcdPK6real_tPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Calculates the Greatest Common Divisor of two <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a> values. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410os_RealLcmPK6real_tPK6real_t">
+<span id="_CPPv310os_RealLcmPK6real_tPK6real_t"></span><span id="_CPPv210os_RealLcmPK6real_tPK6real_t"></span><span id="os_RealLcm__real_tCP.real_tCP"></span><span class="target" id="real_8h_1a8b33b9d3ec28a5fe9d3b56fad761e4a5"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealLcm</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg2</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410os_RealLcmPK6real_tPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Calculates the Least Common Multiple of two <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a> values. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410os_RealMaxPK6real_tPK6real_t">
+<span id="_CPPv310os_RealMaxPK6real_tPK6real_t"></span><span id="_CPPv210os_RealMaxPK6real_tPK6real_t"></span><span id="os_RealMax__real_tCP.real_tCP"></span><span class="target" id="real_8h_1ab1ce14a304371f1362fcc0bd0ff82ceb"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealMax</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg2</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410os_RealMaxPK6real_tPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the larger of two <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a> values. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410os_RealMinPK6real_tPK6real_t">
+<span id="_CPPv310os_RealMinPK6real_tPK6real_t"></span><span id="_CPPv210os_RealMinPK6real_tPK6real_t"></span><span id="os_RealMin__real_tCP.real_tCP"></span><span class="target" id="real_8h_1a5e6744776d45be8870e210c0a4542d40"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealMin</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg2</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410os_RealMinPK6real_tPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the smaller of two <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a> values. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410os_RealMulPK6real_tPK6real_t">
+<span id="_CPPv310os_RealMulPK6real_tPK6real_t"></span><span id="_CPPv210os_RealMulPK6real_tPK6real_t"></span><span id="os_RealMul__real_tCP.real_tCP"></span><span class="target" id="real_8h_1adfd070720a46d3c395608e0727afd50c"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealMul</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg2</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410os_RealMulPK6real_tPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Multiplies two <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a> values. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410os_RealNcrPK6real_tPK6real_t">
+<span id="_CPPv310os_RealNcrPK6real_tPK6real_t"></span><span id="_CPPv210os_RealNcrPK6real_tPK6real_t"></span><span id="os_RealNcr__real_tCP.real_tCP"></span><span class="target" id="real_8h_1ad9617a72db64dae91109ad2b0ddb19bf"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealNcr</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">total</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">num</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410os_RealNcrPK6real_tPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Calculates the value of nCr (binomial coefficient) for two <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a> values. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410os_RealNprPK6real_tPK6real_t">
+<span id="_CPPv310os_RealNprPK6real_tPK6real_t"></span><span id="_CPPv210os_RealNprPK6real_tPK6real_t"></span><span id="os_RealNpr__real_tCP.real_tCP"></span><span class="target" id="real_8h_1a4fed358b7da2dc27c07aa7e616f1b774"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealNpr</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">total</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">num</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410os_RealNprPK6real_tPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Calculates the value of nPr (permutation number) for two <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a> values. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410os_RealPowPK6real_tPK6real_t">
+<span id="_CPPv310os_RealPowPK6real_tPK6real_t"></span><span id="_CPPv210os_RealPowPK6real_tPK6real_t"></span><span id="os_RealPow__real_tCP.real_tCP"></span><span class="target" id="real_8h_1a79757bf03bd0084bf65ac5fc546d9d26"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealPow</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">exp</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410os_RealPowPK6real_tPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Raises one <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a> value to the power of another. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414os_RealRandIntPK6real_tPK6real_t">
+<span id="_CPPv314os_RealRandIntPK6real_tPK6real_t"></span><span id="_CPPv214os_RealRandIntPK6real_tPK6real_t"></span><span id="os_RealRandInt__real_tCP.real_tCP"></span><span class="target" id="real_8h_1a8c9ea24fb776d9746b7b5f7adcc321e6"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealRandInt</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">min</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">max</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414os_RealRandIntPK6real_tPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns a random <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a> between min and max. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410os_RealModPK6real_tPK6real_t">
+<span id="_CPPv310os_RealModPK6real_tPK6real_t"></span><span id="_CPPv210os_RealModPK6real_tPK6real_t"></span><span id="os_RealMod__real_tCP.real_tCP"></span><span class="target" id="real_8h_1ac3f35ea63444d9d80dce627f56875d08"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealMod</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg2</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410os_RealModPK6real_tPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Calculates the remainder (modulo) of two <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a> values. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410os_RealSubPK6real_tPK6real_t">
+<span id="_CPPv310os_RealSubPK6real_tPK6real_t"></span><span id="_CPPv210os_RealSubPK6real_tPK6real_t"></span><span id="os_RealSub__real_tCP.real_tCP"></span><span class="target" id="real_8h_1aecc96bceea9d384b607edd9f6c3a5c89"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealSub</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg2</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410os_RealSubPK6real_tPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Subtracts two <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a> values. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412os_RealRoundPK6real_tc">
+<span id="_CPPv312os_RealRoundPK6real_tc"></span><span id="_CPPv212os_RealRoundPK6real_tc"></span><span id="os_RealRound__real_tCP.c"></span><span class="target" id="real_8h_1a1b45f9fc846040f840cc85c4c95c59ab"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealRound</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">digits</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412os_RealRoundPK6real_tc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Rounds a <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a>. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>digits must be in the range 0 - 9 </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arg</strong> – <strong>[in]</strong> Real variable. </p></li>
+<li><p><strong>digits</strong> – <strong>[in]</strong> Number of digits to round to. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414os_RealComparePK6real_tPK6real_t">
+<span id="_CPPv314os_RealComparePK6real_tPK6real_t"></span><span id="_CPPv214os_RealComparePK6real_tPK6real_t"></span><span id="os_RealCompare__real_tCP.real_tCP"></span><span class="target" id="real_8h_1ac12d5e48a1c3577d15b33bbfc73790dc"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealCompare</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg2</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414os_RealComparePK6real_tPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Compares two <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a>. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">os_RealCompare(arg1,</span> <span class="pre">arg2)</span> <span class="pre">op</span> <span class="pre">0</span></code> computes <code class="docutils literal notranslate"><span class="pre">arg1</span> <span class="pre">op</span> <span class="pre">arg2</span></code> for any comparison operator <code class="docutils literal notranslate"><span class="pre">op</span></code>. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arg1</strong> – <strong>[in]</strong> Real variable 1. </p></li>
+<li><p><strong>arg2</strong> – <strong>[in]</strong> Real variable 2. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>-1, 0, or 1 if arg1 is less than, equal to, or greater than arg2. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414os_RealToInt24PK6real_t">
+<span id="_CPPv314os_RealToInt24PK6real_t"></span><span id="_CPPv214os_RealToInt24PK6real_t"></span><span id="os_RealToInt24__real_tCP"></span><span class="target" id="real_8h_1a3e943f7b734e3d769b1ecf8787cb4187"></span><span class="n"><span class="pre">int24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealToInt24</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414os_RealToInt24PK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Converts a <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a> to an integer. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Saturates on overflow </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>arg</strong> – <strong>[in]</strong> Real variable. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414os_Int24ToReal7int24_t">
+<span id="_CPPv314os_Int24ToReal7int24_t"></span><span id="_CPPv214os_Int24ToReal7int24_t"></span><span id="os_Int24ToReal__int24_t"></span><span class="target" id="real_8h_1a83cd18115c9638421c1e44c7e1ec7380"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_Int24ToReal</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int24_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414os_Int24ToReal7int24_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Converts an integer to a <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a>. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Saturates on overflow </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>arg</strong> – Integer value. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414os_RealToFloatPK6real_t">
+<span id="_CPPv314os_RealToFloatPK6real_t"></span><span id="_CPPv214os_RealToFloatPK6real_t"></span><span id="os_RealToFloat__real_tCP"></span><span class="target" id="real_8h_1a29e3aa966dadbd18298ad0791f7917c8"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealToFloat</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414os_RealToFloatPK6real_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Converts a <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a> to a float. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Saturates on overflow </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>arg</strong> – Real variable. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414os_FloatToRealf">
+<span id="_CPPv314os_FloatToRealf"></span><span id="_CPPv214os_FloatToRealf"></span><span id="os_FloatToReal__float"></span><span class="target" id="real_8h_1a2d8395d37160b196d48467b377a42b53"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_FloatToReal</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414os_FloatToRealf" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Converts a float to a <a class="reference internal" href="#structreal__t"><span class="std std-ref">real_t</span></a>. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Saturates on overflow </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>arg</strong> – <strong>[in]</strong> Float value. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412os_RealToStrPcPK6real_t6int8_t7uint8_t6int8_t">
+<span id="_CPPv312os_RealToStrPcPK6real_t6int8_t7uint8_t6int8_t"></span><span id="_CPPv212os_RealToStrPcPK6real_t6int8_t7uint8_t6int8_t"></span><span id="os_RealToStr__cP.real_tCP.int8_t.uint8_t.int8_t"></span><span class="target" id="real_8h_1a613e51097b40c4c9df803f5e67058b64"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_RealToStr</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">result</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg</span></span>, <span class="n"><span class="pre">int8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxLength</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">mode</span></span>, <span class="n"><span class="pre">int8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">digits</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412os_RealToStrPcPK6real_t6int8_t7uint8_t6int8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>This converts a ti-float to a ti-ascii string. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>result</strong> – <strong>[in]</strong> Zero terminated string copied to this address </p></li>
+<li><p><strong>arg</strong> – <strong>[in]</strong> Real to convert </p></li>
+<li><p><strong>maxLength</strong> – <strong>[in]</strong> <p>&lt;=0: use default max length (14)</p>
+<p>&gt;0: max length of result, minimum of 6</p>
+</p></li>
+<li><p><strong>mode</strong> – <strong>[in]</strong> <p>0: Use current mode for everything (digits ignored)</p>
+<p>1: Normal mode</p>
+<p>2: Sci mode</p>
+<p>3: Eng mode</p>
+
+ &gt;4: Use current Normal/Sci/Eng mode (digits still used) </p></li>
+<li><p><strong>digits</strong> – <strong>[in]</strong> <p>-1: Float mode</p>
+<p>0-9: Fix # mode</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Length of result </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412os_StrToRealPKcPPc">
+<span id="_CPPv312os_StrToRealPKcPPc"></span><span id="_CPPv212os_StrToRealPKcPPc"></span><span id="os_StrToReal__cCP.cPP"></span><span class="target" id="real_8h_1a8c87da7e79da4f15ab80fcc40628ece9"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_StrToReal</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">string</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">end</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412os_StrToRealPKcPPc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>This converts a ti-ascii string to a ti-float. </p>
+<p>String format regexp: / *[-\032+]?[0-9]*(.[0-9]*)?([eE\033][-\032+]?[0-9]*)?/ </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>string</strong> – <strong>[in]</strong> TI-ascii string to convert </p></li>
+<li><p><strong>end</strong> – <strong>[in]</strong> If non-null, pointer to end of parsed number is stored here </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>resulting TI-float; on exponent overflow this is +-9.9999999999999e99 </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp">
+<span class="target" id="structreal__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">real_t</span></span></span><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;real.h&gt;</em></div>
+<p>Structure of real variable type. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6real_t4signE">
+<span id="_CPPv3N6real_t4signE"></span><span id="_CPPv2N6real_t4signE"></span><span id="real_t::sign__int8_t"></span><span class="target" id="structreal__t_1a6817a0fdfdf54765d1cdbe0f35dd7246"></span><span class="n"><span class="pre">int8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sign</span></span></span><a class="headerlink" href="#_CPPv4N6real_t4signE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6real_t3expE">
+<span id="_CPPv3N6real_t3expE"></span><span id="_CPPv2N6real_t3expE"></span><span id="real_t::exp__int8_t"></span><span class="target" id="structreal__t_1a0ca7d2ec3624d856469732795eb907ad"></span><span class="n"><span class="pre">int8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">exp</span></span></span><a class="headerlink" href="#_CPPv4N6real_t3expE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6real_t4mantE">
+<span id="_CPPv3N6real_t4mantE"></span><span id="_CPPv2N6real_t4mantE"></span><span id="real_t::mant__uint8_tA"></span><span class="target" id="structreal__t_1aa34ecca785cdd312314728c32f0d6cf3"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">mant</span></span></span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">7</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#_CPPv4N6real_t4mantE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp">
+<span class="target" id="structcplx__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cplx_t</span></span></span><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;real.h&gt;</em></div>
+<p>Structure of complex variable type. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6cplx_t4realE">
+<span id="_CPPv3N6cplx_t4realE"></span><span id="_CPPv2N6cplx_t4realE"></span><span id="cplx_t::real__real_t"></span><span class="target" id="structcplx__t_1a6fb591cd963e59c42c43b91800301352"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">real</span></span></span><a class="headerlink" href="#_CPPv4N6cplx_t4realE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6cplx_t4imagE">
+<span id="_CPPv3N6cplx_t4imagE"></span><span id="_CPPv2N6cplx_t4imagE"></span><span id="cplx_t::imag__real_t"></span><span class="target" id="structcplx__t_1a1293c2252c6c8253f3e706a87aff040d"></span><a class="reference internal" href="#_CPPv46real_t" title="real_t"><span class="n"><span class="pre">real_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">imag</span></span></span><a class="headerlink" href="#_CPPv4N6cplx_t4imagE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="python.html" class="btn btn-neutral float-left" title="ti/python.h" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tokens.html" class="btn btn-neutral float-right" title="ti/tokens.h" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v12.1
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+             </strong> 
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

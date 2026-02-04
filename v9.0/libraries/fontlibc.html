@@ -1,0 +1,1723 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fontlibc.h &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/design-tabs.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="graphx.h" href="graphx.html" />
+    <link rel="prev" title="fileioc.h" href="fileioc.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v9.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to the CE C Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../static/printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">CE C Libraries</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="fileioc.html">fileioc.h</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">fontlibc.h</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#text-windowing">Text Windowing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#aligning-text">Aligning Text</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#text-control-codes">Text Control Codes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#transparent-text">Transparent Text</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#line-spacing">Line Spacing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="graphx.html">graphx.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="keypadc.html">keypadc.h</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/index.html">CE C Toolchain Specific Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/makefile-options.html">Makefile Options</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../static/contributing.html">Contributing to the CE C Toolchain</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">CE C Libraries</a> &raquo;</li>
+      <li>fontlibc.h</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="fontlibc-h">
+<span id="id1"></span><h1>fontlibc.h<a class="headerlink" href="#fontlibc-h" title="Permalink to this headline"></a></h1>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;fontlibc.h&gt;</span>
+</pre></div>
+</div>
+<p>fontlibc was designed under a “mechanism not policy” sort of philosophy.
+Rather than attempt to provide as many fancy features as a programmer could want, fontlibc tries to provide fast, basic routines that can be used to build the additional functionality you want.
+For example, word-wrap is not directly provided, but can be implemented using <code class="code docutils literal notranslate"><span class="pre">fontlib_SetAlternateStopCode</span></code> and <code class="code docutils literal notranslate"><span class="pre">fontlib_GetStringWidth</span></code>.
+fontlib hopes to provide enough performance to be usable in games, while providing powerful enough basic features for fancy GUIs and document editors.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#text-windowing" id="id2">Text Windowing</a></p></li>
+<li><p><a class="reference internal" href="#aligning-text" id="id3">Aligning Text</a></p></li>
+<li><p><a class="reference internal" href="#text-control-codes" id="id4">Text Control Codes</a></p></li>
+<li><p><a class="reference internal" href="#transparent-text" id="id5">Transparent Text</a></p></li>
+<li><p><a class="reference internal" href="#line-spacing" id="id6">Line Spacing</a></p></li>
+<li><p><a class="reference internal" href="#api-documentation" id="id7">API Documentation</a></p></li>
+</ul>
+</div>
+<div class="section" id="text-windowing">
+<h2><a class="toc-backref" href="#id2">Text Windowing</a><a class="headerlink" href="#text-windowing" title="Permalink to this headline"></a></h2>
+<p>To assist in text layout, fontlibc provides for a text window, which automatically confines text to appear in a specific rectangular area of the screen.
+This feature may be useful for dialogs and scrolling large blocks of text.
+Use <code class="code docutils literal notranslate"><span class="pre">fontlib_SetWindow</span></code> to set the current window bounds.
+Use <code class="code docutils literal notranslate"><span class="pre">fontlib_SetNewlineOptions</span></code> to control how <code class="code docutils literal notranslate"><span class="pre">fontlib_DrawString</span></code> behaves when it reaches the right edge of the text window.</p>
+</div>
+<div class="section" id="aligning-text">
+<h2><a class="toc-backref" href="#id3">Aligning Text</a><a class="headerlink" href="#aligning-text" title="Permalink to this headline"></a></h2>
+<p>Implementing centered text, right-aligned text, and word wrap requires being able to compute the width of a word or string of text.
+The routine <code class="code docutils literal notranslate"><span class="pre">fontlib_GetStringWidth</span></code> provides this functionality.</p>
+<p>If you call <code class="code docutils literal notranslate"><span class="pre">fontlib_SetAlternateStopCode('</span> <span class="pre">')</span></code>, <code class="code docutils literal notranslate"><span class="pre">fontlib_GetStringWidth</span></code> and <code class="code docutils literal notranslate"><span class="pre">fontlib_DrawString</span></code> will stop drawing on spaces, giving you a chance to check if the next word will fit on screen.
+You can use <code class="code docutils literal notranslate"><span class="pre">fontlib_GetLastCharacterRead()</span></code> to find out where <code class="code docutils literal notranslate"><span class="pre">fontlib_GetStringWidth</span></code> or <code class="code docutils literal notranslate"><span class="pre">fontlib_DrawString</span></code> stopped, and, after handling the space, then pass that address (plus one) again to <code class="code docutils literal notranslate"><span class="pre">fontlib_GetStringWidth</span></code> or <code class="code docutils literal notranslate"><span class="pre">fontlib_DrawString</span></code> to resume processing at where it left off before.</p>
+</div>
+<div class="section" id="text-control-codes">
+<h2><a class="toc-backref" href="#id4">Text Control Codes</a><a class="headerlink" href="#text-control-codes" title="Permalink to this headline"></a></h2>
+<p>Embedded control codes are a popular way of managing style and formatting information in string.
+fontlibc only natively recognizes two types of control codes: NULL (0) as a stop code and a user-specified alternate stop code, and a user-specified newline code (defaults to 0x0A—ASCII LF and standard Linux style).
+However, you can add your own control codes with <code class="code docutils literal notranslate"><span class="pre">fontlib_SetFirstPrintableCodePoint</span></code>.
+When any code point less than the first printable code point is encountered, fontlibc stops string processing and returns to allow you to handle the control code yourself using <code class="code docutils literal notranslate"><span class="pre">fontlib_GetLastCharacterRead</span></code>.</p>
+</div>
+<div class="section" id="transparent-text">
+<h2><a class="toc-backref" href="#id5">Transparent Text</a><a class="headerlink" href="#transparent-text" title="Permalink to this headline"></a></h2>
+<p>Part of providing high-performance is not painting a single pixel more than once.
+To assist with this goal, fontlibc provides for both transparent and opaque text backgrounds.
+Use <code class="code docutils literal notranslate"><span class="pre">fontlib_SetTransparency(true)</span></code> if you need to paint text over a background other than a solid color.
+If you turn transparency off, however, fontlibc will paint both background and foreground pixels for you, eliminating the time needed to erase those pixels before painting over that area.</p>
+</div>
+<div class="section" id="line-spacing">
+<h2><a class="toc-backref" href="#id6">Line Spacing</a><a class="headerlink" href="#line-spacing" title="Permalink to this headline"></a></h2>
+<p>Since a block of text may not always be the same size, fontlibc provides <code class="code docutils literal notranslate"><span class="pre">fontlib_ClearEOL</span></code> for erasing the remainder of a line of text without needing to pad it with spaces.
+This action can also be performed automatically after embedded newlines in text and on normal wrapping with <code class="code docutils literal notranslate"><span class="pre">fontlib_SetNewlineOptions</span></code>.</p>
+<p>Additional blank vertical space around text can improve readability in large blocks of text.
+<code class="code docutils literal notranslate"><span class="pre">fontlib_SetLineSpacing</span></code> allows you to set this behavior.
+Fonts may specify default additional spacing that is automatically applied when calling <code class="code docutils literal notranslate"><span class="pre">fontlib_SetFont</span></code>.
+In GUIs and games where the benefits of legibility are outweighed by more aggressive use of vertical space, you can force the default spacing to zero after using <code class="code docutils literal notranslate"><span class="pre">fontlib_SetFont</span></code> with <code class="code docutils literal notranslate"><span class="pre">fontlib_SetLineSpacing</span></code>.</p>
+</div>
+<div class="section" id="api-documentation">
+<h2><a class="toc-backref" href="#id7">API Documentation</a><a class="headerlink" href="#api-documentation" title="Permalink to this headline"></a></h2>
+<p>Provides improved font support. </p>
+<p><dl class="simple">
+<dt><strong>Author</strong></dt><dd><p>DrDnar </p>
+</dd>
+</dl>
+</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-enums">Enums</p>
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv425fontlib_newline_options_t">
+<span id="_CPPv325fontlib_newline_options_t"></span><span id="_CPPv225fontlib_newline_options_t"></span><span class="target" id="fontlibc_8h_1a33af52aa5db3dc2ad8357328b37a528e"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_newline_options_t</span></span></span><a class="headerlink" href="#_CPPv425fontlib_newline_options_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Options for controlling newline behavior <div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#fontlibc_8h_1a9a6814959051d03d5f8b6cd4e60db879"><span class="std std-ref">fontlib_SetNewlineOptions</span></a> </p>
+</div>
+</p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N25fontlib_newline_options_t24FONTLIB_ENABLE_AUTO_WRAPE">
+<span id="_CPPv3N25fontlib_newline_options_t24FONTLIB_ENABLE_AUTO_WRAPE"></span><span id="_CPPv2N25fontlib_newline_options_t24FONTLIB_ENABLE_AUTO_WRAPE"></span><span class="target" id="fontlibc_8h_1a33af52aa5db3dc2ad8357328b37a528ea23b3a1adaf68cae60a390880e8fdcee6"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FONTLIB_ENABLE_AUTO_WRAP</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0x01</span></span><a class="headerlink" href="#_CPPv4N25fontlib_newline_options_t24FONTLIB_ENABLE_AUTO_WRAPE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Enables automatic wrapping at the end of the line. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is per-glyph; word warp is neither implemented nor planned </p>
+</div>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N25fontlib_newline_options_t25FONTLIB_AUTO_CLEAR_TO_EOLE">
+<span id="_CPPv3N25fontlib_newline_options_t25FONTLIB_AUTO_CLEAR_TO_EOLE"></span><span id="_CPPv2N25fontlib_newline_options_t25FONTLIB_AUTO_CLEAR_TO_EOLE"></span><span class="target" id="fontlibc_8h_1a33af52aa5db3dc2ad8357328b37a528ea6c8d826ba8e55ef46c828fc5e35c13c5"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FONTLIB_AUTO_CLEAR_TO_EOL</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0x02</span></span><a class="headerlink" href="#_CPPv4N25fontlib_newline_options_t25FONTLIB_AUTO_CLEAR_TO_EOLE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Upon any newline, clears the remainder of the line of text. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Useful for printing over previously printed text when transparency is turned off, as this means each pixel in a line of text need only be visited once. </p>
+</div>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N25fontlib_newline_options_t24FONTLIB_PRECLEAR_NEWLINEE">
+<span id="_CPPv3N25fontlib_newline_options_t24FONTLIB_PRECLEAR_NEWLINEE"></span><span id="_CPPv2N25fontlib_newline_options_t24FONTLIB_PRECLEAR_NEWLINEE"></span><span class="target" id="fontlibc_8h_1a33af52aa5db3dc2ad8357328b37a528ea373b823a7122a70d3918d2555e6000a7"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FONTLIB_PRECLEAR_NEWLINE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0x04</span></span><a class="headerlink" href="#_CPPv4N25fontlib_newline_options_t24FONTLIB_PRECLEAR_NEWLINEE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Clears the NEXT line of text </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Don’t combine this with AUTO_CLEAR because that just wastes CPU cycles due to erasing/drawing each pixel twice. </p>
+</div>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N25fontlib_newline_options_t19FONTLIB_AUTO_SCROLLE">
+<span id="_CPPv3N25fontlib_newline_options_t19FONTLIB_AUTO_SCROLLE"></span><span id="_CPPv2N25fontlib_newline_options_t19FONTLIB_AUTO_SCROLLE"></span><span class="target" id="fontlibc_8h_1a33af52aa5db3dc2ad8357328b37a528eab37b9c2f4a5fdbef51312bfaede09fb4"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FONTLIB_AUTO_SCROLL</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0x08</span></span><a class="headerlink" href="#_CPPv4N25fontlib_newline_options_t19FONTLIB_AUTO_SCROLLE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Enables automatic scrolling when a newline would push the cursor past the bottom of the text window. The cursor is left at the bottom left. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If PRECLEAR is not set, then the bottom line of text will not be erased. </p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv422fontlib_load_options_t">
+<span id="_CPPv322fontlib_load_options_t"></span><span id="_CPPv222fontlib_load_options_t"></span><span class="target" id="fontlibc_8h_1af106266dcf020e47c6c902b49934376c"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_load_options_t</span></span></span><a class="headerlink" href="#_CPPv422fontlib_load_options_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Options for controlling how SetFont functions. <div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#fontlibc_8h_1acc53a3091651b5469febda8bb68b6bc9"><span class="std std-ref">fontlib_SetFont</span></a> </p>
+</div>
+</p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N22fontlib_load_options_t27FONTLIB_IGNORE_LINE_SPACINGE">
+<span id="_CPPv3N22fontlib_load_options_t27FONTLIB_IGNORE_LINE_SPACINGE"></span><span id="_CPPv2N22fontlib_load_options_t27FONTLIB_IGNORE_LINE_SPACINGE"></span><span class="target" id="fontlibc_8h_1af106266dcf020e47c6c902b49934376ca813669d134b6e1989e0580eb5775ca05"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FONTLIB_IGNORE_LINE_SPACING</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0x01</span></span><a class="headerlink" href="#_CPPv4N22fontlib_load_options_t27FONTLIB_IGNORE_LINE_SPACINGE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>If set, then the space above/below metrics specified in the font will be ignored and set to zero. You can still manually set them later. </p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv416fontlib_styles_t">
+<span id="_CPPv316fontlib_styles_t"></span><span id="_CPPv216fontlib_styles_t"></span><span class="target" id="fontlibc_8h_1af74209031f5e28cfeb61e863db3dcdbc"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_styles_t</span></span></span><a class="headerlink" href="#_CPPv416fontlib_styles_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Options for selecting a font by style <div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#fontlibc_8h_1a3afde32fe0a16526e644130f1261645d"><span class="std std-ref">fontlib_GetFontByStyle</span></a> </p>
+</div>
+</p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N16fontlib_styles_t13FONTLIB_SERIFE">
+<span id="_CPPv3N16fontlib_styles_t13FONTLIB_SERIFE"></span><span id="_CPPv2N16fontlib_styles_t13FONTLIB_SERIFE"></span><span class="target" id="fontlibc_8h_1af74209031f5e28cfeb61e863db3dcdbca0f14aae4ade2d7cb08027c1928285cb8"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FONTLIB_SERIF</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0x01</span></span><a class="headerlink" href="#_CPPv4N16fontlib_styles_t13FONTLIB_SERIFE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Clear = sans-serif font </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N16fontlib_styles_t15FONTLIB_OBLIQUEE">
+<span id="_CPPv3N16fontlib_styles_t15FONTLIB_OBLIQUEE"></span><span id="_CPPv2N16fontlib_styles_t15FONTLIB_OBLIQUEE"></span><span class="target" id="fontlibc_8h_1af74209031f5e28cfeb61e863db3dcdbcaa5a2e66b39e56d65f30f3ab82259230c"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FONTLIB_OBLIQUE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0x02</span></span><a class="headerlink" href="#_CPPv4N16fontlib_styles_t15FONTLIB_OBLIQUEE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Oblique is slanted like italic text, but with the cursive-like styling. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N16fontlib_styles_t14FONTLIB_ITALICE">
+<span id="_CPPv3N16fontlib_styles_t14FONTLIB_ITALICE"></span><span id="_CPPv2N16fontlib_styles_t14FONTLIB_ITALICE"></span><span class="target" id="fontlibc_8h_1af74209031f5e28cfeb61e863db3dcdbcafc300af1a57629e8273e267a09ff65a3"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FONTLIB_ITALIC</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0x04</span></span><a class="headerlink" href="#_CPPv4N16fontlib_styles_t14FONTLIB_ITALICE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>If both italic and oblique are set, then assume there’s no difference between oblique and italic styles. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N16fontlib_styles_t18FONTLIB_MONOSPACEDE">
+<span id="_CPPv3N16fontlib_styles_t18FONTLIB_MONOSPACEDE"></span><span id="_CPPv2N16fontlib_styles_t18FONTLIB_MONOSPACEDE"></span><span class="target" id="fontlibc_8h_1af74209031f5e28cfeb61e863db3dcdbca71ecb196e7f4e20db0c4c9643bf3b373"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FONTLIB_MONOSPACED</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0x08</span></span><a class="headerlink" href="#_CPPv4N16fontlib_styles_t18FONTLIB_MONOSPACEDE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Monospaced font </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Chances are you’re not using this library for monospaced fonts. But if you are, you’ll still have to provide a widths table where every byte is the same. </p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is not enforced; a variable-width font can claim to be monospaced! </p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv417fontlib_weights_t">
+<span id="_CPPv317fontlib_weights_t"></span><span id="_CPPv217fontlib_weights_t"></span><span class="target" id="fontlibc_8h_1a7254f40632cd9129d608dbf019099389"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_weights_t</span></span></span><a class="headerlink" href="#_CPPv417fontlib_weights_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Options for selecting a font by weight <div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#fontlibc_8h_1a3afde32fe0a16526e644130f1261645d"><span class="std std-ref">fontlib_GetFontByStyle</span></a> </p>
+</div>
+</p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N17fontlib_weights_t12FONTLIB_THINE">
+<span id="_CPPv3N17fontlib_weights_t12FONTLIB_THINE"></span><span id="_CPPv2N17fontlib_weights_t12FONTLIB_THINE"></span><span class="target" id="fontlibc_8h_1a7254f40632cd9129d608dbf019099389a825b19540a486f87a0b43ee378605e47"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FONTLIB_THIN</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0x20</span></span><a class="headerlink" href="#_CPPv4N17fontlib_weights_t12FONTLIB_THINE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N17fontlib_weights_t19FONTLIB_EXTRA_LIGHTE">
+<span id="_CPPv3N17fontlib_weights_t19FONTLIB_EXTRA_LIGHTE"></span><span id="_CPPv2N17fontlib_weights_t19FONTLIB_EXTRA_LIGHTE"></span><span class="target" id="fontlibc_8h_1a7254f40632cd9129d608dbf019099389a4ed40f6db5b9e0a51d5f8667ffe28651"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FONTLIB_EXTRA_LIGHT</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0x30</span></span><a class="headerlink" href="#_CPPv4N17fontlib_weights_t19FONTLIB_EXTRA_LIGHTE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N17fontlib_weights_t13FONTLIB_LIGHTE">
+<span id="_CPPv3N17fontlib_weights_t13FONTLIB_LIGHTE"></span><span id="_CPPv2N17fontlib_weights_t13FONTLIB_LIGHTE"></span><span class="target" id="fontlibc_8h_1a7254f40632cd9129d608dbf019099389aa2bc7be90a082eaeda5d8a0c6a48b820"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FONTLIB_LIGHT</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0x40</span></span><a class="headerlink" href="#_CPPv4N17fontlib_weights_t13FONTLIB_LIGHTE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N17fontlib_weights_t17FONTLIB_SEMILIGHTE">
+<span id="_CPPv3N17fontlib_weights_t17FONTLIB_SEMILIGHTE"></span><span id="_CPPv2N17fontlib_weights_t17FONTLIB_SEMILIGHTE"></span><span class="target" id="fontlibc_8h_1a7254f40632cd9129d608dbf019099389ae924ba397a7085d8ea5382a383a12f6d"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FONTLIB_SEMILIGHT</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0x60</span></span><a class="headerlink" href="#_CPPv4N17fontlib_weights_t17FONTLIB_SEMILIGHTE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N17fontlib_weights_t14FONTLIB_NORMALE">
+<span id="_CPPv3N17fontlib_weights_t14FONTLIB_NORMALE"></span><span id="_CPPv2N17fontlib_weights_t14FONTLIB_NORMALE"></span><span class="target" id="fontlibc_8h_1a7254f40632cd9129d608dbf019099389a12f95ed02d9cd290544edce84c62c6d1"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FONTLIB_NORMAL</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0x80</span></span><a class="headerlink" href="#_CPPv4N17fontlib_weights_t14FONTLIB_NORMALE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N17fontlib_weights_t14FONTLIB_MEDIUME">
+<span id="_CPPv3N17fontlib_weights_t14FONTLIB_MEDIUME"></span><span id="_CPPv2N17fontlib_weights_t14FONTLIB_MEDIUME"></span><span class="target" id="fontlibc_8h_1a7254f40632cd9129d608dbf019099389ade894e2ab6544072e2fc8fb850809230"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FONTLIB_MEDIUM</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0x90</span></span><a class="headerlink" href="#_CPPv4N17fontlib_weights_t14FONTLIB_MEDIUME" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N17fontlib_weights_t16FONTLIB_SEMIBOLDE">
+<span id="_CPPv3N17fontlib_weights_t16FONTLIB_SEMIBOLDE"></span><span id="_CPPv2N17fontlib_weights_t16FONTLIB_SEMIBOLDE"></span><span class="target" id="fontlibc_8h_1a7254f40632cd9129d608dbf019099389a5b60e788bea57708f840b2179f1600e5"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FONTLIB_SEMIBOLD</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0xA0</span></span><a class="headerlink" href="#_CPPv4N17fontlib_weights_t16FONTLIB_SEMIBOLDE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N17fontlib_weights_t12FONTLIB_BOLDE">
+<span id="_CPPv3N17fontlib_weights_t12FONTLIB_BOLDE"></span><span id="_CPPv2N17fontlib_weights_t12FONTLIB_BOLDE"></span><span class="target" id="fontlibc_8h_1a7254f40632cd9129d608dbf019099389a7eda50a9b48e9760e4c4966b41fd56e1"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FONTLIB_BOLD</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0xC0</span></span><a class="headerlink" href="#_CPPv4N17fontlib_weights_t12FONTLIB_BOLDE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N17fontlib_weights_t18FONTLIB_EXTRA_BOLDE">
+<span id="_CPPv3N17fontlib_weights_t18FONTLIB_EXTRA_BOLDE"></span><span id="_CPPv2N17fontlib_weights_t18FONTLIB_EXTRA_BOLDE"></span><span class="target" id="fontlibc_8h_1a7254f40632cd9129d608dbf019099389a59801546ccfa53411b854410f685fc60"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FONTLIB_EXTRA_BOLD</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0xE0</span></span><a class="headerlink" href="#_CPPv4N17fontlib_weights_t18FONTLIB_EXTRA_BOLDE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N17fontlib_weights_t13FONTLIB_BLACKE">
+<span id="_CPPv3N17fontlib_weights_t13FONTLIB_BLACKE"></span><span id="_CPPv2N17fontlib_weights_t13FONTLIB_BLACKE"></span><span class="target" id="fontlibc_8h_1a7254f40632cd9129d608dbf019099389a5c1c048ce9b8b1a4bb553f37dcd20788"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FONTLIB_BLACK</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0xF0</span></span><a class="headerlink" href="#_CPPv4N17fontlib_weights_t13FONTLIB_BLACKE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv427fontlib_SetWindowFullScreenv">
+<span id="_CPPv327fontlib_SetWindowFullScreenv"></span><span id="_CPPv227fontlib_SetWindowFullScreenv"></span><span id="fontlib_SetWindowFullScreen__void"></span><span class="target" id="fontlibc_8h_1a32646881706a7931dfe43c3ceed05ff9"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_SetWindowFullScreen</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv427fontlib_SetWindowFullScreenv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets the bounds of the window all text will appear in to be the full screen. This is the default. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417fontlib_SetWindowj7uint8_tj7uint8_t">
+<span id="_CPPv317fontlib_SetWindowj7uint8_tj7uint8_t"></span><span id="_CPPv217fontlib_SetWindowj7uint8_tj7uint8_t"></span><span id="fontlib_SetWindow__unsigned-i.uint8_t.unsigned-i.uint8_t"></span><span class="target" id="fontlibc_8h_1aa742426d20b6f03e5059063cb6ef9c69"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_SetWindow</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x_min</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y_min</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">width</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">height</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417fontlib_SetWindowj7uint8_tj7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets the bounds of the window all text will appear in. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Clipping of partial glyphs is not supported. If a glyph, either horizontally or vertically, does not fit in the text window, it will not be printed at all. </p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Behavior is undefined if the text cursor is positioned outside of the current text window. </p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Changing this does not automatically move the text cursor into the window. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_min</strong> – X coord base </p></li>
+<li><p><strong>y_min</strong> – Y coord base </p></li>
+<li><p><strong>width</strong> – Width </p></li>
+<li><p><strong>height</strong> – Height </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv421fontlib_GetWindowXMinv">
+<span id="_CPPv321fontlib_GetWindowXMinv"></span><span id="_CPPv221fontlib_GetWindowXMinv"></span><span id="fontlib_GetWindowXMin__void"></span><span class="target" id="fontlibc_8h_1a9149f8cfd2df7946df3b5bbc772d8078"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetWindowXMin</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421fontlib_GetWindowXMinv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the starting column of the current text window </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Window X </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv421fontlib_GetWindowYMinv">
+<span id="_CPPv321fontlib_GetWindowYMinv"></span><span id="_CPPv221fontlib_GetWindowYMinv"></span><span id="fontlib_GetWindowYMin__void"></span><span class="target" id="fontlibc_8h_1ad731c36201edd432e6996e33c3da9f2b"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetWindowYMin</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421fontlib_GetWindowYMinv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the starting row of the current text window </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Window Y </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv422fontlib_GetWindowWidthv">
+<span id="_CPPv322fontlib_GetWindowWidthv"></span><span id="_CPPv222fontlib_GetWindowWidthv"></span><span id="fontlib_GetWindowWidth__void"></span><span class="target" id="fontlibc_8h_1a90f6b52727c2ea3e7064dba3b2e52a47"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetWindowWidth</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422fontlib_GetWindowWidthv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the width of the current text window </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Window width </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv423fontlib_GetWindowHeightv">
+<span id="_CPPv323fontlib_GetWindowHeightv"></span><span id="_CPPv223fontlib_GetWindowHeightv"></span><span id="fontlib_GetWindowHeight__void"></span><span class="target" id="fontlibc_8h_1a22c1f272c6157868fe68d684aef12043"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetWindowHeight</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423fontlib_GetWindowHeightv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the height of the current text window </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Window height </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv425fontlib_SetCursorPositionj7uint8_t">
+<span id="_CPPv325fontlib_SetCursorPositionj7uint8_t"></span><span id="_CPPv225fontlib_SetCursorPositionj7uint8_t"></span><span id="fontlib_SetCursorPosition__unsigned-i.uint8_t"></span><span class="target" id="fontlibc_8h_1a0f05b1006f53dfc86b309fc167f4e639"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_SetCursorPosition</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425fontlib_SetCursorPositionj7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets the cursor position.</p>
+<p>Behavior is undefined if the cursor is set outside of the text window. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – X </p></li>
+<li><p><strong>y</strong> – Y </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv418fontlib_GetCursorXv">
+<span id="_CPPv318fontlib_GetCursorXv"></span><span id="_CPPv218fontlib_GetCursorXv"></span><span id="fontlib_GetCursorX__void"></span><span class="target" id="fontlibc_8h_1a8d703b163f86c32871cf24c2b40e07df"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetCursorX</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418fontlib_GetCursorXv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the cursor column. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Current cursor X </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv418fontlib_GetCursorYv">
+<span id="_CPPv318fontlib_GetCursorYv"></span><span id="_CPPv218fontlib_GetCursorYv"></span><span id="fontlib_GetCursorY__void"></span><span class="target" id="fontlibc_8h_1a7bb35b2ba2f4dc1f8b898187e51d0209"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetCursorY</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418fontlib_GetCursorYv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the cursor row. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Current cursor Y </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv427fontlib_ShiftCursorPositionii">
+<span id="_CPPv327fontlib_ShiftCursorPositionii"></span><span id="_CPPv227fontlib_ShiftCursorPositionii"></span><span id="fontlib_ShiftCursorPosition__i.i"></span><span class="target" id="fontlibc_8h_1a47c2ee66aca3dc3c6cb588f4788a7be1"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_ShiftCursorPosition</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv427fontlib_ShiftCursorPositionii" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Adds the given (x,y) to the cursor position. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Useful for tabbing, for example. </p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Behavior is undefined if the resulting cursor position is offscreen. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – x-shift </p></li>
+<li><p><strong>y</strong> – y-shift </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414fontlib_HomeUpv">
+<span id="_CPPv314fontlib_HomeUpv"></span><span id="_CPPv214fontlib_HomeUpv"></span><span id="fontlib_HomeUp"></span><span class="target" id="fontlibc_8h_1a81e3f7dd0de8677770b8565abf8dd5c7"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_HomeUp</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414fontlib_HomeUpv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Moves the cursor to the upper left corner of the text window. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412fontlib_Homev">
+<span id="_CPPv312fontlib_Homev"></span><span id="_CPPv212fontlib_Homev"></span><span id="fontlib_Home"></span><span class="target" id="fontlibc_8h_1ace0f65ffa5b1fcf22621903e188d5033"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_Home</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412fontlib_Homev" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Moves the cursor back to the start of the current line. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415fontlib_SetFontPK14fontlib_font_t22fontlib_load_options_t">
+<span id="_CPPv315fontlib_SetFontPK14fontlib_font_t22fontlib_load_options_t"></span><span id="_CPPv215fontlib_SetFontPK14fontlib_font_t22fontlib_load_options_t"></span><span id="fontlib_SetFont__fontlib_font_tCP.fontlib_load_options_t"></span><span class="target" id="fontlibc_8h_1acc53a3091651b5469febda8bb68b6bc9"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_SetFont</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv414fontlib_font_t" title="fontlib_font_t"><span class="n"><span class="pre">fontlib_font_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">font_data</span></span>, <a class="reference internal" href="#_CPPv422fontlib_load_options_t" title="fontlib_load_options_t"><span class="n"><span class="pre">fontlib_load_options_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">flags</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415fontlib_SetFontPK14fontlib_font_t22fontlib_load_options_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets the current font </p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If false is returned, no valid font is currently loaded and trying to print will print garbage! </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>font_data</strong> – Pointer to font data </p></li>
+<li><p><strong>flags</strong> – Information about how to process the font (unused) </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Returns false if the font seems invalid for any reason </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv426fontlib_SetForegroundColor7uint8_t">
+<span id="_CPPv326fontlib_SetForegroundColor7uint8_t"></span><span id="_CPPv226fontlib_SetForegroundColor7uint8_t"></span><span id="fontlib_SetForegroundColor__uint8_t"></span><span class="target" id="fontlibc_8h_1a7ac6e904c6623f177589a5ffa73f61fe"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_SetForegroundColor</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">color</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv426fontlib_SetForegroundColor7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets the current foreground color FontLibC will use for drawing. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is NOT the same as GraphX’s current color! </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>color</strong> – New color to use </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv426fontlib_SetBackgroundColor7uint8_t">
+<span id="_CPPv326fontlib_SetBackgroundColor7uint8_t"></span><span id="_CPPv226fontlib_SetBackgroundColor7uint8_t"></span><span id="fontlib_SetBackgroundColor__uint8_t"></span><span class="target" id="fontlibc_8h_1a6f8872a27db6942d2b6585dc033c7ee5"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_SetBackgroundColor</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">color</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv426fontlib_SetBackgroundColor7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets the current background color FontLibC will use for drawing. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is NOT the same as GraphX’s current color! </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>color</strong> – New color to use </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417fontlib_SetColors7uint8_t7uint8_t">
+<span id="_CPPv317fontlib_SetColors7uint8_t7uint8_t"></span><span id="_CPPv217fontlib_SetColors7uint8_t7uint8_t"></span><span id="fontlib_SetColors__uint8_t.uint8_t"></span><span class="target" id="fontlibc_8h_1a43d3708893218e3128c195a37b2734ac"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_SetColors</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">forecolor</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">backcolor</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417fontlib_SetColors7uint8_t7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets the current colors FontLibC will use for drawing. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>These are NOT the same as GraphX’s current colors! </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>forecolor</strong> – New foreground color to use </p></li>
+<li><p><strong>backcolor</strong> – New background color to use </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv426fontlib_GetForegroundColorv">
+<span id="_CPPv326fontlib_GetForegroundColorv"></span><span id="_CPPv226fontlib_GetForegroundColorv"></span><span id="fontlib_GetForegroundColor__void"></span><span class="target" id="fontlibc_8h_1a12a1fdee18d450db7570f98acfec5fdc"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetForegroundColor</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv426fontlib_GetForegroundColorv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the current foreground color FontLibC will use for drawing. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is NOT the same as GraphX’s current color! </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Current foreground color </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv426fontlib_GetBackgroundColorv">
+<span id="_CPPv326fontlib_GetBackgroundColorv"></span><span id="_CPPv226fontlib_GetBackgroundColorv"></span><span id="fontlib_GetBackgroundColor__void"></span><span class="target" id="fontlibc_8h_1abab8e0640b4edd87d48934ac7d9aec61"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetBackgroundColor</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv426fontlib_GetBackgroundColorv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the current background color FontLibC will use for drawing. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is NOT the same as GraphX’s current color! </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Current background color </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv423fontlib_SetTransparencyb">
+<span id="_CPPv323fontlib_SetTransparencyb"></span><span id="_CPPv223fontlib_SetTransparencyb"></span><span id="fontlib_SetTransparency__b"></span><span class="target" id="fontlibc_8h_1a4514964d8e5c727c332d7db9c60b0e1c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_SetTransparency</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">transparency</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423fontlib_SetTransparencyb" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Controls whether FontLibC will use a transparent background for text drawing instead of the currently configured background color. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This has nothing to do with GraphX’s configured transparent color </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>transparency</strong> – true to make background transparent, false to use background color </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv423fontlib_GetTransparencyv">
+<span id="_CPPv323fontlib_GetTransparencyv"></span><span id="_CPPv223fontlib_GetTransparencyv"></span><span id="fontlib_GetTransparency__void"></span><span class="target" id="fontlibc_8h_1a2f72879333f089200ccb462ec2723ed3"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetTransparency</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423fontlib_GetTransparencyv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns whether FontLibC will use a transparent background for text drawing instead of the currently configured background color. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This has nothing to do with GraphX’s configured transparent color </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>true if background will be transparent, false if background color will be used </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv422fontlib_SetLineSpacing7uint8_t7uint8_t">
+<span id="_CPPv322fontlib_SetLineSpacing7uint8_t7uint8_t"></span><span id="_CPPv222fontlib_SetLineSpacing7uint8_t7uint8_t"></span><span id="fontlib_SetLineSpacing__uint8_t.uint8_t"></span><span class="target" id="fontlibc_8h_1af146bd8f8902c01917c3eb98df35ab70"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_SetLineSpacing</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">space_above</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">space_below</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422fontlib_SetLineSpacing7uint8_t7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Controls hows much black space will be added above and below each line of text. If transparency is set, then the padding will not be overwritten with the background color, but padding will still be added. Padding space is added at the time each glyph is drawn. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>space_above</strong> – Blank space padding to add above </p></li>
+<li><p><strong>space_below</strong> – Blank space padding to add below </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv421fontlib_GetSpaceAbovev">
+<span id="_CPPv321fontlib_GetSpaceAbovev"></span><span id="_CPPv221fontlib_GetSpaceAbovev"></span><span id="fontlib_GetSpaceAbove__void"></span><span class="target" id="fontlibc_8h_1ac8d7c6dce3d14cc49da29d1ff15e2603"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetSpaceAbove</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421fontlib_GetSpaceAbovev" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns current padding space above. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Current padding space above </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv421fontlib_GetSpaceBelowv">
+<span id="_CPPv321fontlib_GetSpaceBelowv"></span><span id="_CPPv221fontlib_GetSpaceBelowv"></span><span id="fontlib_GetSpaceBelow__void"></span><span class="target" id="fontlibc_8h_1ab6d7da24aa7bb02a5f189b9742949682"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetSpaceBelow</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421fontlib_GetSpaceBelowv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns current padding space below </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Current padding space below </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv434fontlib_SetItalicSpacingAdjustment7uint8_t">
+<span id="_CPPv334fontlib_SetItalicSpacingAdjustment7uint8_t"></span><span id="_CPPv234fontlib_SetItalicSpacingAdjustment7uint8_t"></span><span id="fontlib_SetItalicSpacingAdjustment__uint8_t"></span><span class="target" id="fontlibc_8h_1a5ca80cd2aca759d0fa51ec659c3e825f"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_SetItalicSpacingAdjustment</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">italic_spacing_adjustment</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv434fontlib_SetItalicSpacingAdjustment7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets current spacing adjustment for italic text. This causes the cursor to be moved back a certain number of pixels after every glyph is drawn. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is only useful if transparency mode is set. </p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Italics is currently untested! (I haven’t designed an italic font yet.) </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>italic_spacing_adjustment</strong> – Pixels to move cursor backward after each glyph </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv434fontlib_GetItalicSpacingAdjustmentv">
+<span id="_CPPv334fontlib_GetItalicSpacingAdjustmentv"></span><span id="_CPPv234fontlib_GetItalicSpacingAdjustmentv"></span><span id="fontlib_GetItalicSpacingAdjustment__void"></span><span class="target" id="fontlibc_8h_1a8373d8cb64c2e7330b21507b3247ea68"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetItalicSpacingAdjustment</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv434fontlib_GetItalicSpacingAdjustmentv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns current spacing adjustment for italic text. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Current spacing adjustment for italic text </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv428fontlib_GetCurrentFontHeightv">
+<span id="_CPPv328fontlib_GetCurrentFontHeightv"></span><span id="_CPPv228fontlib_GetCurrentFontHeightv"></span><span id="fontlib_GetCurrentFontHeight__void"></span><span class="target" id="fontlibc_8h_1a40cb5c901931bf242e9bc9946c1eb578"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetCurrentFontHeight</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv428fontlib_GetCurrentFontHeightv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the height of the current font, INCLUDING space above/below </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Height in pixels </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv425fontlib_ValidateCodePointc">
+<span id="_CPPv325fontlib_ValidateCodePointc"></span><span id="_CPPv225fontlib_ValidateCodePointc"></span><span id="fontlib_ValidateCodePoint__c"></span><span class="target" id="fontlibc_8h_1a6a3163396bc9dd8e5fffd7a539a3b179"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_ValidateCodePoint</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">code_point</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425fontlib_ValidateCodePointc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Tests whether the current font has the given code point </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>code_point</strong> – Code point to test </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>true if code_point is in current font, false if not </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv422fontlib_GetTotalGlyphsv">
+<span id="_CPPv322fontlib_GetTotalGlyphsv"></span><span id="_CPPv222fontlib_GetTotalGlyphsv"></span><span id="fontlib_GetTotalGlyphs__void"></span><span class="target" id="fontlibc_8h_1a2a94d80b93826a20277830fedb576c33"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetTotalGlyphs</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422fontlib_GetTotalGlyphsv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the total number of printable glyphs in the font. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This can return 256; no valid font has 0 printable glyphs. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Total number of printable glyphs </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv421fontlib_GetFirstGlyphv">
+<span id="_CPPv321fontlib_GetFirstGlyphv"></span><span id="_CPPv221fontlib_GetFirstGlyphv"></span><span id="fontlib_GetFirstGlyph__void"></span><span class="target" id="fontlibc_8h_1aaf5e64f2657797eec55b7cbeff099084"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetFirstGlyph</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421fontlib_GetFirstGlyphv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the code point of the first printable glyph. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The C SDK makes char SIGNED by default, so you probably want to typecast this to unsigned char before attempting any math with it. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>First print glyph code point </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv422fontlib_SetNewlineCodec">
+<span id="_CPPv322fontlib_SetNewlineCodec"></span><span id="_CPPv222fontlib_SetNewlineCodec"></span><span id="fontlib_SetNewlineCode__c"></span><span class="target" id="fontlibc_8h_1a5506d578d27f60fbdb5d850b0246992c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_SetNewlineCode</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">code_point</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422fontlib_SetNewlineCodec" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Allows you to set the code point that is recognized as being a new line code. You can set this to zero to prevent new line code processing. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If FONTLIB_ENABLE_AUTO_WRAP is enabled, then wrapping will still implicitly case a newline. </p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This defaults to 0x0A (ASCII line feed/UNIX newline) </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>code_point</strong> – New code point to use for newline </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv422fontlib_GetNewlineCodev">
+<span id="_CPPv322fontlib_GetNewlineCodev"></span><span id="_CPPv222fontlib_GetNewlineCodev"></span><span id="fontlib_GetNewlineCode__void"></span><span class="target" id="fontlibc_8h_1ad7ab65589290885224cd785f6656e06e"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetNewlineCode</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422fontlib_GetNewlineCodev" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the code point that is currently recognized as being a newline. If 0, newlines in strings will not be processed. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Current newline </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv428fontlib_SetAlternateStopCodec">
+<span id="_CPPv328fontlib_SetAlternateStopCodec"></span><span id="_CPPv228fontlib_SetAlternateStopCodec"></span><span id="fontlib_SetAlternateStopCode__c"></span><span class="target" id="fontlibc_8h_1a4c871e4254b30123c71319cc6f2da903"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_SetAlternateStopCode</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">code_point</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv428fontlib_SetAlternateStopCodec" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets an alternate code point to recognize as a stop code. Set this to 0 if you do not want to use the alternate stop code feature. Defaults to 0. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can set this to space to make DrawString and GetStringWidth stop processing when they reach a space. </p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>NULL (0) will still be recognized as a stop code regardless of value. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>code_point</strong> – Additional code point to recognize as a stop code. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv428fontlib_GetAlternateStopCodev">
+<span id="_CPPv328fontlib_GetAlternateStopCodev"></span><span id="_CPPv228fontlib_GetAlternateStopCodev"></span><span id="fontlib_GetAlternateStopCode__void"></span><span class="target" id="fontlibc_8h_1a2e7a88d9d0c0c8194b6e3a9870cccd40"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetAlternateStopCode</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv428fontlib_GetAlternateStopCodev" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the current alternate stop code. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Current alternate stop code. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv434fontlib_SetFirstPrintableCodePointc">
+<span id="_CPPv334fontlib_SetFirstPrintableCodePointc"></span><span id="_CPPv234fontlib_SetFirstPrintableCodePointc"></span><span id="fontlib_SetFirstPrintableCodePoint__c"></span><span class="target" id="fontlibc_8h_1a3a913c73d41d70c2cf89a90525047e0d"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_SetFirstPrintableCodePoint</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">code_point</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv434fontlib_SetFirstPrintableCodePointc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets the first code point considered printable. All code points before this will be considered control codes. This defaults 0x10. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Setting this to 0 (NULL) will NOT cause NULL to be ignored. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>code_point</strong> – First printable code point </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv434fontlib_GetFirstPrintableCodePointv">
+<span id="_CPPv334fontlib_GetFirstPrintableCodePointv"></span><span id="_CPPv234fontlib_GetFirstPrintableCodePointv"></span><span id="fontlib_GetFirstPrintableCodePoint__void"></span><span class="target" id="fontlibc_8h_1ae2dbbe3fb051e77adbb76fa89e98b30c"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetFirstPrintableCodePoint</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv434fontlib_GetFirstPrintableCodePointv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the first code point considered printable. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Current first printable code point </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv428fontlib_SetDrawIntCodePointscc">
+<span id="_CPPv328fontlib_SetDrawIntCodePointscc"></span><span id="_CPPv228fontlib_SetDrawIntCodePointscc"></span><span id="fontlib_SetDrawIntCodePoints__c.c"></span><span class="target" id="fontlibc_8h_1a0f756296537f5c19d112f1386cc30331"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_SetDrawIntCodePoints</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">minus</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">zero</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv428fontlib_SetDrawIntCodePointscc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets the code points DrawInt and DrawUInt will use for the minus symbol and digits 0-9. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>minus</strong> – Minus symbol code point, defaults to ‘-‘ </p></li>
+<li><p><strong>zero</strong> – Zero code point, defaults to ‘0’; ‘1’-‘9’ are assumed to follow </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv423fontlib_GetDrawIntMinusv">
+<span id="_CPPv323fontlib_GetDrawIntMinusv"></span><span id="_CPPv223fontlib_GetDrawIntMinusv"></span><span id="fontlib_GetDrawIntMinus__void"></span><span class="target" id="fontlibc_8h_1a592be2e20726263ca63a097f56ea7ef1"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetDrawIntMinus</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423fontlib_GetDrawIntMinusv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the code point DrawInt and DrawUInt will use for a minus symbol Defaults to ‘-‘ </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>‘-‘ or whatever you set it to </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv422fontlib_GetDrawIntZerov">
+<span id="_CPPv322fontlib_GetDrawIntZerov"></span><span id="_CPPv222fontlib_GetDrawIntZerov"></span><span id="fontlib_GetDrawIntZero__void"></span><span class="target" id="fontlibc_8h_1a5ae52de9301411d04ec2044ffa11ab85"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetDrawIntZero</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422fontlib_GetDrawIntZerov" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the code point DrawInt and DrawUInt will use for ‘0’; it assumes ‘1’-‘9’ follow ‘0’ Defaults to ‘0’ </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>‘0’ or whatever you set it to </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv421fontlib_GetGlyphWidthc">
+<span id="_CPPv321fontlib_GetGlyphWidthc"></span><span id="_CPPv221fontlib_GetGlyphWidthc"></span><span id="fontlib_GetGlyphWidth__c"></span><span class="target" id="fontlibc_8h_1a41889e9a9ed04a9befea09cb90ae94a4"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetGlyphWidth</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">codepoint</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421fontlib_GetGlyphWidthc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the width of the given glyph </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>codepoint</strong> – Codepoint to test </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Width of glyph, 0 if invalid codepoint </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv422fontlib_GetStringWidthPKc">
+<span id="_CPPv322fontlib_GetStringWidthPKc"></span><span id="_CPPv222fontlib_GetStringWidthPKc"></span><span id="fontlib_GetStringWidth__cCP"></span><span class="target" id="fontlibc_8h_1a06871ff3e96ccb8134d03661f6270adf"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetStringWidth</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">str</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422fontlib_GetStringWidthPKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the width of a string printed in the current font.</p>
+<p>Stops processing when it encounters ANY control code or a codepoint not in the current font. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>str</strong> – Pointer to string </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Width of string </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv423fontlib_GetStringWidthLPKc6size_t">
+<span id="_CPPv323fontlib_GetStringWidthLPKc6size_t"></span><span id="_CPPv223fontlib_GetStringWidthLPKc6size_t"></span><span id="fontlib_GetStringWidthL__cCP.s"></span><span class="target" id="fontlibc_8h_1a62e0d24e13364207931ceab3ca5ed18a"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetStringWidthL</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">str</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max_characters</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423fontlib_GetStringWidthLPKc6size_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns the width of a string printed in the current font.</p>
+<p>Stops processing when it encounters ANY control code or a codepoint not in the current font, or when max_characters have been processed. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>str</strong> – Pointer to string </p></li>
+<li><p><strong>max_characters</strong> – Maximum number of characters to process </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Width of string </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv428fontlib_GetLastCharacterReadv">
+<span id="_CPPv328fontlib_GetLastCharacterReadv"></span><span id="_CPPv228fontlib_GetLastCharacterReadv"></span><span id="fontlib_GetLastCharacterRead__void"></span><span class="target" id="fontlibc_8h_1af3720cdf80f9e996497cb6fc9e04a1f3"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetLastCharacterRead</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv428fontlib_GetLastCharacterReadv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the location of the last character processed by GetStringWidth or DrawString </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Pointer to character </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv430fontlib_GetCharactersRemainingv">
+<span id="_CPPv330fontlib_GetCharactersRemainingv"></span><span id="_CPPv230fontlib_GetCharactersRemainingv"></span><span id="fontlib_GetCharactersRemaining__void"></span><span class="target" id="fontlibc_8h_1a7f707487e0e259cc16718be475955f0f"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetCharactersRemaining</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv430fontlib_GetCharactersRemainingv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns 0 if DrawStringL or GetStringWidthL returned because max_characters were processed. Returns a non-zero number otherwise. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Either zero, or a non-zero number depending on the reason DrawStringL or GetStringWidthL returned. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417fontlib_DrawGlyph7uint8_t">
+<span id="_CPPv317fontlib_DrawGlyph7uint8_t"></span><span id="_CPPv217fontlib_DrawGlyph7uint8_t"></span><span id="fontlib_DrawGlyph__uint8_t"></span><span class="target" id="fontlibc_8h_1a812bd0337964886c8b53827f90aa50fb"></span><span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_DrawGlyph</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">glyph</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417fontlib_DrawGlyph7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Draws a glyph. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This can even draw code points less than the code point specified with <a class="reference internal" href="#fontlibc_8h_1a3a913c73d41d70c2cf89a90525047e0d"><span class="std std-ref">fontlib_SetFirstPrintableCodePoint()</span></a>. It can even draw code point 0. </p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although this does update the cursor X/Y positions, it does NOT process window bounds at all! (Maybe this should be FIXME? On the other hand, users may want this specifically so they can handle all their own layout without the text window settings getting in their way.) </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>glyph</strong> – Codepoint </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The new X value of the cursor </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv418fontlib_DrawStringPKc">
+<span id="_CPPv318fontlib_DrawStringPKc"></span><span id="_CPPv218fontlib_DrawStringPKc"></span><span id="fontlib_DrawString__cCP"></span><span class="target" id="fontlibc_8h_1aac454dc688dc346015fff0ead04ab516"></span><span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_DrawString</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">str</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418fontlib_DrawStringPKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Draws a string.</p>
+<p>This will return when it reaches the right edge of the text window if FONTLIB_ENABLE_AUTO_WRAP is turned off.</p>
+<p>This stops drawing upon reaching NULL. It will also stop if it encounters the character code specified with <a class="reference internal" href="#fontlibc_8h_1a4c871e4254b30123c71319cc6f2da903"><span class="std std-ref">fontlib_SetAlternateStopCode()</span></a>. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The check for the alternate stop code always takes place before drawing a glyph, so if you need to also display the stop code character, you must directly call fontlib_DrawGlyph to force display the character and increment past it. </p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Newline codes will print regardless of whether FONTLIB_ENABLE_AUTO_WRAP is enabled. To disable parsing newline codes, use fontlib_SetNewlineCode(0); </p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>THIS IS NOT REENTRANT (though if you need that, you’re probably not using C) </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>str</strong> – Pointer to string </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The new X value of the cursor (probably not useful if a newline was processed.) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv419fontlib_DrawStringLPKc6size_t">
+<span id="_CPPv319fontlib_DrawStringLPKc6size_t"></span><span id="_CPPv219fontlib_DrawStringLPKc6size_t"></span><span id="fontlib_DrawStringL__cCP.s"></span><span class="target" id="fontlibc_8h_1ae26275a6591acd60879f4e83ba31efe0"></span><span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_DrawStringL</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">str</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max_characters</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419fontlib_DrawStringLPKc6size_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Draws a string, up to a maximum number of characters.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is intended to be used if you only want a portion of a string printed. (Or if you hate null-terminated strings and want length-prefixed strings instead. It still won’t print NULLs though.)</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>THIS IS NOT REENTRANT (though if you need that, you’re probably not using C) </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>str</strong> – Pointer to string </p></li>
+<li><p><strong>max_characters</strong> – Maximum number of characters to attempt to print, may return early if some other condition requires returning </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The new X value of the cursor (probably not useful if a newline was processed.) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415fontlib_DrawInti7uint8_t">
+<span id="_CPPv315fontlib_DrawInti7uint8_t"></span><span id="_CPPv215fontlib_DrawInti7uint8_t"></span><span id="fontlib_DrawInt__i.uint8_t"></span><span class="target" id="fontlibc_8h_1a10a876922304ad81c04e2a18799ad627"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_DrawInt</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">length</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415fontlib_DrawInti7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Prints a signed integer</p>
+<p>Outputs at the current cursor position. Padded with leading zeros if necessary to satisfy the specified minimum length. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This does not obey window bounds like DrawString/L </p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">length</span></code> must be between 1 and 8, inclusive </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> – Integer to print </p></li>
+<li><p><strong>length</strong> – Minimum number of characters to print </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416fontlib_DrawUIntj7uint8_t">
+<span id="_CPPv316fontlib_DrawUIntj7uint8_t"></span><span id="_CPPv216fontlib_DrawUIntj7uint8_t"></span><span id="fontlib_DrawUInt__unsigned-i.uint8_t"></span><span class="target" id="fontlibc_8h_1ad028311bab2702052551b6ae6b92132b"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_DrawUInt</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">n</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">length</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416fontlib_DrawUIntj7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Prints an unsigned integer</p>
+<p>Outputs at the current cursor position. Padded with leading zeros if necessary to satisfy the specified minimum length. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This does not obey window bounds like DrawString/L </p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">length</span></code> must be between 1 and 8, inclusive </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> – Unsigned integer to print </p></li>
+<li><p><strong>length</strong> – Minimum number of characters to print </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416fontlib_ClearEOLv">
+<span id="_CPPv316fontlib_ClearEOLv"></span><span id="_CPPv216fontlib_ClearEOLv"></span><span id="fontlib_ClearEOL__void"></span><span class="target" id="fontlibc_8h_1a14be8642d64cafdab002b292207e70da"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_ClearEOL</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416fontlib_ClearEOLv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Erases everything from the cursor to the right side of the text window (End-Of-Line). This ignores the transparent background flag. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv419fontlib_ClearWindowv">
+<span id="_CPPv319fontlib_ClearWindowv"></span><span id="_CPPv219fontlib_ClearWindowv"></span><span id="fontlib_ClearWindow__void"></span><span class="target" id="fontlibc_8h_1aef90c4ab8ead59aea7890d22c7692380"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_ClearWindow</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419fontlib_ClearWindowv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Erases the entire current text window. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This ignores the transparent background flag. If background transparency is important, check <a class="reference internal" href="#fontlibc_8h_1a2f72879333f089200ccb462ec2723ed3"><span class="std std-ref">fontlib_GetTransparency()</span></a> before calling this routine. </p>
+</div>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415fontlib_Newlinev">
+<span id="_CPPv315fontlib_Newlinev"></span><span id="_CPPv215fontlib_Newlinev"></span><span id="fontlib_Newline__void"></span><span class="target" id="fontlibc_8h_1ab1c2770ee01a6d8a555eba4e734b223a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_Newline</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415fontlib_Newlinev" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Performs a newline. Pays attention to newline flags. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv425fontlib_SetNewlineOptions7uint8_t">
+<span id="_CPPv325fontlib_SetNewlineOptions7uint8_t"></span><span id="_CPPv225fontlib_SetNewlineOptions7uint8_t"></span><span id="fontlib_SetNewlineOptions__uint8_t"></span><span class="target" id="fontlibc_8h_1a9a6814959051d03d5f8b6cd4e60db879"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_SetNewlineOptions</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">options</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425fontlib_SetNewlineOptions7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets options for controlling newline behavior <div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#fontlibc_8h_1a33af52aa5db3dc2ad8357328b37a528e"><span class="std std-ref">fontlib_newline_options_t</span></a> </p>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>options</strong> – Flags setting newline behavior </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv425fontlib_GetNewlineOptionsv">
+<span id="_CPPv325fontlib_GetNewlineOptionsv"></span><span id="_CPPv225fontlib_GetNewlineOptionsv"></span><span id="fontlib_GetNewlineOptions__void"></span><span class="target" id="fontlibc_8h_1a69add8ef1e5c069646056dd528cd797d"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetNewlineOptions</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425fontlib_GetNewlineOptionsv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the current newline behavior options. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Current newline behavior options </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv424fontlib_ScrollWindowDownv">
+<span id="_CPPv324fontlib_ScrollWindowDownv"></span><span id="_CPPv224fontlib_ScrollWindowDownv"></span><span id="fontlib_ScrollWindowDown__void"></span><span class="target" id="fontlibc_8h_1ab7a5fba085a1ec2c07da2260d120cde4"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_ScrollWindowDown</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424fontlib_ScrollWindowDownv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Scrolls the contents of the text window down one line, i.e. everything in the window is copied UP one line, thus yielding the effect of scrolling down. The current text cursor position is ignored. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The bottom line is not erased; you must erase or overwrite it yourself. </p>
+</div>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv422fontlib_ScrollWindowUpv">
+<span id="_CPPv322fontlib_ScrollWindowUpv"></span><span id="_CPPv222fontlib_ScrollWindowUpv"></span><span id="fontlib_ScrollWindowUp__void"></span><span class="target" id="fontlibc_8h_1a1ee42b75ba524469917f89112f9bbe23"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_ScrollWindowUp</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422fontlib_ScrollWindowUpv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Scrolls the contents of the text window up one line, i.e. everything in the window is copied DOWN one line, thus yielding the effect of scrolling up. The current text cursor position is ignored. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The bottom line is not erased; you must erase or overwrite it yourself. </p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This doesn’t try to compute the location of the bottom line of text; it just blindly copies rows of pixels, so make sure the window height is an exact multiple of the font height. </p>
+</div>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv423fontlib_GetFontPackNamePKc">
+<span id="_CPPv323fontlib_GetFontPackNamePKc"></span><span id="_CPPv223fontlib_GetFontPackNamePKc"></span><span id="fontlib_GetFontPackName__cCP"></span><span class="target" id="fontlibc_8h_1a48c3f7fbc16cc215e60aefd46f333398"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetFontPackName</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">appvar_name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423fontlib_GetFontPackNamePKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the long name associated with a font pack. Useful in a loop with <a class="reference internal" href="fileioc.html#fileioc_8h_1a6d6a527c178d510caf7ceddd564cef1a"><span class="std std-ref">ti_Detect()</span></a> when searching a typeface with a specific name. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>appvar_name</strong> – Pointer to name of appvar </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Direct pointer to font’s name; or NULL if no such appvar exists, the appvar isn’t a font pack, or the font pack does not supply a name. NOTA BENE: Any operation that can move variables around in memory can invalidate this pointer! </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv425fontlib_GetFontByIndexRawPK19fontlib_font_pack_t7uint8_t">
+<span id="_CPPv325fontlib_GetFontByIndexRawPK19fontlib_font_pack_t7uint8_t"></span><span id="_CPPv225fontlib_GetFontByIndexRawPK19fontlib_font_pack_t7uint8_t"></span><span id="fontlib_GetFontByIndexRaw__fontlib_font_pack_tCP.uint8_t"></span><span class="target" id="fontlibc_8h_1af573eef418b1d4d953d61f99859d264a"></span><a class="reference internal" href="#_CPPv414fontlib_font_t" title="fontlib_font_t"><span class="n"><span class="pre">fontlib_font_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetFontByIndexRaw</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv419fontlib_font_pack_t" title="fontlib_font_pack_t"><span class="n"><span class="pre">fontlib_font_pack_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">font_pack</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425fontlib_GetFontByIndexRawPK19fontlib_font_pack_t7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets a pointer to a font, suitable for passing to SetFont(), given a font pack’s address. Useful if you know caching the font pack’s address is safe. <div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="fileioc.html#fileioc_8h_1aa2d593d6985f969cbac12374ad13b11e"><span class="std std-ref">ti_GetDataPtr()</span></a> </p>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>font_pack</strong> – Pointer to font pack </p></li>
+<li><p><strong>index</strong> – Index into font table of font pack </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Direct pointer to font, or NULL if the index is invalid. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv422fontlib_GetFontByIndexPKc7uint8_t">
+<span id="_CPPv322fontlib_GetFontByIndexPKc7uint8_t"></span><span id="_CPPv222fontlib_GetFontByIndexPKc7uint8_t"></span><span id="fontlib_GetFontByIndex__cCP.uint8_t"></span><span class="target" id="fontlibc_8h_1a938e073a66d8b24d51e3508da55a31e0"></span><a class="reference internal" href="#_CPPv414fontlib_font_t" title="fontlib_font_t"><span class="n"><span class="pre">fontlib_font_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetFontByIndex</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">font_pack_name</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">index</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422fontlib_GetFontByIndexPKc7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets a pointer to a font, suitable for passing to SetFont(), given a font pack’s appvar’s name. Recommended to use after any file write, create, delete, or un/archive, as all those operations could invalidate the cached data pointers to the currently loaded font. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>font_pack_name</strong> – Pointer to font pack appvar’s name </p></li>
+<li><p><strong>index</strong> – Index into font table of font pack </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Direct pointer to font, or NULL if the index is invalid. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv425fontlib_GetFontByStyleRawPK19fontlib_font_pack_t7uint8_t7uint8_t7uint8_t7uint8_t7uint8_t7uint8_t">
+<span id="_CPPv325fontlib_GetFontByStyleRawPK19fontlib_font_pack_t7uint8_t7uint8_t7uint8_t7uint8_t7uint8_t7uint8_t"></span><span id="_CPPv225fontlib_GetFontByStyleRawPK19fontlib_font_pack_t7uint8_t7uint8_t7uint8_t7uint8_t7uint8_t7uint8_t"></span><span id="fontlib_GetFontByStyleRaw__fontlib_font_pack_tCP.uint8_t.uint8_t.uint8_t.uint8_t.uint8_t.uint8_t"></span><span class="target" id="fontlibc_8h_1a86eec0c199e7e4046865b8a041b39bd7"></span><a class="reference internal" href="#_CPPv414fontlib_font_t" title="fontlib_font_t"><span class="n"><span class="pre">fontlib_font_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetFontByStyleRaw</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv419fontlib_font_pack_t" title="fontlib_font_pack_t"><span class="n"><span class="pre">fontlib_font_pack_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">font_pack</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size_min</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size_max</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">weight_min</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">weight_max</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">style_bits_set</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">style_bits_reset</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425fontlib_GetFontByStyleRawPK19fontlib_font_pack_t7uint8_t7uint8_t7uint8_t7uint8_t7uint8_t7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets a pointer to a font, suitable for passing to SetFont(), given a font pack’s address and a set of font properties. Useful if you know caching the font pack’s address is safe. <div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="fileioc.html#fileioc_8h_1aa2d593d6985f969cbac12374ad13b11e"><span class="std std-ref">ti_GetDataPtr()</span></a> </p>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>font_pack</strong> – Pointer to font pack </p></li>
+<li><p><strong>size_min</strong> – Minimum heigh, in pixels, to accept. Space above and space below metrics are not considered. </p></li>
+<li><p><strong>size_max</strong> – Maximum height </p></li>
+<li><p><strong>weight_min</strong> – Minimum weight to accept. 0 may be used. </p></li>
+<li><p><strong>weight_max</strong> – Maximum weight to accept. 0xFF may be used. </p></li>
+<li><p><strong>style_bits_set</strong> – Mask of style bits you want set. For example, FONTLIB_SERIF | FONTLIB_MONOSPACE to look for a monospaced serifed font. </p></li>
+<li><p><strong>style_bits_reset</strong> – Style bits you want RESET. For example, pass FONTLIB_MONOSPACE to REJECT monospaced fonts. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Direct pointer to font, or NULL if no matching font is found </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv422fontlib_GetFontByStylePKc7uint8_t7uint8_t7uint8_t7uint8_t7uint8_t7uint8_t">
+<span id="_CPPv322fontlib_GetFontByStylePKc7uint8_t7uint8_t7uint8_t7uint8_t7uint8_t7uint8_t"></span><span id="_CPPv222fontlib_GetFontByStylePKc7uint8_t7uint8_t7uint8_t7uint8_t7uint8_t7uint8_t"></span><span id="fontlib_GetFontByStyle__cCP.uint8_t.uint8_t.uint8_t.uint8_t.uint8_t.uint8_t"></span><span class="target" id="fontlibc_8h_1a3afde32fe0a16526e644130f1261645d"></span><a class="reference internal" href="#_CPPv414fontlib_font_t" title="fontlib_font_t"><span class="n"><span class="pre">fontlib_font_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_GetFontByStyle</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">font_pack_name</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size_min</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size_max</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">weight_min</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">weight_max</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">style_bits_set</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">style_bits_reset</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422fontlib_GetFontByStylePKc7uint8_t7uint8_t7uint8_t7uint8_t7uint8_t7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets a pointer to a font, suitable for passing to SetFont(), given a font pack’s appvar’s name and a set of font properties. Recommended to use after any file write, create, delete, or un/archive, as all those operations could invalidate the cached data pointers to the currently loaded font. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>font_pack_name</strong> – Pointer to font pack appvar’s name </p></li>
+<li><p><strong>size_min</strong> – Minimum heigh, in pixels, to accept. Space above and space below metrics are not considered. </p></li>
+<li><p><strong>size_max</strong> – Maximum height </p></li>
+<li><p><strong>weight_min</strong> – Minimum weight to accept. 0 may be used. </p></li>
+<li><p><strong>weight_max</strong> – Maximum weight to accept. 0xFF may be used. </p></li>
+<li><p><strong>style_bits_set</strong> – Mask of style bits you want set. For example, FONTLIB_SERIF | FONTLIB_MONOSPACE to look for a monospaced serifed font. </p></li>
+<li><p><strong>style_bits_reset</strong> – Style bits you want RESET. For example, pass FONTLIB_MONOSPACE to REJECT monospaced fonts. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Direct pointer to font, or NULL if no matching font is found </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv418fontlib_metadata_t">
+<span id="_CPPv318fontlib_metadata_t"></span><span id="_CPPv218fontlib_metadata_t"></span><span id="fontlib_metadata_t"></span><span class="target" id="structfontlib__metadata__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_metadata_t</span></span></span><a class="headerlink" href="#_CPPv418fontlib_metadata_t" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;&gt;</em></div>
+<p>Contains references to various metadata strings. <div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#structfontlib__font__pack__t"><span class="std std-ref">fontlib_font_pack_t</span></a> </p>
+</div>
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Any or all of these offsets may be NULL. </p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>These should be short null-terminated C strings, but this is not enforced. Check for malformed metadata! </p>
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N18fontlib_metadata_t6lengthE">
+<span id="_CPPv3N18fontlib_metadata_t6lengthE"></span><span id="_CPPv2N18fontlib_metadata_t6lengthE"></span><span id="fontlib_metadata_t::length__int24_t"></span><span class="target" id="structfontlib__metadata__t_1a12dff264e69b9dafe4edf53a8a2423cd"></span><span class="n"><span class="pre">int24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">length</span></span></span><a class="headerlink" href="#_CPPv4N18fontlib_metadata_t6lengthE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Size of this struct, basically functions as a version field. This does NOT include the lengths of the strings! </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N18fontlib_metadata_t16font_family_nameE">
+<span id="_CPPv3N18fontlib_metadata_t16font_family_nameE"></span><span id="_CPPv2N18fontlib_metadata_t16font_family_nameE"></span><span id="fontlib_metadata_t::font_family_name__int24_t"></span><span class="target" id="structfontlib__metadata__t_1a296ec51aa258f7f7af2fb1ad6c559dab"></span><span class="n"><span class="pre">int24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">font_family_name</span></span></span><a class="headerlink" href="#_CPPv4N18fontlib_metadata_t16font_family_nameE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>A short, human-readable typeface name, such as “Times” </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N18fontlib_metadata_t11font_authorE">
+<span id="_CPPv3N18fontlib_metadata_t11font_authorE"></span><span id="_CPPv2N18fontlib_metadata_t11font_authorE"></span><span id="fontlib_metadata_t::font_author__int24_t"></span><span class="target" id="structfontlib__metadata__t_1ae71043c5f8ec1c47cb1ca0091bde645d"></span><span class="n"><span class="pre">int24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">font_author</span></span></span><a class="headerlink" href="#_CPPv4N18fontlib_metadata_t11font_authorE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>A SHORT string naming the typeface designer. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N18fontlib_metadata_t20font_pseudocopyrightE">
+<span id="_CPPv3N18fontlib_metadata_t20font_pseudocopyrightE"></span><span id="_CPPv2N18fontlib_metadata_t20font_pseudocopyrightE"></span><span id="fontlib_metadata_t::font_pseudocopyright__int24_t"></span><span class="target" id="structfontlib__metadata__t_1a90b74ff876aa222c774e42e2664624bd"></span><span class="n"><span class="pre">int24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">font_pseudocopyright</span></span></span><a class="headerlink" href="#_CPPv4N18fontlib_metadata_t20font_pseudocopyrightE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>A SHORT copyright claim. Do not try to include a complete license in here! Space is limited! </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Typefaces and bitmapped fonts cannot be copyrighted under US law. This field is therefore referred to as a pseudocopyright. HOWEVER, it IS is applicable in other jusrisdictions, such as Germany. </p>
+</div>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N18fontlib_metadata_t16font_descriptionE">
+<span id="_CPPv3N18fontlib_metadata_t16font_descriptionE"></span><span id="_CPPv2N18fontlib_metadata_t16font_descriptionE"></span><span id="fontlib_metadata_t::font_description__int24_t"></span><span class="target" id="structfontlib__metadata__t_1abe8d9b63b279fd78c20063a2dcd51117"></span><span class="n"><span class="pre">int24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">font_description</span></span></span><a class="headerlink" href="#_CPPv4N18fontlib_metadata_t16font_descriptionE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>A BRIEF description of the font. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N18fontlib_metadata_t12font_versionE">
+<span id="_CPPv3N18fontlib_metadata_t12font_versionE"></span><span id="_CPPv2N18fontlib_metadata_t12font_versionE"></span><span id="fontlib_metadata_t::font_version__int24_t"></span><span class="target" id="structfontlib__metadata__t_1af1c4d436d5081763a32814de91825e2e"></span><span class="n"><span class="pre">int24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">font_version</span></span></span><a class="headerlink" href="#_CPPv4N18fontlib_metadata_t12font_versionE" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><p>This is a STRING, so while this should be something like “1.0.0.0” it could also be something like “1 June 2019” or even “Hahaha versioning</p>
+<p>is overrated!”</p>
+</p>
+</div>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N18fontlib_metadata_t14font_code_pageE">
+<span id="_CPPv3N18fontlib_metadata_t14font_code_pageE"></span><span id="_CPPv2N18fontlib_metadata_t14font_code_pageE"></span><span id="fontlib_metadata_t::font_code_page__int24_t"></span><span class="target" id="structfontlib__metadata__t_1adb3bb8304a1a8a333ee92b47c526b757"></span><span class="n"><span class="pre">int24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">font_code_page</span></span></span><a class="headerlink" href="#_CPPv4N18fontlib_metadata_t14font_code_pageE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Suggested values: “ASCII” “TIOS” “ISO-8859-1” “Windows 1252” “Calculator 1252” </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv414fontlib_font_t">
+<span id="_CPPv314fontlib_font_t"></span><span id="_CPPv214fontlib_font_t"></span><span id="fontlib_font_t"></span><span class="target" id="structfontlib__font__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_font_t</span></span></span><a class="headerlink" href="#_CPPv414fontlib_font_t" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;&gt;</em></div>
+<p>This is the actual font format. Directly reading from this struct is the only way to read a font’s cap_height, x_height, and baseline_height metrics.</p>
+<p>For example: <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>unsigned char baseline;
+fontlib_font_t *my_font = fontlib_GetFontByStyle(&quot;FONTPACK&quot;, 12, 12,
+    FONTLIB_NORMAL, FONTLIB_NORMAL, FONTLIB_SERIF, 0);
+if (!my_font || !fontlib_SetFont(my_font))
+    return;
+baseline = my_font-&gt;baseline_height;
+</pre></div>
+</div>
+ </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The font’s width table and bitmaps table should appear directly after this struct. The struct does not contain a member for the data because it is probably not useful for C code to parse the width or bitmap data directly. </p>
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14fontlib_font_t11fontVersionE">
+<span id="_CPPv3N14fontlib_font_t11fontVersionE"></span><span id="_CPPv2N14fontlib_font_t11fontVersionE"></span><span id="fontlib_font_t::fontVersion__uint8_t"></span><span class="target" id="structfontlib__font__t_1abebdded4b386f80c845f0075078de331"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontVersion</span></span></span><a class="headerlink" href="#_CPPv4N14fontlib_font_t11fontVersionE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Version ID </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This must be zero or the font will be rejected as invalid. </p>
+</div>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14fontlib_font_t6heightE">
+<span id="_CPPv3N14fontlib_font_t6heightE"></span><span id="_CPPv2N14fontlib_font_t6heightE"></span><span id="fontlib_font_t::height__uint8_t"></span><span class="target" id="structfontlib__font__t_1ac2559151f28b0b5089e98fb36289c7eb"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">height</span></span></span><a class="headerlink" href="#_CPPv4N14fontlib_font_t6heightE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Height in pixels not including space above/below </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14fontlib_font_t12total_glyphsE">
+<span id="_CPPv3N14fontlib_font_t12total_glyphsE"></span><span id="_CPPv2N14fontlib_font_t12total_glyphsE"></span><span id="fontlib_font_t::total_glyphs__uint8_t"></span><span class="target" id="structfontlib__font__t_1a43b39342c914354c7b2c9885042db16d"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">total_glyphs</span></span></span><a class="headerlink" href="#_CPPv4N14fontlib_font_t12total_glyphsE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Total number of glyphs provided. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If this is zero, then 256 glyphs are provided, not zero! </p>
+</div>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14fontlib_font_t11first_glyphE">
+<span id="_CPPv3N14fontlib_font_t11first_glyphE"></span><span id="_CPPv2N14fontlib_font_t11first_glyphE"></span><span id="fontlib_font_t::first_glyph__uint8_t"></span><span class="target" id="structfontlib__font__t_1a48411bdfb58e0ee0f88c1a4b7c57563f"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">first_glyph</span></span></span><a class="headerlink" href="#_CPPv4N14fontlib_font_t11first_glyphE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Number of first glyph. If you have no codepoints below 32, for example, you can omit the first 32 bitmaps. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14fontlib_font_t12widths_tableE">
+<span id="_CPPv3N14fontlib_font_t12widths_tableE"></span><span id="_CPPv2N14fontlib_font_t12widths_tableE"></span><span id="fontlib_font_t::widths_table__int24_t"></span><span class="target" id="structfontlib__font__t_1a23d14891c01b8ee4ffd9fcaaa402deb0"></span><span class="n"><span class="pre">int24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">widths_table</span></span></span><a class="headerlink" href="#_CPPv4N14fontlib_font_t12widths_tableE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Offset/pointer to glyph widths table. This is an OFFSET from the fontVersion member </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It is 24-bits long because it becomes a real pointer upon loading. </p>
+</div>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14fontlib_font_t7bitmapsE">
+<span id="_CPPv3N14fontlib_font_t7bitmapsE"></span><span id="_CPPv2N14fontlib_font_t7bitmapsE"></span><span id="fontlib_font_t::bitmaps__int24_t"></span><span class="target" id="structfontlib__font__t_1a86166ce10e1a594edbd98c6291576ab1"></span><span class="n"><span class="pre">int24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bitmaps</span></span></span><a class="headerlink" href="#_CPPv4N14fontlib_font_t7bitmapsE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Offset to a table of offsets to glyph bitmaps. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Parsing the bitmaps yourself is probably not useful. </p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>These offsets are only 16-bits each to save some space. </p>
+</div>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14fontlib_font_t19italic_space_adjustE">
+<span id="_CPPv3N14fontlib_font_t19italic_space_adjustE"></span><span id="_CPPv2N14fontlib_font_t19italic_space_adjustE"></span><span id="fontlib_font_t::italic_space_adjust__uint8_t"></span><span class="target" id="structfontlib__font__t_1ad3aa19442a24737a0818a8f399e49712"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">italic_space_adjust</span></span></span><a class="headerlink" href="#_CPPv4N14fontlib_font_t19italic_space_adjustE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Specifies how much to move the cursor left after each glyph. Total movement is width - overhang. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Intended for italics. </p>
+</div>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14fontlib_font_t11space_aboveE">
+<span id="_CPPv3N14fontlib_font_t11space_aboveE"></span><span id="_CPPv2N14fontlib_font_t11space_aboveE"></span><span id="fontlib_font_t::space_above__uint8_t"></span><span class="target" id="structfontlib__font__t_1a0fe4dcbd3bdce083d2b7434287193b24"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">space_above</span></span></span><a class="headerlink" href="#_CPPv4N14fontlib_font_t11space_aboveE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>These suggest adding blank space above or below each line of text. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This can be overridden </p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This can increase legibility while saving space for always-blank lines. </p>
+</div>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14fontlib_font_t11space_belowE">
+<span id="_CPPv3N14fontlib_font_t11space_belowE"></span><span id="_CPPv2N14fontlib_font_t11space_belowE"></span><span id="fontlib_font_t::space_below__uint8_t"></span><span class="target" id="structfontlib__font__t_1a105bf0d9c1d9433a8e295ff200fdddd8"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">space_below</span></span></span><a class="headerlink" href="#_CPPv4N14fontlib_font_t11space_belowE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14fontlib_font_t6weightE">
+<span id="_CPPv3N14fontlib_font_t6weightE"></span><span id="_CPPv2N14fontlib_font_t6weightE"></span><span id="fontlib_font_t::weight__uint8_t"></span><span class="target" id="structfontlib__font__t_1a00f01d655c6c6b8d2c0bec10809aa195"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">weight</span></span></span><a class="headerlink" href="#_CPPv4N14fontlib_font_t6weightE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Specifies the boldness of the font. <div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#fontlibc_8h_1a7254f40632cd9129d608dbf019099389"><span class="std std-ref">fontlib_weights_t</span></a> </p>
+</div>
+</p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14fontlib_font_t5styleE">
+<span id="_CPPv3N14fontlib_font_t5styleE"></span><span id="_CPPv2N14fontlib_font_t5styleE"></span><span id="fontlib_font_t::style__uint8_t"></span><span class="target" id="structfontlib__font__t_1aed79013d64b16a77eb8a67e4b43a4702"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">style</span></span></span><a class="headerlink" href="#_CPPv4N14fontlib_font_t5styleE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Specifies the style of the font. <div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#fontlibc_8h_1af74209031f5e28cfeb61e863db3dcdbc"><span class="std std-ref">fontlib_styles_t</span></a> </p>
+</div>
+</p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14fontlib_font_t10cap_heightE">
+<span id="_CPPv3N14fontlib_font_t10cap_heightE"></span><span id="_CPPv2N14fontlib_font_t10cap_heightE"></span><span id="fontlib_font_t::cap_height__uint8_t"></span><span class="target" id="structfontlib__font__t_1a6293542b035aedd6675fa752d4f5632e"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cap_height</span></span></span><a class="headerlink" href="#_CPPv4N14fontlib_font_t10cap_heightE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>For layout, allows aligning text of differing fonts vertically. These count pixels going down, i.e. 0 means the top of the glyph. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14fontlib_font_t8x_heightE">
+<span id="_CPPv3N14fontlib_font_t8x_heightE"></span><span id="_CPPv2N14fontlib_font_t8x_heightE"></span><span id="fontlib_font_t::x_height__uint8_t"></span><span class="target" id="structfontlib__font__t_1a83abf3c69b2973341ba0aee6ba8ea6c4"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">x_height</span></span></span><a class="headerlink" href="#_CPPv4N14fontlib_font_t8x_heightE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N14fontlib_font_t15baseline_heightE">
+<span id="_CPPv3N14fontlib_font_t15baseline_heightE"></span><span id="_CPPv2N14fontlib_font_t15baseline_heightE"></span><span id="fontlib_font_t::baseline_height__uint8_t"></span><span class="target" id="structfontlib__font__t_1ac02db7a88e6b0aabdcbd4f17342355f2"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">baseline_height</span></span></span><a class="headerlink" href="#_CPPv4N14fontlib_font_t15baseline_heightE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv419fontlib_font_pack_t">
+<span id="_CPPv319fontlib_font_pack_t"></span><span id="_CPPv219fontlib_font_pack_t"></span><span id="fontlib_font_pack_t"></span><span class="target" id="structfontlib__font__pack__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontlib_font_pack_t</span></span></span><a class="headerlink" href="#_CPPv419fontlib_font_pack_t" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;&gt;</em></div>
+<p>This is the format of a font pack appvar. Parsing this directly is the only way to get metadata other than the typeface name. <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>FILE font_pack_file;
+fontlib_font_pack_t *font_pack;
+fontlib_metadata_t *metadata;
+char *var_name;
+char *font_author;
+uint8_t *search_pos = NULL;
+// Just randomly select the first font pack found
+if ((var_name = ti_Detect(&amp;search_pos, &quot;FONTPACK&quot;)) == NULL)
+    return;
+// Get font pack header
+font_pack_file = ti_Open(var_name, &quot;r&quot;);
+font_pack = ti_GetDataPtr(font_pack_file);
+// Is metadata present?
+if (!font-&gt;metadata)
+    return;
+if (EOF == ti_Seek(font-&gt;metadata, SEEK_SET, font_pack_file))
+    return;
+// Is metadata semi-valid?
+metadata = ti_GetDataPtr(font_pack_file);
+if (metadata-&gt;length &lt; sizeof(fontlib_metadata_t))
+    return;
+// Get font&#39;s author
+if (!metadata-&gt;font_author)
+    return;
+if (EOF == ti_Seek(metadata-&gt;font_author, SEEK_SET, font_pack_file))
+    return;
+font_author = ti_GetDataPtr(font_pack_file);
+ti_Close(font_pack_file);
+</pre></div>
+</div>
+ </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N19fontlib_font_pack_t6headerE">
+<span id="_CPPv3N19fontlib_font_pack_t6headerE"></span><span id="_CPPv2N19fontlib_font_pack_t6headerE"></span><span id="fontlib_font_pack_t::header__cA"></span><span class="target" id="structfontlib__font__pack__t_1a46654c578ced20cbca0d82f8a3c68be2"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">header</span></span></span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">8</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#_CPPv4N19fontlib_font_pack_t6headerE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Must be “FONTPACK” </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is NOT null-terminated! </p>
+</div>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N19fontlib_font_pack_t8metadataE">
+<span id="_CPPv3N19fontlib_font_pack_t8metadataE"></span><span id="_CPPv2N19fontlib_font_pack_t8metadataE"></span><span id="fontlib_font_pack_t::metadata__int24_t"></span><span class="target" id="structfontlib__font__pack__t_1a99515d49f3723e04e14de956e5232169"></span><span class="n"><span class="pre">int24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">metadata</span></span></span><a class="headerlink" href="#_CPPv4N19fontlib_font_pack_t8metadataE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Offset from first byte of header </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N19fontlib_font_pack_t9fontCountE">
+<span id="_CPPv3N19fontlib_font_pack_t9fontCountE"></span><span id="_CPPv2N19fontlib_font_pack_t9fontCountE"></span><span id="fontlib_font_pack_t::fontCount__uint8_t"></span><span class="target" id="structfontlib__font__pack__t_1ab782d6ee1dd8f207d3b8723759f815fb"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fontCount</span></span></span><a class="headerlink" href="#_CPPv4N19fontlib_font_pack_t9fontCountE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Number of fonts present. Should be greater than zero… . </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Frankly, if you have more than 127 fonts in a pack, you have a problem. </p>
+</div>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N19fontlib_font_pack_t9font_listE">
+<span id="_CPPv3N19fontlib_font_pack_t9font_listE"></span><span id="_CPPv2N19fontlib_font_pack_t9font_listE"></span><span id="fontlib_font_pack_t::font_list__int24_tA"></span><span class="target" id="structfontlib__font__pack__t_1a82c7a6e7c8bf574994a45e9016623a92"></span><span class="n"><span class="pre">int24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">font_list</span></span></span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#_CPPv4N19fontlib_font_pack_t9font_listE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Array of offsets to each individual font. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Despite being declared as a single element, this will be fontCount elements long. </p>
+</div>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="fileioc.html" class="btn btn-neutral float-left" title="fileioc.h" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="graphx.html" class="btn btn-neutral float-right" title="graphx.h" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v9.0
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+            
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+             </strong> 
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

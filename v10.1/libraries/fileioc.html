@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fileioc.h &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/design-tabs.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="keypadc.h" href="keypadc.html" />
+    <link rel="prev" title="fontlibc.h" href="fontlibc.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v10.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to the CE C/C++ Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/hardware.html">Calculator Hardware Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../static/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/makefile-options.html">Makefile Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/debugging.html">Debugging</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Libraries/Headers</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">CE Libraries</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="graphx.html">graphx.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fontlibc.html">fontlibc.h</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">fileioc.h</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="keypadc.html">keypadc.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="libload.html">libload.h</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/sys/index.html">CE Hardware Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/ti/index.html">TI Operating System Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/index.html">Miscellaneous Headers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Helpful Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../static/git.html">Using Git For Revision Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/coding-guidelines.html">General Coding Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/ides.html">Using the Toolchain in an IDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/contributing.html">Contributing to the CE Toolchain</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/asm.html">Assembly</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">CE Libraries</a> &raquo;</li>
+      <li>fileioc.h</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="fileioc-h">
+<span id="id1"></span><h1>fileioc.h<a class="headerlink" href="#fileioc-h" title="Permalink to this headline"></a></h1>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;fileioc.h&gt;</span>
+</pre></div>
+</div>
+<p>The <code class="code docutils literal notranslate"><span class="pre">fileioc</span></code> library provides access to OS variables such as AppVars, Programs, Lists, and Strings.</p>
+<p>AppVars are special types of variables that can be used to store any arbitrary data, and are utilized by the CE toolchain to provide data storage beyond what can be compiled into a program.
+AppVars may store things like save states, sprites, and user configurations.
+Because the program context is destroyed when a program returns to the OS, AppVars can be used to store data between program launches.</p>
+<p>The OS stores variables in either RAM or archive (aka flash) memory.
+RAM memory is volatile and is cleared whenever the calculator is reset, whereas archive memory provides a more permanent storage for variables.
+However, variables can only be written to while in RAM as the calculator’s security measures do not provide a way to directly write to the archive.
+The function <code class="code docutils literal notranslate"><span class="pre">ti_SetArchiveStatus</span></code> can be used to move a variable between the archive and RAM.</p>
+<p>The function <code class="code docutils literal notranslate"><span class="pre">ti_Open</span></code> and <code class="code docutils literal notranslate"><span class="pre">ti_OpenVar</span></code> can be used to access AppVars and other OS variables respectively.
+They return an opaque <code class="code docutils literal notranslate"><span class="pre">handle</span></code> value that is passed to the other functions available in the library.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#api-documentation" id="id2">API Documentation</a></p></li>
+</ul>
+</div>
+<div class="section" id="api-documentation">
+<h2><a class="toc-backref" href="#id2">API Documentation</a><a class="headerlink" href="#api-documentation" title="Permalink to this headline"></a></h2>
+<p><dl class="simple">
+<dt><strong>Author</strong></dt><dd><p>Matt “MateoConLechuga” Waltz </p>
+</dd>
+</dl>
+</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.TI_PRGM_TYPE">
+<span class="target" id="fileioc_8h_1a042725b820b49caf2501cab98dea1922"></span><span class="sig-name descname"><span class="n"><span class="pre">TI_PRGM_TYPE</span></span></span><a class="headerlink" href="#c.TI_PRGM_TYPE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Unprotected program. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.TI_PPRGM_TYPE">
+<span class="target" id="fileioc_8h_1a10fb36573054c5bc3f5ebe4f6d8e94eb"></span><span class="sig-name descname"><span class="n"><span class="pre">TI_PPRGM_TYPE</span></span></span><a class="headerlink" href="#c.TI_PPRGM_TYPE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Protected program. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.TI_TPRGM_TYPE">
+<span class="target" id="fileioc_8h_1a7df46d9e0906bb0770fdde798e37b272"></span><span class="sig-name descname"><span class="n"><span class="pre">TI_TPRGM_TYPE</span></span></span><a class="headerlink" href="#c.TI_TPRGM_TYPE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Temporary program. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.TI_APPVAR_TYPE">
+<span class="target" id="fileioc_8h_1a4210393b01fb71ca4a155c29801de40a"></span><span class="sig-name descname"><span class="n"><span class="pre">TI_APPVAR_TYPE</span></span></span><a class="headerlink" href="#c.TI_APPVAR_TYPE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>AppVar. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.TI_STRING_TYPE">
+<span class="target" id="fileioc_8h_1a3c593dfcd972c0098e8a054e180295f4"></span><span class="sig-name descname"><span class="n"><span class="pre">TI_STRING_TYPE</span></span></span><a class="headerlink" href="#c.TI_STRING_TYPE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>String. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.TI_EQU_TYPE">
+<span class="target" id="fileioc_8h_1a400447e289c5c433cf72f279904d9bee"></span><span class="sig-name descname"><span class="n"><span class="pre">TI_EQU_TYPE</span></span></span><a class="headerlink" href="#c.TI_EQU_TYPE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Equation. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.TI_ANS_TYPE">
+<span class="target" id="fileioc_8h_1ace3ede37f76c68746bd254ad20b09b57"></span><span class="sig-name descname"><span class="n"><span class="pre">TI_ANS_TYPE</span></span></span><a class="headerlink" href="#c.TI_ANS_TYPE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Ans. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.TI_REAL_LIST_TYPE">
+<span class="target" id="fileioc_8h_1a143f28d7eb0bd26d201014ce2c507510"></span><span class="sig-name descname"><span class="n"><span class="pre">TI_REAL_LIST_TYPE</span></span></span><a class="headerlink" href="#c.TI_REAL_LIST_TYPE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Real variable list. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.TI_CPLX_LIST_TYPE">
+<span class="target" id="fileioc_8h_1a1f186b112acef7d06668a5f2047f8026"></span><span class="sig-name descname"><span class="n"><span class="pre">TI_CPLX_LIST_TYPE</span></span></span><a class="headerlink" href="#c.TI_CPLX_LIST_TYPE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Complex variable list. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.TI_REAL_TYPE">
+<span class="target" id="fileioc_8h_1a6579fc90c1f9e7859c0506011f90a6d0"></span><span class="sig-name descname"><span class="n"><span class="pre">TI_REAL_TYPE</span></span></span><a class="headerlink" href="#c.TI_REAL_TYPE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Real variable. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.TI_CPLX_TYPE">
+<span class="target" id="fileioc_8h_1ad261f3864128ddf911e9dd9fd0dccef2"></span><span class="sig-name descname"><span class="n"><span class="pre">TI_CPLX_TYPE</span></span></span><a class="headerlink" href="#c.TI_CPLX_TYPE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Complex variable. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.TI_MATRIX_TYPE">
+<span class="target" id="fileioc_8h_1aace4aab0b068025d9f748a536016b735"></span><span class="sig-name descname"><span class="n"><span class="pre">TI_MATRIX_TYPE</span></span></span><a class="headerlink" href="#c.TI_MATRIX_TYPE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Matrix variable. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.TI_MAX_SIZE">
+<span class="target" id="fileioc_8h_1a849fc10227e9e30c0a4269d98338cff3"></span><span class="sig-name descname"><span class="n"><span class="pre">TI_MAX_SIZE</span></span></span><a class="headerlink" href="#c.TI_MAX_SIZE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Maximum variable size. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv47ti_OpenPKcPKc">
+<span id="_CPPv37ti_OpenPKcPKc"></span><span id="_CPPv27ti_OpenPKcPKc"></span><span id="ti_Open__cCP.cCP"></span><span class="target" id="fileioc_8h_1a61f7b96ac3ca3e5a52ce97eaef77b198"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_Open</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">mode</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47ti_OpenPKcPKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Opens an AppVar for reading, writing, and/or appending. </p>
+<p>AppVars may be stored in either the archive (aka flash memory), or in RAM. Depending on the mode used to open the AppVar it may be moved from archive memory into RAM.</p>
+<p><p><table class="docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>mode</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+</tr>
+<tr class="row-even"><td><p>”r”</p></td>
+<td><p>Read mode. If the AppVar does not exist <code class="code docutils literal notranslate"><span class="pre">0</span></code> is returned. The AppVar is not moved from its storage location.</p></td>
+</tr>
+<tr class="row-odd"><td><p>”w”</p></td>
+<td><p>Write mode. Deletes any existing AppVar and creates the AppVar in RAM.</p></td>
+</tr>
+<tr class="row-even"><td><p>”a”</p></td>
+<td><p>Append mode. The AppVar is created if it does not exist. If the AppVar is stored in the archive it is moved to RAM.</p></td>
+</tr>
+<tr class="row-odd"><td><p>”r+”</p></td>
+<td><p>Read/Write mode. If the AppVar does not exist <code class="code docutils literal notranslate"><span class="pre">0</span></code> is returned. If the AppVar is stored in the archive it is moved to RAM.</p></td>
+</tr>
+<tr class="row-even"><td><p>”w+”</p></td>
+<td><p>Write/Read mode. Deletes any existing AppVar and creates the AppVar in RAM.</p></td>
+</tr>
+<tr class="row-odd"><td><p>”a+”</p></td>
+<td><p>Append/Read mode. The AppVar is created if it does not exist. If the AppVar is stored in the archive it is moved to RAM.</p></td>
+</tr>
+</tbody>
+</table>
+</p>
+ </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – <strong>[in]</strong> Name of AppVar to open. </p></li>
+<li><p><strong>mode</strong> – <strong>[in]</strong> Documented in the above table. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>AppVar variable handle, or <code class="docutils literal notranslate"><span class="pre">0</span></code> (zero) on error. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410ti_OpenVarPKcPKc7uint8_t">
+<span id="_CPPv310ti_OpenVarPKcPKc7uint8_t"></span><span id="_CPPv210ti_OpenVarPKcPKc7uint8_t"></span><span id="ti_OpenVar__cCP.cCP.uint8_t"></span><span class="target" id="fileioc_8h_1ae5f2f5ce321bd90d1883ed146057dc46"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_OpenVar</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">mode</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">type</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410ti_OpenVarPKcPKc7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Opens a variable for reading, writing, and/or appending. </p>
+<p>Variables may be stored in either the archive (aka flash memory), or in RAM. Depending on the mode used to open the variable it may be moved from archive memory into RAM.</p>
+<p><p><table class="docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>mode</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+</tr>
+<tr class="row-even"><td><p>”r”</p></td>
+<td><p>Read mode. If the variable does not exist <code class="code docutils literal notranslate"><span class="pre">0</span></code> is returned. The variable is not moved from its storage location.</p></td>
+</tr>
+<tr class="row-odd"><td><p>”w”</p></td>
+<td><p>Write mode. Deletes any existing variable and creates the variable in RAM.</p></td>
+</tr>
+<tr class="row-even"><td><p>”a”</p></td>
+<td><p>Append mode. The variable is created if it does not exist. If the variable is stored in the archive it is moved to RAM.</p></td>
+</tr>
+<tr class="row-odd"><td><p>”r+”</p></td>
+<td><p>Read/Write mode. If the variable does not exist <code class="code docutils literal notranslate"><span class="pre">0</span></code> is returned. If the variable is stored in the archive it is moved to RAM.</p></td>
+</tr>
+<tr class="row-even"><td><p>”w+”</p></td>
+<td><p>Write/Read mode. Deletes any existing variable and creates the variable in RAM.</p></td>
+</tr>
+<tr class="row-odd"><td><p>”a+”</p></td>
+<td><p>Append/Read mode. The variable is created if it does not exist. If the variable is stored in the archive it is moved to RAM.</p></td>
+</tr>
+</tbody>
+</table>
+</p>
+ </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – <strong>[in]</strong> Name of variable to open. </p></li>
+<li><p><strong>mode</strong> – <strong>[in]</strong> Documented in the above table. </p></li>
+<li><p><strong>type</strong> – <strong>[in]</strong> Variable type. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Variable handle, or <code class="docutils literal notranslate"><span class="pre">0</span></code> (zero) on error. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv48ti_Close7uint8_t">
+<span id="_CPPv38ti_Close7uint8_t"></span><span id="_CPPv28ti_Close7uint8_t"></span><span id="ti_Close__uint8_t"></span><span class="target" id="fileioc_8h_1a2568706d962b23ff2a04b74b9e4a7cc8"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_Close</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48ti_Close7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Closes an open AppVar/variable handle. </p>
+<p>This must be performed for every ti_Open or ti_OpenVar call.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>handle</strong> – <strong>[in]</strong> AppVar/variable handle. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">0</span></code> (zero) on error. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49ti_DetectPPvPKc">
+<span id="_CPPv39ti_DetectPPvPKc"></span><span id="_CPPv29ti_DetectPPvPKc"></span><span id="ti_Detect__voidPP.cCP"></span><span class="target" id="fileioc_8h_1a6e2a6d2fbe6d0e77f242c5eeb54e9c79"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">ti_Detect</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">vat_ptr</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">detect_string</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49ti_DetectPPvPKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Locates AppVars stored in archive and RAM. </p>
+<p>This function searches for AppVars whose data section begins with a specific string. The null terminator of the string is not included in the search.</p>
+<p><code class="docutils literal notranslate"><span class="pre">vat_ptr</span></code> should be set to NULL to begin a search, and is updated with each call.</p>
+<p><div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">var_name</span><span class="p">;</span>
+<span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">vat_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span>
+
+<span class="k">while</span><span class="w"> </span><span class="p">((</span><span class="n">var_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ti_Detect</span><span class="p">(</span><span class="o">&amp;</span><span class="n">vat_ptr</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;my_data&quot;</span><span class="p">)))</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="c1">// do something with var_name or vat_ptr</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the return value is NULL, there are no more variables to find. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vat_ptr</strong> – <strong>[in]</strong> Current offset in the VAT. </p></li>
+<li><p><strong>detect_string</strong> – <strong>[in]</strong> String to search for (NULL to search for all). </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The AppVar name. This should be duplicated to another buffer as subsequent calls of this function change the name stored at the returned pointer’s address. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412ti_DetectVarPPvPKc7uint8_t">
+<span id="_CPPv312ti_DetectVarPPvPKc7uint8_t"></span><span id="_CPPv212ti_DetectVarPPvPKc7uint8_t"></span><span id="ti_DetectVar__voidPP.cCP.uint8_t"></span><span class="target" id="fileioc_8h_1aeabe7a4142d821ded87b5fa8cd13173b"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">ti_DetectVar</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">vat_ptr</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">detect_string</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">var_type</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412ti_DetectVarPPvPKc7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Locates variables stored in archive and RAM. </p>
+<p>This function searches for variables whose data section begins with a specific string. The null terminator of the string is not included in the search.</p>
+<p><code class="docutils literal notranslate"><span class="pre">vat_ptr</span></code> should be set to NULL to begin a search, and is updated with each call.</p>
+<p><div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">var_name</span><span class="p">;</span>
+<span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">vat_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span>
+
+<span class="k">while</span><span class="w"> </span><span class="p">((</span><span class="n">var_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ti_DetectVar</span><span class="p">(</span><span class="o">&amp;</span><span class="n">vat_ptr</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;my_data&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">TI_PRGM_TYPE</span><span class="p">)))</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="c1">// do something with var_name or vat_ptr</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the return value is NULL, there are no more variables to find. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vat_ptr</strong> – <strong>[inout]</strong> Current offset in the VAT. </p></li>
+<li><p><strong>detect_string</strong> – <strong>[in]</strong> String to search for (NULL to search for all). </p></li>
+<li><p><strong>var_type</strong> – <strong>[in]</strong> Type of variable to detect. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The variable name. This should be duplicated to another buffer as subsequent calls of this function change the name stored at the returned pointer’s address. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412ti_DetectAnyPPvPKcP7uint8_t">
+<span id="_CPPv312ti_DetectAnyPPvPKcP7uint8_t"></span><span id="_CPPv212ti_DetectAnyPPvPKcP7uint8_t"></span><span id="ti_DetectAny__voidPP.cCP.uint8_tP"></span><span class="target" id="fileioc_8h_1a486cee566380994271f71fb99ce57336"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">ti_DetectAny</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">vat_ptr</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">detect_string</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">var_type</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412ti_DetectAnyPPvPKcP7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Locates any variables stored in archive and RAM. </p>
+<p>This function searches for variables whose data section begins with a specific string. The null terminator of the string is not included in the search.</p>
+<p><code class="docutils literal notranslate"><span class="pre">vat_ptr</span></code> should be set to NULL to begin a search, and is updated with each call.</p>
+<p><div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">var_type</span><span class="p">;</span>
+<span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">var_name</span><span class="p">;</span>
+<span class="kt">void</span><span class="w"> </span><span class="o">*</span><span class="n">vat_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span>
+
+<span class="k">while</span><span class="w"> </span><span class="p">((</span><span class="n">var_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ti_DetectAny</span><span class="p">(</span><span class="o">&amp;</span><span class="n">vat_ptr</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;my_data&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">var_type</span><span class="p">)))</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">var_type</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">TI_PRGM_TYPE</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">var_type</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">TI_PPRGM_TYPE</span><span class="p">)</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// do something with var_name or vat_ptr</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the return value is NULL, there are no more variables to find. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vat_ptr</strong> – <strong>[inout]</strong> Current offset in the VAT. </p></li>
+<li><p><strong>detect_string</strong> – <strong>[in]</strong> String to search for (NULL to search for all). </p></li>
+<li><p><strong>var_type</strong> – <strong>[out]</strong> Type of variable found. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The variable name. This should be duplicated to another buffer as subsequent calls of this function change the name stored at the returned pointer’s address. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv48ti_WritePKv6size_t6size_t7uint8_t">
+<span id="_CPPv38ti_WritePKv6size_t6size_t7uint8_t"></span><span id="_CPPv28ti_WritePKv6size_t6size_t7uint8_t"></span><span id="ti_Write__voidCP.s.s.uint8_t"></span><span class="target" id="fileioc_8h_1a70cf4c1eec5d57830f015c35d12f8fd1"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_Write</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48ti_WritePKv6size_t6size_t7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Writes data to an AppVar/variable handle. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – <strong>[in]</strong> Pointer to data structure(s). </p></li>
+<li><p><strong>size</strong> – <strong>[in]</strong> Size (in bytes) of a single <code class="docutils literal notranslate"><span class="pre">data</span></code> structure. </p></li>
+<li><p><strong>count</strong> – <strong>[in]</strong> Number of <code class="docutils literal notranslate"><span class="pre">data</span></code> structures to write. </p></li>
+<li><p><strong>handle</strong> – <strong>[in]</strong> AppVar/variable handle. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Number of data structures written; equals count on success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv47ti_ReadPv6size_t6size_t7uint8_t">
+<span id="_CPPv37ti_ReadPv6size_t6size_t7uint8_t"></span><span id="_CPPv27ti_ReadPv6size_t6size_t7uint8_t"></span><span id="ti_Read__voidP.s.s.uint8_t"></span><span class="target" id="fileioc_8h_1a45f65fbf1cc7dfa6724faa67d3350292"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_Read</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47ti_ReadPv6size_t6size_t7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Reads data from an AppVar/variable handle. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – <strong>[out]</strong> Pointer to data structure(s). </p></li>
+<li><p><strong>size</strong> – <strong>[in]</strong> Size (in bytes) of a single <code class="docutils literal notranslate"><span class="pre">data</span></code> structure. </p></li>
+<li><p><strong>count</strong> – <strong>[in]</strong> Number of <code class="docutils literal notranslate"><span class="pre">data</span></code> structures to write. </p></li>
+<li><p><strong>handle</strong> – <strong>[in]</strong> AppVar/variable handle. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Number of data structures written; equals count on success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv47ti_PutCc7uint8_t">
+<span id="_CPPv37ti_PutCc7uint8_t"></span><span id="_CPPv27ti_PutCc7uint8_t"></span><span id="ti_PutC__c.uint8_t"></span><span class="target" id="fileioc_8h_1a7f37fe8ef16fca25ca80844a69d02d09"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_PutC</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ch</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47ti_PutCc7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Writes a character to an AppVar/variable handle. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ch</strong> – <strong>[in]</strong> Character to write. </p></li>
+<li><p><strong>handle</strong> – <strong>[in]</strong> AppVar/variable handle. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">EOF</span></code> on error, or <code class="docutils literal notranslate"><span class="pre">ch</span></code>. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv47ti_GetC7uint8_t">
+<span id="_CPPv37ti_GetC7uint8_t"></span><span id="_CPPv27ti_GetC7uint8_t"></span><span id="ti_GetC__uint8_t"></span><span class="target" id="fileioc_8h_1a570505578c9716973e44b2339ca4ce28"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_GetC</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47ti_GetC7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Reads a character from an AppVar/variable handle. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>handle</strong> – <strong>[in]</strong> AppVar/variable handle. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">EOF</span></code> on error, or a valid character. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv47ti_Seekij7uint8_t">
+<span id="_CPPv37ti_Seekij7uint8_t"></span><span id="_CPPv27ti_Seekij7uint8_t"></span><span id="ti_Seek__i.unsigned-i.uint8_t"></span><span class="target" id="fileioc_8h_1a8bd5eeccd99463afd96127793ab8cb70"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_Seek</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">offset</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">origin</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47ti_Seekij7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Seeks to an offset in the file. </p>
+<p><p><table class="docutils align-default">
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 80%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>origin</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+</tr>
+<tr class="row-even"><td><p>SEEK_SET</p></td>
+<td><p>Seek from beginning of AppVar/variable.</p></td>
+</tr>
+<tr class="row-odd"><td><p>SEEK_CUR</p></td>
+<td><p>Seek from current AppVar/variable offset.</p></td>
+</tr>
+<tr class="row-even"><td><p>SEEK_END</p></td>
+<td><p>Seek from end of AppVar/variable.</p></td>
+</tr>
+</tbody>
+</table>
+</p>
+ </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>offset</strong> – <strong>[in]</strong> Number of bytes to offest from (can be negative). </p></li>
+<li><p><strong>origin</strong> – <strong>[in]</strong> Documented in the above table. </p></li>
+<li><p><strong>handle</strong> – <strong>[in]</strong> AppVar/variable handle. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">EOF</span></code> on failure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49ti_Rewind7uint8_t">
+<span id="_CPPv39ti_Rewind7uint8_t"></span><span id="_CPPv29ti_Rewind7uint8_t"></span><span id="ti_Rewind__uint8_t"></span><span class="target" id="fileioc_8h_1aff2d7495f293321aa2c153929fca4327"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_Rewind</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49ti_Rewind7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Seeks to the start of an AppVar/variable’s data. </p>
+<p>Functionally equivalent to <code class="docutils literal notranslate"><span class="pre">ti_Seek(0,</span> <span class="pre">SEEK_SET,</span> <span class="pre">handle)</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>handle</strong> – <strong>[in]</strong> AppVar/variable handle. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">EOF</span></code> on failure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv47ti_Tell7uint8_t">
+<span id="_CPPv37ti_Tell7uint8_t"></span><span id="_CPPv27ti_Tell7uint8_t"></span><span id="ti_Tell__uint8_t"></span><span class="target" id="fileioc_8h_1ad7280e2a63f5e66f6a52c9858f9ebd06"></span><span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_Tell</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv47ti_Tell7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the current data offset from the start of an AppVar/variable. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>handle</strong> – <strong>[in]</strong> AppVar/variable handle. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The current data offset from the start of the AppVar/variable. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410ti_GetSize7uint8_t">
+<span id="_CPPv310ti_GetSize7uint8_t"></span><span id="_CPPv210ti_GetSize7uint8_t"></span><span id="ti_GetSize__uint8_t"></span><span class="target" id="fileioc_8h_1a1e8387fab6a9767b5524f6b30bce4c4f"></span><span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_GetSize</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410ti_GetSize7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the size of an AppVar/variable. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>handle</strong> – <strong>[in]</strong> AppVar/variable handle. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The size of the AppVar/variable. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49ti_Resize6size_t7uint8_t">
+<span id="_CPPv39ti_Resize6size_t7uint8_t"></span><span id="_CPPv29ti_Resize6size_t7uint8_t"></span><span id="ti_Resize__s.uint8_t"></span><span class="target" id="fileioc_8h_1acc7ef7cd60b98f790fab202d29a5138c"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_Resize</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49ti_Resize6size_t7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Resizes an AppVar/variable. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>handle</strong> – <strong>[in]</strong> AppVar/variable handle. </p></li>
+<li><p><strong>size</strong> – <strong>[in]</strong> New AppVar/variable size. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Resized size on success, <code class="docutils literal notranslate"><span class="pre">0</span></code> on failure, or <code class="docutils literal notranslate"><span class="pre">-1</span></code> if the AppVar/variable cannot be opened. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413ti_IsArchived7uint8_t">
+<span id="_CPPv313ti_IsArchived7uint8_t"></span><span id="_CPPv213ti_IsArchived7uint8_t"></span><span id="ti_IsArchived__uint8_t"></span><span class="target" id="fileioc_8h_1a56cdcce347f0e948db77053f3cd8f0be"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_IsArchived</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413ti_IsArchived7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Checks if an AppVar/variable is stored in archive memory. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>handle</strong> – <strong>[in]</strong> AppVar/variable handle. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">0</span></code> if the AppVar/variable is not in the archive. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv419ti_SetArchiveStatusb7uint8_t">
+<span id="_CPPv319ti_SetArchiveStatusb7uint8_t"></span><span id="_CPPv219ti_SetArchiveStatusb7uint8_t"></span><span id="ti_SetArchiveStatus__b.uint8_t"></span><span class="target" id="fileioc_8h_1afe6bf99af96234a3f922b37849fb2987"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_SetArchiveStatus</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">archive</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419ti_SetArchiveStatusb7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Moves an AppVar/variable between archive or RAM storage. </p>
+<p><p><table class="docutils align-default">
+<colgroup>
+<col style="width: 24%" />
+<col style="width: 76%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><strong>archive</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+</tr>
+<tr class="row-even"><td><p>true</p></td>
+<td><p>Store AppVar/variable in archive.</p></td>
+</tr>
+<tr class="row-odd"><td><p>false</p></td>
+<td><p>Store AppVar/variable in RAM.</p></td>
+</tr>
+</tbody>
+</table>
+</p>
+ </p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Archiving a variable can cause a garbage collection cycle. You should use ti_SetGCBehavior to catch this event. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>archive</strong> – <strong>[in]</strong> Documented in the above table. </p></li>
+<li><p><strong>handle</strong> – <strong>[in]</strong> AppVar/variable handle. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">0</span></code> on failure.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49ti_DeletePKc">
+<span id="_CPPv39ti_DeletePKc"></span><span id="_CPPv29ti_DeletePKc"></span><span id="ti_Delete__cCP"></span><span class="target" id="fileioc_8h_1a226e1d9967372ee94b9d4dbd53dcc72a"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_Delete</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49ti_DeletePKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Deletes an AppVar. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> – <strong>[in]</strong> AppVar name. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">0</span></code> on failure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412ti_DeleteVarPKc7uint8_t">
+<span id="_CPPv312ti_DeleteVarPKc7uint8_t"></span><span id="_CPPv212ti_DeleteVarPKc7uint8_t"></span><span id="ti_DeleteVar__cCP.uint8_t"></span><span class="target" id="fileioc_8h_1ae18c24e32444c07fde6fd5e5dadfd90d"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_DeleteVar</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">type</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412ti_DeleteVarPKc7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Deletes a variable. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – <strong>[in]</strong> Variable name. </p></li>
+<li><p><strong>type</strong> – <strong>[in]</strong> Variable type. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">0</span></code> on failure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417ti_GetTokenStringPPvP7uint8_tPj">
+<span id="_CPPv317ti_GetTokenStringPPvP7uint8_tPj"></span><span id="_CPPv217ti_GetTokenStringPPvP7uint8_tPj"></span><span id="ti_GetTokenString__voidPP.uint8_tP.unsigned-iP"></span><span class="target" id="fileioc_8h_1adc443ad47dd931921521077a78f6deab"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">ti_GetTokenString</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">read_pointer</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">token_len</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">str_len</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417ti_GetTokenStringPPvP7uint8_tPj" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the string used for displaying a TI token. </p>
+<p>The TI calculators encode programs and other variables in “tokens”, which are either 1 or 2 bytes in length. For example, the token <code class="docutils literal notranslate"><span class="pre">0x21</span></code> corresponds to the string <code class="docutils literal notranslate"><span class="pre">mean(</span></code> in TI-BASIC programs. This allows program size to be reduced as the whole string is not stored - but requires additional decoding in order to resolve the token’s string representation.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">read_pointer</span></code> is automatically updated to point to the next token, incremented by the value of <code class="docutils literal notranslate"><span class="pre">token_len</span></code>. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>read_pointer</strong> – <strong>[inout]</strong> Address of pointer to data to read. </p></li>
+<li><p><strong>token_len</strong> – <strong>[out]</strong> Pointer to variable to hold length of the token, used for determining the next read location (Can be NULL if unused). </p></li>
+<li><p><strong>str_len</strong> – <strong>[out]</strong> Pointer to variable to hold length of resulting string (Can be NULL if unused). The returned string is static, and should be copied to another buffer as needed if it needs to be preserved across function calls.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A pointer to a null-terminated string used for displaying a TI token. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413ti_GetDataPtr7uint8_t">
+<span id="_CPPv313ti_GetDataPtr7uint8_t"></span><span id="_CPPv213ti_GetDataPtr7uint8_t"></span><span id="ti_GetDataPtr__uint8_t"></span><span class="target" id="fileioc_8h_1aa6c308bdc68f460d52395f5bd782d028"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">ti_GetDataPtr</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413ti_GetDataPtr7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets a direct data pointer to the current offset in an AppVar/variable. </p>
+<p>This may be used for direct reading/writing without the need for an extra copy. It is easily prone to memory corruption if not used correctly, so use at your own risk.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the AppVar is in RAM, the direct pointer can be used to read/modify its contents directly, with the caveat that the AppVar must be large enough to consume any writes. If the AppVar is in the archive, direct reading is possible but writes will lead to a system reset.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This function is potentially unsafe to use as variables may be shifted around in memory, causing this pointer to become invalid and potentially corrupt memory. Avoid creating, deleting, resizing, or changing the storage location any variables while this pointer is being actively used. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>handle</strong> – <strong>[in]</strong> AppVar/variable handle. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pointer to AppVar/variable data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412ti_GetVATPtr7uint8_t">
+<span id="_CPPv312ti_GetVATPtr7uint8_t"></span><span id="_CPPv212ti_GetVATPtr7uint8_t"></span><span id="ti_GetVATPtr__uint8_t"></span><span class="target" id="fileioc_8h_1a39ca194e5d232cf24ed097d47c1521ca"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">ti_GetVATPtr</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412ti_GetVATPtr7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets a pointer to the VAT entry of an AppVar/variable. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the variable is in RAM, the direct pointer can be used to read/modify its contents directly, with the caveat that the AppVar must be large enough to consume any writes. If the AppVar is in the archive, direct reading is possible but writes will lead to a system reset.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This function is potentially unsafe to use as variables may be shifted around in memory, causing this pointer to become invalid and potentially corrupt memory. Avoid creating, deleting, resizing, or changing the storage location any variables while this pointer is being actively used. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>handle</strong> – <strong>[in]</strong> AppVar/variable handle. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>VAT location of the variable.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410ti_GetNamePc7uint8_t">
+<span id="_CPPv310ti_GetNamePc7uint8_t"></span><span id="_CPPv210ti_GetNamePc7uint8_t"></span><span id="ti_GetName__cP.uint8_t"></span><span class="target" id="fileioc_8h_1ab19d8a0497ec9e28569cf72f3b6ca58c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_GetName</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">handle</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410ti_GetNamePc7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the AppVar/variable name of an already opened handle. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – <strong>[in]</strong> Buffer to store name, must be at least 10 bytes in sizew. </p></li>
+<li><p><strong>handle</strong> – <strong>[in]</strong> AppVar/variable handle. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49ti_RenamePKcPKc">
+<span id="_CPPv39ti_RenamePKcPKc"></span><span id="_CPPv29ti_RenamePKcPKc"></span><span id="ti_Rename__cCP.cCP"></span><span class="target" id="fileioc_8h_1aab2318e59b2617e30191be01c0f76bd5"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_Rename</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">old_name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">new_name</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49ti_RenamePKcPKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Renames an AppVar. </p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>It is hazardous to rename an open AppVar. Close the AppVar before renaming. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>old_name</strong> – <strong>[in]</strong> Old name of AppVar. </p></li>
+<li><p><strong>new_name</strong> – <strong>[in]</strong> New name of AppVar. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">0</span></code> if success, <code class="docutils literal notranslate"><span class="pre">1</span></code> if AppVar already exists, <code class="docutils literal notranslate"><span class="pre">2</span></code> any other error occurs.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412ti_RenameVarPKcPKc7uint8_t">
+<span id="_CPPv312ti_RenameVarPKcPKc7uint8_t"></span><span id="_CPPv212ti_RenameVarPKcPKc7uint8_t"></span><span id="ti_RenameVar__cCP.cCP.uint8_t"></span><span class="target" id="fileioc_8h_1a52bad6131d7f6ff024f546ed1b5a7f1d"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_RenameVar</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">old_name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">new_name</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">type</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412ti_RenameVarPKcPKc7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Renames a variable. </p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>It is hazardous to rename an open variable. Close the variable before renaming. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>old_name</strong> – <strong>[in]</strong> Old name of variable. </p></li>
+<li><p><strong>new_name</strong> – <strong>[in]</strong> New name of variable. </p></li>
+<li><p><strong>type</strong> – <strong>[in]</strong> Type of variable. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">0</span></code> if success, <code class="docutils literal notranslate"><span class="pre">1</span></code> if variable already exists, <code class="docutils literal notranslate"><span class="pre">2</span></code> any other error occurs.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49ti_SetVar7uint8_tPKcPKv">
+<span id="_CPPv39ti_SetVar7uint8_tPKcPKv"></span><span id="_CPPv29ti_SetVar7uint8_tPKcPKv"></span><span id="ti_SetVar__uint8_t.cCP.voidCP"></span><span class="target" id="fileioc_8h_1a3893faeeab3bcfd193f7a5d6d9ccec08"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_SetVar</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">type</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49ti_SetVar7uint8_tPKcPKv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Stores data or values to an OS variable. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>type</strong> – <strong>[in]</strong> Variable type. </p></li>
+<li><p><strong>name</strong> – <strong>[in]</strong> Variable name. </p></li>
+<li><p><strong>data</strong> – <strong>[in]</strong> Data to set variable to.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">0</span></code> if success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49ti_StoVar7uint8_tPKc7uint8_tPKc">
+<span id="_CPPv39ti_StoVar7uint8_tPKc7uint8_tPKc"></span><span id="_CPPv29ti_StoVar7uint8_tPKc7uint8_tPKc"></span><span id="ti_StoVar__uint8_t.cCP.uint8_t.cCP"></span><span class="target" id="fileioc_8h_1ada1b9dcba42bbe74b25e9e6c8ca30d34"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_StoVar</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">type_to</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">to</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">type_from</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">from</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49ti_StoVar7uint8_tPKc7uint8_tPKc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Stores an OS variable to another variable. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>type_to</strong> – <strong>[in]</strong> Variable type to store data to. </p></li>
+<li><p><strong>to</strong> – <strong>[in]</strong> Variable name to store data to. </p></li>
+<li><p><strong>type_from</strong> – <strong>[in]</strong> Variable type to get data from. </p></li>
+<li><p><strong>from</strong> – <strong>[in]</strong> Variable name to get data from. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">0</span></code> if success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49ti_RclVar7uint8_tPKcPPv">
+<span id="_CPPv39ti_RclVar7uint8_tPKcPPv"></span><span id="_CPPv29ti_RclVar7uint8_tPKcPPv"></span><span id="ti_RclVar__uint8_t.cCP.voidPP"></span><span class="target" id="fileioc_8h_1a948121c8774fd4f6840ea88ffdf20b8b"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_RclVar</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">type</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49ti_RclVar7uint8_tPKcPPv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Recalls a OS variable. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>data_struct is set to the variable’s data. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>type</strong> – <strong>[in]</strong> Variable type. </p></li>
+<li><p><strong>name</strong> – <strong>[in]</strong> Variable name. </p></li>
+<li><p><strong>data</strong> – <strong>[out]</strong> Address of pointer to variable structure. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">0</span></code> if success.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417ti_ArchiveHasRoom8uint24_t">
+<span id="_CPPv317ti_ArchiveHasRoom8uint24_t"></span><span id="_CPPv217ti_ArchiveHasRoom8uint24_t"></span><span id="ti_ArchiveHasRoom__uint24_t"></span><span class="target" id="fileioc_8h_1aeb52ff3f53ba053cae25ef4ff8ca390e"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_ArchiveHasRoom</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_bytes</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417ti_ArchiveHasRoom8uint24_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Checks to see if there is room in the archive for storing <code class="docutils literal notranslate"><span class="pre">num_bytes</span></code>, without needing to execute a Garbage Collect. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>num_bytes</strong> – <strong>[in]</strong> Number of bytes to be stored to the archive. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if the bytes can be stored to the archive without a Garbage Collect. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416ti_SetGCBehaviorPFvvEPFvvE">
+<span id="_CPPv316ti_SetGCBehaviorPFvvEPFvvE"></span><span id="_CPPv216ti_SetGCBehaviorPFvvEPFvvE"></span><span class="target" id="fileioc_8h_1a1acc3249334b606dd3337a846268af6a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti_SetGCBehavior</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">before</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">)</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">after</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">)</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416ti_SetGCBehaviorPFvvEPFvvE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Set routines to run before and after a garbage collect would be triggered. </p>
+<p>A garbage collect is used to free up space in archive memory by reorganizing archive variable storage and removing variables marked for deletion. The OS is required to request the user if they want to perform the operation, and this request may be triggered any time a variable is moved to archive memory. This function is used to set up callbacks that are triggered when this event occurs.</p>
+<p>The OS prompt requires the LCD to be in the standard 16-bit color mode, so if <code class="docutils literal notranslate"><span class="pre">graphx</span></code> or custom LCD behavior is being used <code class="docutils literal notranslate"><span class="pre">gfx_End</span></code> should be used to restore the OS to its default state in the routine run before garbage collection.</p>
+<p>In the after garbage collection rotuine, the LCD state can be restored (using <code class="docutils literal notranslate"><span class="pre">gfx_Begin</span></code> or similar as appropriate), as well as potentially reloading cached variable pointers created with ti_GetDataPtr.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>before</strong> – <strong>[in]</strong> Routine to run before a garbage collect. NULL sets it to do nothing. </p></li>
+<li><p><strong>after</strong> – <strong>[in]</strong> Routine to run following a garbage collect. NULL sets it to do nothing. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="fontlibc.html" class="btn btn-neutral float-left" title="fontlibc.h" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="keypadc.html" class="btn btn-neutral float-right" title="keypadc.h" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v10.1
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+             </strong> 
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sys/lcd.h &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/design-tabs.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="sys/power.h" href="power.html" />
+    <link rel="prev" title="sys/basicusb.h" href="basicusb.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v14.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Welcome to the CE C/C++ Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/hardware.html">Calculator Hardware Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../static/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/makefile-options.html">Makefile Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/debugging.html">Debugging Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/asm.html">Assembly Routines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Libraries/Headers</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../libraries/index.html">CE Library Headers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">CE Hardware Headers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="basicusb.html">sys/basicusb.h</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">sys/lcd.h</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="power.html">sys/power.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rtc.html">sys/rtc.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timers.html">sys/timers.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="util.html">sys/util.h</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ti/index.html">TI Operating System Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Miscellaneous Headers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Helpful Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../static/ides.html">Using the Toolchain in an IDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/git.html">Using Git For Revision Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/coding-guidelines.html">General Coding Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/contributing.html">Contributing to the CE Toolchain</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">CE Hardware Headers</a> &raquo;</li>
+      <li>sys/lcd.h</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="sys-lcd-h">
+<span id="lcd-h"></span><h1>sys/lcd.h<a class="headerlink" href="#sys-lcd-h" title="Permalink to this headline"></a></h1>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;sys/lcd.h&gt;</span>
+</pre></div>
+</div>
+<p>This header includes defines for the PL111 LCD controller used in the CE.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#api-documentation" id="id1">API Documentation</a></p></li>
+</ul>
+</div>
+<div class="section" id="api-documentation">
+<h2><a class="toc-backref" href="#id1">API Documentation</a><a class="headerlink" href="#api-documentation" title="Permalink to this headline"></a></h2>
+<p>CE PL111 LCD controller define file. </p>
+<p><dl class="simple">
+<dt><strong>Authors</strong></dt><dd><p><p>Matt “MateoConLechuga” Waltz</p>
+<p>Jacob “jacobly” Young</p>
+
+prime17569 </p>
+</dd>
+</dl>
+</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.lcd_Ram">
+<span class="target" id="lcd_8h_1a550fea7380cc26f7854121b5bfcc3f68"></span><span class="sig-name descname"><span class="n"><span class="pre">lcd_Ram</span></span></span><a class="headerlink" href="#c.lcd_Ram" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Base address of memory-mapped RAM for the LCD. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.lcd_Control">
+<span class="target" id="lcd_8h_1a7e7056ed0c178571fdabbbe9d3808ecc"></span><span class="sig-name descname"><span class="n"><span class="pre">lcd_Control</span></span></span><a class="headerlink" href="#c.lcd_Control" title="Permalink to this definition"></a><br /></dt>
+<dd><p>LCD Control register. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.lcd_Palette">
+<span class="target" id="lcd_8h_1af42c4802c41b7c1aad630435159be25c"></span><span class="sig-name descname"><span class="n"><span class="pre">lcd_Palette</span></span></span><a class="headerlink" href="#c.lcd_Palette" title="Permalink to this definition"></a><br /></dt>
+<dd><p>LCD palette registers, 512 bytes. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.lcd_BacklightLevel">
+<span class="target" id="lcd_8h_1a7803d6e2b15d1b44e08195d94f89cd52"></span><span class="sig-name descname"><span class="n"><span class="pre">lcd_BacklightLevel</span></span></span><a class="headerlink" href="#c.lcd_BacklightLevel" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Current backlight level of the LCD. </p>
+<p>0 is brightest, 255 is darkest. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.LCD_WIDTH">
+<span class="target" id="lcd_8h_1a19693eac3018d3e7800fde141921b812"></span><span class="sig-name descname"><span class="n"><span class="pre">LCD_WIDTH</span></span></span><a class="headerlink" href="#c.LCD_WIDTH" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Width of LCD in pixels. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.LCD_HEIGHT">
+<span class="target" id="lcd_8h_1a53a8b2a971de4b88047192655a48b651"></span><span class="sig-name descname"><span class="n"><span class="pre">LCD_HEIGHT</span></span></span><a class="headerlink" href="#c.LCD_HEIGHT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Height of LCD in pixels. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.LCD_SIZE">
+<span class="target" id="lcd_8h_1a4b5774fa14ff71cbc1c3f3001b4a8713"></span><span class="sig-name descname"><span class="n"><span class="pre">LCD_SIZE</span></span></span><a class="headerlink" href="#c.LCD_SIZE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Total size of VRAM in bytes. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.lcd_CrsrSetup">
+<span class="target" id="lcd_8h_1aec316b0604ff35166c5917ba843d2278"></span><span class="sig-name descname"><span class="n"><span class="pre">lcd_CrsrSetup</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.lcd_CrsrSetup" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets up the hardware cursor. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.lcd_CrsrSetSize">
+<span class="target" id="lcd_8h_1adeaca5b8b83480031fb2afcf272c5d16"></span><span class="sig-name descname"><span class="n"><span class="pre">lcd_CrsrSetSize</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.lcd_CrsrSetSize" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets cursor size. </p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#lcd_8h_1a78381b53c5d8950fb047411b8d4b6f33"><span class="std std-ref">lcd_cursor_size_t</span></a> </p>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>size</strong> – <strong>[in]</strong> The cursor size. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.lcd_CrsrGetSize">
+<span class="target" id="lcd_8h_1a7da9938a983c09e9ae9af08f09748366"></span><span class="sig-name descname"><span class="n"><span class="pre">lcd_CrsrGetSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.lcd_CrsrGetSize" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets cursor size. </p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#lcd_8h_1a78381b53c5d8950fb047411b8d4b6f33"><span class="std std-ref">lcd_cursor_size_t</span></a> </p>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The cursor size. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.lcd_CrsrSetImageSmall">
+<span class="target" id="lcd_8h_1ac161fb8a9b8b3bc084e4d3a0ad7ed215"></span><span class="sig-name descname"><span class="n"><span class="pre">lcd_CrsrSetImageSmall</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">data</span></span>, <span class="n"><span class="pre">index</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.lcd_CrsrSetImageSmall" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets a small cursor image at the specified index. </p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#lcd_8h_1a508878144930f60a17dc0f0c3433b16a"><span class="std std-ref">lcd_CrsrSetImageIndex</span></a> </p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#lcd_8h_1a78381b53c5d8950fb047411b8d4b6f33"><span class="std std-ref">lcd_cursor_size_t</span></a></p>
+</div>
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To use convimg to create the required data, add <code class="docutils literal notranslate"><span class="pre">bpp:</span> <span class="pre">2</span></code> to the converts section in convimg.yaml corresponding to your image(s). </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – <strong>[in]</strong> A pointer to 256 bytes of packed 2bpp image data. </p></li>
+<li><p><strong>index</strong> – <strong>[in]</strong> The cursor image index to copy the data to (0-3).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.lcd_CrsrSetImageLarge">
+<span class="target" id="lcd_8h_1af630b43cf1e9ed294609368c0d3fcf59"></span><span class="sig-name descname"><span class="n"><span class="pre">lcd_CrsrSetImageLarge</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.lcd_CrsrSetImageLarge" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets a large cursor image. </p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#lcd_8h_1a78381b53c5d8950fb047411b8d4b6f33"><span class="std std-ref">lcd_cursor_size_t</span></a></p>
+</div>
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To use convimg to create the required data, add <code class="docutils literal notranslate"><span class="pre">bpp:</span> <span class="pre">2</span></code> to the converts section in convimg.yaml corresponding to your image(s). </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – <strong>[in]</strong> A pointer to 1024 bytes of packed 2bpp image data.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.lcd_CrsrSetPosition">
+<span class="target" id="lcd_8h_1a623e73a2e190f1048d3d328497024a7a"></span><span class="sig-name descname"><span class="n"><span class="pre">lcd_CrsrSetPosition</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">x</span></span>, <span class="n"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.lcd_CrsrSetPosition" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets the position of the cursor on screen. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – <strong>[in]</strong> X coordinate. </p></li>
+<li><p><strong>y</strong> – <strong>[in]</strong> Y coordinate. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.lcd_CrsrSetClipPosition">
+<span class="target" id="lcd_8h_1ae6b847fd7d72a80bd0f9eb7dcb054c65"></span><span class="sig-name descname"><span class="n"><span class="pre">lcd_CrsrSetClipPosition</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">x</span></span>, <span class="n"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.lcd_CrsrSetClipPosition" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets the cursor clip position. </p>
+<p>The cursor clip is the distance from the top-left edge of the cursor image to the first displayed pixel in the cursor image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – <strong>[in]</strong> X coordinate. </p></li>
+<li><p><strong>y</strong> – <strong>[in]</strong> Y coordinate. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.lcd_CrsrShow">
+<span class="target" id="lcd_8h_1ace2d8242b22cdb03d9f1d775724a9f35"></span><span class="sig-name descname"><span class="n"><span class="pre">lcd_CrsrShow</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.lcd_CrsrShow" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Shows the cursor. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.lcd_CrsrSetImageIndex">
+<span class="target" id="lcd_8h_1a508878144930f60a17dc0f0c3433b16a"></span><span class="sig-name descname"><span class="n"><span class="pre">lcd_CrsrSetImageIndex</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">index</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.lcd_CrsrSetImageIndex" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets the cursor image index (0-3). </p>
+<p>The cursor is capable of holding up to four small (32x32) images at once, each occupying a quarter of the cursor RAM. This function lets you choose which image you want to display.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>There is no effect if the cursor size is set to large (64x64), since the cursor RAM can only hold one 64x64 image. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> – <strong>[in]</strong> The index of the cursor image to display (0-3).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.lcd_CrsrHide">
+<span class="target" id="lcd_8h_1a8828d1bdbb585592ca734026d628078a"></span><span class="sig-name descname"><span class="n"><span class="pre">lcd_CrsrHide</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.lcd_CrsrHide" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Hides the cursor. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.lcd_CrsrCleanup">
+<span class="target" id="lcd_8h_1a45de0e36c87ae3a12a563f12a36917eb"></span><span class="sig-name descname"><span class="n"><span class="pre">lcd_CrsrCleanup</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.lcd_CrsrCleanup" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-enums">Enums</p>
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv417lcd_cursor_size_t">
+<span id="_CPPv317lcd_cursor_size_t"></span><span id="_CPPv217lcd_cursor_size_t"></span><span class="target" id="lcd_8h_1a78381b53c5d8950fb047411b8d4b6f33"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">lcd_cursor_size_t</span></span></span><a class="headerlink" href="#_CPPv417lcd_cursor_size_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Hardware cursor sizes. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N17lcd_cursor_size_t21LCD_CURSOR_SIZE_SMALLE">
+<span id="_CPPv3N17lcd_cursor_size_t21LCD_CURSOR_SIZE_SMALLE"></span><span id="_CPPv2N17lcd_cursor_size_t21LCD_CURSOR_SIZE_SMALLE"></span><span class="target" id="lcd_8h_1a78381b53c5d8950fb047411b8d4b6f33a0054e72055f2ddc02430ced9f57b709b"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LCD_CURSOR_SIZE_SMALL</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N17lcd_cursor_size_t21LCD_CURSOR_SIZE_SMALLE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Small size, 32x32, 256 bytes of packed 2bpp image data. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N17lcd_cursor_size_t21LCD_CURSOR_SIZE_LARGEE">
+<span id="_CPPv3N17lcd_cursor_size_t21LCD_CURSOR_SIZE_LARGEE"></span><span id="_CPPv2N17lcd_cursor_size_t21LCD_CURSOR_SIZE_LARGEE"></span><span class="target" id="lcd_8h_1a78381b53c5d8950fb047411b8d4b6f33a55ee2fa975b9891ec767687d33e01071"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LCD_CURSOR_SIZE_LARGE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N17lcd_cursor_size_t21LCD_CURSOR_SIZE_LARGEE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Large size, 64x64, 1024 bytes of packed 2bpp image data. </p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="basicusb.html" class="btn btn-neutral float-left" title="sys/basicusb.h" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="power.html" class="btn btn-neutral float-right" title="sys/power.h" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v14.2
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+             <strong> 
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+             </strong> 
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

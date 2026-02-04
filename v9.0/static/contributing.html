@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contributing to the CE C Toolchain &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/design-tabs.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Makefile Options" href="makefile-options.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v9.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to the CE C Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../libraries/index.html">CE C Libraries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/index.html">CE C Toolchain Specific Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="makefile-options.html">Makefile Options</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Contributing to the CE C Toolchain</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#creating-prs-for-review">Creating PRs for review</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#building-the-ce-c-toolchain">Building the CE C Toolchain</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#linux-and-macos">Linux and macOS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#windows">Windows</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Contributing to the CE C Toolchain</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="contributing-to-the-ce-c-toolchain">
+<span id="contributing"></span><h1>Contributing to the CE C Toolchain<a class="headerlink" href="#contributing-to-the-ce-c-toolchain" title="Permalink to this headline"></a></h1>
+<p>If you are brave enough to contribute source to the CE C Toolchain, this page is for you!</p>
+<div class="section" id="creating-prs-for-review">
+<h2>Creating PRs for review<a class="headerlink" href="#creating-prs-for-review" title="Permalink to this headline"></a></h2>
+<p>Pull Requests (PRs) should branch from git <code class="code docutils literal notranslate"><span class="pre">master</span></code>.
+Before creating a PR, it is a good idea to get some feedback either from IRC or by creating a relevant issue.
+This will increase the chances of your PR being merged in a timely fashion.
+Please do not make large PRs; it is better to make smaller changes in different PRs.</p>
+<p>For information on how to fork a repo and create a PR using GitHub, see the <a class="reference external" href="https://docs.github.com/en/free-pro-team&#64;latest/github/getting-started-with-github/fork-a-repo">forking documentation</a>.</p>
+</div>
+<div class="section" id="building-the-ce-c-toolchain">
+<h2>Building the CE C Toolchain<a class="headerlink" href="#building-the-ce-c-toolchain" title="Permalink to this headline"></a></h2>
+<div class="section" id="linux-and-macos">
+<h3>Linux and macOS<a class="headerlink" href="#linux-and-macos" title="Permalink to this headline"></a></h3>
+<p>Get the <a class="reference external" href="https://github.com/jacobly0/llvm-project/wiki">ez80-clang LLVM compiler</a>.
+Make sure the compiler is located in the system’s PATH environment variable.</p>
+<p>Get the <a class="reference external" href="https://flatassembler.net/download.php">fasmg assembler</a>.
+The download is located near the bottom of the page.
+Extract the <cite>fasmg</cite> executable for your operating system to either the same place
+as <cite>ez80-clang</cite>, or in the system’s PATH environment variable.</p>
+<p>Clone the repo:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>--recurse-submodules<span class="w"> </span>https://github.com/CE-Programming/toolchain.git
+</pre></div>
+</div>
+<p>Build and install the toolchain:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>toolchain
+make
+make<span class="w"> </span>install
+</pre></div>
+</div>
+<p>By default, the toolchain is installed into the home (<cite>~/CEdev</cite>) directory.</p>
+<p>This is configurable with <code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">install</span> <span class="pre">PREFIX=[LOCATION]</span></code></p>
+</div>
+<div class="section" id="windows">
+<h3>Windows<a class="headerlink" href="#windows" title="Permalink to this headline"></a></h3>
+<p>Get <a class="reference external" href="http://www.mingw.org">MinGW</a>.
+The only required pacakges are <cite>mingw32-base</cite> and <cite>mingw32-gcc-g++</cite>.
+Make sure the <cite>MinGW/bin</cite> directory is in the system’s PATH environment variable.</p>
+<p>Get the <a class="reference external" href="https://github.com/jacobly0/llvm-project/wiki">ez80-clang LLVM compiler</a>.
+Make sure the compiler is located in the system’s PATH environment variable.</p>
+<p>Get the <a class="reference external" href="https://flatassembler.net/download.php">fasmg assembler</a>.
+The download is located near the bottom of the page.
+Extract the <cite>fasmg</cite> executable for your operating system to either the same place
+as <cite>ez80-clang</cite>, or in the system’s PATH environment variable.</p>
+<p>Clone the repo:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>--recurse-submodules<span class="w"> </span>https://github.com/CE-Programming/toolchain.git
+</pre></div>
+</div>
+<p>Build and install the toolchain:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>toolchain
+mingw32-make
+mingw32-make<span class="w"> </span>install
+</pre></div>
+</div>
+<p>By default, the toolchain is installed into the root (C:\CEdev) directory.</p>
+<p>This is configurable with <code class="code docutils literal notranslate"><span class="pre">mingw32-make</span> <span class="pre">install</span> <span class="pre">PREFIX=[LOCATION]</span></code></p>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="makefile-options.html" class="btn btn-neutral float-left" title="Makefile Options" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v9.0
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+            
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+             </strong> 
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

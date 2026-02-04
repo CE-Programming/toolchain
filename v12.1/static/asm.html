@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Assembly Routines &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/design-tabs.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="CE Library Headers" href="../libraries/index.html" />
+    <link rel="prev" title="Using File I/O Functions" href="fileio.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v12.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to the CE C/C++ Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hardware.html">Calculator Hardware Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="makefile-options.html">Makefile Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Assembly Routines</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#assembly-files">Assembly Files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#constants">Constants</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#assume">Assume</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#section">Section</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#extern">Extern</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#linking-asm-routines-to-c-c">Linking ASM routines to C/C++</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#preserve">Preserve</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arguments">Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#returns">Returns</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Libraries/Headers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../libraries/index.html">CE Library Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/sys/index.html">CE Hardware Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/ti/index.html">TI Operating System Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/index.html">Miscellaneous Headers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Helpful Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ides.html">Using the Toolchain in an IDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="git.html">Using Git For Revision Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coding-guidelines.html">General Coding Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to the CE Toolchain</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Assembly Routines</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="assembly-routines">
+<span id="asm"></span><h1>Assembly Routines<a class="headerlink" href="#assembly-routines" title="Permalink to this headline"></a></h1>
+<p>Assembly routines can be linked into a C/C++ program by putting them into the same <strong>src</strong> directory that your C/C++ sources are in, but with an <strong>.asm</strong> extension.
+These can be placed in any subdirectory of <strong>src</strong> just like C/C++ sources.</p>
+<div class="section" id="assembly-files">
+<h2>Assembly Files<a class="headerlink" href="#assembly-files" title="Permalink to this headline"></a></h2>
+<div class="section" id="constants">
+<span id="asm-consts"></span><h3>Constants<a class="headerlink" href="#constants" title="Permalink to this headline"></a></h3>
+<p>The top of the file is a good place defining constants or including other files that define constants.
+These will be availabe throughout the rest of the file, but not in other files.
+You can define a constant by saying <code class="code docutils literal notranslate"><span class="pre">my_constant</span> <span class="pre">:=</span> <span class="pre">42</span></code>.
+You can include common constants in multiple files by defining them in a file named, say, <strong>file.inc</strong> and putting <code class="code docutils literal notranslate"><span class="pre">include</span> <span class="pre">'file.inc'</span></code> in every file that needs them.
+You should not generally put any labels, code, or data here.
+If you try to reference a label defined here, you will get an <code class="code docutils literal notranslate"><span class="pre">Error:</span> <span class="pre">variable</span> <span class="pre">term</span> <span class="pre">used</span> <span class="pre">where</span> <span class="pre">not</span> <span class="pre">expected.</span></code> linker error which means you are trying to resolve an address that doesn’t belong to any section.
+See <a class="reference internal" href="#asm-section"><span class="std std-ref">Section</span></a> to fix this problem.</p>
+</div>
+<div class="section" id="assume">
+<span id="asm-assume"></span><h3>Assume<a class="headerlink" href="#assume" title="Permalink to this headline"></a></h3>
+<p>You should add a <code class="code docutils literal notranslate"><span class="pre">assume</span> <span class="pre">adl=1</span></code> before trying to emit any code, which ensures that you get 24-bit eZ80 instructions.
+If you end an assembly file with <code class="code docutils literal notranslate"><span class="pre">assume</span> <span class="pre">adl=0</span></code> (which is the eZ80’s 16-bit Z80 compatibility mode), it will propogate to another random assembly file.
+All toolchain and compiler-generated sources make sure to reset the mode at the top of the file and end the file in the same mode, but if one of your sources end in Z80 mode, then any other one of your sources might begin in Z80 mode, so it is safer to put the <code class="code docutils literal notranslate"><span class="pre">assume</span></code> line in every file.</p>
+</div>
+<div class="section" id="section">
+<span id="asm-section"></span><h3>Section<a class="headerlink" href="#section" title="Permalink to this headline"></a></h3>
+<p>Now that we are in the correct mode, we need to tell the linker where to put things.
+We use <code class="code docutils literal notranslate"><span class="pre">section</span> <span class="pre">.text</span></code> for code, <code class="code docutils literal notranslate"><span class="pre">section</span> <span class="pre">.data</span></code> for variables, and <code class="code docutils literal notranslate"><span class="pre">section</span> <span class="pre">.rodata</span></code> for constant data.
+Currently these are all placed in RAM, so which section you choose to switch to is much less important than how often you switch sections, even if you are switching to the same section you are already in.
+This is because every time you start a new, or restart the same, section, the linker gets a new opportunity to delete a block of dead code/data.
+Because of this, the correct time to switch sections is usually every time you start a new function or variable.
+You should not let execution fall off the end of a block because you won’t know if that block will be included or deleted from the output, however you can if you say <code class="code docutils literal notranslate"><span class="pre">require</span> <span class="pre">_symbol</span></code> of some public or private symbol defined in the next section to ensure that if the current block is included, then that will force the next block to also be included.
+To define a symbol in a block that can be referenced from other blocks, you should do <code class="code docutils literal notranslate"><span class="pre">private</span> <span class="pre">_symbol</span></code> or <code class="code docutils literal notranslate"><span class="pre">public</span> <span class="pre">_symbol</span></code> right before its definition.
+If it is private then it is only able to be referenced from the same file and no <a class="reference internal" href="#asm-extern"><span class="std std-ref">extern</span></a> should be used.
+If it is public then it can be referenced within the same file without <a class="reference internal" href="#asm-extern"><span class="std std-ref">extern</span></a> just like private symbols, but public symbols can also be referenced from other files and even C/C++!
+The public assembly symbol named <code class="code docutils literal notranslate"><span class="pre">_symbol</span></code> is accessible in C by the global name <code class="code docutils literal notranslate"><span class="pre">symbol</span></code>, assuming it is properly declared, with your asm symbol acting as the definition.</p>
+</div>
+<div class="section" id="extern">
+<span id="asm-extern"></span><h3>Extern<a class="headerlink" href="#extern" title="Permalink to this headline"></a></h3>
+<p>At the end of the file is a good place to list every external symbol that you might depend on like <code class="code docutils literal notranslate"><span class="pre">extern</span> <span class="pre">_symbol</span></code>.
+This includes both public symbols defined in another assembly file and global symbols from C, prefixed with an underscore like usual.
+Lastly, you should not let execution fall off the end of a file because the next file that gets assembled is unpredictable and you could end up anywhere!
+Block ordering can only be relied on within a single file, and only for blocks belonging to the same section.</p>
+</div>
+</div>
+<div class="section" id="linking-asm-routines-to-c-c">
+<h2>Linking ASM routines to C/C++<a class="headerlink" href="#linking-asm-routines-to-c-c" title="Permalink to this headline"></a></h2>
+<p>If an assembly function needs to be called from C, a separate header file should define a extern C global prototype.
+In C this looks like a normal function or global declaration, and in C++ it’s the same thing but in an <code class="code docutils literal notranslate"><span class="pre">extern</span> <span class="pre">&quot;C&quot;</span> <span class="pre">{}</span></code> block.</p>
+<p>Below is an example C prototype followed by the assembly implementation:</p>
+<p><code class="code docutils literal notranslate"><span class="pre">asm_func.h</span></code></p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">asm_func</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">arg</span><span class="p">);</span>
+</pre></div>
+</div>
+<p><code class="code docutils literal notranslate"><span class="pre">asm_func.asm</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">assume</span>  <span class="n">adl</span><span class="o">=</span><span class="mi">1</span>
+
+    <span class="n">section</span> <span class="o">.</span><span class="n">text</span>
+
+    <span class="n">public</span>  <span class="n">_asm_func</span>
+<span class="n">_asm_func</span><span class="p">:</span>
+    <span class="n">pop</span>     <span class="n">hl</span>
+    <span class="n">pop</span>     <span class="n">de</span>
+    <span class="n">push</span>    <span class="n">de</span>      <span class="p">;</span> <span class="n">de</span> <span class="o">=</span> <span class="n">arg</span>
+    <span class="n">push</span>    <span class="n">hl</span>
+
+    <span class="n">push</span>    <span class="n">de</span>
+    <span class="n">call</span>    <span class="n">_external_func</span>
+    <span class="n">pop</span>     <span class="n">de</span>
+
+    <span class="n">ret</span>
+
+    <span class="n">extern</span>  <span class="n">_external_func</span>
+</pre></div>
+</div>
+<p><code class="code docutils literal notranslate"><span class="pre">asm_func.c</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">int</span> <span class="n">external_func</span><span class="p">(</span><span class="nb">int</span> <span class="n">arg</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;external_func called with </span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">arg</span><span class="p">);</span>
+    <span class="k">return</span> <span class="mi">4321</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="n">void</span> <span class="n">test</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nb">int</span> <span class="n">arg</span> <span class="o">=</span> <span class="mi">1234</span><span class="p">;</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;calling asm_func with </span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">arg</span><span class="p">);</span>
+    <span class="nb">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">asm_func</span><span class="p">(</span><span class="n">arg</span><span class="p">);</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;asm_func returned </span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ret</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="section" id="preserve">
+<h3>Preserve<a class="headerlink" href="#preserve" title="Permalink to this headline"></a></h3>
+<p>Assembly routines must preserve the <code class="code docutils literal notranslate"><span class="pre">IX</span></code> and <code class="code docutils literal notranslate"><span class="pre">SP</span></code> registers.
+All other registers are free for use.</p>
+</div>
+<div class="section" id="arguments">
+<h3>Arguments<a class="headerlink" href="#arguments" title="Permalink to this headline"></a></h3>
+<p>Arguments are pushed from last to first corresponding to the C prototype.
+In eZ80, 3 bytes are always pushed to the stack regardless of the actual size.
+However, the assembly function must be careful to only use the valid bytes that are pushed.
+For example, if a <em>short</em> type is used, the upper byte of the value pushed on the stack will contain arbitrary data.
+This table lists the locations relative to <em>sp</em> from within the called funciton.
+Note that <code class="code docutils literal notranslate"><span class="pre">sp</span> <span class="pre">+</span> <span class="pre">[0,2]</span></code> contains the return address.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 26%" />
+<col style="width: 48%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>C/C++ Type</p></th>
+<th class="head"><p>Size</p></th>
+<th class="head"><p>Stack Location</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>char</p></td>
+<td><p>1 byte</p></td>
+<td><p>sp + [3]</p></td>
+</tr>
+<tr class="row-odd"><td><p>short</p></td>
+<td><p>2 bytes</p></td>
+<td><p>sp + [3,4]</p></td>
+</tr>
+<tr class="row-even"><td><p>int</p></td>
+<td><p>3 bytes</p></td>
+<td><p>sp + [3,5]</p></td>
+</tr>
+<tr class="row-odd"><td><p>long</p></td>
+<td><p>4 bytes</p></td>
+<td><p>sp + [3,6]</p></td>
+</tr>
+<tr class="row-even"><td><p>(u)int48_t</p></td>
+<td><p>6 bytes</p></td>
+<td><p>sp + [3,8]</p></td>
+</tr>
+<tr class="row-odd"><td><p>long long</p></td>
+<td><p>8 bytes</p></td>
+<td><p>sp + [3,10]</p></td>
+</tr>
+<tr class="row-even"><td><p>float</p></td>
+<td><p>4 bytes</p></td>
+<td><p>sp + [3,6]</p></td>
+</tr>
+<tr class="row-odd"><td><p>double</p></td>
+<td><p>4 bytes</p></td>
+<td><p>sp + [3,6]</p></td>
+</tr>
+<tr class="row-even"><td><p>pointer</p></td>
+<td><p>3 bytes</p></td>
+<td><p>sp + [3,5]</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Permalink to this headline"></a></h3>
+<p>This table lists which registers are used for return values from a function.
+The type’s sign does not affect the registers used, but may affect the value returned.
+The LSB is located in the register on the far right of the expression, e.g. <code class="docutils literal notranslate"><span class="pre">E:HL</span></code> indicates register <code class="docutils literal notranslate"><span class="pre">L</span></code> stores the LSB.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 39%" />
+<col style="width: 61%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>C/C++ Type</p></th>
+<th class="head"><p>Return Register</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>char</p></td>
+<td><p>A</p></td>
+</tr>
+<tr class="row-odd"><td><p>short</p></td>
+<td><p>HL</p></td>
+</tr>
+<tr class="row-even"><td><p>int</p></td>
+<td><p>UHL</p></td>
+</tr>
+<tr class="row-odd"><td><p>long</p></td>
+<td><p>E:UHL</p></td>
+</tr>
+<tr class="row-even"><td><p>(u)int48_t</p></td>
+<td><p>UDE:UHL</p></td>
+</tr>
+<tr class="row-odd"><td><p>long long</p></td>
+<td><p>BC:UDE:UHL</p></td>
+</tr>
+<tr class="row-even"><td><p>float</p></td>
+<td><p>E:UHL</p></td>
+</tr>
+<tr class="row-odd"><td><p>double</p></td>
+<td><p>E:UHL</p></td>
+</tr>
+<tr class="row-even"><td><p>pointer</p></td>
+<td><p>UHL</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="fileio.html" class="btn btn-neutral float-left" title="Using File I/O Functions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../libraries/index.html" class="btn btn-neutral float-right" title="CE Library Headers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v12.1
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+             </strong> 
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

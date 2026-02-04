@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ti/error.h &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/design-tabs.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="ti/flags.h" href="flags.html" />
+    <link rel="prev" title="TI Operating System Headers" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v13.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Welcome to the CE C/C++ Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/hardware.html">Calculator Hardware Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../static/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/makefile-options.html">Makefile Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/debugging.html">Debugging Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/asm.html">Assembly Routines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Libraries/Headers</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../libraries/index.html">CE Library Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sys/index.html">CE Hardware Headers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">TI Operating System Headers</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">ti/error.h</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="flags.html">ti/flags.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getcsc.html">ti/getcsc.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getkey.html">ti/getkey.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="screen.html">ti/screen.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="info.html">ti/info.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python.html">ti/python.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="real.html">ti/real.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sprintf.html">ti/sprintf.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tokens.html">ti/tokens.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ui.html">ti/ui.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vars.html">ti/vars.h</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Miscellaneous Headers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Helpful Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../static/ides.html">Using the Toolchain in an IDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/git.html">Using Git For Revision Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/coding-guidelines.html">General Coding Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/contributing.html">Contributing to the CE Toolchain</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">TI Operating System Headers</a> &raquo;</li>
+      <li>ti/error.h</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="ti-error-h">
+<span id="error-h"></span><h1>ti/error.h<a class="headerlink" href="#ti-error-h" title="Permalink to this headline"></a></h1>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;ti/error.h&gt;</span>
+</pre></div>
+</div>
+<p>Exceptions in languages like Python provide a structured way of handling rare error conditions.
+TI calls their implementation of this idea error handlers.</p>
+<p>When the OS encounters an unsusal condition such as divide-by-zero or out-of-memory, it looks for an active error handler.
+If no active error handlers exist, the OS will display the <code class="code docutils literal notranslate"><span class="pre">ERR:</span></code> screen.
+If an active error handler does exist, it gets control instead of showing the <code class="code docutils literal notranslate"><span class="pre">ERR:</span></code> screen.</p>
+<p>Unlike exception handlers, TI’s error handlers do not differentiate between error codes; the same error handler is called for all errors.
+However, error handlers do support nesting.
+If an handler decides that it can’t handle an error, it can rethrow it.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>When a TI error handler is invoked, C++ destructors <strong>are not</strong> run <em>even if the handler is outside the current scope!</em>
+Therefore, you must be very careful with object creation while an error handler is active.</p>
+</div>
+<p>Similarly, although the toolchain supports C++, it does <em>not</em> support C++ exceptions, and TI error handlers are not a substitute for C++ exceptions.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#api-documentation" id="id1">API Documentation</a></p></li>
+</ul>
+</div>
+<div class="section" id="api-documentation">
+<h2><a class="toc-backref" href="#id1">API Documentation</a><a class="headerlink" href="#api-documentation" title="Permalink to this headline"></a></h2>
+<p>TI CE OS errors; this is all the <code class="docutils literal notranslate"><span class="pre">ERR:A</span> <span class="pre">MESSAGE</span></code> screen stuff. You can use this to show custom error screens, as well as intercept errors to prevent the error screen from showing. </p>
+<p><dl class="simple">
+<dt><strong>Authors</strong></dt><dd><p><p>Matt “MateoConLechuga” Waltz</p>
+<p>Jacob “jacobly” Young</p>
+</p>
+</dd>
+</dl>
+</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_AppErr1">
+<span class="target" id="error_8h_1a0079510fce07ab691bf7e34b4214cc1f"></span><span class="sig-name descname"><span class="n"><span class="pre">os_AppErr1</span></span></span><a class="headerlink" href="#c.os_AppErr1" title="Permalink to this definition"></a><br /></dt>
+<dd><p>String for custom error. </p>
+<p>Can be used by calling <code class="docutils literal notranslate"><span class="pre">os_ThrowError(OS_E_APPERR1);</span></code>. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>String must be null-terminated, maximum of 12 characters. </p>
+</div>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.os_AppErr2">
+<span class="target" id="error_8h_1af5e8c33f1e68e3d4b31a6fa58037eb40"></span><span class="sig-name descname"><span class="n"><span class="pre">os_AppErr2</span></span></span><a class="headerlink" href="#c.os_AppErr2" title="Permalink to this definition"></a><br /></dt>
+<dd><p>String for custom error. </p>
+<p>Can be used by calling <code class="docutils literal notranslate"><span class="pre">os_ThrowError(OS_E_APPERR2);</span></code>. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>String must be null-terminated, maximum of 12 characters. </p>
+</div>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_EDIT">
+<span class="target" id="error_8h_1a5f32534e81d65e7455850cb7c69d96b4"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_EDIT</span></span></span><a class="headerlink" href="#c.OS_E_EDIT" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_MASK">
+<span class="target" id="error_8h_1a9ac34737f23448756efe88b3834149fb"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_MASK</span></span></span><a class="headerlink" href="#c.OS_E_MASK" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_OVERFLOW">
+<span class="target" id="error_8h_1a5ebd8afcc4c5541d6f96bfcc87c8a80e"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_OVERFLOW</span></span></span><a class="headerlink" href="#c.OS_E_OVERFLOW" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_DIVBY0">
+<span class="target" id="error_8h_1ae43f502c8ecff818e8e652fefe6a3ba2"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_DIVBY0</span></span></span><a class="headerlink" href="#c.OS_E_DIVBY0" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_SINGULARMAT">
+<span class="target" id="error_8h_1a583e118e66156ceba22af29fdba6c09a"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_SINGULARMAT</span></span></span><a class="headerlink" href="#c.OS_E_SINGULARMAT" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_DOMAIN">
+<span class="target" id="error_8h_1a3019a9faa78b82141938288888411870"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_DOMAIN</span></span></span><a class="headerlink" href="#c.OS_E_DOMAIN" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_INCREMENT">
+<span class="target" id="error_8h_1a111faa324c0eabcc061b667faec794b3"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_INCREMENT</span></span></span><a class="headerlink" href="#c.OS_E_INCREMENT" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_BREAK">
+<span class="target" id="error_8h_1ab413725b0fd97048b08949d377b7108c"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_BREAK</span></span></span><a class="headerlink" href="#c.OS_E_BREAK" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_NONREAL">
+<span class="target" id="error_8h_1a34ed4e2db70c9c40d372605a610f4371"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_NONREAL</span></span></span><a class="headerlink" href="#c.OS_E_NONREAL" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_SYNTAX">
+<span class="target" id="error_8h_1a1e1d0e0d5056c5649d7aa06207c85cd2"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_SYNTAX</span></span></span><a class="headerlink" href="#c.OS_E_SYNTAX" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_DATATYPE">
+<span class="target" id="error_8h_1aef22e5e4dba6419b5c7a3d2c807eb6fb"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_DATATYPE</span></span></span><a class="headerlink" href="#c.OS_E_DATATYPE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_ARGUMENT">
+<span class="target" id="error_8h_1a4234bec68ab760c3bdf022a5b2a1e674"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_ARGUMENT</span></span></span><a class="headerlink" href="#c.OS_E_ARGUMENT" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_DIMMISMATCH">
+<span class="target" id="error_8h_1a39bcd5d8afda132424ff54f27d2569bc"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_DIMMISMATCH</span></span></span><a class="headerlink" href="#c.OS_E_DIMMISMATCH" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_DIMENSION">
+<span class="target" id="error_8h_1a5453159320b4b88d534db5a3137643d0"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_DIMENSION</span></span></span><a class="headerlink" href="#c.OS_E_DIMENSION" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_UNDEFINED">
+<span class="target" id="error_8h_1a09d96714ac566b6041ddebf3921293d3"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_UNDEFINED</span></span></span><a class="headerlink" href="#c.OS_E_UNDEFINED" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_MEMORY">
+<span class="target" id="error_8h_1a45f8c8b583681aa15af4f34ac3cadb4f"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_MEMORY</span></span></span><a class="headerlink" href="#c.OS_E_MEMORY" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_INVALID">
+<span class="target" id="error_8h_1a06dd54515cff812986b55e99154ec749"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_INVALID</span></span></span><a class="headerlink" href="#c.OS_E_INVALID" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_ILLEGALNEST">
+<span class="target" id="error_8h_1a5b1997dd656c4ff0aae1489b239b33f0"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_ILLEGALNEST</span></span></span><a class="headerlink" href="#c.OS_E_ILLEGALNEST" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_BOUND">
+<span class="target" id="error_8h_1aa6d982d63faf058effa2b83e3ce3acc3"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_BOUND</span></span></span><a class="headerlink" href="#c.OS_E_BOUND" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_GRAPHRANGE">
+<span class="target" id="error_8h_1a6a9cda7a71636285aae4e7167928eb3c"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_GRAPHRANGE</span></span></span><a class="headerlink" href="#c.OS_E_GRAPHRANGE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_ZOOM">
+<span class="target" id="error_8h_1a6926ad5a4c210a962e07011f74a6ebac"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_ZOOM</span></span></span><a class="headerlink" href="#c.OS_E_ZOOM" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_LABEL">
+<span class="target" id="error_8h_1ad1ee7bef4ebf45120bd580b160081c98"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_LABEL</span></span></span><a class="headerlink" href="#c.OS_E_LABEL" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_STAT">
+<span class="target" id="error_8h_1a30cf0c04027bd2f32b010fc03ad6a98b"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_STAT</span></span></span><a class="headerlink" href="#c.OS_E_STAT" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_SOLVER">
+<span class="target" id="error_8h_1a7749b1bf24920b17bb4eb2ec6847dcfc"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_SOLVER</span></span></span><a class="headerlink" href="#c.OS_E_SOLVER" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_SINGULARITY">
+<span class="target" id="error_8h_1a87b039ee8773294a24e7beebaaff9ca7"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_SINGULARITY</span></span></span><a class="headerlink" href="#c.OS_E_SINGULARITY" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_SIGNCHANGE">
+<span class="target" id="error_8h_1ab6f244e0630c749c0b91e6ba5a3634a1"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_SIGNCHANGE</span></span></span><a class="headerlink" href="#c.OS_E_SIGNCHANGE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_ITERATIONS">
+<span class="target" id="error_8h_1afaaa9ec89c296ea67244f2a4a5fb91fa"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_ITERATIONS</span></span></span><a class="headerlink" href="#c.OS_E_ITERATIONS" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_BADGUESS">
+<span class="target" id="error_8h_1aa2491a8abe7eab8458e590197acacca4"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_BADGUESS</span></span></span><a class="headerlink" href="#c.OS_E_BADGUESS" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_STATPLOT">
+<span class="target" id="error_8h_1a1c407616c696d89ca25ce33caac61373"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_STATPLOT</span></span></span><a class="headerlink" href="#c.OS_E_STATPLOT" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_TOLTOOSMALL">
+<span class="target" id="error_8h_1a720df7f83101bf5d87494e87a242e8ac"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_TOLTOOSMALL</span></span></span><a class="headerlink" href="#c.OS_E_TOLTOOSMALL" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_RESERVED">
+<span class="target" id="error_8h_1a31fd7c0bbcb74ffa0cfd1b8a1371d298"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_RESERVED</span></span></span><a class="headerlink" href="#c.OS_E_RESERVED" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_MODE">
+<span class="target" id="error_8h_1ae6dce98adae98797b930afa88f5bb4bf"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_MODE</span></span></span><a class="headerlink" href="#c.OS_E_MODE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_LNKERR">
+<span class="target" id="error_8h_1a99b0a603b9fa6737a0c48fc85314f486"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_LNKERR</span></span></span><a class="headerlink" href="#c.OS_E_LNKERR" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_LNKMEMERR">
+<span class="target" id="error_8h_1a064773476141278a491d428b92e954e1"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_LNKMEMERR</span></span></span><a class="headerlink" href="#c.OS_E_LNKMEMERR" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_LNKTRANSERR">
+<span class="target" id="error_8h_1a9384be86e0cd7ba1cb81bf279e0dca3c"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_LNKTRANSERR</span></span></span><a class="headerlink" href="#c.OS_E_LNKTRANSERR" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_LNKDUPERR">
+<span class="target" id="error_8h_1a3d8f79fb9c4d994453daea12cc8cf28f"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_LNKDUPERR</span></span></span><a class="headerlink" href="#c.OS_E_LNKDUPERR" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_LNKMEMFULL">
+<span class="target" id="error_8h_1aa0d8293e64f5f9502698a4f1e1e6fc30"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_LNKMEMFULL</span></span></span><a class="headerlink" href="#c.OS_E_LNKMEMFULL" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_UNKNOWN">
+<span class="target" id="error_8h_1a9b45f9f124096e1bf329b08330893bf3"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_UNKNOWN</span></span></span><a class="headerlink" href="#c.OS_E_UNKNOWN" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_SCALE">
+<span class="target" id="error_8h_1a8f168ef66cc3a4e794cee4f4fbd431ea"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_SCALE</span></span></span><a class="headerlink" href="#c.OS_E_SCALE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_IDNOTFOUND">
+<span class="target" id="error_8h_1a7a70e74c708ccb0a5528928e4b8289e0"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_IDNOTFOUND</span></span></span><a class="headerlink" href="#c.OS_E_IDNOTFOUND" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_NOMODE">
+<span class="target" id="error_8h_1adade6f56105e1a1169e100b946d70cbf"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_NOMODE</span></span></span><a class="headerlink" href="#c.OS_E_NOMODE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_VALIDATION">
+<span class="target" id="error_8h_1a420f1a5275d449913a3ced7d11a2e34e"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_VALIDATION</span></span></span><a class="headerlink" href="#c.OS_E_VALIDATION" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_LENGTH">
+<span class="target" id="error_8h_1a7a18b8253024780a9561504911484c75"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_LENGTH</span></span></span><a class="headerlink" href="#c.OS_E_LENGTH" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_APPLICATION">
+<span class="target" id="error_8h_1a95fb26e1b05bb758d882b6fc8b30a857"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_APPLICATION</span></span></span><a class="headerlink" href="#c.OS_E_APPLICATION" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_APPERR1">
+<span class="target" id="error_8h_1a989acf0550aa19376f38285248eef373"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_APPERR1</span></span></span><a class="headerlink" href="#c.OS_E_APPERR1" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_APPERR2">
+<span class="target" id="error_8h_1a48ffd892def6f5ebeaa4aecc22b8fdbd"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_APPERR2</span></span></span><a class="headerlink" href="#c.OS_E_APPERR2" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_EXPIREDAPP">
+<span class="target" id="error_8h_1a03356c03505d4b4366c2df6da10e0528"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_EXPIREDAPP</span></span></span><a class="headerlink" href="#c.OS_E_EXPIREDAPP" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_BADADD">
+<span class="target" id="error_8h_1ae0d7c2b7681288187f7a54ffa816c017"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_BADADD</span></span></span><a class="headerlink" href="#c.OS_E_BADADD" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_ARCHIVED">
+<span class="target" id="error_8h_1a8eed33758ca60a262dea6c19e7a6aaa0"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_ARCHIVED</span></span></span><a class="headerlink" href="#c.OS_E_ARCHIVED" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_VERSION">
+<span class="target" id="error_8h_1a6e0f8039c622f4f19727ad71687e10ff"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_VERSION</span></span></span><a class="headerlink" href="#c.OS_E_VERSION" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_ARCHFULL">
+<span class="target" id="error_8h_1a36b04127ec1d4342d4112155edc430fc"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_ARCHFULL</span></span></span><a class="headerlink" href="#c.OS_E_ARCHFULL" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_VARIABLE">
+<span class="target" id="error_8h_1af3b9d303be89da03b34d1b4989e35e91"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_VARIABLE</span></span></span><a class="headerlink" href="#c.OS_E_VARIABLE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.OS_E_DUPLICATE">
+<span class="target" id="error_8h_1a321551ba0c0cf0b993750f292e5bbdfc"></span><span class="sig-name descname"><span class="n"><span class="pre">OS_E_DUPLICATE</span></span></span><a class="headerlink" href="#c.OS_E_DUPLICATE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413os_ThrowError7uint8_t">
+<span id="_CPPv313os_ThrowError7uint8_t"></span><span id="_CPPv213os_ThrowError7uint8_t"></span><span id="os_ThrowError__uint8_t"></span><span class="target" id="error_8h_1aa252830284164d05fd60dee151a4b0f1"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_ThrowError</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">error</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="pre">__attribute__((noreturn))</span><a class="headerlink" href="#_CPPv413os_ThrowError7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Throws an OS error. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>error</strong> – <strong>[in]</strong> Error code to throw </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv419os_PushErrorHandlerv">
+<span id="_CPPv319os_PushErrorHandlerv"></span><span id="_CPPv219os_PushErrorHandlerv"></span><span id="os_PushErrorHandler__void"></span><span class="target" id="error_8h_1a322bb5e2d345a8e1206084df4251dbc3"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_PushErrorHandler</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="pre">__attribute__((returns_twice))</span><a class="headerlink" href="#_CPPv419os_PushErrorHandlerv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>This function can return twice (like setjmp). </p>
+<p>First return always happens with a return value of 0. Second return only happens if an error occurs before os_PopErrorHandler is called, with the errNo as the return value.</p>
+<p><div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="n">errno</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">os_PushErrorHandler</span><span class="p">();</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">errno</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// handle error, but no longer under the protection of the error handler so do not call os_PopErrorHandler()</span>
+<span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// run some code that may error</span>
+<span class="w">    </span><span class="n">os_PopErrorHandler</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#error_8h_1a2862dc222a72179213b2b9ed6eb0a3d9"><span class="std std-ref">os_PopErrorHandler</span></a> </p>
+</div>
+</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This does not respect C++ destructors! So don’t use anything that requires a non-trivial destructor.</p>
+</div>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv418os_PopErrorHandlerv">
+<span id="_CPPv318os_PopErrorHandlerv"></span><span id="_CPPv218os_PopErrorHandlerv"></span><span id="os_PopErrorHandler__void"></span><span class="target" id="error_8h_1a2862dc222a72179213b2b9ed6eb0a3d9"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">os_PopErrorHandler</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418os_PopErrorHandlerv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Restores stack state after a call to os_PushErrorHandler. </p>
+<p>Must be called with stack in the same state as it was when os_PushErrorHandler returned with 0, and should not be called along the error path.</p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#error_8h_1a322bb5e2d345a8e1206084df4251dbc3"><span class="std std-ref">os_PushErrorHandler</span></a> </p>
+</div>
+</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="TI Operating System Headers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="flags.html" class="btn btn-neutral float-right" title="ti/flags.h" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v13.0
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+             </strong> 
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

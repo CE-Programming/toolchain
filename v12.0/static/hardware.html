@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculator Hardware Overview &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/design-tabs.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Frequently Asked Questions" href="faq.html" />
+    <link rel="prev" title="Welcome to the CE C/C++ Toolchain!" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v12.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to the CE C/C++ Toolchain!</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Calculator Hardware Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#a-brief-history-of-ti-graphing-calculator-hardware">A Brief History of TI Graphing Calculator Hardware</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#the-z80-cpu">The Z80 CPU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#running-from-rom">Running From ROM</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#the-ti-84-plus-ce">The TI-84 Plus CE</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#versions">Versions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-24-bit-ez80-cpu">The 24-bit eZ80 CPU</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#floating-point-numbers">Floating-Point Numbers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-memory-map">The Memory Map</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#flash-memory">Flash Memory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-lcd">The LCD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-lcd-controller">The LCD Controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-lcd-driver">The LCD Driver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-keyboard">The Keyboard</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#real-time-clock">Real-Time Clock</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#timers">Timers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#usb">USB</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#protected-hardware">Protected Hardware</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#wait-states">Wait States</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="makefile-options.html">Makefile Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ides.html">Using the Toolchain in an IDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html#debug-h">debug.h</a></li>
+<li class="toctree-l1"><a class="reference internal" href="asm.html">Assembly Routines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Libraries/Headers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../libraries/index.html">CE Library Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/sys/index.html">CE Hardware Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/ti/index.html">TI Operating System Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/index.html">Miscellaneous Headers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Helpful Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="git.html">Using Git For Revision Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coding-guidelines.html">General Coding Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to the CE Toolchain</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Calculator Hardware Overview</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="calculator-hardware-overview">
+<span id="hardware"></span><h1>Calculator Hardware Overview<a class="headerlink" href="#calculator-hardware-overview" title="Permalink to this headline"></a></h1>
+<p>This is a low-level overview of the TI-84 Plus CE’s hardware from a programmer’s perspective.</p>
+<p>Note: In France, the TI-84 Plus CE is called the TI-83 Premium CE.
+It also has a slightly different OS with additional functionality, but the hardware is the same.</p>
+<div class="section" id="a-brief-history-of-ti-graphing-calculator-hardware">
+<h2>A Brief History of TI Graphing Calculator Hardware<a class="headerlink" href="#a-brief-history-of-ti-graphing-calculator-hardware" title="Permalink to this headline"></a></h2>
+<p>While the TI-84 Plus CE’s hardware is very different from previous models,
+its software is directly derived from the software of previous models.
+Understanding the history of the TI-8x line gives some context to why the TI-84 Plus CE is the way it is.</p>
+<p>TI’s first graphing calculator was the TI-81, released in 1990.
+It took the then-popular idea of a “pocket computer” and turned it into an educational tool for students:
+not only did it handle scientific computations, but it could also graph equations, do some matrix operations, and was programmable in BASIC, which was a popular language at the time.
+At the time, most homes did not have any kind of computer (or tablet or smartphone), and computers costs thousands of dollars;
+the TI-81 cost just $110 and students could learn programming on a portable, personal device.</p>
+<p>Since 1990, TI has continued to improve their offerings incrementally, adding more functionality to the TI-81’s original software.
+The TI-83 (non-Plus), introduced in 1996, has nearly all of the mathematical functionality of the TI-84 Plus CE.
+The TI-83 Plus, introduced in 1999, added flash memory, allowing more data to be stored in the calculator’s “archive,” as well as installing “Flash (TM)” applications.
+The TI-84 Plus, introduced in 2004, adds a USB port and more RAM (but hidden from the user).
+The TI-84 Plus C SE, introduced in 2013, was TI’s first attempt to add color to the TI-81’s lineage.
+Unfortunately, there were too many pixels for too slow a CPU, and it was discontinued soon after.
+Thus came the TI-84 Plus CE.</p>
+<p>Up until the TI-84 Plus CE, the hardware of the TI-8x series was improved only incrementally.
+The TI-84 Plus C SE made it clear that no further incremental improvements were possible, and thus for the TI-84 Plus CE TI radically redesigned the entirety of the calculator’s hardware.
+However, TI made sure to choose a CPU that was compatible with the TI-84 Plus’s so that they could avoid completely rewriting the calculator’s software.
+Thus, while the TI-84 Plus CE hardware is completely unlike previous models, the software is still very similar.</p>
+<div class="section" id="the-z80-cpu">
+<h3>The Z80 CPU<a class="headerlink" href="#the-z80-cpu" title="Permalink to this headline"></a></h3>
+<p>The TI-81 used a Zilog Z80 8-bit CPU, which had been popular in early PCs from the late 70s and early 80s.
+Newer, faster CPUs made the Z80 obsolete in PCs, but it remained adequate for a student’s calculator.
+With the TI-83 Plus and TI-84 Plus, TI kept the same Z80 CPU, but they increased its speed, from 2 MHz on the TI-81 to 15 MHz on the TI-84 Plus.
+Unfortunately, the Z80 is just not fast enough for a full color screen (at least not without a graphics accelerator of some kind),
+so the TI-84 Plus CE switched to the Z80’s most modern successor, the eZ80.</p>
+</div>
+<div class="section" id="running-from-rom">
+<h3>Running From ROM<a class="headerlink" href="#running-from-rom" title="Permalink to this headline"></a></h3>
+<p>Unlike modern computers (and indeed the TI Nspire series), the TI-81’s CPU did not copy code from a storage device (hard drive or internal flash) before executing it.
+Instead the CPU is slow enough and the ROM fast enough that the CPU can fetch each byte from the ROM the moment it’s needed, without any waiting.
+Today, flash memory has replaced ROMs in nearly all applications, including in the TI-83 Plus and its successors.
+Running code directly from a flash memory instead of copying it to RAM first is known as XIP (execute-in-place) flash.</p>
+<p>The TI-84 Plus CE continues to use an XIP design like the TI-83 Plus before it.
+XIP designs are actually common in microcontrollers like the Arduino.
+Usually, the microcontroller has the flash memory built-in, but some, like the Raspberry Pi Pico, do use external flash.</p>
+<p>The original Z80 could only directly access 64 K of memory, making accessing additional memory awkward and slow.
+The TI-81 has just 64 K of ROM and 8 K of RAM, while the TI-84 Plus C SE had 4 MB of flash and 128 K of RAM, and getting access to everything was complicated!</p>
+</div>
+</div>
+<div class="section" id="the-ti-84-plus-ce">
+<h2>The TI-84 Plus CE<a class="headerlink" href="#the-ti-84-plus-ce" title="Permalink to this headline"></a></h2>
+<p>As mentioned, the TI-84 Plus CE’s hardware is radically different from its predecessors.</p>
+<div class="section" id="versions">
+<h3>Versions<a class="headerlink" href="#versions" title="Permalink to this headline"></a></h3>
+<p>From time to time, TI revises their calculator hardware.</p>
+<ul class="simple">
+<li><p>Starting with revision code I, TI removed the CPU’s interrupt vectoring feature.</p></li>
+<li><p>In 2019, the TI-84 Plus CE went through a major revision that significantly improved performance by adding a cache in front of the XIP flash.</p></li>
+<li><p>At the same time, TI added a serial link to allow communication with an optional Python co-processor.
+This was originally limited to the French market, but TI has since made Python available in all markets.</p></li>
+</ul>
+</div>
+<div class="section" id="the-24-bit-ez80-cpu">
+<h3>The 24-bit eZ80 CPU<a class="headerlink" href="#the-24-bit-ez80-cpu" title="Permalink to this headline"></a></h3>
+<p>The TI-84 Plus CE’s eZ80 is much faster than the Z80 even when running at the same speed, in some cases up to ten times as fast,
+and on the TI-84 Plus CE, the CPU is clocked at 48 MHz, instead of the TI-84 Plus’s 15 MHz.
+This makes running C code much more practical than it was on previous models, and TI takes advantage of that on the CE.
+At the same time, the eZ80 can easily run old Z80 software with only minor changes,
+allowing TI to add new functionality written in C to their old Z80 assembly code.</p>
+<p>The eZ80 expands the memory space from 64 K to 16 MB, allowing easy access to all of the calculator’s memory.
+Unfortunately, while the Z80 has perfectly-sensible 16-bit addresses, with an address being two bytes in size,
+the eZ80 uses 24-bit addresses, meaning each address is three bytes long.
+This is an unusual size, and it also results in the toolchain having 24-bit-size <code class="code docutils literal notranslate"><span class="pre">int</span></code> .</p>
+<p>Consequently, the eZ80 can natively access variables that are either one byte (8 bits, <code class="code docutils literal notranslate"><span class="pre">char</span></code>) or three bytes (24 bits, <code class="code docutils literal notranslate"><span class="pre">int</span></code>) in size,
+but two-byte (16 bits, <code class="code docutils literal notranslate"><span class="pre">short</span></code>) and four-byte (32 bits, <code class="code docutils literal notranslate"><span class="pre">long</span></code>) variables are actually a little slower for the CPU to access.
+The <code class="code docutils literal notranslate"><span class="pre">&lt;stdint.h&gt;</span></code> header contains declarations for the standard 8-, 16-, and 32-bit types,
+Furthermore, the eZ80 is a little slower at signed arithmetic, so you should use <code class="code docutils literal notranslate"><span class="pre">unsigned</span></code> when possible.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">&lt;stdint.h&gt;</span></code> header contains declarations for the standard 8-, 16-, and 32-bit types, as well as the eZ80’s 24-bit type.
+Here’s a table:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 27%" />
+<col style="width: 5%" />
+<col style="width: 6%" />
+<col style="width: 8%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>C Type</p></th>
+<th class="head"><p><code class="code docutils literal notranslate"><span class="pre">&lt;stdint.h&gt;</span></code> Names</p></th>
+<th class="head"><p>CE Bits</p></th>
+<th class="head"><p>CE Bytes</p></th>
+<th class="head"><p>Common Size</p></th>
+<th class="head"><p>CE <code class="code docutils literal notranslate"><span class="pre">unsigned</span></code> Range</p></th>
+<th class="head"><p>CE <code class="code docutils literal notranslate"><span class="pre">signed</span></code> Range</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="code docutils literal notranslate"><span class="pre">char</span></code></p></td>
+<td><p><code class="code docutils literal notranslate"><span class="pre">uint8_t</span></code>, <code class="code docutils literal notranslate"><span class="pre">int8_t</span></code></p></td>
+<td><p>8</p></td>
+<td><p>1</p></td>
+<td><p>8/1</p></td>
+<td><p>0 to 255</p></td>
+<td><p>-128 to 127</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="code docutils literal notranslate"><span class="pre">short</span></code></p></td>
+<td><p><code class="code docutils literal notranslate"><span class="pre">uint16_t</span></code>, <code class="code docutils literal notranslate"><span class="pre">int16_t</span></code></p></td>
+<td><p>16</p></td>
+<td><p>2</p></td>
+<td><p>16/2</p></td>
+<td><p>0 to 65535</p></td>
+<td><p>-32768 to 32767</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="code docutils literal notranslate"><span class="pre">int</span></code></p></td>
+<td><p><code class="code docutils literal notranslate"><span class="pre">uint24_t</span></code>, <code class="code docutils literal notranslate"><span class="pre">int24_t</span></code></p></td>
+<td><p>24</p></td>
+<td><p>3</p></td>
+<td><p>32/4</p></td>
+<td><p>0 to 16777215</p></td>
+<td><p>-8388608 to 8388607</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="code docutils literal notranslate"><span class="pre">long</span></code></p></td>
+<td><p><code class="code docutils literal notranslate"><span class="pre">uint32_t</span></code>, <code class="code docutils literal notranslate"><span class="pre">int32_t</span></code></p></td>
+<td><p>32</p></td>
+<td><p>4</p></td>
+<td><p>32/4</p></td>
+<td><p>0 to 4294967295</p></td>
+<td><p>-2147483648 to 2147483647</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="code docutils literal notranslate"><span class="pre">long</span> <span class="pre">long</span></code></p></td>
+<td><p><code class="code docutils literal notranslate"><span class="pre">uint64_t</span></code>, <code class="code docutils literal notranslate"><span class="pre">int64_t</span></code></p></td>
+<td><p>64</p></td>
+<td><p>8</p></td>
+<td><p>64/8</p></td>
+<td><p>0 to a lot</p></td>
+<td><p>-negative lot to a lot</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="code docutils literal notranslate"><span class="pre">void*</span></code></p></td>
+<td><p><code class="code docutils literal notranslate"><span class="pre">uintptr_t</span></code>, <code class="code docutils literal notranslate"><span class="pre">ptrdiff_t</span></code></p></td>
+<td><p>24</p></td>
+<td><p>3</p></td>
+<td><p>64/8</p></td>
+<td><p>All of RAM and the archive</p></td>
+<td><p>N/A</p></td>
+</tr>
+</tbody>
+</table>
+<p>“Common Size” is the size in bit/bytes of the type that Windows uses, as well as many other platforms;
+on some platforms, the types are larger than in this toolchain.</p>
+</div>
+<div class="section" id="floating-point-numbers">
+<h3>Floating-Point Numbers<a class="headerlink" href="#floating-point-numbers" title="Permalink to this headline"></a></h3>
+<p>Perhaps surprisingly, even though the Z80 is used in a calculator, the CPU itself does not have any concept of <code class="code docutils literal notranslate"><span class="pre">float</span></code> or <code class="code docutils literal notranslate"><span class="pre">double</span></code>.
+The circuits that modern CPUs use to handle such types is large and complicated, and simply wasn’t feasible in the 70s when the Z80 was designed.
+Therefore, software has to implement that functionality.</p>
+<p>Like the Z80, the eZ80 also lacks native support for float-point arithmetic, so <code class="code docutils literal notranslate"><span class="pre">float</span></code> is slower than <code class="code docutils literal notranslate"><span class="pre">int</span></code>.
+Furthermore, in the toolchain, <code class="code docutils literal notranslate"><span class="pre">float</span></code> and <code class="code docutils literal notranslate"><span class="pre">double</span></code> are actually treated the same (this is allowed by the C standard).</p>
+<p>In the toolchain, <code class="code docutils literal notranslate"><span class="pre">float</span></code> is the standard IEEE 32-bit float.
+However, IEEE floats have limited precision and have unintuitive rouding behavior.
+So when TI designed the TI-81, they wrote their own special floating-point number format, which is much more suitable for precision scientific calculations.
+Unfortunately, it also much slower.</p>
+<p>This, however, has nothing to do with the calculator’s hardware, and is instead covered on a different page.</p>
+</div>
+<div class="section" id="the-memory-map">
+<h3>The Memory Map<a class="headerlink" href="#the-memory-map" title="Permalink to this headline"></a></h3>
+<p>Both flash and RAM are mapped into the eZ80’s address space.
+This means that a pointer may point to RAM or flash (or something else!) depending on its value.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 64%" />
+<col style="width: 36%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Pointer Value</p></th>
+<th class="head"><p>Memory Accessed <a class="footnote-reference brackets" href="#id2" id="id1">1</a></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="code docutils literal notranslate"><span class="pre">0x000000</span></code> to <code class="code docutils literal notranslate"><span class="pre">0x3FFFFF</span></code></p></td>
+<td><p>Flash</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="code docutils literal notranslate"><span class="pre">0x400000</span></code> to <code class="code docutils literal notranslate"><span class="pre">0xCFFFFF</span></code></p></td>
+<td><p>Nothing</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="code docutils literal notranslate"><span class="pre">0xD00000</span></code> to <code class="code docutils literal notranslate"><span class="pre">0xD3FFFF</span></code></p></td>
+<td><p>RAM</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="code docutils literal notranslate"><span class="pre">0xD40000</span></code> to <code class="code docutils literal notranslate"><span class="pre">0xD657FF</span></code></p></td>
+<td><p>VRAM</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="code docutils literal notranslate"><span class="pre">0xD65800</span></code> to <code class="code docutils literal notranslate"><span class="pre">0xFFFFFF</span></code></p></td>
+<td><p>I/O</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="footnote brackets">
+<dt class="label" id="id2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>WikiTI has more details at <a class="reference external" href="https://wikiti.brandonw.net/index.php?title=84PCE:Wait_States">https://wikiti.brandonw.net/index.php?title=84PCE:Wait_States</a></p>
+</dd>
+</dl>
+<p>How does a CPU tell a USB port to send data to a device?
+Today, most CPUs use something called memory-mapped I/O.
+This means that reading from or writing to special address (pointers) won’t actually access memory, but instead sends a command or query to a hardware device.</p>
+<p>For example, there is no RAM or flash at the address <code class="code docutils literal notranslate"><span class="pre">0xF60024</span></code>,
+but if you write to that address, the LCD backlight controller will know you’re trying to talk it and change the LCD’s brightness.
+Similarly, if you read from that address, the backlight controller will respond with the current backlight value.
+The toolchain exposes these special addresses as variables you can read and write.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;sys/lcd.h&gt;</span><span class="c1"> // Gets access to the LCD&#39;s special memory addresses</span>
+
+<span class="c1">// Later in your program</span>
+<span class="c1">// Show the current backlight level by reading it directly from hardware:</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">&quot;Current backlight level: 0x%2X</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">lcd_BacklightLevel</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="flash-memory">
+<h3>Flash Memory<a class="headerlink" href="#flash-memory" title="Permalink to this headline"></a></h3>
+<p>Archived variables, the operating system, and applications, are all stored in flash.
+While you can freely read any and all of flash, the calculator’s hardware prevents you from writing to flash, and in fact, attempting to do so will cause a crash.
+The calculator’s operating system works with special hardware to enforce this restriction in order to prevent students from patching the OS to let them cheat.
+Consequently, the only way to store data in flash is to create a variable in RAM and then archive it.
+The <a class="reference internal" href="../libraries/fileioc.html#fileioc-h"><span class="std std-ref">fileioc library</span></a> makes this easy.</p>
+<p>Because teachers (and therefore TI’s management) get very worked up by cheating, the toolchain does not (and will not) provide any means of bypassing this restriction.</p>
+</div>
+<div class="section" id="the-lcd">
+<h3>The LCD<a class="headerlink" href="#the-lcd" title="Permalink to this headline"></a></h3>
+<p>The TI-84 Plus CE’s display is an LCD with 320 by 240 pixels.
+The LCD technically supports 18-bit color, but it has fairly mediocre color.
+The LCD is actually a portrait display, rotated 90 degrees;
+software configures the LCD controller to present the illusion of a landscape display.
+This, however, does result in the diagonal line that plagues the <a class="reference internal" href="../libraries/graphx.html#graphx-h"><span class="std std-ref">graphx library</span></a>.</p>
+</div>
+<div class="section" id="the-lcd-controller">
+<h3>The LCD Controller<a class="headerlink" href="#the-lcd-controller" title="Permalink to this headline"></a></h3>
+<p>The LCD controller is a logic block that sends pixels from VRAM to the physical display.
+TI’s operating system uses VRAM in a 16-bits-per-pixel format, but the LCD controller also supports other formats:</p>
+<ul class="simple">
+<li><p>24-bit color, which uses way too much RAM;</p></li>
+<li><p>other 16- and 15-bit color formats;</p></li>
+<li><p>8-bit palettized color, using one byte per pixel and allowing double bufferiing;</p></li>
+<li><p>4-bit palettized color, using even less RAM and packing in two pixels per byte;</p></li>
+<li><p>2-bit and 1-bit palettized color modes, packing in four or eight pixels per byte.</p></li>
+</ul>
+<p>The <a class="reference internal" href="../libraries/graphx.html#graphx-h"><span class="std std-ref">graphx library</span></a> puts the controller in 8-bit mode, which is faster (half as much data),
+and allows double buffering.
+There are currently no libraries for using other graphics modes.
+You’ll even have to write your own routines if you want use 16-bit color mode.</p>
+<p>Direct access to the LCD controller’s control registers is provided in the <a class="reference internal" href="../headers/sys/lcd.html#lcd-h"><span class="std std-ref">sys/lcd.h header</span></a>.</p>
+</div>
+<div class="section" id="the-lcd-driver">
+<h3>The LCD Driver<a class="headerlink" href="#the-lcd-driver" title="Permalink to this headline"></a></h3>
+<p>Internal to the LCD panel is a chip-on-glass LCD driver.
+It translates digital color values into analog voltages that drive the physical pixels.
+The LCD driver also has an internal graphics RAM (GRAM) of its own.
+It is possible to disable the LCD controller and send pixels directly to the LCD driver,
+but there is no toolchain support for that.</p>
+</div>
+<div class="section" id="the-keyboard">
+<h3>The Keyboard<a class="headerlink" href="#the-keyboard" title="Permalink to this headline"></a></h3>
+<p>The calculator’s keypad is organized as a generic key matrix.
+You can directly read the key matrix using the <a class="reference internal" href="../libraries/keypadc.html#keypadc-h"><span class="std std-ref">keypadc library</span></a>.
+However, for simple programs, it is often easier to let the operating system handle the keypad.
+This can be done using the <a class="reference internal" href="../headers/ti/getcsc.html#getcsc-h"><span class="std std-ref">ti/getcsc.h</span></a> or <a class="reference internal" href="../headers/ti/getkey.html#getkey-h"><span class="std std-ref">ti/getkey.h</span></a> headers.</p>
+</div>
+<div class="section" id="real-time-clock">
+<h3>Real-Time Clock<a class="headerlink" href="#real-time-clock" title="Permalink to this headline"></a></h3>
+<p>The calculator has a dedicated real-time clock (RTC) circuit that keeps track of the time and date.
+Most digital devices that track real time use a 32768 Hz crystal, and the calculator is no different.</p>
+<p>The <a class="reference internal" href="../headers/sys/rtc.html#rtc-h"><span class="std std-ref">sys/rtc.h header</span></a> provides direct access to the clock hardware.
+While you can easily directly read the clock’s time, the header also gives you access to OS
+routines that also process the time and date into more a human-readable form.</p>
+</div>
+<div class="section" id="timers">
+<h3>Timers<a class="headerlink" href="#timers" title="Permalink to this headline"></a></h3>
+<p>The RTC only tracks time to the nearest second.
+If you want sub-second timing, there are also hardware timers that provide more precision.
+The <a class="reference internal" href="../headers/sys/timers.html#timers-h"><span class="std std-ref">sys/timers.h header</span></a> provides access to the timers.</p>
+</div>
+<div class="section" id="usb">
+<h3>USB<a class="headerlink" href="#usb" title="Permalink to this headline"></a></h3>
+<p>The calculator has a USB port which uses a Faraday FOTG210.
+A hardware driver is implemented in the  <a class="reference internal" href="../libraries/usbdrvce.html#usbdrvce-h"><span class="std std-ref">usbdrvce</span></a> library; available toolchain libraries are listed below.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 45%" />
+<col style="width: 55%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Library</p></th>
+<th class="head"><p>Use Case</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="../libraries/usbdrvce.html#usbdrvce-h"><span class="std std-ref">usbdrvce</span></a></p></td>
+<td><p>USB data/control transfers</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libraries/msddrvce.html#msddrvce-h"><span class="std std-ref">msddrvce</span></a></p></td>
+<td><p>Mass Storage Device access (drives)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../libraries/fatdrvce.html#fatdrvce-h"><span class="std std-ref">fatdrvce</span></a></p></td>
+<td><p>FAT32 filesystem support</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../libraries/srldrvce.html#srldrvce-h"><span class="std std-ref">srldrvce</span></a></p></td>
+<td><p>Serial device/host driver</p></td>
+</tr>
+</tbody>
+</table>
+<p>The <a class="reference internal" href="../headers/sys/basicusb.html#basicusb-h"><span class="std std-ref">sys/basicusb.h header</span></a> also allows you to check if the battery is currently being charged, and that’s about it.</p>
+</div>
+<div class="section" id="protected-hardware">
+<h3>Protected Hardware<a class="headerlink" href="#protected-hardware" title="Permalink to this headline"></a></h3>
+<p>Some of the calculator’s hardware is protected, meaning normal programs cannot access it.
+The protection is linked to the protection on the flash chip (mentioned above), and the intention is that only the calculator’s operating system can access protected hardware.</p>
+<ul class="simple">
+<li><p>The calculator has an SHA accelerator block.
+For some reason it is protected, so there isn’t much useful to say about it.</p></li>
+<li><p>System configuration and power control are protected.</p></li>
+<li><p>In some markets, the CE comes with an additional LED on the front that blinks when the calculator is in exam mode.
+Naturally, user programs cannot activate this LED to prevent programs from faking exam mode.</p></li>
+</ul>
+</div>
+<div class="section" id="wait-states">
+<h3>Wait States<a class="headerlink" href="#wait-states" title="Permalink to this headline"></a></h3>
+<p>When TI designed the TI-84 Plus CE, they wanted to save money by using standard logic blocks they could just buy pre-designed.
+These logic blocks were designed for use with ARM CPUs.
+Unfortunately, TI did an abysmal, atrocious, awful job of integrating the eZ80 CPU with the ARM-oriented logic blocks.</p>
+<p>Fundamentally, the issue is that the eZ80, as a successor to the Z80, is designed to be used with low-speed, zero-lantency memory.
+However, ARM CPUs are optimized for high-speed, high-latency memory.
+TI failed to take this into account, so the eZ80 is unable to take advantage of the extra speed, while getting the full brunt of the high latency.
+For the version of the TI-84 Plus CE released in 2015, this results in the eZ80 CPU spending some 85 % of its time stalled, unable to do anything useful.
+Yes, the CPU litterally runs as though it’s only clocked at around 6 MHz (equivalent to a Z80 at around 50 MHz).
+In 2019, TI released a new version of the TI-84 Plus CE that improves this significantly: now the CPU only spends about two-thirds of its time stalled.</p>
+<p>This isn’t really important for toolchain users; there’s nothing you can do about it.
+I just feel the need to tell everyone about TI Education’s bad engineering in the hope that they’ll one day feel enough shame to do better.
+Because TI <em>does</em> have good engineers; they just apparently weren’t employed when designing the TI-84 Plus CE.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to the CE C/C++ Toolchain!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="faq.html" class="btn btn-neutral float-right" title="Frequently Asked Questions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v12.0
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+             </strong> 
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ti/info.h &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/design-tabs.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="ti/python.h" href="python.html" />
+    <link rel="prev" title="ti/screen.h" href="screen.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v11.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Welcome to the CE C/C++ Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/hardware.html">Calculator Hardware Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../static/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/makefile-options.html">Makefile Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/ides.html">Using the Toolchain in an IDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/debugging.html">Debugging Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/asm.html">Assembly Routines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Libraries/Headers</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../libraries/index.html">CE Library Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sys/index.html">CE Hardware Headers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">TI Operating System Headers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="debug.html">ti/debug.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="error.html">ti/error.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flags.html">ti/flags.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getcsc.html">ti/getcsc.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getkey.html">ti/getkey.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="screen.html">ti/screen.h</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">ti/info.h</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="python.html">ti/python.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="real.html">ti/real.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tokens.html">ti/tokens.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ui.html">ti/ui.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vars.html">ti/vars.h</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Miscellaneous Headers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Helpful Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../static/git.html">Using Git For Revision Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/coding-guidelines.html">General Coding Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/contributing.html">Contributing to the CE Toolchain</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">TI Operating System Headers</a> &raquo;</li>
+      <li>ti/info.h</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="ti-info-h">
+<span id="info-h"></span><h1>ti/info.h<a class="headerlink" href="#ti-info-h" title="Permalink to this headline"></a></h1>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;ti/info.h&gt;</span>
+</pre></div>
+</div>
+<p>TI provides an API for getting basic information about a specific calculator.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#api-documentation" id="id1">API Documentation</a></p></li>
+</ul>
+</div>
+<div class="section" id="api-documentation">
+<h2><a class="toc-backref" href="#id1">API Documentation</a><a class="headerlink" href="#api-documentation" title="Permalink to this headline"></a></h2>
+<p>TI CE information. </p>
+<p><dl class="simple">
+<dt><strong>Authors</strong></dt><dd><p><p>Matt “MateoConLechuga” Waltz</p>
+<p>Jacob “jacobly” Young</p>
+</p>
+</dd>
+</dl>
+</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv413system_info_t">
+<span id="_CPPv313system_info_t"></span><span id="_CPPv213system_info_t"></span><span id="system_info_t"></span><span class="target" id="info_8h_1aa06ca8214058011948640a6bfb42fb9f"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411system_info" title="system_info"><span class="n"><span class="pre">system_info</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">system_info_t</span></span></span><a class="headerlink" href="#_CPPv413system_info_t" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv420boot_GetBootMajorVerv">
+<span id="_CPPv320boot_GetBootMajorVerv"></span><span id="_CPPv220boot_GetBootMajorVerv"></span><span id="boot_GetBootMajorVer__void"></span><span class="target" id="info_8h_1a53ae2074847992a63c8bee26afd9d56f"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">boot_GetBootMajorVer</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420boot_GetBootMajorVerv" title="Permalink to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Bootcode version major </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv420boot_GetBootMinorVerv">
+<span id="_CPPv320boot_GetBootMinorVerv"></span><span id="_CPPv220boot_GetBootMinorVerv"></span><span id="boot_GetBootMinorVer__void"></span><span class="target" id="info_8h_1a28ce1b99292e6e580c3c44fa3b6cb431"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">boot_GetBootMinorVer</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420boot_GetBootMinorVerv" title="Permalink to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Bootcode version minor </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv419boot_GetHardwareVerv">
+<span id="_CPPv319boot_GetHardwareVerv"></span><span id="_CPPv219boot_GetHardwareVerv"></span><span id="boot_GetHardwareVer__void"></span><span class="target" id="info_8h_1a542746d4ed5588264ffe6436c40e2976"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">boot_GetHardwareVer</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419boot_GetHardwareVerv" title="Permalink to this definition"></a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Hardware version </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416os_GetSystemInfov">
+<span id="_CPPv316os_GetSystemInfov"></span><span id="_CPPv216os_GetSystemInfov"></span><span id="os_GetSystemInfo__void"></span><span class="target" id="info_8h_1a8d5d6946d5337c56361bdb68604258df"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv413system_info_t" title="system_info_t"><span class="n"><span class="pre">system_info_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">os_GetSystemInfo</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416os_GetSystemInfov" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the system info. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A pointer to system_info_t </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv411system_info">
+<span id="_CPPv311system_info"></span><span id="_CPPv211system_info"></span><span id="system_info"></span><span class="target" id="structsystem__info"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">system_info</span></span></span><a class="headerlink" href="#_CPPv411system_info" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11system_info4sizeE">
+<span id="_CPPv3N11system_info4sizeE"></span><span id="_CPPv2N11system_info4sizeE"></span><span id="system_info::size__s"></span><span class="target" id="structsystem__info_1ad254a07ecf8db20988951f54e2792426"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size</span></span></span><a class="headerlink" href="#_CPPv4N11system_info4sizeE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>number of valid bytes after this field </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11system_info15hardwareVersionE">
+<span id="_CPPv3N11system_info15hardwareVersionE"></span><span id="_CPPv2N11system_info15hardwareVersionE"></span><span id="system_info::hardwareVersion__uint8_t"></span><span class="target" id="structsystem__info_1ae9210cc97bc510265b4d0180d718dbd1"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hardwareVersion</span></span></span><a class="headerlink" href="#_CPPv4N11system_info15hardwareVersionE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>7 on CE </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11system_info12hardwareTypeE">
+<span id="_CPPv3N11system_info12hardwareTypeE"></span><span id="_CPPv2N11system_info12hardwareTypeE"></span><span id="system_info::hardwareType__uint8_t"></span><span class="target" id="structsystem__info_1a7979b2741711dbe790d67c69d1d23d7f"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hardwareType</span></span></span><a class="headerlink" href="#_CPPv4N11system_info12hardwareTypeE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>0 on TI84+CE, 1 on TI83PCE </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11system_info13hardwareType2E">
+<span id="_CPPv3N11system_info13hardwareType2E"></span><span id="_CPPv2N11system_info13hardwareType2E"></span><span id="system_info::hardwareType2__uint8_t"></span><span class="target" id="structsystem__info_1ad688ec8ce223ede49080eedadeb9ecc6"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hardwareType2</span></span></span><a class="headerlink" href="#_CPPv4N11system_info13hardwareType2E" title="Permalink to this definition"></a><br /></dt>
+<dd><p>9 on TI84+CE, 12 on TI83PCE </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11system_info14osMajorVersionE">
+<span id="_CPPv3N11system_info14osMajorVersionE"></span><span id="_CPPv2N11system_info14osMajorVersionE"></span><span id="system_info::osMajorVersion__uint8_t"></span><span class="target" id="structsystem__info_1ab31d0fccbaf2c40ce110fb5c5e86648d"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">osMajorVersion</span></span></span><a class="headerlink" href="#_CPPv4N11system_info14osMajorVersionE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>e.g. </p>
+<p>5 on OS 5.4.0.0034 </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11system_info14osMinorVersionE">
+<span id="_CPPv3N11system_info14osMinorVersionE"></span><span id="_CPPv2N11system_info14osMinorVersionE"></span><span id="system_info::osMinorVersion__uint8_t"></span><span class="target" id="structsystem__info_1a70ffaba1d5d5706f73f38607adc77337"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">osMinorVersion</span></span></span><a class="headerlink" href="#_CPPv4N11system_info14osMinorVersionE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>e.g. </p>
+<p>4 on OS 5.4.0.0034 </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11system_info17osRevisionVersionE">
+<span id="_CPPv3N11system_info17osRevisionVersionE"></span><span id="_CPPv2N11system_info17osRevisionVersionE"></span><span id="system_info::osRevisionVersion__uint8_t"></span><span class="target" id="structsystem__info_1a1026304fd20a6f051fdca2edf0dbc134"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">osRevisionVersion</span></span></span><a class="headerlink" href="#_CPPv4N11system_info17osRevisionVersionE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>e.g. </p>
+<p>0 on OS 5.4.0.0034 </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11system_info14osBuildVersionE">
+<span id="_CPPv3N11system_info14osBuildVersionE"></span><span id="_CPPv2N11system_info14osBuildVersionE"></span><span id="system_info::osBuildVersion__unsigned"></span><span class="target" id="structsystem__info_1ad72a0cd1a6525a64bacb9bdc04f4f62a"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">osBuildVersion</span></span></span><a class="headerlink" href="#_CPPv4N11system_info14osBuildVersionE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>e.g. </p>
+<p>34 on OS 5.4.0.0034 </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11system_info16bootMajorVersionE">
+<span id="_CPPv3N11system_info16bootMajorVersionE"></span><span id="_CPPv2N11system_info16bootMajorVersionE"></span><span id="system_info::bootMajorVersion__uint8_t"></span><span class="target" id="structsystem__info_1a49dd1efdb367afee4fe2c005eefb0f20"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bootMajorVersion</span></span></span><a class="headerlink" href="#_CPPv4N11system_info16bootMajorVersionE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>e.g. </p>
+<p>5 on boot 5.3.6.0017 </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11system_info16bootMinorVersionE">
+<span id="_CPPv3N11system_info16bootMinorVersionE"></span><span id="_CPPv2N11system_info16bootMinorVersionE"></span><span id="system_info::bootMinorVersion__uint8_t"></span><span class="target" id="structsystem__info_1a160919490bbc9c59d15a7e32373bc3a5"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bootMinorVersion</span></span></span><a class="headerlink" href="#_CPPv4N11system_info16bootMinorVersionE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>e.g. </p>
+<p>3 on boot 5.3.6.0017 </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11system_info19bootRevisionVersionE">
+<span id="_CPPv3N11system_info19bootRevisionVersionE"></span><span id="_CPPv2N11system_info19bootRevisionVersionE"></span><span id="system_info::bootRevisionVersion__uint8_t"></span><span class="target" id="structsystem__info_1a521d4d46d2a4ba570db053b62bbfbdc4"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bootRevisionVersion</span></span></span><a class="headerlink" href="#_CPPv4N11system_info19bootRevisionVersionE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>e.g. </p>
+<p>6 on boot 5.3.6.0017 </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11system_info16bootBuildVersionE">
+<span id="_CPPv3N11system_info16bootBuildVersionE"></span><span id="_CPPv2N11system_info16bootBuildVersionE"></span><span id="system_info::bootBuildVersion__unsigned"></span><span class="target" id="structsystem__info_1a6ad813651a72247253770dcf271ccbac"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bootBuildVersion</span></span></span><a class="headerlink" href="#_CPPv4N11system_info16bootBuildVersionE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>e.g. </p>
+<p>17 on boot 5.3.6.0017 </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11system_info7unknownE">
+<span id="_CPPv3N11system_info7unknownE"></span><span id="_CPPv2N11system_info7unknownE"></span><span id="system_info::unknown__uint8_tA"></span><span class="target" id="structsystem__info_1a957348ee5bf6c8230445d559307ccdea"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">unknown</span></span></span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">10</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#_CPPv4N11system_info7unknownE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>400100f0000010300000 on CE </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11system_info6calcidE">
+<span id="_CPPv3N11system_info6calcidE"></span><span id="_CPPv2N11system_info6calcidE"></span><span id="system_info::calcid__uint8_tA"></span><span class="target" id="structsystem__info_1a98f093c0ee600f548ab3666148b8541b"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">calcid</span></span></span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">8</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#_CPPv4N11system_info6calcidE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>From certificate </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11system_info2tiE">
+<span id="_CPPv3N11system_info2tiE"></span><span id="_CPPv2N11system_info2tiE"></span><span id="system_info::ti__cA"></span><span class="target" id="structsystem__info_1a9dc8f4d4b85bccf856badca04386b2ad"></span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ti</span></span></span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">2</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#_CPPv4N11system_info2tiE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>First part of device name, “TI” </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11system_info8languageE">
+<span id="_CPPv3N11system_info8languageE"></span><span id="_CPPv2N11system_info8languageE"></span><span id="system_info::language__uint16_t"></span><span class="target" id="structsystem__info_1a53004275948e216cda5d6c70dae75622"></span><span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">language</span></span></span><a class="headerlink" href="#_CPPv4N11system_info8languageE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Localization language </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="screen.html" class="btn btn-neutral float-left" title="ti/screen.h" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="python.html" class="btn btn-neutral float-right" title="ti/python.h" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v11.0
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+             </strong> 
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

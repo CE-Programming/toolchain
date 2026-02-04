@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>sys/rtc.h &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/design-tabs.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="sys/timers.h" href="timers.html" />
+    <link rel="prev" title="sys/power.h" href="power.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v12.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Welcome to the CE C/C++ Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/hardware.html">Calculator Hardware Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../static/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/makefile-options.html">Makefile Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/debugging.html">Debugging Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/asm.html">Assembly Routines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Libraries/Headers</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../libraries/index.html">CE Library Headers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">CE Hardware Headers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="basicusb.html">sys/basicusb.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lcd.html">sys/lcd.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="power.html">sys/power.h</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">sys/rtc.h</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="timers.html">sys/timers.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="util.html">sys/util.h</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../ti/index.html">TI Operating System Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Miscellaneous Headers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Helpful Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../static/ides.html">Using the Toolchain in an IDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/git.html">Using Git For Revision Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/coding-guidelines.html">General Coding Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/contributing.html">Contributing to the CE Toolchain</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">CE Hardware Headers</a> &raquo;</li>
+      <li>sys/rtc.h</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="sys-rtc-h">
+<span id="rtc-h"></span><h1>sys/rtc.h<a class="headerlink" href="#sys-rtc-h" title="Permalink to this headline"></a></h1>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;sys/rtc.h&gt;</span>
+</pre></div>
+</div>
+<p>This header includes defines for the Real-Time Clock (RTC) used in the CE.
+The toolchain allows both direct access to the hardware registers, and using TI’s helper routines.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#api-documentation" id="id1">API Documentation</a></p></li>
+</ul>
+</div>
+<div class="section" id="api-documentation">
+<h2><a class="toc-backref" href="#id1">API Documentation</a><a class="headerlink" href="#api-documentation" title="Permalink to this headline"></a></h2>
+<p>CE Real-Time Clock define file. </p>
+<p><dl class="simple">
+<dt><strong>Authors</strong></dt><dd><p><p>Matt “MateoConLechuga” Waltz</p>
+<p>Jacob “jacobly” Young</p>
+</p>
+</dd>
+</dl>
+</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.rtc_Enable">
+<span class="target" id="rtc_8h_1af38bd3da371f5716dcb636a4d6b56652"></span><span class="sig-name descname"><span class="n"><span class="pre">rtc_Enable</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">int</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.rtc_Enable" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Enables the Real-Time-Clock (RTC). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>int</strong> – Interrupt mask to enable specific RTC interrupts. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.rtc_Set">
+<span class="target" id="rtc_8h_1aab80d3dacdd411b50a40364553de96b4"></span><span class="sig-name descname"><span class="n"><span class="pre">rtc_Set</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">sec</span></span>, <span class="n"><span class="pre">min</span></span>, <span class="n"><span class="pre">hr</span></span>, <span class="n"><span class="pre">day</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.rtc_Set" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets the Real-Time-Clock (RTC) with new values. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The set values do not take effect until the next RTC second. Verify the values have been loaded by waiting for <a class="reference internal" href="#rtc_8h_1aa9ae5e22b622db44e86ec52249e879b5"><span class="std std-ref">rtc_IsBusy()</span></a> to be false. The RTC will also need to be enabled. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sec</strong> – Second value to load. </p></li>
+<li><p><strong>min</strong> – Minute value to load. </p></li>
+<li><p><strong>hr</strong> – Hour value to load. </p></li>
+<li><p><strong>day</strong> – Day value to load.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.rtc_SetAlarm">
+<span class="target" id="rtc_8h_1aa05424a8261e7d8df9f75981e7d5adcc"></span><span class="sig-name descname"><span class="n"><span class="pre">rtc_SetAlarm</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">sec</span></span>, <span class="n"><span class="pre">min</span></span>, <span class="n"><span class="pre">hr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.rtc_SetAlarm" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets the Real-Time-Clock (RTC) alarm with new values. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sec</strong> – Second alarm value. </p></li>
+<li><p><strong>min</strong> – Minute alarm value. </p></li>
+<li><p><strong>hr</strong> – Hour alarm value. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.rtc_Disable">
+<span class="target" id="rtc_8h_1ab2d877622d393302d9e9ce537a8e020e"></span><span class="sig-name descname"><span class="n"><span class="pre">rtc_Disable</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.rtc_Disable" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Disables the Real-Time-Clock (RTC). </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.rtc_IsBusy">
+<span class="target" id="rtc_8h_1aa9ae5e22b622db44e86ec52249e879b5"></span><span class="sig-name descname"><span class="n"><span class="pre">rtc_IsBusy</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.rtc_IsBusy" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Checks if the RTC is busy setting newly loaded values. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.rtc_AckInterrupt">
+<span class="target" id="rtc_8h_1ab83cb4c555d2feb16a25f7a6e3773762"></span><span class="sig-name descname"><span class="n"><span class="pre">rtc_AckInterrupt</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">mask</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.rtc_AckInterrupt" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Acknowledges an RTC interrupt. </p>
+<p>This should be used to clear the condition that is causing the interrupt.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mask</strong> – RTC interrupt mask. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.rtc_ChkInterrupt">
+<span class="target" id="rtc_8h_1a2e3372f51332cff448996dffc8f6fef7"></span><span class="sig-name descname"><span class="n"><span class="pre">rtc_ChkInterrupt</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">mask</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.rtc_ChkInterrupt" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Checks if a RTC interrupt condition has occurred. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mask</strong> – RTC interrupt mask. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.rtc_Time">
+<span class="target" id="rtc_8h_1a61765dd0a064283c74e97b24dcfedd67"></span><span class="sig-name descname"><span class="n"><span class="pre">rtc_Time</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.rtc_Time" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets a combination of the RTC time; useful for seeding random numbers via srand(). </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.rtc_Seconds">
+<span class="target" id="rtc_8h_1abdf23d88ecf555286569e28be144a3f5"></span><span class="sig-name descname"><span class="n"><span class="pre">rtc_Seconds</span></span></span><a class="headerlink" href="#c.rtc_Seconds" title="Permalink to this definition"></a><br /></dt>
+<dd><p>RTC seconds. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.rtc_Minutes">
+<span class="target" id="rtc_8h_1af8e4c18b56727e449acd6d88598a8e6e"></span><span class="sig-name descname"><span class="n"><span class="pre">rtc_Minutes</span></span></span><a class="headerlink" href="#c.rtc_Minutes" title="Permalink to this definition"></a><br /></dt>
+<dd><p>RTC minutes. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.rtc_Hours">
+<span class="target" id="rtc_8h_1abdd5bbe4dc80ec7acd84323cd33bff74"></span><span class="sig-name descname"><span class="n"><span class="pre">rtc_Hours</span></span></span><a class="headerlink" href="#c.rtc_Hours" title="Permalink to this definition"></a><br /></dt>
+<dd><p>RTC hours. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.rtc_Days">
+<span class="target" id="rtc_8h_1a726fdd385318e31d8a7702d9c08c4523"></span><span class="sig-name descname"><span class="n"><span class="pre">rtc_Days</span></span></span><a class="headerlink" href="#c.rtc_Days" title="Permalink to this definition"></a><br /></dt>
+<dd><p>RTC days. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.rtc_AlarmSeconds">
+<span class="target" id="rtc_8h_1aabea150de0a86ae8482df851d364b401"></span><span class="sig-name descname"><span class="n"><span class="pre">rtc_AlarmSeconds</span></span></span><a class="headerlink" href="#c.rtc_AlarmSeconds" title="Permalink to this definition"></a><br /></dt>
+<dd><p>RTC alarm seconds. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.rtc_AlarmMinutes">
+<span class="target" id="rtc_8h_1aa7e4bb06f40fb201c28c37ff90e65022"></span><span class="sig-name descname"><span class="n"><span class="pre">rtc_AlarmMinutes</span></span></span><a class="headerlink" href="#c.rtc_AlarmMinutes" title="Permalink to this definition"></a><br /></dt>
+<dd><p>RTC alarm minutes. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.rtc_AlarmHours">
+<span class="target" id="rtc_8h_1a2fb848758b7a3287e9aa02e680235fb1"></span><span class="sig-name descname"><span class="n"><span class="pre">rtc_AlarmHours</span></span></span><a class="headerlink" href="#c.rtc_AlarmHours" title="Permalink to this definition"></a><br /></dt>
+<dd><p>RTC alarm hours. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.RTC_LOAD_INT">
+<span class="target" id="rtc_8h_1a0353ddf54b01271354466d33ef2bd85e"></span><span class="sig-name descname"><span class="n"><span class="pre">RTC_LOAD_INT</span></span></span><a class="headerlink" href="#c.RTC_LOAD_INT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>RTC load operation complete. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.RTC_ALARM_INT">
+<span class="target" id="rtc_8h_1ad49cab3be02397c38e4e9142ff03e4a8"></span><span class="sig-name descname"><span class="n"><span class="pre">RTC_ALARM_INT</span></span></span><a class="headerlink" href="#c.RTC_ALARM_INT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>RTC alarm interrupt. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.RTC_DAY_INT">
+<span class="target" id="rtc_8h_1a7667a27467dee9355571996216680b37"></span><span class="sig-name descname"><span class="n"><span class="pre">RTC_DAY_INT</span></span></span><a class="headerlink" href="#c.RTC_DAY_INT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>RTC interrupt on day change. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.RTC_HR_INT">
+<span class="target" id="rtc_8h_1ad5dd377a093ff767ce43bc7d61b6e06e"></span><span class="sig-name descname"><span class="n"><span class="pre">RTC_HR_INT</span></span></span><a class="headerlink" href="#c.RTC_HR_INT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>RTC interrupt on hour change. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.RTC_MIN_INT">
+<span class="target" id="rtc_8h_1a186ff169ce776960273e096baeef810c"></span><span class="sig-name descname"><span class="n"><span class="pre">RTC_MIN_INT</span></span></span><a class="headerlink" href="#c.RTC_MIN_INT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>RTC interrupt on minute change. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.RTC_SEC_INT">
+<span class="target" id="rtc_8h_1aebf00bff844a0a69af360e24c0945d38"></span><span class="sig-name descname"><span class="n"><span class="pre">RTC_SEC_INT</span></span></span><a class="headerlink" href="#c.RTC_SEC_INT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>RTC interrupt on second change. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.RTC_INT_MASK">
+<span class="target" id="rtc_8h_1a5842b31b337c7f949a0414c8f9aeb7ec"></span><span class="sig-name descname"><span class="n"><span class="pre">RTC_INT_MASK</span></span></span><a class="headerlink" href="#c.RTC_INT_MASK" title="Permalink to this definition"></a><br /></dt>
+<dd><p>RTC mask for all interrupts. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412boot_SetDate7uint8_t7uint8_t8uint16_t">
+<span id="_CPPv312boot_SetDate7uint8_t7uint8_t8uint16_t"></span><span id="_CPPv212boot_SetDate7uint8_t7uint8_t8uint16_t"></span><span id="boot_SetDate__uint8_t.uint8_t.uint16_t"></span><span class="target" id="rtc_8h_1ad8aa16bfaaeea4a827bce2d7baa90745"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">boot_SetDate</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">day</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">month</span></span>, <span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">year</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412boot_SetDate7uint8_t7uint8_t8uint16_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets the calculator’s date. </p>
+<p>Performs checks to ensure date is within range </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>day</strong> – <strong>[in]</strong> Day to set </p></li>
+<li><p><strong>month</strong> – <strong>[in]</strong> Month to set </p></li>
+<li><p><strong>year</strong> – <strong>[in]</strong> Year to set </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412boot_GetDateP7uint8_tP7uint8_tP8uint16_t">
+<span id="_CPPv312boot_GetDateP7uint8_tP7uint8_tP8uint16_t"></span><span id="_CPPv212boot_GetDateP7uint8_tP7uint8_tP8uint16_t"></span><span id="boot_GetDate__uint8_tP.uint8_tP.uint16_tP"></span><span class="target" id="rtc_8h_1ae0315dfff7eec682d38467a99415d4c4"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">boot_GetDate</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">day</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">month</span></span>, <span class="n"><span class="pre">uint16_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">year</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412boot_GetDateP7uint8_tP7uint8_tP8uint16_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the calculator’s date. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>day</strong> – <strong>[out]</strong> Pointer to variable to store day </p></li>
+<li><p><strong>month</strong> – <strong>[out]</strong> Pointer to variable to store month </p></li>
+<li><p><strong>year</strong> – <strong>[out]</strong> Pointer to variable to store year </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412boot_SetTime7uint8_t7uint8_t7uint8_t">
+<span id="_CPPv312boot_SetTime7uint8_t7uint8_t7uint8_t"></span><span id="_CPPv212boot_SetTime7uint8_t7uint8_t7uint8_t"></span><span id="boot_SetTime__uint8_t.uint8_t.uint8_t"></span><span class="target" id="rtc_8h_1ac1200f2b4cbbc346d0e6a2f5c353f9c8"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">boot_SetTime</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">seconds</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">minutes</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">hours</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412boot_SetTime7uint8_t7uint8_t7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets the calculator’s time. </p>
+<p>Performs checks to ensure time is within range. </p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This function doesn’t wait until the previous full RTC load operation is completed before attempting to start a new one. This may lead to issues, for example if you call <a class="reference internal" href="#rtc_8h_1ad8aa16bfaaeea4a827bce2d7baa90745"><span class="std std-ref">boot_SetDate()</span></a> before this function. To mitigate this, use <a class="reference internal" href="#rtc_8h_1ad8aa16bfaaeea4a827bce2d7baa90745"><span class="std std-ref">boot_SetDate()</span></a> (which doesn’t have this bug), after <a class="reference internal" href="#rtc_8h_1ac1200f2b4cbbc346d0e6a2f5c353f9c8"><span class="std std-ref">boot_SetTime()</span></a> or validate <a class="reference internal" href="#rtc_8h_1aa9ae5e22b622db44e86ec52249e879b5"><span class="std std-ref">rtc_IsBusy()</span></a> is false before calling <a class="reference internal" href="#rtc_8h_1ac1200f2b4cbbc346d0e6a2f5c353f9c8"><span class="std std-ref">boot_SetTime()</span></a>. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seconds</strong> – <strong>[in]</strong> Seconds to set </p></li>
+<li><p><strong>minutes</strong> – <strong>[in]</strong> Minutes to set </p></li>
+<li><p><strong>hours</strong> – <strong>[in]</strong> Hours to set </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412boot_GetTimeP7uint8_tP7uint8_tP7uint8_t">
+<span id="_CPPv312boot_GetTimeP7uint8_tP7uint8_tP7uint8_t"></span><span id="_CPPv212boot_GetTimeP7uint8_tP7uint8_tP7uint8_t"></span><span id="boot_GetTime__uint8_tP.uint8_tP.uint8_tP"></span><span class="target" id="rtc_8h_1a718df11f85fe8ddab8d5b2e54b1eb668"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">boot_GetTime</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">seconds</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">minutes</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">hours</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412boot_GetTimeP7uint8_tP7uint8_tP7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the calculator’s time. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can read <code class="docutils literal notranslate"><span class="pre">rtc_Seconds</span></code>, <code class="docutils literal notranslate"><span class="pre">rtc_Minutes</span></code> , and <code class="docutils literal notranslate"><span class="pre">rtc_Hours</span></code> directly, but you should double check that <code class="docutils literal notranslate"><span class="pre">rtc_Seconds</span></code> didn’t change while reading <code class="docutils literal notranslate"><span class="pre">rtc_Minutes</span></code> and <code class="docutils literal notranslate"><span class="pre">rtc_Hours</span></code> .</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seconds</strong> – <strong>[out]</strong> Pointer to variable to store seconds </p></li>
+<li><p><strong>minutes</strong> – <strong>[out]</strong> Pointer to variable to store minutes </p></li>
+<li><p><strong>hours</strong> – <strong>[out]</strong> Pointer to variable to store hours </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416boot_IsAfterNoonv">
+<span id="_CPPv316boot_IsAfterNoonv"></span><span id="_CPPv216boot_IsAfterNoonv"></span><span id="boot_IsAfterNoon__void"></span><span class="target" id="rtc_8h_1aa96977eb1d9ee88829c13cde9b2bb8fd"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">boot_IsAfterNoon</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416boot_IsAfterNoonv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Checks if past noon. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>True if past noon </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="power.html" class="btn btn-neutral float-left" title="sys/power.h" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="timers.html" class="btn btn-neutral float-right" title="sys/timers.h" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v12.1
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+             </strong> 
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

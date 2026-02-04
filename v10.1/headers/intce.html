@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>intce.h &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/design-tabs.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="tice.h" href="tice.html" />
+    <link rel="prev" title="compression.h" href="compression.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v10.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to the CE C/C++ Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/hardware.html">Calculator Hardware Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../static/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/makefile-options.html">Makefile Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/debugging.html">Debugging</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Libraries/Headers</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../libraries/index.html">CE Libraries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sys/index.html">CE Hardware Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ti/index.html">TI Operating System Headers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Miscellaneous Headers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="compression.html">compression.h</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">intce.h</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tice.html">tice.h</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Helpful Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../static/git.html">Using Git For Revision Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/coding-guidelines.html">General Coding Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/ides.html">Using the Toolchain in an IDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/contributing.html">Contributing to the CE Toolchain</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/asm.html">Assembly</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Miscellaneous Headers</a> &raquo;</li>
+      <li>intce.h</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="intce-h">
+<span id="id1"></span><h1>intce.h<a class="headerlink" href="#intce-h" title="Permalink to this headline"></a></h1>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;intce.h&gt;</span>
+</pre></div>
+</div>
+<p>This header includes defines and prototypes for working with user interrupts.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>As of hardware revision I, user interrupt vectors are no longer supported.
+Some functions will no longer work on the newer hardware, and are labeled as such.
+Feel free to send TI a strongly worded email about this limitation.</p>
+</div>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#api-documentation" id="id2">API Documentation</a></p></li>
+</ul>
+</div>
+<div class="section" id="api-documentation">
+<h2><a class="toc-backref" href="#id2">API Documentation</a><a class="headerlink" href="#api-documentation" title="Permalink to this headline"></a></h2>
+<p>Interrupt configuring and setting. </p>
+<p>
+This file provides routines for setting custom interrupt vectors for your program. Note that TI broke interrupt support in hardware revisions &gt;= I, and they will not work. Use at your own risk. <dl class="simple">
+<dt><strong>Author</strong></dt><dd><p>Matt “MateoConLechuga” Waltz </p>
+</dd>
+<dt><strong>Author</strong></dt><dd><p>Jacob “jacobly” Young</p>
+</dd>
+</dl>
+</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.int_Enable">
+<span class="target" id="intce_8h_1afb75b8b479a72cc73820adf0bc08befd"></span><span class="sig-name descname"><span class="n"><span class="pre">int_Enable</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.int_Enable" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Enable global interrupts. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.int_Disable">
+<span class="target" id="intce_8h_1a6ec8b8485765e532c020654ffa71d010"></span><span class="sig-name descname"><span class="n"><span class="pre">int_Disable</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.int_Disable" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Diasble global interrupts. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.int_Wait">
+<span class="target" id="intce_8h_1a33a97bbfc0b2bc67a7fc08b89ddb7af9"></span><span class="sig-name descname"><span class="n"><span class="pre">int_Wait</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c.int_Wait" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Blocking wait for an interrupt to trigger. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.ON_IVECT">
+<span class="target" id="intce_8h_1a943135922f1530d220992c1be01f85ca"></span><span class="sig-name descname"><span class="n"><span class="pre">ON_IVECT</span></span></span><a class="headerlink" href="#c.ON_IVECT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>[on] key interrupt source </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.TIMER1_IVECT">
+<span class="target" id="intce_8h_1a2f75817cc58a4af3153d7ded7417fe1c"></span><span class="sig-name descname"><span class="n"><span class="pre">TIMER1_IVECT</span></span></span><a class="headerlink" href="#c.TIMER1_IVECT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Timer 1 interrupt source </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.TIMER2_IVECT">
+<span class="target" id="intce_8h_1a30ea4194e1b4a5cd8704924c38601541"></span><span class="sig-name descname"><span class="n"><span class="pre">TIMER2_IVECT</span></span></span><a class="headerlink" href="#c.TIMER2_IVECT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Timer 2 interrupt source </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.TIMER3_IVECT">
+<span class="target" id="intce_8h_1a3a9c2c96e35e0ffdca11db51f877f511"></span><span class="sig-name descname"><span class="n"><span class="pre">TIMER3_IVECT</span></span></span><a class="headerlink" href="#c.TIMER3_IVECT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Timer 3 interrupt source </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.TIMEROS_IVECT">
+<span class="target" id="intce_8h_1a4051151c7071cee1282b22d5bdf1de6e"></span><span class="sig-name descname"><span class="n"><span class="pre">TIMEROS_IVECT</span></span></span><a class="headerlink" href="#c.TIMEROS_IVECT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Timer OS interrupt source </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.KEYBOARD_IVECT">
+<span class="target" id="intce_8h_1a8f6789611ea138188774b86cb5ca2026"></span><span class="sig-name descname"><span class="n"><span class="pre">KEYBOARD_IVECT</span></span></span><a class="headerlink" href="#c.KEYBOARD_IVECT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Keyboard interrupt source </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.LCD_IVECT">
+<span class="target" id="intce_8h_1a0d43b2844d71fa684995621b23565c5d"></span><span class="sig-name descname"><span class="n"><span class="pre">LCD_IVECT</span></span></span><a class="headerlink" href="#c.LCD_IVECT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>LCD interrupt source </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.RTC_IVECT">
+<span class="target" id="intce_8h_1a3c995b90c817e81b1f019d59be93a127"></span><span class="sig-name descname"><span class="n"><span class="pre">RTC_IVECT</span></span></span><a class="headerlink" href="#c.RTC_IVECT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Real Time Clock interrupt source. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.USB_IVECT">
+<span class="target" id="intce_8h_1adbf13a7a05a1b03f106b0090f818f361"></span><span class="sig-name descname"><span class="n"><span class="pre">USB_IVECT</span></span></span><a class="headerlink" href="#c.USB_IVECT" title="Permalink to this definition"></a><br /></dt>
+<dd><p>USB interrupt source </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.INT_ON">
+<span class="target" id="intce_8h_1a5c3e355bcfe0aa4b26dd7d125dec9c2a"></span><span class="sig-name descname"><span class="n"><span class="pre">INT_ON</span></span></span><a class="headerlink" href="#c.INT_ON" title="Permalink to this definition"></a><br /></dt>
+<dd><p>[on] key interrupt source mask </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.INT_TIMER1">
+<span class="target" id="intce_8h_1acdda65b160cb0022f7c6f4e4604210e7"></span><span class="sig-name descname"><span class="n"><span class="pre">INT_TIMER1</span></span></span><a class="headerlink" href="#c.INT_TIMER1" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Timer 1 interrupt source mask </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.INT_TIMER2">
+<span class="target" id="intce_8h_1a8f4aa48df33790d0e23cf9da6d2ca792"></span><span class="sig-name descname"><span class="n"><span class="pre">INT_TIMER2</span></span></span><a class="headerlink" href="#c.INT_TIMER2" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Timer 2 interrupt source mask </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.INT_TIMER3">
+<span class="target" id="intce_8h_1a910b4a137425bbda6dce103325fcfbf0"></span><span class="sig-name descname"><span class="n"><span class="pre">INT_TIMER3</span></span></span><a class="headerlink" href="#c.INT_TIMER3" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Timer 3 interrupt source mask </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.INT_TIMEROS">
+<span class="target" id="intce_8h_1ad5aa2c5ed711b515bc4aa11294897bba"></span><span class="sig-name descname"><span class="n"><span class="pre">INT_TIMEROS</span></span></span><a class="headerlink" href="#c.INT_TIMEROS" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Timer OS interrupt source mask </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.INT_KEYBOARD">
+<span class="target" id="intce_8h_1ab9bd41cf6efe226daa5b4332b6978cbe"></span><span class="sig-name descname"><span class="n"><span class="pre">INT_KEYBOARD</span></span></span><a class="headerlink" href="#c.INT_KEYBOARD" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Keyboard interrupt source mask </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.INT_LCD">
+<span class="target" id="intce_8h_1ae237028dfc8f9c24f83e6330627677f0"></span><span class="sig-name descname"><span class="n"><span class="pre">INT_LCD</span></span></span><a class="headerlink" href="#c.INT_LCD" title="Permalink to this definition"></a><br /></dt>
+<dd><p>LCD interrupt source mask </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.INT_RTC">
+<span class="target" id="intce_8h_1ab7e8fc199a616a345ec378ad6ff1364e"></span><span class="sig-name descname"><span class="n"><span class="pre">INT_RTC</span></span></span><a class="headerlink" href="#c.INT_RTC" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Real Time Clock interrupt source mask. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.INT_USB">
+<span class="target" id="intce_8h_1a5dae4195f004e6899a36066e00dcd13d"></span><span class="sig-name descname"><span class="n"><span class="pre">INT_USB</span></span></span><a class="headerlink" href="#c.INT_USB" title="Permalink to this definition"></a><br /></dt>
+<dd><p>USB interrupt source mask </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.int_RawStatus">
+<span class="target" id="intce_8h_1a71954cb916374956580787343afaa598"></span><span class="sig-name descname"><span class="n"><span class="pre">int_RawStatus</span></span></span><a class="headerlink" href="#c.int_RawStatus" title="Permalink to this definition"></a><br /></dt>
+<dd><p>State of interrupt signals </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.int_MaskedStatus">
+<span class="target" id="intce_8h_1a75e09bb113a1b881a08a2ee3bc5f8ce3"></span><span class="sig-name descname"><span class="n"><span class="pre">int_MaskedStatus</span></span></span><a class="headerlink" href="#c.int_MaskedStatus" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Masked state of interrupt signals. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.int_EnableConfig">
+<span class="target" id="intce_8h_1a199a834c8a27ec5c848e07c213c79a16"></span><span class="sig-name descname"><span class="n"><span class="pre">int_EnableConfig</span></span></span><a class="headerlink" href="#c.int_EnableConfig" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Enabled interrupt signals </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.int_LatchConfig">
+<span class="target" id="intce_8h_1a34511bddcd97499c8e52dd16d0494eea"></span><span class="sig-name descname"><span class="n"><span class="pre">int_LatchConfig</span></span></span><a class="headerlink" href="#c.int_LatchConfig" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Latchable interrupt signals </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.int_InvertConfig">
+<span class="target" id="intce_8h_1a3ee7faceab95bf1575135a285c357713"></span><span class="sig-name descname"><span class="n"><span class="pre">int_InvertConfig</span></span></span><a class="headerlink" href="#c.int_InvertConfig" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Invertable interrupt signals </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.int_Acknowledge">
+<span class="target" id="intce_8h_1ad000396f89e682c2a3fe5162b7adfa7e"></span><span class="sig-name descname"><span class="n"><span class="pre">int_Acknowledge</span></span></span><a class="headerlink" href="#c.int_Acknowledge" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Acknowledge interrupt signals </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414int_Initializev">
+<span id="_CPPv314int_Initializev"></span><span id="_CPPv214int_Initializev"></span><span id="int_Initialize__void"></span><span class="target" id="intce_8h_1ac3d0c796883acc43e5cc74b37b83b167"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">int_Initialize</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414int_Initializev" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Initizalize to use custom interrupts. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Saves status of current interrupt state. </p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>TI broke interrupt support on CE models with hardware revision &gt;= I. </p>
+</div>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49int_Resetv">
+<span id="_CPPv39int_Resetv"></span><span id="_CPPv29int_Resetv"></span><span id="int_Reset__void"></span><span class="target" id="intce_8h_1a1ec1e47453492910a36a5e7fc6bb46ea"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">int_Reset</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49int_Resetv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Resets interrupts back to the OS expected values. </p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Must have called int_Initialize before using. </p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>TI broke interrupt support on CE models with hardware revision &gt;= I. </p>
+</div>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413int_SetVector7uint8_tPFvvE">
+<span id="_CPPv313int_SetVector7uint8_tPFvvE"></span><span id="_CPPv213int_SetVector7uint8_tPFvvE"></span><span class="target" id="intce_8h_1a3c525272c01a36854d6d231f78ffb226"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">int_SetVector</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ivect</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">handler</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">)</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413int_SetVector7uint8_tPFvvE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sets up an interrupt vector given an ISR. </p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>TI broke interrupt support on CE models with hardware revision &gt;= I. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ivect</strong> – <strong>[in]</strong> Interrupt vector to set. </p></li>
+<li><p><strong>handler</strong> – <strong>[in]</strong> Handler to interrupt service routine. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="compression.html" class="btn btn-neutral float-left" title="compression.h" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tice.html" class="btn btn-neutral float-right" title="tice.h" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v10.1
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+             </strong> 
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
