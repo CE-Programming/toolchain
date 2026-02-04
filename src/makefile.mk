@@ -204,7 +204,7 @@ LIBLOAD_LIBS ?= $(wildcard $(CEDEV_TOOLCHAIN)/lib/libload/*.lib) $(EXTRA_LIBLOAD
 LIBLOAD_LIBS := $(foreach l,$(filter-out %libload.lib,$(LIBLOAD_LIBS)),$(call QUOTE_ARG,$(call FORWARD_PATH,$l)))
 endif
 
-# check if there is an icon present that to convert
+# check if there is an icon to convert
 ifneq ($(ICON_IMG),)
 ICON_SRC = $(OBJDIR)/icon.s
 ifneq ($(DESCRIPTION),)
