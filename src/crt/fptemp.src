@@ -1,33 +1,37 @@
-	assume	adl=1
+	.assume	adl=1
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text
 
-	public	__fptod
+	.global	__fptod
+	.type	__fptod, @function
 __fptod := __ftod
 
-	extern	__ftod
+	.extern	__ftod
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text
 
-	public	__dtofp
+	.global	__dtofp
+	.type	__dtofp, @function
 __dtofp := __dtof
 
-	extern	__dtof
+	.extern	__dtof
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text
 
-	public	__dcmpo
-	public	__dcmpu
+	.global	__dcmpo
+	.type	__dcmpo, @function
+	.global	__dcmpu
+	.type	__dcmpu, @function
 
 __dcmpo := __dcmp
 __dcmpu := __dcmp
 
-	extern	__dcmp
+	.extern	__dcmp
 
 ;-------------------------------------------------------------------------------

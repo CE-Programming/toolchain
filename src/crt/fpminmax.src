@@ -1,9 +1,11 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__fpmin
-	public	__fpmax
+	.global	__fpmin
+	.type	__fpmin, @function
+	.global	__fpmax
+	.type	__fpmax, @function
 
 ; IEEE single precision minimum
 ; aubc = fmin(aubc, euhl)
@@ -45,4 +47,4 @@ __fpmax: ; CHECK: sameignzerosign(bitcast(float, pair8_24_t, { out.BC, out.A }),
 .return:
 	jq	__fpmin.return
 
-	extern	__fpcmpo
+	.extern	__fpcmpo

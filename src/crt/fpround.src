@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__fpround
+	.global	__fpround
+	.type	__fpround, @function
 
 ; IEEE single precision round
 ; aubc = round(aubc)
@@ -57,5 +58,5 @@ __fpround: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), roundf(b
 	pop	hl
 	ret
 
-	extern	__iand
-	extern	__ishl
+	.extern	__iand
+	.extern	__ishl

@@ -1,10 +1,11 @@
-	assume	adl=1
+	.assume	adl=1
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text
 
-	public	__fpfloor
+	.global	__fpfloor
+	.type	__fpfloor, @function
 
 ; IEEE single precision floor
 ; aubc = floor(aubc)
@@ -12,7 +13,7 @@ __fpfloor: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), floorf(b
 	cp	a, 080h
 	jq	c, __fptrunc
 
-	private	__fpfloor.roundup
+	.local	__fpfloor.roundup
 
 __fpfloor.roundup:
 	push	bc
@@ -59,9 +60,10 @@ __fpfloor.roundup:
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text
 
-	public	__fpceil
+	.global	__fpceil
+	.type	__fpceil, @function
 
 ; IEEE single precision ceiling
 ; aubc = ceil(aubc)
@@ -74,9 +76,10 @@ __fpceil: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), ceilf(bit
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text
 
-	public	__fptrunc
+	.global	__fptrunc
+	.type	__fptrunc, @function
 
 ; IEEE single precision truncation
 ; aubc = trunc(aubc)
@@ -115,5 +118,5 @@ __fptrunc: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), truncf(b
 
 ;-------------------------------------------------------------------------------
 
-	extern	__iand
-	extern	__ishl
+	.extern	__iand
+	.extern	__ishl
