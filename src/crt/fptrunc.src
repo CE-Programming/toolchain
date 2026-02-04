@@ -11,7 +11,7 @@
 ; aubc = floor(aubc)
 __fpfloor: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), floorf(bitcast(float, pair8_24_t, { in.BC, in.A }))) && out.DE == in.DE && out.HL == in.HL && out.IX == in.IX && out.IY == in.IY
 	cp	a, 080h
-	jq	c, __fptrunc
+	jr	c, __fptrunc
 
 	.local	__fpfloor.roundup
 
@@ -21,11 +21,11 @@ __fpfloor.roundup:
 	adc	hl, hl
 	ld	h, a
 	rla
-	jq	z, .mantissa.zero
+	jr	z, .mantissa.zero
 	sub	a, 07Fh
-	jq	c, .return.one
+	jr	c, .return.one
 	sub	a, 24
-	jq	nc, .return
+	jr	nc, .return
 	push	bc
 	cpl
 	ld	c, a
@@ -50,7 +50,7 @@ __fpfloor.roundup:
 .mantissa.zero:
 	dec	a
 	cp	a, 07Fh - 1
-	jq	nc, .return
+	jr	nc, .return
 .return.one:
 	ld	bc, 0800000h
 	ld	a, h
@@ -70,7 +70,7 @@ __fpfloor.roundup:
 __fpceil: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), ceilf(bitcast(float, pair8_24_t, { in.BC, in.A }))) && out.DE == in.DE && out.HL == in.HL && out.IX == in.IX && out.IY == in.IY
 	rlca
 	rrca
-	jq	nc, __fpfloor.roundup
+	jr	nc, __fpfloor.roundup
 
 	; require	__fptrunc
 
@@ -90,9 +90,9 @@ __fptrunc: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), truncf(b
 	ld	h, a
 	rla
 	sub	a, 07Fh
-	jq	c, .return.zero
+	jr	c, .return.zero
 	sub	a, 24
-	jq	nc, .return
+	jr	nc, .return
 	ld	l, c
 	cpl
 	ld	c, a

@@ -14,7 +14,7 @@ __fpcbrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)cb
 	ld	e, a
 	call	__fppop1
 	inc	e
-	jq	z, .nonfinite
+	jr	z, .nonfinite
 	dec	e
 	ld	d, 0ABh	; multiplicative inverse of 3 modulo 256
 	ld	b, d
@@ -33,13 +33,13 @@ __fpcbrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)cb
 	add	ix, ix
 	adc	hl, hl
 	sub	a, b
-	jq	c, .modulo.loop
-	jq	nz, .normalized
+	jr	c, .modulo.loop
+	jr	nz, .normalized
 	dec	d
-	jq	z, .return
+	jr	z, .return
 	cp	a, l
 	inc	a
-	jq	nc, .modulo.loop
+	jr	nc, .modulo.loop
 .normalized:
 	add	a, d
 	ld	b, a
@@ -65,7 +65,7 @@ __fpcbrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)cb
 .root.loop:
 	exx
 	lea	bc, iy + 0
-	jq	c, .root.zerobit
+	jr	c, .root.zerobit
 	ex	af, af'
 	; q += 1
 	inc	iy
@@ -85,7 +85,7 @@ __fpcbrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)cb
 	; r += q
 	add	hl, bc
 	adc	a, 0
-	jq	.root.nextbit
+	jr	.root.nextbit
 .root.zerobit:
 	; x += r << 24
 	add	hl, de
@@ -171,7 +171,7 @@ __fpcbrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)cb
 	adc	a, 07Fh - (07Fh / 3) - 10
 	; Set low exponent bit
 	srl	b
-	jq	nc, .return
+	jr	nc, .return
 	ld	de, 0800000h
 	add	hl, de
 .return:

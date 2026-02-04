@@ -20,14 +20,14 @@ __fptol: ; PREREQ: bitcast(float, pair8_24_t, { in.BC, in.A })-INT32_MIN > -1.0f
 	ld	a, e
 	sub	a, 07Fh
 	cp	a, 23 + 32
-	jq	nc, .return.zero
+	jr	nc, .return.zero
 	sub	a, 23 + 1
-	jq	nc, .left
+	jr	nc, .left
 	cpl
 	ld	c, a
 	call	__ishru
 	xor	a, a
-	jq	.finish
+	jr	.finish
 .left:
 	inc	a
 	ld	b, a
@@ -50,7 +50,7 @@ __fptol: ; PREREQ: bitcast(float, pair8_24_t, { in.BC, in.A })-INT32_MIN > -1.0f
 .return.zero:
 	xor	a, a
 	sbc	hl, hl
-	jq	.return
+	jr	.return
 
 	.extern	__ishru
 	.extern	__lneg

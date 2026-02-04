@@ -36,7 +36,7 @@ __ltofp: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)bit
 	ld	c, a
 	ld	a, b
 	push	de
-	jq	nc, .positive
+	jr	nc, .positive
 	add	hl, de
 	ex	de, hl
 	neg

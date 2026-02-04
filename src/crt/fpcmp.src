@@ -31,14 +31,14 @@ __fpcmpu: ; CHECK: out.flags.C == !isunordered(bitcast(float, pair8_24_t, { in.H
 ; s = !(euhl >= aubc)
 __fpcmpo: ; CHECK: out.flags.Z == (bitcast(float, pair8_24_t, { in.HL, in.E }) == bitcast(float, pair8_24_t, { in.BC, in.A })) && out.flags.C == (bitcast(float, pair8_24_t, { in.HL, in.E }) < bitcast(float, pair8_24_t, { in.BC, in.A })) && out.flags.S == !(bitcast(float, pair8_24_t, { in.HL, in.E }) >= bitcast(float, pair8_24_t, { in.BC, in.A })) && out.A == in.A && out.BC == in.BC && out.DE == in.DE && out.HL == in.HL && out.IX == in.IX && out.IY == in.IY
 	xor	a, e
-	jq	z, .maybeEqual
+	jr	z, .maybeEqual
 	cp	a, 080h
-	jq	c, .signsMatch
-	jq	z, .maybeBothZero
+	jr	c, .signsMatch
+	jr	z, .maybeBothZero
 	xor	a, e
 	; Check if first operand could hold NaN, and if so, the second cannot on this code path
 	inc	e
-	jq	z, .checkFirstNan
+	jr	z, .checkFirstNan
 	jp	pe, .checkFirstNan
 	dec	e
 .secondLargerAbs:
@@ -50,7 +50,7 @@ __fpcmpo: ; CHECK: out.flags.Z == (bitcast(float, pair8_24_t, { in.HL, in.E }) =
 	ld	hl, 07FFFFFh
 	add	hl, bc
 	pop	hl
-	jq	c, .unordered
+	jr	c, .unordered
 	cp	a, 080h	; C = S = !sign(aubc), Z = 0
 	ret
 
@@ -58,9 +58,9 @@ __fpcmpo: ; CHECK: out.flags.Z == (bitcast(float, pair8_24_t, { in.HL, in.E }) =
 	xor	a, e
 	; Compare upper 7 exponent bits, which are not equal
 	cp	a, e
-	jq	nc, .secondLargerAbs
+	jr	nc, .secondLargerAbs
 	inc	e
-	jq	z, .checkFirstNan
+	jr	z, .checkFirstNan
 	dec	e	; S = sign(euhl), Z = 0 because E > A
 	rlca
 	rrca		; C = sign(aubc), same as sign(euhl) on this code path
@@ -75,7 +75,7 @@ __fpcmpo: ; CHECK: out.flags.Z == (bitcast(float, pair8_24_t, { in.HL, in.E }) =
 	pop	hl
 	ex	de, hl
 	dec	e	; S = sign(euhl), Z = 0 because (E & 07Fh) == 07Fh
-	jq	c, .unordered
+	jr	c, .unordered
 	ret	p	; C = sign(euhl)
 	scf	; C = sign(euhl)
 	ret
@@ -86,10 +86,10 @@ __fpcmpo: ; CHECK: out.flags.Z == (bitcast(float, pair8_24_t, { in.HL, in.E }) =
 	; Check if upper 7 bits of both exponents are zero
 	add	a, a
 	rra
-	jq	nz, .notBothZero
+	jr	nz, .notBothZero
 	; Check if low bit of both exponents and entire mantissas are 0
 	adc	hl, bc
-	jq	nz, .notBothZeroFixup
+	jr	nz, .notBothZeroFixup
 	ret	nc	; Both inputs are zero, return Z=1, C=0, S=0
 .notBothZeroFixup:
 	or	a, a
@@ -102,8 +102,8 @@ __fpcmpo: ; CHECK: out.flags.Z == (bitcast(float, pair8_24_t, { in.HL, in.E }) =
 	; Check the larger exponent/mantissa for NaN
 	sbc	hl, bc
 	add	hl, bc
-	jq	nc, .checkFirstNanInc
-	jq	.checkSecondNan
+	jr	nc, .checkFirstNanInc
+	jr	.checkSecondNan
 
 .maybeEqual:
 	; Sign and upper 7 exponent bits are equal
@@ -111,7 +111,7 @@ __fpcmpo: ; CHECK: out.flags.Z == (bitcast(float, pair8_24_t, { in.HL, in.E }) =
 	inc	a
 	add	a, a
 	ld	a, e
-	jq	z, .checkBothNan
+	jr	z, .checkBothNan
 	or	a, a
 .checkBothNanDone:
 	; Compare mantissas and low exponent bit
@@ -131,13 +131,13 @@ __fpcmpo: ; CHECK: out.flags.Z == (bitcast(float, pair8_24_t, { in.HL, in.E }) =
 	push	hl
 	ld	hl, 07FFFFFh
 	add	hl, de
-	jq	c, .gotFirstNan
+	jr	c, .gotFirstNan
 	sbc	hl, de
 	add	hl, bc
 .gotFirstNan:
 	pop	hl
 	ex	de, hl
-	jq	nc, .checkBothNanDone
+	jr	nc, .checkBothNanDone
 .unordered:
 	; Carry is always set here
 	rr	a ; Z = 0, S = 1
@@ -157,9 +157,9 @@ __fpcmpo: ; CHECK: out.flags.Z == (bitcast(float, pair8_24_t, { in.HL, in.E }) =
 ; s = euhl < aubc = !(euhl >= aubc)
 __fpcmp: ; CHECK: (isunordered(bitcast(float, pair8_24_t, { in.HL, in.E }), bitcast(float, pair8_24_t, { in.BC, in.A })) || (out.flags.Z == (bitcast(float, pair8_24_t, { in.HL, in.E }) == bitcast(float, pair8_24_t, { in.BC, in.A })) && out.flags.S == (bitcast(float, pair8_24_t, { in.HL, in.E }) < bitcast(float, pair8_24_t, { in.BC, in.A })))) && out.A == in.A && out.BC == in.BC && out.DE == in.DE && out.HL == in.HL && out.IX == in.IX && out.IY == in.IY
 	sub	a, e
-	jq	z, .maybeEqual
+	jr	z, .maybeEqual
 	cp	a, 080h
-	jq	z, .maybeBothZero
+	jr	z, .maybeBothZero
 	; Compare sign and upper 7 exponent bits, which are not equal
 	add	a, e
 	inc	e
@@ -175,9 +175,9 @@ __fpcmp: ; CHECK: (isunordered(bitcast(float, pair8_24_t, { in.HL, in.E }), bitc
 	add	a, e
 	add	a, a
 	rra
-	jq	nz, .notBothZero
+	jr	nz, .notBothZero
 	adc	hl, bc
-	jq	c, .notBothZeroFixup
+	jr	c, .notBothZeroFixup
 	ret	z	; Both inputs are zero, return Z=1, S=0
 .notBothZeroFixup:
 	or	a, a
