@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__fprem
+	.global	__fprem
+	.type	__fprem, @function
 
 ; IEEE single precision remainder
 ; aubc = fmod(aubc, euhl)
@@ -71,9 +72,9 @@ __fprem: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), fmodf(bitc
 	ld	a, 0FFh
 	ret
 
-	extern	__iremu
+	.extern	__iremu
 
-	extern	__fppop1
-	extern	__fppop2
-	extern	__fppack
-	extern	__fpcmpo
+	.extern	__fppop1
+	.extern	__fppop2
+	.extern	__fppack
+	.extern	__fpcmpo

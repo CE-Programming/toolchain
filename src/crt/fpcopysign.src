@@ -1,10 +1,11 @@
-	assume	adl=1
+	.assume	adl=1
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text
 
-	public	__fpcopysign
+	.global	__fpcopysign
+	.type	__fpcopysign, @function
 
 ; IEEE single precision copy sign
 ; aubc = copysign(aubc, euhl)
@@ -16,9 +17,10 @@ __fpcopysign: ; CHECK: bitcast(uint32_t, pair8_24_t, { out.BC, out.A }) == bitca
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text
 
-	public	__fpcopy
+	.global	__fpcopy
+	.type	__fpcopy, @function
 
 ; IEEE single precision copy
 ; aubc = copy(aubc)

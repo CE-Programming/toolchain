@@ -1,9 +1,11 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__fptol
-	public	__fptoul
+	.global	__fptol
+	.type	__fptol, @function
+	.global	__fptoul
+	.type	__fptoul, @function
 
 ; IEEE single precision to 32-bit integers
 ; aubc = long(aubc)
@@ -48,7 +50,7 @@ __fptol: ; PREREQ: bitcast(float, pair8_24_t, { in.BC, in.A })-INT32_MIN > -1.0f
 	sbc	hl, hl
 	jq	.return
 
-	extern	__ishru
-	extern	__lneg
+	.extern	__ishru
+	.extern	__lneg
 
-	extern	__fppop1
+	.extern	__fppop1

@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__fpsqrt
+	.global	__fpsqrt
+	.type	__fpsqrt, @function
 
 ; IEEE single precision square root
 ; aubc = sqrt(aubc)
@@ -57,11 +58,11 @@ __fpsqrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)sq
 	; r += 1
 	inc	de
 	; x <<= 2
-	repeat	2
+	.rept	2
 	add	ix, ix
 	adc	hl, hl
 	rla
-	end repeat
+	.endr
 	ex	de, hl
 	; r <<= 1
 	add	hl, hl
@@ -69,10 +70,10 @@ __fpsqrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)sq
 	djnz	.root.loop
 	; Shift left by 5
 	ld	a, c
-	repeat	5
+	.rept	5
 	add	hl, hl
 	rla
-	end repeat
+	.endr
 	; Set the low exponent bit of the result
 	pop	de, ix
 	sra	e
@@ -108,4 +109,4 @@ __fpsqrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)sq
 	pop	hl, de
 	ret
 
-	extern	__fppop1
+	.extern	__fppop1

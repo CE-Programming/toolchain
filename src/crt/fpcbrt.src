@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__fpcbrt
+	.global	__fpcbrt
+	.type	__fpcbrt, @function
 
 ; IEEE single precision cube root
 ; aubc = cbrt(aubc)
@@ -72,10 +73,10 @@ __fpcbrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)cb
 	add	hl, bc
 	rla
 	inc	bc
-	repeat	3
+	.rept	3
 	add	hl, bc
 	adc	a, 0
-	end repeat
+	.endr
 	; r <<= 2
 	add	hl, hl
 	rla
@@ -116,10 +117,10 @@ __fpcbrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)cb
 	sbc	a, a
 	; Left shift high 32 bits of r by 2
 	ex	de, hl
-	repeat	2
+	.rept	2
 	add	hl, hl
 	rl	c
-	end repeat
+	.endr
 	; Add carry byte to shifted high bits
 	add	hl, de
 	ex	de, hl
@@ -129,17 +130,17 @@ __fpcbrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)cb
 	exx
 	; x <<= 3
 	xor	a, a
-	repeat	3
+	.rept	3
 	add	ix, ix
 	adc	hl, hl
 	rla
-	end repeat
+	.endr
 	exx
 	ex	af, af'
-	repeat	3
+	.rept	3
 	add	hl, hl
 	rla
-	end repeat
+	.endr
 	ex	af, af'
 	or	a, l
 	ld	l, a
@@ -182,4 +183,4 @@ __fpcbrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)cb
 	ei
 	ret
 
-	extern	__fppop1
+	.extern	__fppop1

@@ -1,11 +1,13 @@
-	assume	adl=1
+	.assume	adl=1
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text
 
-	public	__fppop1
-	public	__fppop2
+	.global	__fppop1
+	.type	__fppop1, @function
+	.global	__fppop2
+	.type	__fppop2, @function
 
 __fppop1:
 	ld	bc, 0800000h
@@ -21,11 +23,14 @@ __fppop2:
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text
 
-	public	__fppack
-	public	__fppack.normalize
-	public	__fppack.normalized
+	.global	__fppack
+	.type	__fppack, @function
+	.global	__fppack.normalize
+	.type	__fppack.normalize, @function
+	.global	__fppack.normalized
+	.type	__fppack.normalized, @function
 
 __fppack.normalize:
 	dec	b
@@ -66,11 +71,14 @@ __fppack:
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text
 
-	public	__fppack2
-	public	__fppack2.normalize
-	public	__fppack2.normalized
+	.global	__fppack2
+	.type	__fppack2, @function
+	.global	__fppack2.normalize
+	.type	__fppack2.normalize, @function
+	.global	__fppack2.normalized
+	.type	__fppack2.normalized, @function
 
 __fppack2.normalize:
 	dec	b
