@@ -70,4 +70,4 @@ const system_info_t *os_GetSystemInfo(void);
 }
 #endif
 
-#endif
+#endif /* TI_INFO_H */

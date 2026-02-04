@@ -826,4 +826,4 @@ fontlib_font_t *fontlib_GetFontByStyle(const char *font_pack_name, uint8_t size_
 }
 #endif
 
-#endif
+#endif /* _FONTLIBC_H */

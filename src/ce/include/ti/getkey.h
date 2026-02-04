@@ -889,4 +889,4 @@ uint16_t os_GetKey(void);
 }
 #endif
 
-#endif
+#endif /* TI_GETKEY_H */

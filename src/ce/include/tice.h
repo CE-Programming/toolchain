@@ -51,4 +51,4 @@
 #define asm_ClrTxtShd os_ClrTxtShd
 /* @endcond */
 
-#endif
+#endif /* TICE_H */

@@ -244,4 +244,4 @@ real_t os_StrToReal(const char *string, char **end);
 }
 #endif
 
-#endif
+#endif /* TI_REAL_H */

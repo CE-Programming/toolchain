@@ -125,4 +125,4 @@ void os_PopErrorHandler(void);
 }
 #endif
 
-#endif
+#endif /* TI_ERROR_H */

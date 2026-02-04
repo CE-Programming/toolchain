@@ -296,4 +296,4 @@ fat_error_t fat_CloseFile(fat_file_t *file);
 }
 #endif
 
-#endif
+#endif /* FATDRVCE_H */

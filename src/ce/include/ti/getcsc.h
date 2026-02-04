@@ -146,4 +146,4 @@ typedef uint8_t sk_key_t;
 }
 #endif
 
-#endif
+#endif /* TI_GETCSC_H */

@@ -18,4 +18,4 @@
         _libload_library_##name;                                \
     })
 
-#endif
+#endif /* LIBLOAD_H */

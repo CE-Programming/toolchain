@@ -1083,4 +1083,4 @@ typedef struct lcd_eqctrl_params {
 }
 #endif
 
-#endif
+#endif /* LCDDRVCE_H */

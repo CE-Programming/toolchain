@@ -98,4 +98,4 @@ uint32_t atomic_load_decreasing_32(volatile uint32_t *p);
 }
 #endif
 
-#endif
+#endif /* SYS_UTIL_H */

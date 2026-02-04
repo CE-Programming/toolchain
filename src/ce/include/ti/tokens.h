@@ -1787,4 +1787,4 @@ extern "C" {
 }
 #endif
 
-#endif
+#endif /* TI_TOKENS_H */

@@ -255,4 +255,4 @@ void boot_WaitShort(void);
 }
 #endif
 
-#endif
+#endif /* SYS_TIMERS_H */

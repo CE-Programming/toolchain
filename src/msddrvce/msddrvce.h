@@ -150,4 +150,4 @@ uint8_t msd_FindPartitions(msd_t *msd, msd_partition_t *partitions, uint8_t max)
 }
 #endif
 
-#endif
+#endif /* MSDDRVCE_H */

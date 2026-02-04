@@ -351,4 +351,4 @@ bool os_TestFlagBitsFast(uint16_t offset_pattern);
 }
 #endif
 
-#endif
+#endif /* TI_FLAGS_H */
