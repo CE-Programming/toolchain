@@ -24,7 +24,7 @@ __fpmin: ; CHECK: sameignzerosign(bitcast(float, pair8_24_t, { out.BC, out.A }),
 __fpmax: ; CHECK: sameignzerosign(bitcast(float, pair8_24_t, { out.BC, out.A }), fmaxf(quiet(bitcast(float, pair8_24_t, { in.BC, in.A })), quiet(bitcast(float, pair8_24_t, { in.HL, in.E })))) && out.DE == in.DE && out.HL == in.HL && out.IX == in.IX && out.IY == in.IY
 	call	__fpcmpo
 	ret	c
-	jq	p, __fpmin.return
+	jp	p, __fpmin.return
 .unordered:
 	; Compare the low 31 bits (ignoring sign) and return the smaller one, which is non-NaN if either one is
 	sbc	hl, bc
