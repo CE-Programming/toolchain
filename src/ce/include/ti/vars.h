@@ -555,4 +555,4 @@ int os_EvalVar(const char *name);
 }
 #endif
 
-#endif
+#endif /* TI_VARS_H */

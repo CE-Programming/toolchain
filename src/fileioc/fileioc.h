@@ -672,4 +672,4 @@ void ti_CloseAll(void) __attribute__((deprecated ("Use ti_Close(handle) for each
 }
 #endif
 
-#endif
+#endif /* _FILEIOC_H */

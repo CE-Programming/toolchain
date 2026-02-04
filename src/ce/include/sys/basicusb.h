@@ -56,4 +56,4 @@ int8_t os_USBGetRequestStatus(void);
 }
 #endif
 
-#endif
+#endif /* SYS_BASIC_USB_H */

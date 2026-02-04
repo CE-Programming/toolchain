@@ -321,4 +321,4 @@ uint24_t os_GetDrawBGColor(void);
 }
 #endif
 
-#endif
+#endif /* TI_SCREEN_H */

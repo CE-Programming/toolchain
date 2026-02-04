@@ -97,4 +97,4 @@ void int_SetVector(uint8_t ivect, void (*handler)(void));
 }
 #endif
 
-#endif
+#endif /* _INTCE_H */
