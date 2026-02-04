@@ -72,11 +72,11 @@ __fpceil: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), ceilf(bit
 	rrca
 	jq	nc, __fpfloor.roundup
 
-	require	__fptrunc
+	; require	__fptrunc
 
 ;-------------------------------------------------------------------------------
 
-	.section	.text
+	; .section	.text
 
 	.global	__fptrunc
 	.type	__fptrunc, @function

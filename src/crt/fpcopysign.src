@@ -13,11 +13,13 @@ __fpcopysign: ; CHECK: bitcast(uint32_t, pair8_24_t, { out.BC, out.A }) == bitca
 	xor	a, e
 	and	a, 07Fh
 	xor	a, e
-	jq	__fpcopy
+	; jq	__fpcopy
+
+	; require	__fpcopy
 
 ;-------------------------------------------------------------------------------
 
-	.section	.text
+	; .section	.text
 
 	.global	__fpcopy
 	.type	__fpcopy, @function

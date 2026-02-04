@@ -15,17 +15,13 @@ __fpsub: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	ccf
 	rr	e
 ;	jq	__fpadd.enter
-	virtual
-		ld	d, 0
-		load .ld_d : byte from $$
-	end virtual
-	db	.ld_d
+	db	$16	; ld d, *
 
-	require	__fpadd
+	; require	__fpadd
 
 ;-------------------------------------------------------------------------------
 
-	.section	.text
+	; .section	.text
 
 	.global	__fpadd
 	.type	__fpadd, @function
