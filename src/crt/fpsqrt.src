@@ -8,7 +8,8 @@
 ; IEEE single precision square root
 ; aubc = sqrt(aubc)
 __fpsqrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)sqrt(bitcast(float, pair8_24_t, { in.BC, in.A }))) && out.DE == in.DE && out.HL == in.HL && out.IX == in.IX && out.IY == in.IY
-	push	de, bc
+	push	de
+	push	bc
 	ex	(sp), hl
 	ld	e, a
 	call	__fppop1
@@ -75,7 +76,8 @@ __fpsqrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)sq
 	rla
 	.endr
 	; Set the low exponent bit of the result
-	pop	de, ix
+	pop	de
+	pop	ix
 	sra	e
 	rla
 	rrca
@@ -91,7 +93,8 @@ __fpsqrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)sq
 	add	a, 07Fh / 4 + 1
 	; Check whether to round up (never round-to-even because a root with the lowest mantissa bit set must be irrational)
 	inc	l
-	pop	hl, de
+	pop	hl
+	pop	de
 	ret	p
 	inc	bc	; This never overflows into the exponent field
 	ret
@@ -100,13 +103,15 @@ __fpsqrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)sq
 	rrca
 .zero:
 	ex	(sp), hl
-	pop	bc, de
+	pop	bc
+	pop	de
 	ret
 
 .nan:
 	sbc	a, a
 	set	7, b
-	pop	hl, de
+	pop	hl
+	pop	de
 	ret
 
 	.extern	__fppop1
