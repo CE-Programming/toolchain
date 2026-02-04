@@ -16,7 +16,7 @@ int main(void)
 
     gfx_ZeroScreen();
 
-    if (lz4_Decompress_Block(gfx_vram, background_compressed + sizeof(uint24_t), background_compressed_size) != background_size)
+    if (lz4_Decompress_Block(gfx_vram, background_compressed + sizeof(uint24_t), background_compressed_size - sizeof(uint24_t)) != background_size)
     {
         gfx_ZeroScreen();
     }
