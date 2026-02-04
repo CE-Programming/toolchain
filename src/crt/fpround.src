@@ -33,11 +33,7 @@ __fpround: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), roundf(b
 	jq	c, .no_overflow
 	inc	a
 ;	jq	.overflow
-	virtual
-		jr	c, $
-		load .jr_c : byte from $$
-	end virtual
-	db	.jr_c
+	db	$38	; jr c, *
 .no_overflow:
 	add	hl, hl
 .overflow:
