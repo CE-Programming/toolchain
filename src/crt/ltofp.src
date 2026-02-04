@@ -1,10 +1,11 @@
-	assume	adl=1
+	.assume	adl=1
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text
 
-	public	__ultofp
+	.global	__ultofp
+	.type	__ultofp, @function
 
 ; IEEE single precision from 32-bit integers
 ; aubc = float(aubc)
@@ -22,9 +23,10 @@ __ultofp: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)bi
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text
 
-	public	__ltofp
+	.global	__ltofp
+	.type	__ltofp, @function
 
 __ltofp: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)bitcast(int32_t, pair8_24_t, { in.BC, in.A })) && out.DE == in.DE && out.HL == in.HL && out.IX == in.IX && out.IY == in.IY
 	push	af
@@ -55,4 +57,4 @@ __ltofp: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)bit
 
 ;-------------------------------------------------------------------------------
 
-	extern	__fppack
+	.extern	__fppack

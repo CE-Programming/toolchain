@@ -1,10 +1,11 @@
-	assume	adl=1
+	.assume	adl=1
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text
 
-	public	__lltofp
+	.global	__lltofp
+	.type	__lltofp, @function
 
 ; IEEE single precision from 64-bit integers
 ; euhl = float(bcudeuhl)
@@ -17,9 +18,10 @@ __lltofp: ; CHECK: same(bitcast(float, pair8_24_t, { out.HL, out.E }), (float)bi
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text
 
-	public	__ulltofp
+	.global	__ulltofp
+	.type	__ulltofp, @function
 
 __ulltofp: ; CHECK: same(bitcast(float, pair8_24_t, { out.HL, out.E }), (float)bitcast(uint64_t, tuple16_24_24_t, { in.HL, in.DE, in.BCS })) && out.A == in.A && out.BC == in.BC && out.IX == in.IX && out.IY == in.IY
 	push	af, bc
@@ -66,6 +68,6 @@ __ulltofp: ; CHECK: same(bitcast(float, pair8_24_t, { out.HL, out.E }), (float)b
 
 ;-------------------------------------------------------------------------------
 
-	extern	__llneg
+	.extern	__llneg
 
-	extern	__fppack2
+	.extern	__fppack2

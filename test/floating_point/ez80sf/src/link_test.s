@@ -1,10 +1,10 @@
-	assume	adl=1
+	.assume	adl=1
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text
 
-	public	_link_test
+	.global	_link_test
 
 _link_test:
 	ld	hl, __fpabs
@@ -51,42 +51,42 @@ _link_test:
 	sbc	hl, hl
 	ret
 
-	extern	__fpabs
-	extern	__fpsub
-	extern	__fpadd
-	extern	__fpcbrt
-	extern	__fpcmpu
-	extern	__fpcmpo
-	extern	__fpcmp
-	extern	__fpcopysign
-	extern	__fpcopy
-	extern	__fpdiv
-	extern	__fpmin
-	extern	__fpmax
-	extern	__fpmul
-	extern	__fpneg
-	extern	__fprem
-	extern	__fpround
-	extern	__fpsqrt
-	extern	__fptol
-	extern	__fptoul
-	extern	__fptoll
-	extern	__fptoull
-	extern	__fpfloor
-	extern	__fpceil
-	extern	__fptrunc
-	extern	__fppop1
-	extern	__fppop2
-	extern	__fppack
-	extern	__fppack.normalize
-	extern	__fppack.normalized
-	extern	__fppack2
-	extern	__fppack2.normalize
-	extern	__fppack2.normalized
-	extern	__ltofp
-	extern	__ultofp
-	extern	__lltofp
-	extern	__ulltofp
+	.extern	__fpabs
+	.extern	__fpsub
+	.extern	__fpadd
+	.extern	__fpcbrt
+	.extern	__fpcmpu
+	.extern	__fpcmpo
+	.extern	__fpcmp
+	.extern	__fpcopysign
+	.extern	__fpcopy
+	.extern	__fpdiv
+	.extern	__fpmin
+	.extern	__fpmax
+	.extern	__fpmul
+	.extern	__fpneg
+	.extern	__fprem
+	.extern	__fpround
+	.extern	__fpsqrt
+	.extern	__fptol
+	.extern	__fptoul
+	.extern	__fptoll
+	.extern	__fptoull
+	.extern	__fpfloor
+	.extern	__fpceil
+	.extern	__fptrunc
+	.extern	__fppop1
+	.extern	__fppop2
+	.extern	__fppack
+	.extern	__fppack.normalize
+	.extern	__fppack.normalized
+	.extern	__fppack2
+	.extern	__fppack2.normalize
+	.extern	__fppack2.normalized
+	.extern	__ltofp
+	.extern	__ultofp
+	.extern	__lltofp
+	.extern	__ulltofp
 
-	extern	__fptod
-	extern	__dtofp
+	.extern	__fptod
+	.extern	__dtofp
