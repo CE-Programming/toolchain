@@ -18,14 +18,14 @@ __fptoll: ; PREREQ: bitcast(float, pair8_24_t, { in.HL, in.E })-INT64_MIN > -1.0
 	ld	de, 0
 	sub	a, 07Fh
 	cp	a, 23 + 64
-	jq	nc, .return.zero
+	jr	nc, .return.zero
 	sub	a, 23 + 1
-	jq	nc, .left
+	jr	nc, .left
 	cpl
 	ld	c, a
 	call	__ishru
 	ld	c, b
-	jq	.finish
+	jr	.finish
 .left:
 	inc	a
 	push	af
