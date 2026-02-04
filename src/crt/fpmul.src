@@ -20,9 +20,9 @@ __fpmul: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	ld	e, a
 	call	__fppop2
 	inc	e
-	jr	z, .nonfinite.1
+	jp	z, .nonfinite.1
 	inc	d
-	jr	z, .nonfinite.2
+	jp	z, .nonfinite.2
 	ld	a, d
 	ld	d, b; 0
 	rlc	e
@@ -43,7 +43,7 @@ __fpmul: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	jr	z, .subnormal
 	jr	c, .continue
 	cp	a, -23
-	jr	c, .underflow
+	jp	c, .underflow
 .subnormal:
 	dec	a
 	ld	d, a
