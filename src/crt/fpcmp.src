@@ -1,10 +1,11 @@
-	assume	adl=1
+	.assume	adl=1
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text
 
-	public	__fpcmpu
+	.global	__fpcmpu
+	.type	__fpcmpu, @function
 
 ; IEEE single precision unordered comparison
 ; z = euhl == aubc || isunordered(euhl, aubc)
@@ -19,9 +20,10 @@ __fpcmpu: ; CHECK: out.flags.C == !isunordered(bitcast(float, pair8_24_t, { in.H
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text
 
-	public	__fpcmpo
+	.global	__fpcmpo
+	.type	__fpcmpo, @function
 
 ; IEEE single precision ordered comparison
 ; z = euhl == aubc
@@ -145,9 +147,10 @@ __fpcmpo: ; CHECK: out.flags.Z == (bitcast(float, pair8_24_t, { in.HL, in.E }) =
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text
 
-	public	__fpcmp
+	.global	__fpcmp
+	.type	__fpcmp, @function
 
 ; IEEE single precision comparison (flag outputs for NaN inputs are undefined)
 ; z = euhl == aubc

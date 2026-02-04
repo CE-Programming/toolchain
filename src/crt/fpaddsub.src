@@ -1,10 +1,11 @@
-	assume	adl=1
+	.assume	adl=1
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text
 
-	public	__fpsub
+	.global	__fpsub
+	.type	__fpsub, @function
 
 ; IEEE single precision subtraction
 ; aubc = aubc - euhl
@@ -24,9 +25,10 @@ __fpsub: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 
 ;-------------------------------------------------------------------------------
 
-	section	.text
+	.section	.text
 
-	public	__fpadd
+	.global	__fpadd
+	.type	__fpadd, @function
 
 ; IEEE single precision addition
 ; aubc = aubc + euhl
@@ -72,17 +74,17 @@ __fpadd: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 .noshift1:
 	srl	b
 	jq	c, .noshift2
-	repeat	2
+	.rept	2
 	add	hl, hl
 	rla
-	end repeat
+	.endr
 .noshift2:
 	srl	b
 	jq	c, .noshift4
-	repeat	4
+	.rept	4
 	add	hl, hl
 	rla
-	end repeat
+	.endr
 .noshift4:
 	; Shift right by (amount + 7) / 8 * 8, truncating to 24 bits
 	; The last 2 bits shifted out are in A, while any remaining non-zero
@@ -226,6 +228,6 @@ __fpadd: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 
 ;-------------------------------------------------------------------------------
 
-	extern	__fppop1
-	extern	__fppop2
-	extern	__fppack
+	.extern	__fppop1
+	.extern	__fppop2
+	.extern	__fppack

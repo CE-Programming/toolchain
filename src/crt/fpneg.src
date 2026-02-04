@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__fpneg
+	.global	__fpneg
+	.type	__fpneg, @function
 
 ; IEEE single precision negation
 ; aubc = -aubc
