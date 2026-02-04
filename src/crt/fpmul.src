@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__fpmul
+	.global	__fpmul
+	.type	__fpmul, @function
 
 ; IEEE single precision multiplication
 ; aubc = aubc * euhl
@@ -174,7 +175,7 @@ __fpmul: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	pop	af
 	jq	.return.pop
 
-	extern	__fppop1
-	extern	__fppop2
-	extern	__fppack2.normalized
-	extern	__fppack2
+	.extern	__fppop1
+	.extern	__fppop2
+	.extern	__fppack2.normalized
+	.extern	__fppack2

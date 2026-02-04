@@ -1,8 +1,9 @@
-	assume	adl=1
+	.assume	adl=1
 
-	section	.text
+	.section	.text
 
-	public	__fpabs
+	.global	__fpabs
+	.type	__fpabs, @function
 
 ; IEEE single precision absolute value
 ; aubc = |aubc|
