@@ -462,8 +462,8 @@ ti_SetArchiveStatus:
 	call	ti.ChkFindSym
 	jp	c, util_ret_neg_one
 	call	ti.ChkInRam
-	jr	z, .save_ptrs
-	call	util_skip_archive_header
+	; jr	z, .save_ptrs
+	call	nz, util_skip_archive_header
 .save_ptrs:
 	push	hl
 	call	util_get_vat_ptr
