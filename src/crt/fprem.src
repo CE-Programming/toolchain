@@ -14,7 +14,8 @@ __fprem: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), fmodf(bitc
 	set	7, e	; euhl = -abs(EUHL)
 	call	__fpcmpo	; abs(AUBC) <=> abs(EUHL)
 	jq	m, .notge	; !(abs(AUBC) >= abs(EUHL))
-	push	hl, bc
+	push	hl
+	push	bc
 	call	__fppop1
 	ex	(sp), hl
 	ld	a, e
@@ -59,11 +60,13 @@ __fprem: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), fmodf(bitc
 	xor	a, a
 	call	__fppack
 	ex	(sp), hl
-	pop	bc, de
+	pop	bc
+	pop	de
 	ret
 
 .nan:
-	pop	hl, hl
+	pop	hl
+	pop	hl
 .notge:
 	ld	a, d
 	pop	de
