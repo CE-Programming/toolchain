@@ -1,4 +1,4 @@
-# Copyright (C) 2015-2024 CE Programming
+# Copyright (C) 2015-2026 CE Programming
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -21,21 +21,13 @@ LIB_LIB := graphy.lib
 LIB_8XV := graphy.8xv
 LIB_H := graphy.h
 
-EZCFLAGS := -Wall -Wextra -Wshadow -Oz
-EZCFLAGS += -D_EZ80 -isystem ../libc/include
-
 all: $(LIB_8XV)
-
-build/graphy.c.asm: graphy.c
-	$(Q)$(call MKDIR,build)
-	$(Q)$(EZCC) $(EZCFLAGS) graphy.c
 
 $(LIB_8XV): $(LIB_SRC)
 	$(Q)$(FASMG) $< $@
 
 clean:
 	$(Q)$(call REMOVE,$(LIB_LIB) $(LIB_8XV))
-	$(Q)$(call RMDIR,build)
 
 install: all
 	$(Q)$(call MKDIR,$(INSTALL_LIB))
@@ -44,4 +36,3 @@ install: all
 	$(Q)$(call COPY,$(LIB_H),$(INSTALL_H))
 
 .PHONY: all clean install
-
