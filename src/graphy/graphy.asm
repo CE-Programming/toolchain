@@ -6998,4 +6998,4 @@ end if
 include 'graphy.c.src'
 
 _FooBar:
-	rb	16384
+	rb	8192
