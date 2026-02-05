@@ -9,7 +9,7 @@ COMPRESSED = NO
 ARCHIVED = NO
 
 CFLAGS = -Wall -Wextra -Wshadow -Wconversion -Wformat=2 -std=c17 -Oz
-CXXFLAGS = -Wall -Wextra -Wshadow -Wconversion -Wformat=2 -std=c++17 -Oz
+CXXFLAGS = -Wall -Wextra -Wshadow -Wconversion -Wformat=2 -std=c++23 -Oz
 
 PREFER_OS_LIBC = NO
 
