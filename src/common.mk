@@ -86,8 +86,7 @@ EZCFLAGS := -S -fno-autolink -fno-addrsig -fno-math-errno -ffunction-sections -f
 EZCFLAGS += -Wall -Wextra -Wimplicit-float-conversion -Wimplicit-int-float-conversion -Oz
 EZCFLAGS += -D_EZ80 -isystem $(call NATIVEPATH,$(ROOT_DIR)libc/include) -I$(call NATIVEPATH,$(ROOT_DIR)ce/include) -I$(call NATIVEPATH,$(ROOT_DIR)fileioc)
 EZCFLAGS += -mllvm -profile-guided-section-prefix=false -mllvm -z80-gas-style
-EZCXXFLAGS := $(EZCFLAGS) -fno-exceptions -fno-rtti
-EZCXXFLAGS += -isystem $(call NATIVEPATH,$(ROOT_DIR)libcxx/include)
+EZCXXFLAGS := -isystem $(call NATIVEPATH,$(ROOT_DIR)libcxx/include) $(EZCFLAGS) -fno-exceptions -fno-rtti
 EZASFLAGS := -march=ez80+full
 
 INSTALL_DIR := $(patsubst %/,%,$(subst \,/,$(DESTDIR)))/$(PREFIX)

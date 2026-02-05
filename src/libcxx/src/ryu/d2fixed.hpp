@@ -231,7 +231,12 @@ void __append_nine_digits(uint32_t __digits, char* const __result) {
   return (__log10Pow2(16 * static_cast<int32_t>(__idx)) + 1 + 16 + 8) / 9;
 }
 
+#ifndef _EZ80
 [[nodiscard]] to_chars_result __d2fixed_buffered_n(char* _First, char* const _Last, const double __d,
+#else // _EZ80
+[[nodiscard]] to_chars_result __d2fixed_buffered_n(char* _First, char* const _Last, const long double __d,
+#endif // _EZ80
+
   const uint32_t __precision) {
   char* const _Original_first = _First;
 
@@ -421,7 +426,11 @@ void __append_nine_digits(uint32_t __digits, char* const __result) {
   return { _First, errc{} };
 }
 
+#ifndef _EZ80
 [[nodiscard]] to_chars_result __d2exp_buffered_n(char* _First, char* const _Last, const double __d,
+#else // _EZ80
+[[nodiscard]] to_chars_result __d2exp_buffered_n(char* _First, char* const _Last, const long double __d,
+#endif // _EZ80
   uint32_t __precision) {
   char* const _Original_first = _First;
 

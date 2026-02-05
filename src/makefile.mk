@@ -294,6 +294,13 @@ else
 LIB_CXX =
 endif
 
+# choose libcxxrt
+ifeq ($(HAS_LIBCXX),YES)
+LIB_CXXRT = $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/lib/libcxx/libcxxrt.a)
+else
+LIB_CXXRT =
+endif
+
 # add other libs
 LIB_CE = $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/lib/ce/libce.a)
 LIB_SOFTFLOAT = $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/lib/softfloat/libsoftfloat.a)
@@ -317,7 +324,7 @@ endif
 EZLLVMFLAGS = -mllvm -profile-guided-section-prefix=false -mllvm -z80-gas-style -ffunction-sections -fdata-sections -fno-addrsig -fno-autolink -fno-threadsafe-statics $(MATH_ERRNO)
 EZCOMMONFLAGS = -nostdinc -isystem $(call QUOTE_ARG,$(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/include)) -I$(SRCDIR) -Xclang -fforce-mangle-main-argc-argv $(EZLLVMFLAGS) -D__TICE__=1 $(CC_CUSTOMFILE)
 EZCFLAGS = $(EZCOMMONFLAGS) $(CFLAGS) $(CC_DEBUG)
-EZCXXFLAGS = $(EZCOMMONFLAGS) -isystem $(call QUOTE_ARG,$(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/include/c++)) -fno-exceptions -fno-use-cxa-atexit $(CXXFLAGS) $(CC_DEBUG)
+EZCXXFLAGS = -isystem $(call QUOTE_ARG,$(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/include/c++)) $(EZCOMMONFLAGS) -fno-exceptions -fno-use-cxa-atexit $(CXXFLAGS) $(CC_DEBUG)
 EZLTOFLAGS = $(EZLLVMFLAGS) $(LTOFLAGS)
 EZASFLAGS = -march=ez80+full $(ASFLAGS)
 
@@ -368,6 +375,7 @@ $(BINDIR)/$(TARGETOBJ): $(CRT0_OBJ) $(OBJDIR)/$(TARGETTMP) $(MAKEFILE_LIST) $(DE
 		--end-group \
 		$(LIB_C) \
 		$(LIB_CXX) \
+		$(LIB_CXXRT) \
 		$(LIB_CE) \
 		-o $(call QUOTE_ARG,$@)
 
@@ -451,7 +459,7 @@ $(OBJDIR)/%.$(CPP_EXTENSION).bc: $$(call UPDIR_RM,$$*).$(CPP_EXTENSION) $(EXTRA_
 	$(Q)$(CC) -MD -c -emit-llvm $(EZCXXFLAGS) $(call QUOTE_ARG,$<) -o $(call QUOTE_ARG,$@)
 
 # crt
-$(OBJDIR)/$(TARGETTMP): $(OBJECTS) $(LIB_ALLOCATOR) $(LIB_PRINTF) $(LIB_CXX) $(LIB_CE) $(LIB_SOFTFLOAT) $(LIB_CRT) $(LIB_C) $(ICON_OBJ) $(EXTRA_LIBS) $(MAKEFILE_LIST) $(DEPS)
+$(OBJDIR)/$(TARGETTMP): $(OBJECTS) $(LIB_ALLOCATOR) $(LIB_PRINTF) $(LIB_CXX) $(LIB_CXXRT) $(LIB_CE) $(LIB_SOFTFLOAT) $(LIB_CRT) $(LIB_C) $(ICON_OBJ) $(EXTRA_LIBS) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)$(LD) \
 		-i \
@@ -469,6 +477,7 @@ $(OBJDIR)/$(TARGETTMP): $(OBJECTS) $(LIB_ALLOCATOR) $(LIB_PRINTF) $(LIB_CXX) $(L
 		$(LIB_ALLOCATOR) \
 		$(LIB_PRINTF) \
 		$(LIB_CXX) \
+		$(LIB_CXXRT) \
 		$(LIB_CE) \
 		$(LIB_CRT) \
 		$(LIB_C) \

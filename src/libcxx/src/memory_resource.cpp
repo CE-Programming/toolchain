@@ -174,7 +174,7 @@ void* unsynchronized_pool_resource::__adhoc_pool::__do_allocate(memory_resource*
 }
 
 void unsynchronized_pool_resource::__adhoc_pool::__do_deallocate(
-    memory_resource* upstream, void* p, size_t bytes, size_t align) {
+    memory_resource* upstream, void* p, __attribute__((__unused__)) size_t bytes, __attribute__((__unused__)) size_t align) {
   _LIBCPP_ASSERT_NON_NULL(__first_ != nullptr, "deallocating a block that was not allocated with this allocator");
   if (__first_->__start_ == p) {
     __chunk_footer* next = __first_->__next_;

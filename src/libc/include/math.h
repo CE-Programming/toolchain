@@ -3,7 +3,86 @@
 
 #ifdef __cplusplus
 
-#include <cmath>
+#include <__math_def.h>
+
+template<class _Tp, _Tp __value> struct __cmath_integral_constant {
+    static const _Tp value = __value;
+    using value_type = _Tp;
+    using type = __cmath_integral_constant;
+    [[__gnu__::__visibility__("hidden"), __gnu__::__always_inline__]] inline constexpr operator value_type()   const noexcept { return value; }
+    [[__gnu__::__visibility__("hidden"), __gnu__::__always_inline__]] inline constexpr value_type operator()() const noexcept { return value; }
+};
+
+template<bool __value> using __cmath_bool_constant = __cmath_integral_constant<bool, __value>;
+using __cmath_false_type = __cmath_bool_constant<false>;
+using __cmath_true_type  = __cmath_bool_constant<true>;
+
+template<class _Tp> struct __cmath_type_identity { using type = _Tp; };
+template<class _Tp> using __cmath_type_identity_t = typename __cmath_type_identity<_Tp>::type;
+
+template<bool, class = void> struct __cmath_enable_if {};
+template<class _Tp> struct __cmath_enable_if<true, _Tp> : __cmath_type_identity<_Tp> {};
+template<bool _Ep, class _Tp = void> using __cmath_enable_if_t = typename __cmath_enable_if<_Ep, _Tp>::type;
+
+template<class _Tp> inline constexpr bool __cmath_is_integral_v = __is_integral(_Tp);
+template<class _Tp> using __cmath_is_integral = __cmath_bool_constant<__cmath_is_integral_v<_Tp>>;
+
+inline constexpr bool issignaling(float __x) {
+    return _issignalingf(__x);
+}
+inline constexpr bool issignaling(double __x) {
+    return _issignalingf(__x);
+}
+inline constexpr bool issignaling(long double __x) {
+    return _issignalingl(__x);
+}
+template<typename _Tp> inline constexpr
+__cmath_enable_if_t<__cmath_is_integral<_Tp>::value, bool>
+issignaling(_Tp __x) { return false; }
+
+inline constexpr bool issubnormal(float __x) {
+    if (__builtin_constant_p(__x)) {
+        return (FP_SUBNORMAL == __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, __x));
+    }
+    return _issubnormalf(__x);
+}
+inline constexpr bool issubnormal(double __x) {
+    if (__builtin_constant_p(__x)) {
+        return (FP_SUBNORMAL == __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, __x));
+    }
+    return _issubnormalf(__x);
+}
+inline constexpr bool issubnormal(long double __x) {
+    if (__builtin_constant_p(__x)) {
+        return (FP_SUBNORMAL == __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, __x));
+    }
+    return _issubnormall(__x);
+}
+template<typename _Tp> inline constexpr
+__cmath_enable_if_t<__cmath_is_integral<_Tp>::value, bool>
+issubnormal(_Tp __x) { return false; }
+
+inline constexpr bool iszero(float __x) {
+    if (__builtin_constant_p(__x)) {
+        return (__x == 0.0f);
+    }
+    return _iszerof(__x);
+}
+inline constexpr bool iszero(double __x) {
+    if (__builtin_constant_p(__x)) {
+        return (__x == 0.0);
+    }
+    return _iszerof(__x);
+}
+inline constexpr bool iszero(long double __x) {
+    if (__builtin_constant_p(__x)) {
+        return (__x == 0.0L);
+    }
+    return _iszerol(__x);
+}
+template<typename _Tp> inline constexpr
+__cmath_enable_if_t<__cmath_is_integral<_Tp>::value, bool>
+iszero(_Tp __x) { return (__x == 0); }
 
 #else /* __cplusplus */
 

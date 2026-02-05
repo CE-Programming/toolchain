@@ -31,6 +31,16 @@ inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR unsigned long __convert_to_integr
   return __val;
 }
 
+#ifdef _EZ80
+inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR signed __int48 __convert_to_integral(signed __int48 __val) {
+  return __val;
+}
+
+inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR unsigned __int48 __convert_to_integral(unsigned __int48 __val) {
+  return __val;
+}
+#endif // _EZ80
+
 inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR long long __convert_to_integral(long long __val) { return __val; }
 
 inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR unsigned long long __convert_to_integral(unsigned long long __val) {

@@ -12,7 +12,7 @@
 _LIBCPP_BEGIN_NAMESPACE_STD
 
 template <class Comp, class RandomAccessIterator>
-void __sort(RandomAccessIterator first, RandomAccessIterator last, Comp comp) {
+void __sort(RandomAccessIterator first, RandomAccessIterator last, __attribute__((__unused__)) Comp comp) {
   auto depth_limit = 2 * std::__bit_log2(static_cast<size_t>(last - first));
 
   // Only use bitset partitioning for arithmetic types.  We should also check
