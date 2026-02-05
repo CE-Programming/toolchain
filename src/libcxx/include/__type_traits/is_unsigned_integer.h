@@ -24,6 +24,9 @@ template <>          struct __libcpp_is_unsigned_integer<unsigned char>      : p
 template <>          struct __libcpp_is_unsigned_integer<unsigned short>     : public true_type {};
 template <>          struct __libcpp_is_unsigned_integer<unsigned int>       : public true_type {};
 template <>          struct __libcpp_is_unsigned_integer<unsigned long>      : public true_type {};
+#ifdef _EZ80
+template <>          struct __libcpp_is_unsigned_integer<unsigned __int48>   : public true_type {};
+#endif // _EZ80
 template <>          struct __libcpp_is_unsigned_integer<unsigned long long> : public true_type {};
 #ifndef _LIBCPP_HAS_NO_INT128
 template <>          struct __libcpp_is_unsigned_integer<__uint128_t>        : public true_type {};

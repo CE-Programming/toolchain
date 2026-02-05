@@ -352,8 +352,13 @@ struct __floating_decimal_64 {
   return __fd;
 }
 
+#ifndef _EZ80
 [[nodiscard]] _LIBCPP_HIDE_FROM_ABI inline to_chars_result __to_chars(char* const _First, char* const _Last, const __floating_decimal_64 __v,
   chars_format _Fmt, const double __f) {
+#else // _EZ80
+[[nodiscard]] _LIBCPP_HIDE_FROM_ABI inline to_chars_result __to_chars(char* const _First, char* const _Last, const __floating_decimal_64 __v,
+  chars_format _Fmt, const long double __f) {
+#endif // _EZ80
   // Step 5: Print the decimal representation.
   uint64_t _Output = __v.__mantissa;
   int32_t _Ryu_exponent = __v.__exponent;
@@ -700,8 +705,13 @@ struct __floating_decimal_64 {
   return true;
 }
 
+#ifndef _EZ80
 [[nodiscard]] to_chars_result __d2s_buffered_n(char* const _First, char* const _Last, const double __f,
   const chars_format _Fmt) {
+#else // _EZ80
+[[nodiscard]] to_chars_result __d2s_buffered_n(char* const _First, char* const _Last, const long double __f,
+  const chars_format _Fmt) {
+#endif // _EZ80
 
   // Step 1: Decode the floating-point number, and unify normalized and subnormal cases.
   const uint64_t __bits = __double_to_bits(__f);

@@ -25,6 +25,15 @@ _LIBCPP_BEGIN_NAMESPACE_STD
 
 template <class _Tp>
 [[nodiscard]] _LIBCPP_HIDE_FROM_ABI constexpr _Tp __bit_ceil(_Tp __t) noexcept {
+#ifdef _EZ80
+  if (
+    (__t & (_Tp(1) << (numeric_limits<_Tp>::digits - 1)))
+    &&
+    (__t != (_Tp(1) << (numeric_limits<_Tp>::digits - 1)))
+  ) {
+    return 0;
+  }
+#endif // _EZ80
   if (__t < 2)
     return 1;
   const unsigned __n = numeric_limits<_Tp>::digits - std::__countl_zero((_Tp)(__t - 1u));

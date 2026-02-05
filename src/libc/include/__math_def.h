@@ -141,12 +141,9 @@ double      expm1(double);
 float       expm1f(float);
 long double expm1l(long double);
 
-#ifndef _ABS_FLOAT_DEFINED
-#define _ABS_FLOAT_DEFINED
-double      fabs(double);
-float       fabsf(float);
+float fabsf(float);
+double fabs(double);
 long double fabsl(long double);
-#endif /* _ABS_FLOAT_DEFINED */
 
 double      fdim(double, double);
 float       fdimf(float, float);

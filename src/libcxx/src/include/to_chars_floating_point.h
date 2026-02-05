@@ -60,14 +60,15 @@ struct _Floating_type_traits<float> {
 
     using _Uint_type = uint32_t;
 
-    static constexpr uint32_t _Exponent_mask             = (1u << _Exponent_bits) - 1;
-    static constexpr uint32_t _Normal_mantissa_mask      = (1u << _Mantissa_bits) - 1;
-    static constexpr uint32_t _Denormal_mantissa_mask    = (1u << (_Mantissa_bits - 1)) - 1;
-    static constexpr uint32_t _Special_nan_mantissa_mask = 1u << (_Mantissa_bits - 2);
-    static constexpr uint32_t _Shifted_sign_mask         = 1u << _Sign_shift;
+    static constexpr uint32_t _Exponent_mask             = (1ul << _Exponent_bits) - 1;
+    static constexpr uint32_t _Normal_mantissa_mask      = (1ul << _Mantissa_bits) - 1;
+    static constexpr uint32_t _Denormal_mantissa_mask    = (1ul << (_Mantissa_bits - 1)) - 1;
+    static constexpr uint32_t _Special_nan_mantissa_mask = 1ul << (_Mantissa_bits - 2);
+    static constexpr uint32_t _Shifted_sign_mask         = 1ul << _Sign_shift;
     static constexpr uint32_t _Shifted_exponent_mask     = _Exponent_mask << _Exponent_shift;
 };
 
+#ifndef _EZ80
 template <>
 struct _Floating_type_traits<double> {
     static constexpr int32_t _Mantissa_bits = DBL_MANT_DIG;
@@ -90,6 +91,30 @@ struct _Floating_type_traits<double> {
     static constexpr uint64_t _Shifted_sign_mask         = 1ULL << _Sign_shift;
     static constexpr uint64_t _Shifted_exponent_mask     = _Exponent_mask << _Exponent_shift;
 };
+#else // _EZ80
+template <>
+struct _Floating_type_traits<long double> {
+    static constexpr int32_t _Mantissa_bits = LDBL_MANT_DIG;
+    static constexpr int32_t _Exponent_bits = sizeof(long double) * CHAR_BIT - LDBL_MANT_DIG;
+
+    static constexpr int32_t _Maximum_binary_exponent = LDBL_MAX_EXP - 1;
+    static constexpr int32_t _Minimum_binary_exponent = LDBL_MIN_EXP - 1;
+
+    static constexpr int32_t _Exponent_bias = 1023;
+
+    static constexpr int32_t _Sign_shift     = _Exponent_bits + _Mantissa_bits - 1;
+    static constexpr int32_t _Exponent_shift = _Mantissa_bits - 1;
+
+    using _Uint_type = uint64_t;
+
+    static constexpr uint64_t _Exponent_mask             = (1ULL << _Exponent_bits) - 1;
+    static constexpr uint64_t _Normal_mantissa_mask      = (1ULL << _Mantissa_bits) - 1;
+    static constexpr uint64_t _Denormal_mantissa_mask    = (1ULL << (_Mantissa_bits - 1)) - 1;
+    static constexpr uint64_t _Special_nan_mantissa_mask = 1ULL << (_Mantissa_bits - 2);
+    static constexpr uint64_t _Shifted_sign_mask         = 1ULL << _Sign_shift;
+    static constexpr uint64_t _Shifted_exponent_mask     = _Exponent_mask << _Exponent_shift;
+};
+#endif // _EZ80
 
 // ^^^^^^^^^^ DERIVED FROM corecrt_internal_fltintrn.h ^^^^^^^^^^
 
@@ -719,7 +744,11 @@ struct _General_precision_tables<float> {
 };
 
 template <>
+#ifndef _EZ80
 struct _General_precision_tables<double> {
+#else // _EZ80
+struct _General_precision_tables<long double> {
+#endif // _EZ80
     static constexpr int _Max_special_P = 15;
 
     static constexpr uint64_t _Special_X_table[195] = {0x3F18E757928E0C9Du, 0x3F4F212D77318FC5u, 0x3F8374BC6A7EF9DBu,
@@ -862,13 +891,13 @@ to_chars_result _Floating_to_chars_general_precision(
         _Precision = 6;
     } else if (_Precision == 0) {
         _Precision = 1;
-    } else if (_Precision < 1'000'000) {
+    } else if (_Precision < (INT_MAX / 2)) {
         // _Precision is ok.
     } else {
         // Avoid integer overflow.
         // Due to general notation's zero-trimming behavior, we can simply clamp _Precision.
         // This is further clamped below.
-        _Precision = 1'000'000;
+        _Precision = (INT_MAX / 2);
     }
 
     // _Precision is now the Standard's P.

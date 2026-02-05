@@ -87,8 +87,7 @@ EZCFLAGS += -Wall -Wextra -Wimplicit-float-conversion -Wimplicit-int-float-conve
 EZCFLAGS += -D_EZ80 -D__TICE__=1
 EZCFLAGS += -isystem $(call NATIVEPATH,$(ROOT_DIR)libc/include) -I$(call NATIVEPATH,$(ROOT_DIR)ce/include) -I$(call NATIVEPATH,$(ROOT_DIR)fileioc)
 EZCFLAGS += -mllvm -profile-guided-section-prefix=false -mllvm -z80-gas-style
-EZCXXFLAGS := $(EZCFLAGS) -fno-exceptions -fno-rtti
-EZCXXFLAGS += -isystem $(call NATIVEPATH,$(ROOT_DIR)libcxx/include)
+EZCXXFLAGS := -isystem $(call NATIVEPATH,$(ROOT_DIR)libcxx/include) $(EZCFLAGS) -fno-exceptions -fno-rtti
 EZASFLAGS := -march=ez80+full
 EZASFLAGS += --defsym __TICE__=1
 

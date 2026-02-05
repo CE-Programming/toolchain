@@ -16,18 +16,22 @@
 
 include $(CURDIR)/../common.mk
 
+EZCXXFLAGS += -std=gnu++23
+EZCXXFLAGS += -Oz
+EZCXXFLAGS += -D_LIBCPP_BUILDING_LIBRARY -DLIBCXX_BUILDING_LIBCXXABI
+EZCXXFLAGS += -fno-use-cxa-atexit
+
 OBJECTS =
 OBJECTS += $(patsubst %.c,build/%.c.o,$(wildcard *.c))
 OBJECTS += $(patsubst %.cpp,build/%.cpp.o,$(wildcard *.cpp))
 OBJECTS += $(patsubst %.src,build/%.o,$(wildcard *.src))
-
-WILDCARD_H := $(wildcard include/*)
 
 CXX_LIB := build/libcxx.a
 
 .SECONDARY:
 
 all: $(CXX_LIB)
+	$(MAKE) -C src
 
 $(CXX_LIB): $(OBJECTS)
 	$(Q)$(call MKDIR,build)
@@ -61,6 +65,7 @@ install: all
 	$(Q)$(call MKDIR,$(INSTALL_CXX_H))
 	$(Q)$(call MKDIR,$(INSTALL_LIBCXX))
 	$(Q)$(call COPY,$(call NATIVEPATH,$(CXX_LIB)),$(INSTALL_LIBCXX))
-	$(Q)$(call COPY,$(foreach file,$(call NATIVEPATH,$(WILDCARD_H)),$(call QUOTE_ARG,$(file))),$(INSTALL_CXX_H))
+	$(Q)$(call COPYDIR,$(call NATIVEPATH,include),$(INSTALL_CXX_H))
+	$(MAKE) -C src install
 
 .PHONY: all clean install
