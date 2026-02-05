@@ -1,9 +1,31 @@
 // -*- C++ -*-
-#ifndef _EZCXX_CSTDBOOL
-#define _EZCXX_CSTDBOOL
+//===----------------------------------------------------------------------===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
 
-#include <stdbool.h>
+#ifndef _LIBCPP_CSTDBOOL
+#define _LIBCPP_CSTDBOOL
 
-#pragma clang system_header
+/*
+    cstdbool synopsis
 
-#endif // _EZCXX_CSTDBOOL
+Macros:
+
+    __bool_true_false_are_defined
+
+*/
+
+#include <__config>
+
+#if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
+#  pragma GCC system_header
+#endif
+
+#undef __bool_true_false_are_defined
+#define __bool_true_false_are_defined 1
+
+#endif // _LIBCPP_CSTDBOOL
