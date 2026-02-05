@@ -10,6 +10,7 @@
 #include <inttypes.h>
 #include <iso646.h>
 #include <limits.h>
+#include <locale.h>
 #include <math.h>
 #include <setjmp.h>
 #include <stdalign.h>

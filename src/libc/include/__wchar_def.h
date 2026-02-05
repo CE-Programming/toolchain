@@ -3,13 +3,6 @@
 
 #include <cdefs.h>
 
-#ifndef _WCHAR_T_DEFINED
-#define _WCHAR_T_DEFINED
-#ifndef __cplusplus
-typedef __WCHAR_TYPE__ wchar_t;
-#endif /* __cplusplus */
-#endif /* _WCHAR_T_DEFINED */
-
 #ifndef _WINT_T_DEFINED
 #define _WINT_T_DEFINED
 typedef __WINT_TYPE__ wint_t;

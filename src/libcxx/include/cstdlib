@@ -52,6 +52,11 @@ using ::i48div;
 inline i48div_t div(signed __int48 __x, signed __int48 __y) { return i48div(__x, __y); }
 #endif // __SIZEOF_INT48__
 
+using ::mblen;
+using ::mbtowc;
+using ::wctomb;
+using ::mbstowcs;
+using ::wcstombs;
 } // namespace std
 
 #endif // _EZCXX_CSTDLIB

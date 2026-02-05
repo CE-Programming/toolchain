@@ -121,6 +121,10 @@ int strncasecmp(const char *s1, const char *s2, size_t n)
 
 char* strerror(int errnum);
 
+int strcoll(const char *s1, const char *s2);
+
+size_t strxfrm(char *__restrict dest, const char *__restrict src, size_t n);
+
 __END_DECLS
 
 #endif /* _STRING_H */
