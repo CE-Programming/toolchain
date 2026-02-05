@@ -14,6 +14,10 @@
 #include <__config>
 #include <cstdint>
 
+#ifdef _EZ80
+#include <ez80_builtin.h>
+#endif // _EZ80
+
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
 #  pragma GCC system_header
 #endif
@@ -28,8 +32,16 @@ template <integral _Tp>
     return __val;
   } else if constexpr (sizeof(_Tp) == 2) {
     return __builtin_bswap16(__val);
+  #ifdef _EZ80
+  } else if constexpr (sizeof(_Tp) == 3) {
+    return __ez80_bswap24(__val);
+  #endif // _EZ80
   } else if constexpr (sizeof(_Tp) == 4) {
     return __builtin_bswap32(__val);
+  #ifdef _EZ80
+  } else if constexpr (sizeof(_Tp) == 6) {
+    return __ez80_bswap48(__val);
+  #endif // _EZ80
   } else if constexpr (sizeof(_Tp) == 8) {
     return __builtin_bswap64(__val);
 #  ifndef _LIBCPP_HAS_NO_INT128
