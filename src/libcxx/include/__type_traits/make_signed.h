@@ -32,6 +32,9 @@ using __signed_types =
     __type_list<signed char,
                 signed short,
                 signed int,
+#  ifdef _EZ80
+                signed __int48,
+#  endif // _EZ80
                 signed long,
                 signed long long
 #  if _LIBCPP_HAS_INT128
@@ -56,6 +59,10 @@ template <> struct __make_signed<  signed int,       true> {typedef int       ty
 template <> struct __make_signed<unsigned int,       true> {typedef int       type;};
 template <> struct __make_signed<  signed long,      true> {typedef long      type;};
 template <> struct __make_signed<unsigned long,      true> {typedef long      type;};
+#ifdef _EZ80
+template <> struct __make_signed<  signed __int48,   true> {typedef signed __int48   type;};
+template <> struct __make_signed<unsigned __int48,   true> {typedef signed __int48   type;};
+#endif // _EZ80
 template <> struct __make_signed<  signed long long, true> {typedef long long type;};
 template <> struct __make_signed<unsigned long long, true> {typedef long long type;};
 #  if _LIBCPP_HAS_INT128

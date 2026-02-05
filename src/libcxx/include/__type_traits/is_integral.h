@@ -39,6 +39,10 @@ template <>          struct __libcpp_is_integral<int>                { enum { va
 template <>          struct __libcpp_is_integral<unsigned int>       { enum { value = 1 }; };
 template <>          struct __libcpp_is_integral<long>               { enum { value = 1 }; };
 template <>          struct __libcpp_is_integral<unsigned long>      { enum { value = 1 }; };
+#ifdef _EZ80
+template <>          struct __libcpp_is_integral<signed __int48>     { enum { value = 1 }; };
+template <>          struct __libcpp_is_integral<unsigned __int48>   { enum { value = 1 }; };
+#endif // _EZ80
 template <>          struct __libcpp_is_integral<long long>          { enum { value = 1 }; };
 template <>          struct __libcpp_is_integral<unsigned long long> { enum { value = 1 }; };
 #if _LIBCPP_HAS_INT128

@@ -44,6 +44,41 @@ template <class _Size, size_t = sizeof(_Size) * __CHAR_BIT__>
 struct __murmur2_or_cityhash;
 
 template <class _Size>
+struct __murmur2_or_cityhash<_Size, 24> {
+  _LIBCPP_HIDE_FROM_ABI _LIBCPP_DISABLE_UBSAN_UNSIGNED_INTEGER_CHECK _Size
+  operator()(const void* __key, _Size __len) const {
+    // murmur2
+    const uint_least32_t __m             = UINT32_C(0x5bd1e995);
+    const uint_least32_t __r             = 24;
+    uint_least32_t __h                   = static_cast<uint_least32_t>(__len);
+    const unsigned char* __data = static_cast<const unsigned char*>(__key);
+    for (; __len >= 4; __data += 4, __len -= 4) {
+      uint_least32_t __k = std::__loadword<uint_least32_t>(__data);
+      __k *= __m;
+      __k ^= __k >> __r;
+      __k *= __m;
+      __h *= __m;
+      __h ^= __k;
+    }
+    switch (__len) {
+    case 3:
+      __h ^= static_cast<_Size>(__data[2] << 16);
+      _LIBCPP_FALLTHROUGH();
+    case 2:
+      __h ^= static_cast<_Size>(__data[1] << 8);
+      _LIBCPP_FALLTHROUGH();
+    case 1:
+      __h ^= __data[0];
+      __h *= __m;
+    }
+    __h ^= __h >> 13;
+    __h *= __m;
+    __h ^= __h >> 15;
+    return static_cast<_Size>(__h);
+  }
+};
+
+template <class _Size>
 struct __murmur2_or_cityhash<_Size, 32> {
   _LIBCPP_HIDE_FROM_ABI _LIBCPP_DISABLE_UBSAN_UNSIGNED_INTEGER_CHECK _Size
   operator()(const void* __key, _Size __len) const {
@@ -405,6 +440,7 @@ struct _LIBCPP_TEMPLATE_VIS hash<long> : public __unary_function<long, size_t> {
   _LIBCPP_HIDE_FROM_ABI size_t operator()(long __v) const _NOEXCEPT { return static_cast<size_t>(__v); }
 };
 
+#ifndef _EZ80
 template <>
 struct _LIBCPP_TEMPLATE_VIS hash<unsigned long> : public __unary_function<unsigned long, size_t> {
   _LIBCPP_HIDE_FROM_ABI size_t operator()(unsigned long __v) const _NOEXCEPT {
@@ -413,6 +449,10 @@ struct _LIBCPP_TEMPLATE_VIS hash<unsigned long> : public __unary_function<unsign
     return static_cast<size_t>(__v);
   }
 };
+#else
+template <>
+struct _LIBCPP_TEMPLATE_VIS hash<unsigned long> : public __scalar_hash<unsigned long> {};
+#endif
 
 template <>
 struct _LIBCPP_TEMPLATE_VIS hash<long long> : public __scalar_hash<long long> {};

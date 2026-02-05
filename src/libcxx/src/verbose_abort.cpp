@@ -23,6 +23,8 @@ extern "C" void android_set_abort_message(const char* msg);
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 
+#ifndef _EZ80
+
 _LIBCPP_WEAK void __libcpp_verbose_abort(char const* format, ...) _LIBCPP_VERBOSE_ABORT_NOEXCEPT {
   // Write message to stderr. We do this before formatting into a
   // buffer so that we still get some information out if that fails.
@@ -61,5 +63,7 @@ _LIBCPP_WEAK void __libcpp_verbose_abort(char const* format, ...) _LIBCPP_VERBOS
 
   std::abort();
 }
+
+#endif // _EZ80
 
 _LIBCPP_END_NAMESPACE_STD

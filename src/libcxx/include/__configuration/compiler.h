@@ -33,9 +33,11 @@
 // Warn if a compiler version is used that is not supported anymore
 // LLVM RELEASE Update the minimum compiler versions
 #  if defined(_LIBCPP_CLANG_VER)
+#ifndef _EZ80
 #    if _LIBCPP_CLANG_VER < 1800
 #      warning "Libc++ only supports Clang 18 and later"
 #    endif
+#endif // _EZ80
 #  elif defined(_LIBCPP_APPLE_CLANG_VER)
 #    if _LIBCPP_APPLE_CLANG_VER < 1500
 #      warning "Libc++ only supports AppleClang 15 and later"

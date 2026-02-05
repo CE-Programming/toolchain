@@ -9,7 +9,9 @@
 #include <charconv>
 #include <string.h>
 
+#ifndef _EZ80
 #include "include/from_chars_floating_point.h"
+#endif // _EZ80
 #include "include/to_chars_floating_point.h"
 
 _LIBCPP_BEGIN_NAMESPACE_STD
@@ -33,6 +35,8 @@ _LIBCPP_EXPORTED_FROM_ABI char* __u64toa(uint64_t value, char* buffer) noexcept 
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
 // This implementation is dedicated to the memory of Mary and Thavatchai.
+
+#ifndef _EZ80
 
 to_chars_result to_chars(char* __first, char* __last, float __value) {
   return _Floating_to_chars<_Floating_to_chars_overload::_Plain>(__first, __last, __value, chars_format{}, 0);
@@ -75,6 +79,53 @@ to_chars_result to_chars(char* __first, char* __last, long double __value, chars
       __first, __last, static_cast<double>(__value), __fmt, __precision);
 }
 
+#else // _EZ80
+
+to_chars_result to_chars(char* __first, char* __last, float __value) {
+  return _Floating_to_chars<_Floating_to_chars_overload::_Plain>(__first, __last, __value, chars_format{}, 0);
+}
+
+to_chars_result to_chars(char* __first, char* __last, long double __value) {
+  return _Floating_to_chars<_Floating_to_chars_overload::_Plain>(__first, __last, __value, chars_format{}, 0);
+}
+
+to_chars_result to_chars(char* __first, char* __last, double __value) {
+  return _Floating_to_chars<_Floating_to_chars_overload::_Plain>(
+      __first, __last, static_cast<float>(__value), chars_format{}, 0);
+}
+
+to_chars_result to_chars(char* __first, char* __last, float __value, chars_format __fmt) {
+  return _Floating_to_chars<_Floating_to_chars_overload::_Format_only>(__first, __last, __value, __fmt, 0);
+}
+
+to_chars_result to_chars(char* __first, char* __last, long double __value, chars_format __fmt) {
+  return _Floating_to_chars<_Floating_to_chars_overload::_Format_only>(__first, __last, __value, __fmt, 0);
+}
+
+to_chars_result to_chars(char* __first, char* __last, double __value, chars_format __fmt) {
+  return _Floating_to_chars<_Floating_to_chars_overload::_Format_only>(
+      __first, __last, static_cast<float>(__value), __fmt, 0);
+}
+
+to_chars_result to_chars(char* __first, char* __last, float __value, chars_format __fmt, int __precision) {
+  return _Floating_to_chars<_Floating_to_chars_overload::_Format_precision>(
+      __first, __last, __value, __fmt, __precision);
+}
+
+to_chars_result to_chars(char* __first, char* __last, long double __value, chars_format __fmt, int __precision) {
+  return _Floating_to_chars<_Floating_to_chars_overload::_Format_precision>(
+      __first, __last, __value, __fmt, __precision);
+}
+
+to_chars_result to_chars(char* __first, char* __last, double __value, chars_format __fmt, int __precision) {
+  return _Floating_to_chars<_Floating_to_chars_overload::_Format_precision>(
+      __first, __last, static_cast<float>(__value), __fmt, __precision);
+}
+
+#endif // _EZ80
+
+#ifndef _EZ80
+
 template <class _Fp>
 __from_chars_result<_Fp> __from_chars_floating_point(
     _LIBCPP_NOESCAPE const char* __first, _LIBCPP_NOESCAPE const char* __last, chars_format __fmt) {
@@ -86,4 +137,7 @@ template __from_chars_result<float> __from_chars_floating_point(
 
 template __from_chars_result<double> __from_chars_floating_point(
     _LIBCPP_NOESCAPE const char* __first, _LIBCPP_NOESCAPE const char* __last, chars_format __fmt);
+
+#endif // _EZ80
+
 _LIBCPP_END_NAMESPACE_STD

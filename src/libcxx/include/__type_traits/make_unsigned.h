@@ -34,6 +34,9 @@ using __unsigned_types =
     __type_list<unsigned char,
                 unsigned short,
                 unsigned int,
+#  ifdef _EZ80
+                unsigned __int48,
+#  endif // _EZ80
                 unsigned long,
                 unsigned long long
 #  if _LIBCPP_HAS_INT128
@@ -58,6 +61,10 @@ template <> struct __make_unsigned<  signed int,       true> {typedef unsigned i
 template <> struct __make_unsigned<unsigned int,       true> {typedef unsigned int       type;};
 template <> struct __make_unsigned<  signed long,      true> {typedef unsigned long      type;};
 template <> struct __make_unsigned<unsigned long,      true> {typedef unsigned long      type;};
+#ifdef _EZ80
+template <> struct __make_unsigned<  signed __int48,   true> {typedef unsigned __int48   type;};
+template <> struct __make_unsigned<unsigned __int48,   true> {typedef unsigned __int48   type;};
+#endif // _EZ80
 template <> struct __make_unsigned<  signed long long, true> {typedef unsigned long long type;};
 template <> struct __make_unsigned<unsigned long long, true> {typedef unsigned long long type;};
 #  if _LIBCPP_HAS_INT128
