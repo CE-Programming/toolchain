@@ -171,7 +171,51 @@ file_data = file_data.replace(
     b"\tld\tb, 7\n\trrca\n\tand\ta, 128\n"
 )
 
+# __bshru
+
+file_data = file_data.replace(
+    b"\tld\tb, 1\n\tcall\t__bshru\n",
+    b"\tld\tb, 1\n\tsrl\ta\n"
+)
+
+file_data = file_data.replace(
+    b"\tld\tb, 2\n\tcall\t__bshru\n",
+    b"\tld\tb, 2\n\tsrl\ta\n\tsrl\ta\n"
+)
+
+file_data = file_data.replace(
+    b"\tld\tb, 6\n\tcall\t__bshru\n",
+    b"\tld\tb, 6\n\trlca\n\trlca\n\tand\ta, 3\n"
+)
+
+file_data = file_data.replace(
+    b"\tld\tb, 7\n\tcall\t__bshru\n",
+    b"\tld\tb, 7\n\trlca\n\tand\ta, 1\n"
+)
+
+# __bshrs
+
+file_data = file_data.replace(
+    b"\tld\tb, 1\n\tcall\t__bshrs\n",
+    b"\tld\tb, 1\n\tsra\ta\n"
+)
+
+file_data = file_data.replace(
+    b"\tld\tb, 2\n\tcall\t__bshrs\n",
+    b"\tld\tb, 2\n\tsra\ta\n\tsra\ta\n"
+)
+
+file_data = file_data.replace(
+    b"\tld\tb, 7\n\tcall\t__bshrs\n",
+    b"\tld\tb, 7\n\trlca\n\tsbc\ta, a\n"
+)
+
 # __iand
+
+file_data = file_data.replace(
+    b"\tld\tbc, 65535\n\tcall\t__iand\n",
+    b"\tld\tbc, 65535\n\tinc\thl\n\tdec.s\thl\n"
+)
 
 file_data = file_data.replace(
     b"\tld\tbc, 255\n\tcall\t__iand\n",
