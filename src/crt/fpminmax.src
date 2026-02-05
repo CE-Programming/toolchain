@@ -13,7 +13,7 @@ __fpmin: ; CHECK: sameignzerosign(bitcast(float, pair8_24_t, { out.BC, out.A }),
 	call	__fpcmpo
 	ret	p
 	jr	nc, __fpmax.unordered
-.return:
+__fpmin.return:
 	push	hl
 	pop	bc
 	ld	a, e
@@ -25,7 +25,7 @@ __fpmax: ; CHECK: sameignzerosign(bitcast(float, pair8_24_t, { out.BC, out.A }),
 	call	__fpcmpo
 	ret	c
 	jp	p, __fpmin.return
-.unordered:
+__fpmax.unordered:
 	; Compare the low 31 bits (ignoring sign) and return the smaller one, which is non-NaN if either one is
 	sbc	hl, bc
 	ccf
@@ -34,13 +34,13 @@ __fpmax: ; CHECK: sameignzerosign(bitcast(float, pair8_24_t, { out.BC, out.A }),
 	ccf
 	adc	a, e
 	; Carry into bit 31 is equivalent to carry XOR overflow
-	jr	nc, .nocarry
+	jr	nc, __fpmax.nocarry
 	ret	po
-;	jq	.return
+;	jq	__fpmax.return
 	db	$30	; jr nc, *
-.nocarry:
+__fpmax.nocarry:
 	ret	pe
-.return:
+__fpmax.return:
 	jr	__fpmin.return
 
 	.extern	__fpcmpo

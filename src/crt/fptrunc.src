@@ -90,9 +90,9 @@ __fptrunc: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), truncf(b
 	ld	h, a
 	rla
 	sub	a, 07Fh
-	jr	c, .return.zero
+	jr	c, __fptrunc.return.zero
 	sub	a, 24
-	jr	nc, .return
+	jr	nc, __fptrunc.return
 	ld	l, c
 	cpl
 	ld	c, a
@@ -104,12 +104,12 @@ __fptrunc: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), truncf(b
 	call	__iand
 	ex	(sp), hl
 	pop	bc
-.return:
+__fptrunc.return:
 	ld	a, h
 	pop	hl
 	ret
 
-.return.zero:
+__fptrunc.return.zero:
 	ld	bc, 0
 	ld	a, h
 	and	a, 080h

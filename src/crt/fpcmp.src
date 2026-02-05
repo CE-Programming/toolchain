@@ -157,36 +157,36 @@ __fpcmpo: ; CHECK: out.flags.Z == (bitcast(float, pair8_24_t, { in.HL, in.E }) =
 ; s = euhl < aubc = !(euhl >= aubc)
 __fpcmp: ; CHECK: (isunordered(bitcast(float, pair8_24_t, { in.HL, in.E }), bitcast(float, pair8_24_t, { in.BC, in.A })) || (out.flags.Z == (bitcast(float, pair8_24_t, { in.HL, in.E }) == bitcast(float, pair8_24_t, { in.BC, in.A })) && out.flags.S == (bitcast(float, pair8_24_t, { in.HL, in.E }) < bitcast(float, pair8_24_t, { in.BC, in.A })))) && out.A == in.A && out.BC == in.BC && out.DE == in.DE && out.HL == in.HL && out.IX == in.IX && out.IY == in.IY
 	sub	a, e
-	jr	z, .maybeEqual
+	jr	z, __fpcmp.maybeEqual
 	cp	a, 080h
-	jr	z, .maybeBothZero
+	jr	z, __fpcmp.maybeBothZero
 	; Compare sign and upper 7 exponent bits, which are not equal
 	add	a, e
 	inc	e
 	dec	e	; S = sign(euhl), Z = 0 because E > A
 	ret	c
-.notBothZero:
+__fpcmp.notBothZero:
 	cp	a, 080h	; S = !sign(aubc)
 	ret	nz
 	cp	a, e ; S = !sign(aubc), Z = 0 because A == 080h and A > E and A - E != 080h
 	ret
 
-.maybeBothZero:
+__fpcmp.maybeBothZero:
 	add	a, e
 	add	a, a
 	rra
-	jr	nz, .notBothZero
+	jr	nz, __fpcmp.notBothZero
 	adc	hl, bc
-	jr	c, .notBothZeroFixup
+	jr	c, __fpcmp.notBothZeroFixup
 	ret	z	; Both inputs are zero, return Z=1, S=0
-.notBothZeroFixup:
+__fpcmp.notBothZeroFixup:
 	or	a, a
 	sbc	hl, bc
 	dec	a	; S = !sign(aubc), Z = 0 because (A & 07Fh) == 0
 	cpl	; Restore A, preserve S and Z
 	ret
 
-.maybeEqual:
+__fpcmp.maybeEqual:
 	ld	a, e
 	sbc	hl, bc
 	add	hl, bc

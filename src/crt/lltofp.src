@@ -28,7 +28,7 @@ __ulltofp: ; CHECK: same(bitcast(float, pair8_24_t, { out.HL, out.E }), (float)b
 	push	af
 	push	bc
 	xor	a, a
-.enter:
+__ulltofp.enter:
 	inc	b
 	djnz	.upper
 	inc	c

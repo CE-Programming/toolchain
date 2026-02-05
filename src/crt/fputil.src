@@ -34,11 +34,11 @@ __fppop2:
 
 __fppack.normalize:
 	dec	b
-	call	nz, .entry
+	call	nz, __fppack.normalize.entry
 __fppack:
 	add	hl, de
-	jr	nc, .normalize
-.normalized:
+	jr	nc, __fppack.normalize
+__fppack.normalized:
 	rrc	l
 	rlc	l
 	adc	a, 07Fh
@@ -52,7 +52,7 @@ __fppack:
 	add	hl, de
 	ret
 
-.normalize.entry:
+__fppack.normalize.entry:
 	add	a, a
 	adc	hl, hl
 	ret	m
@@ -82,11 +82,11 @@ __fppack:
 
 __fppack2.normalize:
 	dec	b
-	call	nz, .loop
+	call	nz, __fppack2.normalize.loop
 __fppack2:
 	add	hl, de
-	jr	nc, .normalize
-.normalized:
+	jr	nc, __fppack2.normalize
+__fppack2.normalized:
 	ld	a, b
 	add	ix, de
 	jr	nc, .rounded
@@ -116,11 +116,11 @@ __fppack2:
 	ex	de, hl
 	ret
 
-.normalize.loop:
+__fppack2.normalize.loop:
 	add	ix, ix
 	adc	hl, hl
 	ret	m
-	djnz	.normalize.loop
+	djnz	__fppack2.normalize.loop
 	add	hl, de
 	ret
 
