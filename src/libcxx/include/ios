@@ -681,12 +681,24 @@ inline _LIBCPP_HIDE_FROM_ABI locale basic_ios<_CharT, _Traits>::imbue(const loca
 
 template <class _CharT, class _Traits>
 inline _LIBCPP_HIDE_FROM_ABI char basic_ios<_CharT, _Traits>::narrow(char_type __c, char __dfault) const {
+#ifndef _EZ80
   return std::use_facet<ctype<char_type> >(getloc()).narrow(__c, __dfault);
+#else // _EZ80
+  char __ret = static_cast<char>(__c);
+  if (static_cast<char_type>(__ret) == __c) {
+    return __ret;
+  }
+  return __dfault;
+#endif // _EZ80
 }
 
 template <class _CharT, class _Traits>
 inline _LIBCPP_HIDE_FROM_ABI _CharT basic_ios<_CharT, _Traits>::widen(char __c) const {
+#ifndef _EZ80
   return std::use_facet<ctype<char_type> >(getloc()).widen(__c);
+#else // _EZ80
+  return static_cast<char_type>(__c);
+#endif // _EZ80
 }
 
 template <class _CharT, class _Traits>
