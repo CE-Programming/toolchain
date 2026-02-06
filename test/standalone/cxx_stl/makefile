@@ -12,6 +12,7 @@ CFLAGS = -Wall -Wextra -Wno-deprecated-declarations -std=c17 -Oz
 CXXFLAGS = -Wall -Wextra -Wno-deprecated-declarations -std=c++20 -Oz
 
 PREFER_OS_LIBC = NO
+HAS_PRINTF = YES
 
 # ----------------------------
 
