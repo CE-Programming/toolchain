@@ -1,0 +1,76 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__i48mulhu
+	.type	__i48mulhu, @function
+
+; UDE:UHL = ((uint96_t)UDE:UHL * (uint96_t)UIY:UBC) >> 48
+__i48mulhu:
+; CC: 93 bytes
+;  minimum:  92F +  42R +  42W + 2
+;  maximum:  94F +  42R +  42W + 4
+; including __i48mulu:
+;  minimum: 900F + 246R + 182W + 342
+;  maximum: 902F + 246R + 182W + 344
+	push	ix
+	push	iy
+	push	bc
+	ld	ix, 0
+	lea	iy, ix + 0
+	add	ix, sp
+	push	de
+	push	hl
+
+	; x_lo * y_lo
+	lea	de, iy + 0
+	call	__i48mulu
+	push	de		; UHL * UBC (low carry)
+
+	; x_hi * y_lo
+	lea	de, iy + 0
+	ld	hl, (ix - 3)
+	call	__i48mulu
+	push	de		; hi24
+	push	hl		; lo24
+
+	; x_lo * y_hi
+	lea	de, iy + 0
+	ld	bc, (ix + 3)
+	ld	hl, (ix - 6)
+	call	__i48mulu
+	pop	bc		; lo24
+	add	hl, bc
+	ex	de, hl
+	pop	bc		; hi24
+	adc	hl, bc
+
+	pop	bc		; UHL * UBC (low carry)
+	push	af		; upper carry
+	ex	de, hl
+	add	hl, bc
+	jr	nc, .L.no_low_carry
+	inc	de
+.L.no_low_carry:
+	push	de		; high carry
+
+	; x_hi * y_hi
+	lea	de, iy + 0
+	ld	bc, (ix + 3)
+	ld	hl, (ix - 3)
+	call	__i48mulu
+	pop	bc		; high carry
+	pop	af		; upper carry
+	jr	nc, .L.no_upper_carry
+	inc	de
+.L.no_upper_carry:
+	add	hl, bc
+	ld	sp, ix
+	pop	bc
+	pop	iy
+	pop	ix
+	ret	nc		; no high carry
+	inc	de
+	ret
+
+	.extern	__i48mulu

@@ -1,0 +1,124 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__llmulhu
+	.type	__llmulhu, @function
+
+; BC:UDE:UHL = ((uint128_t)BC:UDE:UHL * (uint128_t)(SP64)) >> 64
+__llmulhu:
+; modified version of __llmulu that uses exx to obtain the upper 64 bits of the result.
+; __llmulhu runs slightly faster than two calls to __llmulu, and is much faster
+; than the naive implementation of __llmulhu that calls __llmulu four times.
+	push	af
+	ld	a, i
+	di
+	push	af
+
+	push	ix
+	push	iy
+
+	ld	ix, 0
+	lea	iy, ix - 6
+	add	iy, sp		; cf=1
+
+	push	de
+	push	hl
+	ld	l, c
+	ld	h, b
+	ld.s	sp, hl
+
+	lea	hl, iy + 21
+	ld	b, 8
+.L.push_loop:
+	push	af
+	ld	a, (hl)
+	inc	hl
+	or	a, a		; cf=0
+	djnz	.L.push_loop
+
+	sbc	hl, hl
+	ld	e, l
+	ld	d, h
+
+	exx
+	sbc	hl, hl
+	ex	de, hl
+	sbc	hl, hl
+	ld	c, l
+	ld	b, l
+	exx
+
+.L.byte_loop:
+	scf
+	adc	a, a
+
+.L.bit_loop:
+	ex	af, af'
+
+	add	ix, ix
+	adc	hl, hl
+	ex	de, hl
+	adc.s	hl, hl
+	ex	de, hl
+
+	exx
+	adc	hl, hl
+	ex	de, hl
+	adc	hl, hl
+	ex	de, hl
+	rl	c
+	rl	b
+	exx
+
+	ex	af, af'
+
+	jr	nc, .L.add_end
+	ld	bc, (iy)
+	add	ix, bc
+	ld	bc, (iy + 3)
+	adc	hl, bc
+	ex	de, hl
+	adc.s	hl, sp
+	ex	de, hl
+	jr	nc, .L.add_end
+	exx
+	inc	hl
+	add	hl, de
+	or	a, a
+	sbc	hl, de
+	jr	nz, .L.add_end_exx
+	inc	de
+	sbc	hl, de
+	add	hl, de
+	jr	nz, .L.add_end_exx
+	inc	bc
+.L.add_end_exx:
+	exx
+.L.add_end:
+
+	add	a, a
+	jr	nz, .L.bit_loop
+
+	pop	af
+	jr 	nc, .L.byte_loop
+
+	; ld	b, d
+	; ld	c, e
+	; ex	de, hl
+	; lea	hl, ix + 0
+	; BC:UDE:UHL = lower 64 bits
+	; shadow BC:UDE:UHL = upper 64 bits
+	exx
+
+	pop	af		; reset SP
+	pop	af		; reset SP
+	pop	iy
+	pop	ix
+
+	pop	af
+	jp	po, .L.skipEI
+	ei
+.L.skipEI:
+	pop	af
+	ret
