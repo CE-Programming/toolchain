@@ -135,6 +135,20 @@
 #      include <__locale_dir/locale_base_api/openbsd.h>
 #    elif defined(__wasi__) || _LIBCPP_HAS_MUSL_LIBC
 #      include <__locale_dir/locale_base_api/musl.h>
+#    elif defined(_EZ80)
+#      include <wchar.h>
+#      include <locale.h>
+// #      include <__locale_dir/support/no_locale/characters.h>
+// #      include <__locale_dir/support/no_locale/strtonum.h>
+// #      include <__support/xlocale/__nop_locale_mgmt.h>
+#      include <__support/xlocale/__posix_l_fallback.h>
+#      include <__support/xlocale/__strtonum_fallback.h>
+static inline size_t wcsnrtombs(char* __dest, const wchar_t** __src, size_t __nwc, size_t __len, mbstate_t* __ps) {
+  return 0;
+}
+static inline size_t mbsnrtowcs(wchar_t* __dest, const char** __src, size_t __nms, size_t __len, mbstate_t* __ps) {
+  return 0;
+}
 #    endif
 
 #    include <__locale_dir/locale_base_api/bsd_locale_fallbacks.h>
