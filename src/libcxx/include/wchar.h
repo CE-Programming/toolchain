@@ -108,10 +108,12 @@ size_t wcsrtombs(char* restrict dst, const wchar_t** restrict src, size_t len,
 #  include <__config>
 #  include <stddef.h>
 
+#ifndef _EZ80
 #  if defined(_LIBCPP_HAS_NO_WIDE_CHARACTERS)
 #    error                                                                                                             \
         "The <wchar.h> header is not supported since libc++ has been configured with LIBCXX_ENABLE_WIDE_CHARACTERS disabled"
 #  endif
+#endif // _EZ80
 
 #  if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
 #    pragma GCC system_header
