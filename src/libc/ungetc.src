@@ -1,0 +1,12 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.weak	_ungetc
+	.type	_ungetc, @function
+
+_ungetc:
+	; return EOF
+	scf
+	sbc	hl, hl
+	ret
