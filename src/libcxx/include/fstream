@@ -418,7 +418,11 @@ basic_filebuf<_CharT, _Traits>::basic_filebuf()
     __cv_            = &std::use_facet<codecvt<char_type, char, state_type> >(this->getloc());
     __always_noconv_ = __cv_->always_noconv();
   }
+  #ifndef _EZ80
   setbuf(nullptr, 4096);
+  #else // _EZ80
+  setbuf(nullptr, 256);
+  #endif // _EZ80
 }
 
 template <class _CharT, class _Traits>
