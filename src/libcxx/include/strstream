@@ -189,7 +189,11 @@ private:
   static const __mode_type __constant      = 0x02;
   static const __mode_type __dynamic       = 0x04;
   static const __mode_type __frozen        = 0x08;
+  #ifndef _EZ80
   static const streamsize __default_alsize = 4096;
+  #else // _EZ80
+  static const streamsize __default_alsize = 256;
+  #endif // _EZ80
 
   __mode_type __strmode_;
   streamsize __alsize_;
