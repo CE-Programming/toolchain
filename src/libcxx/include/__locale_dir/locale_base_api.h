@@ -28,10 +28,9 @@
 #elif defined(__APPLE__) || defined(__FreeBSD__)
 #  include <xlocale.h>
 #elif defined(_EZ80)
+#  include <locale.h>
 #  include <__support/xlocale/__posix_l_fallback.h>
 #  include <__support/xlocale/__strtonum_fallback.h>
-#  include <__locale_dir/locale_base_api/bsd_locale_defaults.h>
-#  include <__locale_dir/locale_base_api/bsd_locale_fallbacks.h>
 #endif
 
 #if !defined(_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER)
