@@ -10,6 +10,7 @@
 #include <inttypes.h>
 #include <iso646.h>
 #include <limits.h>
+#include <locale.h>
 #include <math.h>
 #include <setjmp.h>
 #include <signal.h>
@@ -26,6 +27,7 @@
 #include <string.h>
 #include <tgmath.h>
 #include <time.h>
+#include <uchar.h>
 #include <wchar.h>
 #include <wctype.h>
 
