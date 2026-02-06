@@ -794,7 +794,11 @@ inline _LIBCPP_HIDE_FROM_ABI double __do_strtod<double>(const char* __a, char** 
 
 template <>
 inline _LIBCPP_HIDE_FROM_ABI long double __do_strtod<long double>(const char* __a, char** __p2) {
+#ifndef _EZ80
   return strtold_l(__a, __p2, _LIBCPP_GET_C_LOCALE);
+#else // _EZ80
+  return static_cast<long double>(strtod_l(__a, __p2, _LIBCPP_GET_C_LOCALE));
+#endif // _EZ80
 }
 
 template <class _Tp>
