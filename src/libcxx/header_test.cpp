@@ -171,10 +171,11 @@
 #include <variant>
 #include <vector>
 #include <version>
-#if !defined(_LIBCPP_HAS_NO_WIDE_CHARACTERS)
+// We can still provide some of the functions in <wchar.h> without issues
+#if 1 || !defined(_LIBCPP_HAS_NO_WIDE_CHARACTERS)
 #  include <wchar.h>
 #endif
-#if !defined(_LIBCPP_HAS_NO_WIDE_CHARACTERS)
+#if 1 || !defined(_LIBCPP_HAS_NO_WIDE_CHARACTERS)
 #  include <wctype.h>
 #endif
 
