@@ -61,6 +61,17 @@ OBJECTS += build/verbose_abort.cpp.o
 
 OBJECTS += build/new.cpp.o
 
+# LIBCXX_ENABLE_LOCALIZATION
+
+OBJECTS += build/fstream.cpp.o
+OBJECTS += build/ios.cpp.o
+OBJECTS += build/ios.instantiations.cpp.o
+OBJECTS += build/iostream.cpp.o
+OBJECTS += build/locale.cpp.o
+OBJECTS += build/ostream.cpp.o
+OBJECTS += build/regex.cpp.o
+OBJECTS += build/strstream.cpp.o
+
 CXXRT_LIB := build/libcxxrt.a
 
 .SECONDARY:

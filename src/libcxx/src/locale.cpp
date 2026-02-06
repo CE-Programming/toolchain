@@ -34,7 +34,7 @@
 #  define _CTYPE_DISABLE_MACROS
 #endif
 
-#if !defined(_LIBCPP_MSVCRT) && !defined(__MINGW32__) && !defined(__BIONIC__) && !defined(__NuttX__)
+#if !defined(_LIBCPP_MSVCRT) && !defined(__MINGW32__) && !defined(__BIONIC__) && !defined(__NuttX__) && !defined(_EZ80)
 #  include <langinfo.h>
 #endif
 
@@ -3957,7 +3957,7 @@ static bool is_non_breaking_space(const char* ptr) {
 }
 #endif // _LIBCPP_HAS_NO_WIDE_CHARACTERS
 
-static bool checked_string_to_char_convert(char& dest, const char* ptr, locale_t __loc) {
+static bool checked_string_to_char_convert(char& dest, const char* ptr, __attribute__((__unused__)) locale_t __loc) {
   if (*ptr == '\0')
     return false;
   if (!ptr[1]) {
