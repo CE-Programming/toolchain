@@ -28,14 +28,6 @@
 #elif defined(__APPLE__) || defined(__FreeBSD__)
 #  include <xlocale.h>
 #elif defined(_EZ80)
-#include <wchar.h>
-static inline size_t wcsnrtombs(char* __dest, const wchar_t** __src, size_t __nwc, size_t __len, mbstate_t* __ps) {
-  return 0;
-}
-static inline size_t mbsnrtowcs(wchar_t* __dest, const char** __src, size_t __nms, size_t __len, mbstate_t* __ps) {
-  return 0;
-}
-#  include <__support/xlocale/__nop_locale_mgmt.h>
 #  include <__support/xlocale/__posix_l_fallback.h>
 #  include <__support/xlocale/__strtonum_fallback.h>
 #  include <__locale_dir/locale_base_api/bsd_locale_defaults.h>
