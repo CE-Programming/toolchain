@@ -20,7 +20,9 @@ void __abort_message(const char *message) {
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 
-void __libcpp_verbose_abort(char const* format, ...) {
+#if 0
+// Assembly version is used instead so we can avoid calling vsprintf
+void __libcpp_verbose_abort(const char *format, ...) {
     va_list list;
     va_start(list, format);
     std::vsprintf(dbgerr, format, list);
@@ -28,5 +30,6 @@ void __libcpp_verbose_abort(char const* format, ...) {
 
     abort();
 }
+#endif
 
 _LIBCPP_END_NAMESPACE_STD

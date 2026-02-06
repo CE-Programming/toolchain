@@ -1,0 +1,26 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__ZNSt3__122__libcpp_verbose_abortEPKcz
+	.type	__ZNSt3__122__libcpp_verbose_abortEPKcz,@function
+
+; void __libcpp_verbose_abort(const char *format, ...)
+__ZNSt3__122__libcpp_verbose_abortEPKcz:
+	; sp + 6 : args...
+	; sp + 3 : format
+	; sp + 0 : ret
+	ld	hl, $FC0000	; dbgerr
+	ex	(sp), hl	; destroys previous return address
+
+	; _boot_sprintf will return to _abort
+	ld	hl, _abort
+	push	hl
+	; sp + 9 : args...
+	; sp + 6 : format
+	; sp + 3 : dbgerr
+	; sp + 0 : _abort
+	jp	_boot_sprintf
+
+	.extern	_abort
+	.extern	_boot_sprintf
