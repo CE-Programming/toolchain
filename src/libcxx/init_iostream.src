@@ -1,0 +1,22 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	_init_iostream
+	.type	_init_iostream,@function
+
+___fini_iostream:
+	ret
+
+_init_iostream:
+	push	hl
+	call	__ZNSt3__18ios_base4InitC2Ev
+	pop	hl
+	ld	hl, ___fini_iostream
+	push	hl
+	call	_atexit
+	pop	hl
+	ret
+
+ 	.extern	_atexit
+ 	.extern	__ZNSt3__18ios_base4InitC2Ev
