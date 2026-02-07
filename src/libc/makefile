@@ -16,6 +16,8 @@
 
 include $(CURDIR)/../common.mk
 
+EZCFLAGS += -DDEBUG_FOOBAR
+
 OBJECTS =
 OBJECTS += $(patsubst %.c,build/%.c.o,$(wildcard *.c))
 OBJECTS += $(patsubst %.cpp,build/%.cpp.o,$(wildcard *.cpp))
