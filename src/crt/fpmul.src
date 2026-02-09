@@ -76,7 +76,7 @@ __fpmul: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	inc	d
 	jr	z, .L.nonfinite.2
 	ld	a, d
-	ld	d, b; 0
+	ld	d, b		; ld d, 0
 	rlc	e
 	ccf
 	rr	e
@@ -133,26 +133,28 @@ __fpmul: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	ld	bc, (ix + 12)
 	mlt	bc
 	add	hl, bc
+
 	ld	(ix + 2), hl
-	ld	hl, (ix + 3)
-	inc	hl
-	dec.s	hl
-	ld	c, (ix + 11)
-	ld	b, (ix + 15)
-	mlt	bc
+	ld	b, (ix + 4)
+	ld	c, h
+	ld	l, (ix + 11)
+	ld	h, (ix + 15)
+	mlt	hl		; clears UHL
 	add	hl, bc
+
 	ld	c, (ix + 12)
 	ld	b, (ix + 14)
 	mlt	bc
 	add	hl, bc
+
 	ld	(ix + 3), hl
-	ld	hl, (ix + 4)
-	inc	hl
-	dec.s	hl
-	ld	c, (ix + 12)
-	ld	b, (ix + 15)
-	mlt	bc
+	ld	b, (ix + 5)
+	ld	c, h
+	ld	l, (ix + 12)
+	ld	h, (ix + 15)
+	mlt	hl		; clears UHL
 	add	hl, bc
+
 	cp	a, d
 	jr	nz, .L.normalized
 	ld	bc, (ix + 2)
