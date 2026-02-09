@@ -30,7 +30,8 @@ __fpsub: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 ; aubc = aubc + euhl
 __fpadd: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(float, pair8_24_t, { in.BC, in.A }) + bitcast(float, pair8_24_t, { in.HL, in.E })) && out.DE == in.DE && out.HL == in.HL && out.IX == in.IX && out.IY == in.IY
 	push	de
-.enter:
+	.local	__fpadd.enter
+__fpadd.enter:
 	push	hl
 	push	bc
 	xor	a, e
