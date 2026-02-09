@@ -45,44 +45,44 @@ __fpadd.enter:
 	ld	e, a
 	call	__fppop2
 	inc	e
-	jr	z, .nonfinite1
+	jr	z, .L.nonfinite1
 	inc	d
-	jr	z, .return2
+	jr	z, .L.return2
 	ld	a, d
 	sub	a, e
-	jr	z, .rounded
-	jr	nc, .sorted
+	jr	z, .L.rounded
+	jr	nc, .L.sorted
 	inc	c
 	ex	(sp), hl
 	ld	a, e
 	sub	a, d
 	ld	d, e
-.sorted:
+.L.sorted:
 	cp	a, 26
-	jr	nc, .largest
+	jr	nc, .L.largest
 	; Extend to 32 bits and shift left by ~(amount - 1) & 7
 	dec	a
 	ld	b, a
 	xor	a, a
 	srl	b
-	jr	c, .noshift1
+	jr	c, .L.noshift1
 	add	hl, hl
 	rla
-.noshift1:
+.L.noshift1:
 	srl	b
-	jr	c, .noshift2
+	jr	c, .L.noshift2
 	.rept	2
 	add	hl, hl
 	rla
 	.endr
-.noshift2:
+.L.noshift2:
 	srl	b
-	jr	c, .noshift4
+	jr	c, .L.noshift4
 	.rept	4
 	add	hl, hl
 	rla
 	.endr
-.noshift4:
+.L.noshift4:
 	; Shift right by (amount + 7) / 8 * 8, truncating to 24 bits
 	; The last 2 bits shifted out are in A, while any remaining non-zero
 	; bits are aggregated into the lower bits of A
@@ -91,81 +91,81 @@ __fpadd.enter:
 	push	hl
 	inc	sp
 	ld	a, l
-	jr	nz, .shift16
+	jr	nz, .L.shift16
 	; Shift by 8 for amounts between 1 and 8
 	pop	hl
 	inc	sp
-	jr	.rounded
+	jr	.L.rounded
 
-.shift16:
+.L.shift16:
 	; Shift by 16 for amounts between 9 and 16
 	ld	e, h
 	inc	sp
 	pop	hl
 	dec	b
-	jr	z, .flush
-.shift8more:
+	jr	z, .L.flush
+.L.shift8more:
 	; Shift by 24 for amounts between 17 and 24
 	or	a, e
 	ld	e, l
 	ld	l, h
 	ld	h, 0
 	; Shift by 32 for amount of 25
-	djnz	.shift8more
-.flush:
+	djnz	.L.shift8more
+.L.flush:
 	sub	a, 1
 	sbc	a, a
 	inc	a
 	or	a, e
-.rounded:
+.L.rounded:
 	ld	b, d
 	pop	de
 	ex	(sp), hl
 	add.s	hl, hl
-	jr	nc, .add
+	jr	nc, .L.add
 	ld	l, h
 	add	hl, bc
 	ld	c, l
 	pop	hl
-	djnz	.subtract	;always taken
+	djnz	.L.subtract	;always taken
 
-.nonfinite1:
+.L.nonfinite1:
 	inc	d
-	jr	z, .nonfinite
-.return1:
+	jr	z, .L.nonfinite
+.L.return1:
 	pop	bc
-.return1.pop1:
+.L.return1.pop1:
 	pop	de
 	ld	a, d
-.return1.pop2:
+.L.return1.pop2:
 	xor	a, e
 	pop	bc
-.return:
+.L.return:
 	pop	hl
 	pop	de
 	ret
 
-.largest:
+.L.largest:
 	ld	a, d
 	cp	a, e
-	jr	z, .return1
-.return2:
+	jr	z, .L.return1
+.L.return2:
 	pop	bc
-.return2.pop1:
+.L.return2.pop1:
 	pop	de
-.return2.pop2:
+.L.return2.pop2:
 	ld	a, e
 	pop	bc
 	pop	bc
 	push	bc
-	jr	.return
+	jr	.L.return
 
-.add:
+.L.add:
 	ld	c, h
 	pop	hl
 	add	hl, de
 	dec	b
-	jr	nc, .done
+	jr	nc, .L.done
 	ex	de, hl
 	sbc	hl, hl
 	add	hl, sp
@@ -175,25 +175,25 @@ __fpadd.enter:
 	rr	h
 	rr	l
 	rra
-	jr	nc, .flushed2
+	jr	nc, .L.flushed2
 	or	a, 1
-.flushed2:
+.L.flushed2:
 	inc	b
 	inc	b
-	jr	z, .infinite
-	djnz	.done	;always taken
+	jr	z, .L.infinite
+	djnz	.L.done	;always taken
 
-.borrow:
+.L.borrow:
 	inc	c
 	add	hl, de
-.subtract:
+.L.subtract:
 	ex	de, hl
 	neg
 	sbc	hl, de
-	jr	c, .borrow
-	jr	nz, .done
+	jr	c, .L.borrow
+	jr	nz, .L.done
 	or	a, a
-.done:
+.L.done:
 	ld	de, 0800000h
 	call	nz, __fppack
 	pop	bc
@@ -202,20 +202,20 @@ __fpadd.enter:
 	pop	de
 	ret
 
-.nonfinite:
+.L.nonfinite:
 	xor	a, a
 	sbc	hl, bc
-	jr	nz, .return1
+	jr	nz, .L.return1
 	pop	hl
 	sbc	hl, bc
-	jr	nz, .return2.pop1
+	jr	nz, .L.return2.pop1
 	pop	de
 	bit	7, d
-	jr	z, .return1.pop2
+	jr	z, .L.return1.pop2
 	ld	bc, 0C00000h
-.infinite:
+.L.infinite:
 	ld	a, c
-	ld	c, b ;0, also note BCU=080h from __fppop1 or 0C0h from .nonfinite
+	ld	c, b ;0, also note BCU=080h from __fppop1 or 0C0h from .L.nonfinite
 	rrca
 	or	a, 07Fh
 	pop	hl

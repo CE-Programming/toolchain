@@ -37,12 +37,12 @@ __ltofp.enter:
 	ld	c, a
 	ld	a, b
 	push	de
-	jr	nc, .positive
+	jr	nc, .L.positive
 	add	hl, de
 	ex	de, hl
 	neg
 	sbc	hl, de
-.positive:
+.L.positive:
 	ld	de, 0800000h
 	ld	b, 07Fh + 31
 	call	__fppack

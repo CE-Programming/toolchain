@@ -21,11 +21,11 @@ __fpfloor.roundup:
 	adc	hl, hl
 	ld	h, a
 	rla
-	jr	z, .mantissa.zero
+	jr	z, .L.mantissa.zero
 	sub	a, 07Fh
-	jr	c, .return.one
+	jr	c, .L.return.one
 	sub	a, 24
-	jr	nc, .return
+	jr	nc, .L.return
 	push	bc
 	cpl
 	ld	c, a
@@ -42,16 +42,16 @@ __fpfloor.roundup:
 	push	hl
 	pop	bc
 	ld	h, a
-.return:
+.L.return:
 	ld	a, h
 	pop	hl
 	ret
 
-.mantissa.zero:
+.L.mantissa.zero:
 	dec	a
 	cp	a, 07Fh - 1
-	jr	nc, .return
-.return.one:
+	jr	nc, .L.return
+.L.return.one:
 	ld	bc, 0800000h
 	ld	a, h
 	or	a, 07Fh >> 1
