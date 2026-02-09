@@ -26,7 +26,8 @@ __ultofp: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)bi
 
 __ltofp: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)bitcast(int32_t, pair8_24_t, { in.BC, in.A })) && out.DE == in.DE && out.HL == in.HL && out.IX == in.IX && out.IY == in.IY
 	push	af
-.enter:
+	.local	__ltofp.enter
+__ltofp.enter:
 	rlca
 	inc	sp
 	push	bc
