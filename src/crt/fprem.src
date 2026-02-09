@@ -13,7 +13,7 @@ __fprem: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), fmodf(bitc
 	set	7, a	; aubc = -abs(AUBC)
 	set	7, e	; euhl = -abs(EUHL)
 	call	__fpcmpo	; abs(AUBC) <=> abs(EUHL)
-	jp	m, .notge	; !(abs(AUBC) >= abs(EUHL))
+	jp	m, .L.notge	; !(abs(AUBC) >= abs(EUHL))
 	push	hl
 	push	bc
 	call	__fppop1
@@ -32,7 +32,7 @@ __fprem: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), fmodf(bitc
 	ex	de, hl
 	sbc	hl, hl
 	add	hl, bc
-	jr	nc, .nan	; Return if dividend non-finite or divisor zero
+	jr	nc, .L.nan	; Return if dividend non-finite or divisor zero
 	sbc	hl, hl
 	or	a, a
 	sbc	hl, bc
@@ -41,19 +41,19 @@ __fprem: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), fmodf(bitc
 	call	m, __iremu	; If divisor subnormal, modulo the mantissas
 	ld	b, a
 	inc	b
-.rem.compare:
+.L.rem.compare:
 	add	hl, de
-	jr	c, .rem.norestore
+	jr	c, .L.rem.norestore
 	sbc	hl, de
-.rem.norestore:
+.L.rem.norestore:
 	dec	b
-	jr	z, .rem.finish
-.rem.loop:
+	jr	z, .L.rem.finish
+.L.rem.loop:
 	add	hl, hl
-	jr	nc, .rem.compare
+	jr	nc, .L.rem.compare
 	add	hl, de
-	djnz	.rem.loop
-.rem.finish:
+	djnz	.L.rem.loop
+.L.rem.finish:
 	pop	bc
 	rlc	c
 	ld	de, 0800000h
@@ -64,10 +64,10 @@ __fprem: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), fmodf(bitc
 	pop	de
 	ret
 
-.nan:
+.L.nan:
 	pop	hl
 	pop	hl
-.notge:
+.L.notge:
 	ld	a, d
 	pop	de
 	ret	c	; abs(AUBC) < abs(EUHL)

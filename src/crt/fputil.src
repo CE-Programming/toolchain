@@ -13,11 +13,11 @@ __fppop1:
 	ld	bc, 0800000h
 __fppop2:
 	sla	e
-	jr	z, .denormal
+	jr	z, .L.denormal
 	add	hl, bc
 	ret	nc
 	add	hl, bc
-.denormal:
+.L.denormal:
 	inc	e
 	ret
 
@@ -57,16 +57,16 @@ __fppack.normalize.entry:
 	add	a, a
 	adc	hl, hl
 	ret	m
-	jr	nz, .normalize.continue
+	jr	nz, .L.normalize.continue
 	or	a, a
-	jr	nz, .normalize.continue
+	jr	nz, .L.normalize.continue
 	ld	b, 1
-.normalize.loop:
+.L.normalize.loop:
 	add	a, a
 	adc	hl, hl
 	ret	m
-.normalize.continue:
-	djnz	.normalize.loop
+.L.normalize.continue:
+	djnz	.L.normalize.loop
 	add	hl, de
 	ret
 
@@ -90,28 +90,28 @@ __fppack2:
 __fppack2.normalized:
 	ld	a, b
 	add	ix, de
-	jr	nc, .rounded
+	jr	nc, .L.rounded
 	dec	ix
 	add	ix, de
-	jr	nc, .round
+	jr	nc, .L.round
 	bit	0, l
-	jr	z, .rounded
-.round:
+	jr	z, .L.rounded
+.L.round:
 	scf
 	adc	hl, de
 	adc	a, e
-.clear:
+.L.clear:
 	add	hl, de
-	jr	nc, .clear
-.rounded:
+	jr	nc, .L.clear
+.L.rounded:
 	cp	a, 0FFh
-	jr	z, .infinite
+	jr	z, .L.infinite
 	sla	c
 	rra
 	ret	nc
 	add	hl, de
 	ret
-.infinite:
+.L.infinite:
 	sla	c
 	rra
 	ex	de, hl

@@ -31,11 +31,11 @@ __ulltofp: ; CHECK: same(bitcast(float, pair8_24_t, { out.HL, out.E }), (float)b
 	.local	__ulltofp.enter
 __ulltofp.enter:
 	inc	b
-	djnz	.upper
+	djnz	.L.upper
 	inc	c
 	dec	c
-	jr	z, .lower
-.upper:
+	jr	z, .L.lower
+.L.upper:
 	push	bc
 	push	de
 	push	hl
@@ -50,12 +50,12 @@ __ulltofp.enter:
 	or	a, l
 	ld	l, a
 	ld	b, 07Fh + 63
-;	jq	.pack
+;	jq	.L.pack
 	db	$DA	; jp c, *
-.lower:
+.L.lower:
 	ld	c, a
 	ld	b, 07Fh + 47
-.pack:
+.L.pack:
 	ex	de, hl
 	push	de
 	ex	(sp), ix
