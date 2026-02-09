@@ -31,43 +31,43 @@ __fpcmpu: ; CHECK: out.flags.C == !isunordered(bitcast(float, pair8_24_t, { in.H
 ; s = !(euhl >= aubc)
 __fpcmpo: ; CHECK: out.flags.Z == (bitcast(float, pair8_24_t, { in.HL, in.E }) == bitcast(float, pair8_24_t, { in.BC, in.A })) && out.flags.C == (bitcast(float, pair8_24_t, { in.HL, in.E }) < bitcast(float, pair8_24_t, { in.BC, in.A })) && out.flags.S == !(bitcast(float, pair8_24_t, { in.HL, in.E }) >= bitcast(float, pair8_24_t, { in.BC, in.A })) && out.A == in.A && out.BC == in.BC && out.DE == in.DE && out.HL == in.HL && out.IX == in.IX && out.IY == in.IY
 	xor	a, e
-	jr	z, .maybeEqual
+	jr	z, .L.maybeEqual
 	cp	a, 080h
-	jr	c, .signsMatch
-	jr	z, .maybeBothZero
+	jr	c, .L.signsMatch
+	jr	z, .L.maybeBothZero
 	xor	a, e
 	; Check if first operand could hold NaN, and if so, the second cannot on this code path
 	inc	e
-	jr	z, .checkFirstNan
-	jp	pe, .checkFirstNan
+	jr	z, .L.checkFirstNan
+	jp	pe, .L.checkFirstNan
 	dec	e
-.secondLargerAbs:
+.L.secondLargerAbs:
 	cp	a, 07Fh	; C = S = !sign(aubc), Z = 0
 	ret	c	; Return if A less than 07Fh
 	ret	pe	; Return if A between 080h and 0FEh
-.checkSecondNan:
+.L.checkSecondNan:
 	push	hl
 	ld	hl, 07FFFFFh
 	add	hl, bc
 	pop	hl
-	jr	c, .unordered
+	jr	c, .L.unordered
 	cp	a, 080h	; C = S = !sign(aubc), Z = 0
 	ret
 
-.signsMatch:
+.L.signsMatch:
 	xor	a, e
 	; Compare upper 7 exponent bits, which are not equal
 	cp	a, e
-	jr	nc, .secondLargerAbs
+	jr	nc, .L.secondLargerAbs
 	inc	e
-	jr	z, .checkFirstNan
+	jr	z, .L.checkFirstNan
 	dec	e	; S = sign(euhl), Z = 0 because E > A
 	rlca
 	rrca		; C = sign(aubc), same as sign(euhl) on this code path
 	ret	po	; Return if E != 07Fh
-.checkFirstNanInc:
+.L.checkFirstNanInc:
 	inc	e
-.checkFirstNan:
+.L.checkFirstNan:
 	ex	de, hl
 	push	hl
 	ld	hl, 07FFFFFh
@@ -75,26 +75,26 @@ __fpcmpo: ; CHECK: out.flags.Z == (bitcast(float, pair8_24_t, { in.HL, in.E }) =
 	pop	hl
 	ex	de, hl
 	dec	e	; S = sign(euhl), Z = 0 because (E & 07Fh) == 07Fh
-	jr	c, .unordered
+	jr	c, .L.unordered
 	ret	p	; C = sign(euhl)
 	scf	; C = sign(euhl)
 	ret
 
-.maybeBothZero:
+.L.maybeBothZero:
 	; Upper 7 bits of exponents are equal, but sign differs
 	xor	a, e
 	; Check if upper 7 bits of both exponents are zero
 	add	a, a
 	rra
-	jr	nz, .notBothZero
+	jr	nz, .L.notBothZero
 	; Check if low bit of both exponents and entire mantissas are 0
 	adc	hl, bc
-	jr	nz, .notBothZeroFixup
+	jr	nz, .L.notBothZeroFixup
 	ret	nc	; Both inputs are zero, return Z=1, C=0, S=0
-.notBothZeroFixup:
+.L.notBothZeroFixup:
 	or	a, a
 	sbc	hl, bc
-.notBothZero:
+.L.notBothZero:
 	; Check if upper 7 bits of both exponents are one
 	cp	a, 07Fh	; C = S = !sign(aubc), Z = 0
 	ret	c	; Return if less than 07Fh
@@ -102,18 +102,18 @@ __fpcmpo: ; CHECK: out.flags.Z == (bitcast(float, pair8_24_t, { in.HL, in.E }) =
 	; Check the larger exponent/mantissa for NaN
 	sbc	hl, bc
 	add	hl, bc
-	jr	nc, .checkFirstNanInc
-	jr	.checkSecondNan
+	jr	nc, .L.checkFirstNanInc
+	jr	.L.checkSecondNan
 
-.maybeEqual:
+.L.maybeEqual:
 	; Sign and upper 7 exponent bits are equal
 	ld	a, e
 	inc	a
 	add	a, a
 	ld	a, e
-	jr	z, .checkBothNan
+	jr	z, .L.checkBothNan
 	or	a, a
-.checkBothNanDone:
+.L.checkBothNanDone:
 	; Compare mantissas and low exponent bit
 	sbc	hl, bc
 	add	hl, bc
@@ -126,19 +126,19 @@ __fpcmpo: ; CHECK: out.flags.Z == (bitcast(float, pair8_24_t, { in.HL, in.E }) =
 	ld	a, e
 	ret
 
-.checkBothNan:
+.L.checkBothNan:
 	ex	de, hl
 	push	hl
 	ld	hl, 07FFFFFh
 	add	hl, de
-	jr	c, .gotFirstNan
+	jr	c, .L.gotFirstNan
 	sbc	hl, de
 	add	hl, bc
-.gotFirstNan:
+.L.gotFirstNan:
 	pop	hl
 	ex	de, hl
-	jr	nc, .checkBothNanDone
-.unordered:
+	jr	nc, .L.checkBothNanDone
+.L.unordered:
 	; Carry is always set here
 	rr	a ; Z = 0, S = 1
 	rla	; Restore A

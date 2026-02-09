@@ -16,24 +16,24 @@ __fpsqrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)sq
 	add	hl, bc
 	or	a, a
 	sbc	hl, bc
-	jr	z, .zero
+	jr	z, .L.zero
 	rlca
-	jr	c, .nan
+	jr	c, .L.nan
 	inc	e
-	jr	z, .nonfinite
+	jr	z, .L.nonfinite
 	push	hl
 	ex	(sp), ix
 	sbc	hl, hl
 	srl	e
-	jr	nc, .normalize.skip
-.normalize.loop:
+	jr	nc, .L.normalize.skip
+.L.normalize.loop:
 	add	ix, ix
 	adc	hl, hl
-.normalize.skip:
+.L.normalize.skip:
 	dec	e
 	add	ix, ix
 	adc	hl, hl
-	jr	z, .normalize.loop
+	jr	z, .L.normalize.loop
 	push	de
 	xor	a, a
 	ex	de, hl
@@ -41,21 +41,21 @@ __fpsqrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)sq
 	ld	c, a
 	ld	b, 25
 	; x in AUDEUIX, r in CUHL
-.root.loop:
+.L.root.loop:
 	ex	de, hl
 	; r += 1
 	inc	de	; sets bit 0 so never overflows
 	; x -= r << 24
 	sbc	hl, de
 	sbc	a, c
-	jr	nc, .root.onebit
+	jr	nc, .L.root.onebit
 	; x += r << 24
 	add	hl, de
 	adc	a, c
 	; r -= 2
 	dec	de
 	dec	de
-.root.onebit:
+.L.root.onebit:
 	; r += 1
 	inc	de
 	; x <<= 2
@@ -68,7 +68,7 @@ __fpsqrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)sq
 	; r <<= 1
 	add	hl, hl
 	rl	c	; clears carry
-	djnz	.root.loop
+	djnz	.L.root.loop
 	; Shift left by 5
 	ld	a, c
 	.rept	5
@@ -99,15 +99,15 @@ __fpsqrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)sq
 	inc	bc	; This never overflows into the exponent field
 	ret
 
-.nonfinite:
+.L.nonfinite:
 	rrca
-.zero:
+.L.zero:
 	ex	(sp), hl
 	pop	bc
 	pop	de
 	ret
 
-.nan:
+.L.nan:
 	sbc	a, a
 	set	7, b
 	pop	hl
