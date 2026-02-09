@@ -14,7 +14,7 @@ __fpcbrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)cb
 	ld	e, a
 	call	__fppop1
 	inc	e
-	jp	z, .nonfinite
+	jp	z, .L.nonfinite
 	dec	e
 	ld	d, 0ABh	; multiplicative inverse of 3 modulo 256
 	ld	b, d
@@ -28,19 +28,19 @@ __fpcbrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)cb
 	sbc	hl, hl
 	ld	a, e
 	ld	d, 10	; maximum normalization iterations to determine a zero
-.modulo.loop:
+.L.modulo.loop:
 	; x <<= 1
 	add	ix, ix
 	adc	hl, hl
 	sub	a, b
-	jr	c, .modulo.loop
-	jr	nz, .normalized
+	jr	c, .L.modulo.loop
+	jr	nz, .L.normalized
 	dec	d
-	jp	z, .return
+	jp	z, .L.return
 	cp	a, l
 	inc	a
-	jr	nc, .modulo.loop
-.normalized:
+	jr	nc, .L.modulo.loop
+.L.normalized:
 	add	a, d
 	ld	b, a
 	push	bc
@@ -62,10 +62,10 @@ __fpcbrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)cb
 	sbc	hl, hl
 	ld	b, 24
 	; x in AUHL[UHL']UIX, r in CUDE[UDE'], q in UIY
-.root.loop:
+.L.root.loop:
 	exx
 	lea	bc, iy + 0
-	jr	c, .root.zerobit
+	jr	c, .L.root.zerobit
 	ex	af, af'
 	; q += 1
 	inc	iy
@@ -85,8 +85,8 @@ __fpcbrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)cb
 	; r += q
 	add	hl, bc
 	adc	a, 0
-	jr	.root.nextbit
-.root.zerobit:
+	jr	.L.root.nextbit
+.L.root.zerobit:
 	; x += r << 24
 	add	hl, de
 	exx
@@ -106,7 +106,7 @@ __fpcbrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)cb
 	or	a, a
 	sbc	hl, bc
 	sbc	a, 0
-.root.nextbit:
+.L.root.nextbit:
 	; r <<= 1
 	add	hl, hl
 	rla
@@ -157,7 +157,7 @@ __fpcbrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)cb
 	exx
 	sbc	hl, de
 	sbc	a, c
-	djnz	.root.loop
+	djnz	.L.root.loop
 	; Apply rounding (never round-to-even because a root with the lowest mantissa bit set must be irrational)
 	; q += !carry
 	exx
@@ -171,16 +171,16 @@ __fpcbrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)cb
 	adc	a, 07Fh - (07Fh / 3) - 10
 	; Set low exponent bit
 	srl	b
-	jr	nc, .return
+	jr	nc, .L.return
 	ld	de, 0800000h
 	add	hl, de
-.return:
+.L.return:
 	sla	c
 	rra
 	pop	ix
 	pop	bc
 	bit	2, c
-.nonfinite:
+.L.nonfinite:
 	ex	(sp), hl
 	pop	bc
 	pop	de

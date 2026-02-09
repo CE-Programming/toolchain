@@ -20,34 +20,34 @@ __fpmul: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	ld	e, a
 	call	__fppop2
 	inc	e
-	jp	z, .nonfinite.1
+	jp	z, .L.nonfinite.1
 	inc	d
-	jp	z, .nonfinite.2
+	jp	z, .L.nonfinite.2
 	ld	a, d
 	ld	d, b; 0
 	rlc	e
 	ccf
 	rr	e
-	jr	nc, .subtract
+	jr	nc, .L.subtract
 	add	a, e
-	jr	nc, .continue
-.overflow:
+	jr	nc, .L.continue
+.L.overflow:
 	pop	af
 	pop	af
 	pop	hl
 	pop	de
 	or	a, 07Fh
 	ret
-.subtract:
+.L.subtract:
 	add	a, e
-	jr	z, .subnormal
-	jr	c, .continue
+	jr	z, .L.subnormal
+	jr	c, .L.continue
 	cp	a, -23
-	jp	c, .underflow
-.subnormal:
+	jp	c, .L.underflow
+.L.subnormal:
 	dec	a
 	ld	d, a
-.continue:
+.L.continue:
 	push	hl
 	push	ix
 	ld	ix, -7
@@ -102,24 +102,24 @@ __fpmul: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	mlt	bc
 	add	hl, bc
 	cp	a, d
-	jr	nz, .normalized
+	jr	nz, .L.normalized
 	ld	bc, (ix + 2)
 	pop	de
-.normalize:
+.L.normalize:
 	srl	h
 	rr	l
 	rr	b
 	rr	c
 	rr	d
 	rr	e
-	jr	nc, .flushed
+	jr	nc, .L.flushed
 	ld	e, a
-.flushed:
+.L.flushed:
 	inc	a
-	jr	nz, .normalize
+	jr	nz, .L.normalize
 	push	de
 	ld	(ix + 2), bc
-.normalized:
+.L.normalized:
 	ld	(ix + 4), hl
 	ld	c, (ix + 17)
 	pop	ix
@@ -138,7 +138,7 @@ __fpmul: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	pop	bc
 	pop	de
 	ret
-.underflow:
+.L.underflow:
 	pop	af
 	pop	af
 	pop	hl
@@ -146,49 +146,49 @@ __fpmul: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(fl
 	and	a, 080h
 	ld	bc, 0
 	ret
-.nonfinite:
+.L.nonfinite:
 	sbc	hl, bc
-	jr	z, .return.2
+	jr	z, .L.return.2
 	add	hl, bc
 	pop	bc
-	jr	.return.1
-.nonfinite.1:
+	jr	.L.return.1
+.L.nonfinite.1:
 	inc	d
-	jr	z, .nonfinite
+	jr	z, .L.nonfinite
 	ex	de, hl
 	pop	hl
 	add	hl, bc
 	or	a, a
 	sbc	hl, bc
 	ex	de, hl
-	jr	nz, .return.1
+	jr	nz, .L.return.1
 	ld	h, a
-.return.1:
+.L.return.1:
 	pop	af
 	ex	(sp), hl
 	pop	bc
-	jr	.return
-.nonfinite.2:
+	jr	.L.return
+.L.nonfinite.2:
 	add	hl, bc
 	or	a, a
 	sbc	hl, bc
-	jr	z, .return.nan
-.return.2:
+	jr	z, .L.return.nan
+.L.return.2:
 	pop	bc
 	pop	af
 	pop	bc
 	push	bc
-.return.pop:
+.L.return.pop:
 	pop	hl
-.return:
+.L.return:
 	pop	de
 	or	a, 07Fh
 	ret
-.return.nan:
+.L.return.nan:
 	pop	bc
 	set	7, b
 	pop	af
-	jr	.return.pop
+	jr	.L.return.pop
 
 	.extern	__fppop1
 	.extern	__fppop2
