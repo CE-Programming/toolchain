@@ -117,8 +117,10 @@ disable_relocations
 
 	ld	(error_sp), sp
 
-	res	is_dep, (iy + LIB_FLAGS)
-	res	optional, (iy + LIB_FLAGS)
+	ld	(iy + LIB_FLAGS), c	; C is zero here
+	; res	is_dep, (iy + LIB_FLAGS)
+	; res	optional, (iy + LIB_FLAGS)
+
 	ld	a, (hl)
 	cp	a, REQ_LIB_MARKER
 	jr	z, start
