@@ -90,10 +90,6 @@ disable_relocations
 	call	ti.MemClear
 	pop	bc
 
-	ld	a, (iy + LIB_FLAGS)
-	ld	(flag_save), a
-	ld	(ix_save), ix		; save IX since older ICE programs don't
-
 	ld	hl, $AA55AA
 	xor	a, a
 	sbc	hl, bc
@@ -117,19 +113,11 @@ disable_relocations
 
 	ld	(error_sp), sp
 
-	ld	(iy + LIB_FLAGS), c	; C is zero here
-	; res	is_dep, (iy + LIB_FLAGS)
-	; res	optional, (iy + LIB_FLAGS)
-
 	ld	a, (hl)
 	cp	a, REQ_LIB_MARKER
 	jr	z, start
-	set	optional, (iy + LIB_FLAGS)
 	cp	a, OPT_LIB_MARKER
-	jr	z, start
-	ld	a, (flag_save)
-	ld	(iy + LIB_FLAGS), a	; restore flag bits
-	ld	ix, (ix_save)		; restore IX register
+	jr	z, start_optional
 	jp	(hl)			; return to execution if there are no libs
 
 macro relocate? name, address*
@@ -187,7 +175,20 @@ macro rload? name
 	dl	name - $ - 3
 end macro
 
+start_optional:
+	; set optional, (iy + LIB_FLAGS)
+	ld	c, 1 shl optional
 start:
+	ld	(ix_save), ix		; save IX since older ICE programs don't
+
+	ld	a, (iy + LIB_FLAGS)
+	ld	(flag_save), a
+	; initialize LIB_FLAGS
+	; REQ_LIB_MARKER --> C = 0
+	; OPT_LIB_MARKER --> C = (1 << optional)
+	ld	(iy + LIB_FLAGS), c
+	; res	is_dep, (iy + LIB_FLAGS)
+
 	push	hl
 	call	ti.PushOP1		; save calling program name
 	pop	hl
