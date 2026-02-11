@@ -92,7 +92,6 @@ disable_relocations
 
 	ld	a, (iy + LIB_FLAGS)
 	ld	(flag_save), a
-	ld	(ix_save), ix		; save IX since older ICE programs don't
 
 	ld	hl, $AA55AA
 	xor	a, a
@@ -129,7 +128,6 @@ disable_relocations
 	jr	z, start
 	ld	a, (flag_save)
 	ld	(iy + LIB_FLAGS), a	; restore flag bits
-	ld	ix, (ix_save)		; restore IX register
 	jp	(hl)			; return to execution if there are no libs
 
 macro relocate? name, address*
@@ -188,6 +186,7 @@ macro rload? name
 end macro
 
 start:
+	ld	(ix_save), ix		; save IX since older ICE programs don't
 	push	hl
 	call	ti.PushOP1		; save calling program name
 	pop	hl
