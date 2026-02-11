@@ -1990,34 +1990,33 @@ fontlib_GetFontByStyleRaw:
 .badFont:
 	pop	ix
 	ret
+
 .checkStyle:
 	ld	a,(ix + strucFont.height)
-	cp	(iy + arg1)
+	cp	a, (iy + arg1)
 	ccf
 	ret	nc
-	cp	(iy + arg2)
+	cp	a, (iy + arg2)
 	jr	z,.sizeOK
 	ret	nc
 .sizeOK:
 	ld	a,(ix + strucFont.weight)
-	cp	(iy + arg3)
+	cp	a, (iy + arg3)
 	ccf
 	ret	nc
-	cp	(iy + arg4)
+	cp	a, (iy + arg4)
 	jr	z,.weightOK
 	ret	nc
 .weightOK:
-; TODO: I think the CP here might sometimes SET carry when it shouldn't be?
-	ld	a,(ix + strucFont.style)
-	ld	c,(iy + arg5)
-	and	a,c
-	cp	a,c
+	ld	c, (ix + strucFont.style)
+	ld	a, (iy + arg5)
+	; test for required set bits
+	and	a, c
+	xor	a, c
 	ret	nz
-	ld	a,(ix + strucFont.style)
-	ld	c,(iy + arg6)
-	and	a,c
-	xor	a,c
-	cp	a,c
+	ld	a, (iy + arg6)
+	; test for required cleared bits
+	and	a, c
 	ret	nz
 	scf
 	ret
