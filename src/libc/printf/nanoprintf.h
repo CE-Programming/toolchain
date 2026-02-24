@@ -43,7 +43,7 @@ extern "C" {
 
 typedef void (*npf_putc)(int c, void *ctx);
 
-#if 0
+#ifndef _EZ80
 
 NPF_VISIBILITY int npf_snprintf(char * NPF_RESTRICT buffer,
                                 size_t bufsz,
@@ -61,7 +61,7 @@ NPF_VISIBILITY int npf_pprintf(npf_putc pc,
                                char const * NPF_RESTRICT format,
                                ...) NPF_PRINTF_ATTR(3, 4);
 
-#endif
+#endif /* _EZ80 */
 
 NPF_VISIBILITY int npf_vpprintf(npf_putc pc,
                                 void * NPF_RESTRICT pc_ctx,
@@ -518,7 +518,9 @@ static NPF_NOINLINE int npf_utoa_rev(
 #if NANOPRINTF_USE_FLOAT_FORMAT_SPECIFIERS == 1
 
 #include <float.h>
+#ifdef _EZ80
 #include <math.h> // signbit iszero
+#endif /* _EZ80 */
 
 #if NANOPRINTF_PROMOTE_TO_LONG_DOUBLE == 1
   typedef long double npf_double_t;
@@ -584,11 +586,11 @@ static NPF_FORCE_INLINE npf_double_bin_t npf_double_to_int_rep(npf_double_t f) {
   npf_double_bin_t bin;
   char const *__restrict src = (char const *__restrict)&f;
   char *__restrict dst = (char *__restrict)&bin;
-  #if 0
+  #ifndef _EZ80
     for (uint_fast8_t i = 0; i < sizeof(f); ++i) { dst[i] = src[i]; }
-  #else
+  #else /* _EZ80 */
     __builtin_memcpy(dst, src, sizeof(f));
-  #endif
+  #endif /* _EZ80 */
   return bin;
 }
 
@@ -1075,17 +1077,17 @@ int npf_vpprintf(npf_putc pc, void *pc_ctx, char const *format, va_list args) {
           }
         #endif
 
-        #if 0
+        #ifndef _EZ80
           sign_c = (npf_double_to_int_rep(val) >> NPF_DOUBLE_SIGN_POS) ? '-' : fs.prepend;
-        #else
+        #else /* _EZ80 */
           sign_c = (signbit(val)) ? '-' : fs.prepend;
-        #endif
+        #endif /* _EZ80 */
 #if NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS == 1
-        #if 0
+        #ifndef _EZ80
           zero = (val == (npf_double_t)0.);
-        #else
+        #else /* _EZ80 */
           zero = iszero(val);
-        #endif
+        #endif /* _EZ80 */
 #endif
         cbuf_len = npf_ftoa_rev(cbuf, &fs, val);
         if (cbuf_len < 0) { // negative means text (not number), so ignore the '0' flag
@@ -1181,7 +1183,7 @@ int npf_vpprintf(npf_putc pc, void *pc_ctx, char const *format, va_list args) {
 #undef NPF_EXTRACT
 #undef NPF_WRITEBACK
 
-#if 0
+#ifndef _EZ80
 int npf_pprintf(npf_putc pc,
                 void * NPF_RESTRICT pc_ctx,
                 char const * NPF_RESTRICT format,
@@ -1226,7 +1228,7 @@ int npf_vsnprintf(char * NPF_RESTRICT buffer,
 
   return n;
 }
-#endif
+#endif /* _EZ80 */
 
 #if NPF_HAVE_GCC_WARNING_PRAGMAS
   #pragma GCC diagnostic pop
