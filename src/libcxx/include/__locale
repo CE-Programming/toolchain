@@ -300,7 +300,11 @@ bool locale::operator()(const basic_string<_CharT, _Traits, _Allocator>& __x,
 class _LIBCPP_EXPORTED_FROM_ABI ctype_base {
 public:
 #  if defined(_LIBCPP_PROVIDES_DEFAULT_RUNE_TABLE)
+#ifndef _EZ80
   typedef unsigned long mask;
+#else // _EZ80
+  typedef unsigned short mask;
+#endif // _EZ80
   static const mask space  = 1 << 0;
   static const mask print  = 1 << 1;
   static const mask cntrl  = 1 << 2;
