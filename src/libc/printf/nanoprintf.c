@@ -8,6 +8,7 @@
 
 #define NANOPRINTF_IMPLEMENTATION
 #define NANOPRINTF_VISIBILITY_STATIC
+#define NANOPRINTF_STATIC_GLOBALS
 
 /**
  * @remarks don't set this above 40, or there is a chance that

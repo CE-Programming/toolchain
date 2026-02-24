@@ -761,13 +761,22 @@ typedef struct npf_cnt_putc_ctx {
   int n;
 } npf_cnt_putc_ctx_t;
 
+#ifdef NANOPRINTF_STATIC_GLOBALS
+static npf_cnt_putc_ctx_t pc_cnt;
+#endif
+
 static void npf_putc_cnt(int c, void *ctx) {
   npf_cnt_putc_ctx_t *pc_cnt = (npf_cnt_putc_ctx_t *)ctx;
   ++pc_cnt->n;
   pc_cnt->pc(c, pc_cnt->ctx); // sibling-call optimization
 }
 
+#ifdef NANOPRINTF_STATIC_GLOBALS
+static void NPF_PUTC_IMPL(int VAL) { npf_putc_cnt((int)(VAL), &pc_cnt); }
+#define NPF_PUTC(VAL) NPF_PUTC_IMPL((int)(VAL))
+#else
 #define NPF_PUTC(VAL) do { npf_putc_cnt((int)(VAL), &pc_cnt); } while (0)
+#endif
 
 #define NPF_EXTRACT(MOD, CAST_TO, EXTRACT_AS) \
   case NPF_FMT_SPEC_LEN_MOD_##MOD: val = (CAST_TO)va_arg(args, EXTRACT_AS); break
@@ -778,7 +787,9 @@ static void npf_putc_cnt(int c, void *ctx) {
 int npf_vpprintf(npf_putc pc, void *pc_ctx, char const *format, va_list args) {
   npf_format_spec_t fs;
   char const *cur = format;
+#ifndef NANOPRINTF_STATIC_GLOBALS
   npf_cnt_putc_ctx_t pc_cnt;
+#endif
   pc_cnt.pc = pc;
   pc_cnt.ctx = pc_ctx;
   pc_cnt.n = 0;
