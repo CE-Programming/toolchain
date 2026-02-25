@@ -478,7 +478,14 @@ resolve_entry_points_enqueued:
 	add	hl, hl			; (offset/3) * 2
 	ld	de, (vector_tbl_ptr)	; hl->start of vector table
 	add	hl, de			; hl->correct vector entry
-	call	ti.LoadDEInd_s		; de=offest in lib for function
+
+	; ti.LoadDEInd_s
+	inc.s	de
+	ld	e, (hl)
+	inc	hl
+	ld	d, (hl)
+	; de=offset in lib for function
+
 	ld	hl, (ramlocation)
 	add	hl, de			; hl->function in ram
 	ex	de, hl			; de->function in ram
