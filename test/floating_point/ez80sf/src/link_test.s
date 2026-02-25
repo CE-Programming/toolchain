@@ -44,8 +44,8 @@ _link_test:
 	ld	hl, __lltofp
 	ld	hl, __ulltofp
 
-	; ld	hl, __fptod
-	; ld	hl, __dtofp
+	ld	hl, __fptod
+	ld	hl, __dtofp
 
 	or	a, a
 	sbc	hl, hl
