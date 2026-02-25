@@ -2,6 +2,10 @@
 
 	.section	.text
 
+	.global	__ftoll
+	.type	__ftoll, @function
+	.global	__ftoull
+	.type	__ftoull, @function
 	.global	__fptoll
 	.type	__fptoll, @function
 	.global	__fptoull
@@ -9,6 +13,8 @@
 
 ; IEEE single precision to 64-bit integers
 ; bcudeuhl = longlong(euhl)
+__ftoull:
+__ftoll:
 __fptoull: ; PREREQ: bitcast(float, pair8_24_t, { in.HL, in.E }) > -1.0f && bitcast(float, pair8_24_t, { in.HL, in.E }) < (UINT64_MAX/2+1)*2.0f CHECK: bitcast(uint64_t, tuple16_24_24_t, { out.HL, out.DE, out.BCS }) == (uint64_t)bitcast(float, pair8_24_t, { in.HL, in.E }) && out.A == in.A && out.IX == in.IX && out.IY == in.IY
 __fptoll: ; PREREQ: bitcast(float, pair8_24_t, { in.HL, in.E })-INT64_MIN > -1.0f && bitcast(float, pair8_24_t, { in.HL, in.E }) < (INT64_MAX/2+1)*2.0f CHECK: bitcast(int64_t, tuple16_24_24_t, { out.HL, out.DE, out.BCS }) == (int64_t)bitcast(float, pair8_24_t, { in.HL, in.E }) && out.A == in.A && out.IX == in.IX && out.IY == in.IY
 	ld	d, a
