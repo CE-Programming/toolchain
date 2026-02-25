@@ -85,7 +85,7 @@ int sprintf(char *__restrict buffer, const char *__restrict format, ...)
 int vasprintf(char **__restrict p_str, const char *__restrict format, va_list vlist) {
   *p_str = NULL;
   int str_len = vsnprintf(NULL, 0, format, vlist);
-  if (str_len <= 0) {
+  if (str_len < 0) {
     return str_len;
   }
   size_t buf_len = (size_t)str_len + 1;
@@ -95,7 +95,7 @@ int vasprintf(char **__restrict p_str, const char *__restrict format, va_list vl
     return -1;
   }
   int ret = vsnprintf(buf, buf_len, format, vlist);
-  if (ret <= 0) {
+  if (ret < 0) {
     free(buf);
     return ret;
   }
