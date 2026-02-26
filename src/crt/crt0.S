@@ -174,23 +174,16 @@ ___libload_libs_ret:
 	di
 
 .L.bss_zeroize:
-	ld	hl, ___bss_len
-	ld	bc, 0
+	ld	bc, ___bss_len + 1
+	ld	hl, ___bss_low - 1
 	xor	a, a
-	sbc	hl, bc
-	jr	z, .L.bss_done
-	ld	de, ___bss_low
-	push	de
-	ld	(de), a
-	dec	hl
-	sbc	hl, bc
-	pop	hl
-	jr	z, .L.bss_done
-	ld	bc, ___bss_len
-	dec	bc
-	inc	de
-	ldir
-.L.bss_done:
+	db	$E6				; and a, $77 (clears carry)
+	; jr	.L.bss_start
+.L.bss_loop:					; 7F + 1R + 1W + 1
+	ld	(hl), a
+; .L.bss_start:
+	cpi
+	jp	pe, .L.bss_loop
 
 	res	1, (iy + 0x0D)			; no text buffer
 	res	3, (iy + 0x4A)			; use first shadow buffer
