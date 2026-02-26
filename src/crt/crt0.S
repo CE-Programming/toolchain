@@ -37,6 +37,7 @@
 	.equ	ti.PopRealO1, 0x0205DC
 	.equ	ti.MovFrOP1, 0x02032C
 	.equ	ti.ClrLCDFull, 0x020808
+	.equ	ti.boot.memclear, 0x0000B0
 
 	.section	.header,"ax",@progbits
 
@@ -173,17 +174,15 @@ ___libload_libs_ret:
 	call	ti.usb_DisableTimer
 	di
 
-.L.bss_zeroize:
-	ld	bc, ___bss_len + 1
-	ld	hl, ___bss_low - 1
-	xor	a, a
-	db	$E6				; and a, $77 (clears carry)
-	; jr	.L.bss_start
-.L.bss_loop:					; 7F + 1R + 1W + 1
-	ld	(hl), a
-; .L.bss_start:
-	cpi
-	jp	pe, .L.bss_loop
+	; zeroize bss
+	ld	hl, ___bss_low
+	ld	bc, ___bss_len
+	push	bc
+	push	hl
+	; void memclear(void *dst, size_t size)
+	call	ti.boot.memclear
+	pop	hl
+	pop	hl
 
 	res	1, (iy + 0x0D)			; no text buffer
 	res	3, (iy + 0x4A)			; use first shadow buffer
