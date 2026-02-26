@@ -5,7 +5,7 @@
 	.global	_strcat
 	.type	_strcat, @function
 
-.ifdef PREFER_CE_LIBC
+.ifdef PREFER_OS_LIBC
 
 	.set	_strcat, 0x0000C0
 

@@ -7,7 +7,7 @@
 	.global	_strtok
 	.type	_strtok, @function
 
-.ifdef PREFER_CE_LIBC
+.ifdef PREFER_OS_LIBC
 
 	.set	_strtok, 0x0000F4
 
