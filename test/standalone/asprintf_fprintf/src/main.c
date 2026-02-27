@@ -91,6 +91,12 @@ __attribute__((__unused__)) static void print_string(const char* str) {
 // prevents Clang from replacing function calls with builtins
 #if RENAME_FUNCTIONS
 
+// this does not have __attribute__((malloc)) so we can test aliasing
+void *T_malloc(size_t size);
+
+// this does not have __attribute__((malloc)) so we can test aliasing
+void *T_calloc(size_t nmemb, size_t size);
+
 void T_bzero(void* s, size_t n);
 
 void *T_memccpy(void *__restrict dest, const void *__restrict src, int c, size_t n)
@@ -182,6 +188,8 @@ char *T_strtok_r(char *__restrict s, const char *__restrict delim, char **__rest
 
 #else
 
+#define T_malloc malloc
+#define T_calloc calloc
 #define T_bzero bzero
 #define T_memccpy memccpy
 #define T_memchr memchr
@@ -571,12 +579,6 @@ int memccpy_tests(void) {
         return __LINE__;
     }
 
-    /* check that no crashes occur with small calloc sizes */
-    buf = (char*)calloc(1, sizeof(char));
-    free(buf);
-    buf = (char*)calloc(0, sizeof(char));
-    free(buf);
-
     buf = (char*)calloc(file_size + 1, sizeof(char));
     if (buf == NULL) {
         perror("calloc failure");
@@ -662,7 +664,7 @@ int bzero_test(void) {
     if (T_strlen(&data[2]) != 0) {
         return __LINE__;
     }
-    T_bzero(NULL, 0);
+
     T_bzero(&data[8], 17);
     int cmp = T_memcmp(data, truth, 32);
     if (cmp != 0) {
@@ -1520,8 +1522,57 @@ int mem65536_test(void) {
     return 0;
 }
 
+int alloc_test(void) {
+    /* test that malloc works and returns mutable memory */
+
+    buf = (char*)T_malloc(1);
+    C(buf != NULL);
+    *buf = 0xFF;
+    C(T_memcmp(buf, SINK, 1) > 0);
+    *buf = 0x00;
+    C(T_memcmp(buf, SINK, 1) == 0);
+    free(buf);
+
+    /* check that no crashes occur with small calloc sizes */
+
+    buf = (char*)T_calloc(1, sizeof(char));
+    C(buf != NULL && *buf == 0x00);
+    free(buf);
+
+    buf = (char*)T_calloc(2, sizeof(char));
+    C(buf != NULL && buf[0] == 0x00 && buf[1] == 0x00);
+    free(buf);
+
+    /* test allocating zero bytes */
+
+    /**
+     * malloc(0) is implementation defined, but it should be safe to assume
+     * that it does not return `buf`
+     */
+    char * const Pointer_Not_From_Malloc = (char*)&buf;
+
+    buf = (char*)T_malloc(0);
+    C(buf != Pointer_Not_From_Malloc);
+    free(buf);
+
+    buf = (char*)T_calloc(0, sizeof(char));
+    C(buf != Pointer_Not_From_Malloc);
+    free(buf);
+
+    // ensure that we do not free twice
+    buf = NULL;
+    return 0;
+}
+
 int run_tests(void) {
     int ret = 0;
+    buf = NULL;
+
+    /* malloc and calloc */
+        ret = alloc_test();
+        free(buf); buf = NULL;
+        if (ret != 0) { return ret; }
+
     /* boot_asprintf */
         ret = boot_sprintf_tests();
         free(buf); buf = NULL;
