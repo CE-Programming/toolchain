@@ -4,7 +4,7 @@
 	.global	_calloc
 	.type	_calloc, @function
 
-.ifdef PREFER_OS_CRT
+.ifdef __TICE__
 
 ; uses the hardware specific $E40000 memory location
 
