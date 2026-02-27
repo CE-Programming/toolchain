@@ -23,22 +23,23 @@ _calloc:
 	pop	bc		; BC = size
 	; test for NULL
 	add	hl, bc
-	; or	a, a		; .assumes that ptr + size does not overflow
+	; or	a, a		; assumes that ptr + size does not overflow
 	sbc	hl, bc
 	ret	z		; return NULL
 	; inlined bzero
-	push	hl
-	ex	de, hl		; DE = dest
-	; test if the size is zero
-	scf
-	sbc	hl, hl
-	add	hl, bc
-	jr	nc, .L.finish
-	; large region of all zeros on the Ti84CE
-	ld	hl, $E40000	; HL = src
-	ldir
-.L.finish:
-	pop	hl		; return value
+
+	dec	bc
+	add	hl, bc		; move to the end of dst
+	; non-zero + (size - 1) sets carry if size is zero
+	jr	c, .L.zero_size
+	inc	bc
+	ex	de, hl		; DE = dst
+	; uses the all zeros address range $E40000-$EFFFFF on the Ti84CE
+	ld	hl, $EFFFFF	; HL = src
+	lddr
+	ex	de, hl
+.L.zero_size:
+	inc	hl
 	ret
 
 .else
