@@ -944,24 +944,19 @@ ti_Detect:
 	ld	(.smc_flag), a
 	push	ix
 	ld	ix, 0
+	lea	bc, ix + 0
 	add	ix, sp
 	ld	hl, (ix + 9)
-	add	hl, bc
-	or	a, a
-	sbc	hl, bc
+	adc	hl, bc
 	jr	nz, .detectall		; if null, then detect everything
 	ld	hl, .fdetectall
 	ld	(ix + 9), hl
 .detectall:
 	ld	hl, (ix + 6)
-	add	hl, bc
-	or	a, a
-	sbc	hl, bc
+	adc	hl, bc
 	jr	z, .fstart
 	ld	hl, (hl)
-	add	hl, bc
-	or	a, a
-	sbc	hl, bc
+	adc	hl, bc
 	jr	nz, .fdetect
 .fstart:
 	ld	hl, (ti.progPtr)
