@@ -14,38 +14,42 @@ _perror:
 	add	hl, bc
 	xor	a, a
 	sbc	hl, bc
-	jr	z, .L.no_string
+	jr	z, .L.null_string
 	cp	a, (hl)
-	jr	z, .L.no_string
-.L.str_loop:
-	call	_perror_errchar_ld_a_inc_hl
-	jr	nz, .L.str_loop
+	jr	z, .L.empty_string
+	; fprintf(stderr, "%s: ", str)
+	call	.L.errchar_puts
 	ld	a, ':'
-	call	_perror_errchar
+	call	.L.errchar_putchar
 	ld	a, ' '
-	call	_perror_errchar
+	call	.L.errchar_putchar
 
-.L.no_string:
+.L.null_string:
+.L.empty_string:
 	ld	hl, (_errno)
 	call	_strerror.hijack_perror
-.L.errstr_loop:
-	call	_perror_errchar_ld_a_inc_hl
-	jr	nz, .L.errstr_loop
-	or	a, $0A		; '\n'
-	.db	$CA		; jp z, *
-_perror_errchar_ld_a_inc_hl:
-	ld	a, (hl)
-	inc	hl
-_perror_errchar:
-	or	a, a
+	call	.L.errchar_puts
+	ld	a, $0A		; '\n'
+.L.errchar_putchar:
+	; input:
+	; - Z for single character
+	; - NZ to loop until '\0'
+	; output:
+	; - Z flag set
 	push	af
 	push	hl
 	ld	l, a
 	push	hl
-	call	nz, _errchar
+	call	_errchar
 	pop	hl
 	pop	hl
 	pop	af
+	ret	z
+.L.errchar_puts:
+	ld	a, (hl)
+	inc	hl
+	or	a, a
+	jr	nz, .L.errchar_putchar
 	ret
 
 	.extern	_errno
