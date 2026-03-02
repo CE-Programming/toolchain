@@ -1,0 +1,10 @@
+	.assume	adl=1
+
+	.section	.text
+	.weak	_errchar
+	.type	_errchar, @function
+
+_errchar:
+	jp	_outchar
+
+	.extern	_outchar

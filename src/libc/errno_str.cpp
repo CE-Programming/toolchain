@@ -124,17 +124,23 @@ char *strerror(int errnum)
     return const_cast<char*>(ret);
 }
 
+static void errchar_puts(const char *str)
+{
+    while (*str) {
+        errchar(*str++);
+    }
+}
+
 void perror(const char *str)
 {
     /* Normally this would print to stderr, but since they are handled the same and pulling */
-    /* in fputs would create a dependency on fileioc, just use puts rather than fputs here */
+    /* in fputs would create a dependency on fileioc, just use puts/errchar rather than fputs here */
 
     if (str != nullptr && *str != '\0') {
-        while (*str) {
-            putchar(*str++);
-        }
-        putchar(':');
-        putchar(' ');
+        errchar_puts(str);
+        errchar(':');
+        errchar(' ');
     }
-    puts(strerror(errno));
+    errchar_puts(strerror(errno));
+    errchar('\n');
 }
