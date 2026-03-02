@@ -1,0 +1,202 @@
+	.assume	adl=1
+
+;-------------------------------------------------------------------------------
+
+	.section	.text
+	.global	_perror
+	.type	_perror, @function
+
+; void perror(const char*)
+_perror:
+	pop	de
+	ex	(sp), hl
+	push	de
+	add	hl, bc
+	xor	a, a
+	sbc	hl, bc
+	jr	z, .L.no_string
+	cp	a, (hl)
+	jr	z, .L.no_string
+.L.str_loop:
+	call	_perror_errchar_ld_a_inc_hl
+	jr	nz, .L.str_loop
+	ld	a, ':'
+	call	_perror_errchar
+	ld	a, ' '
+	call	_perror_errchar
+
+.L.no_string:
+	ld	hl, (_errno)
+	call	_strerror.hijack_perror
+.L.errstr_loop:
+	call	_perror_errchar_ld_a_inc_hl
+	jr	nz, .L.errstr_loop
+	or	a, $0A		; '\n'
+	.db	$CA		; jp z, *
+_perror_errchar_ld_a_inc_hl:
+	ld	a, (hl)
+	inc	hl
+_perror_errchar:
+	or	a, a
+	push	af
+	push	hl
+	ld	l, a
+	push	hl
+	call	nz, _errchar
+	pop	hl
+	pop	hl
+	pop	af
+	ret
+
+	.extern	_errno
+	.extern	_errchar
+
+;-------------------------------------------------------------------------------
+
+	.section	.text
+	.global	_strerror
+	.type	_strerror, @function
+
+	; supports a maximum of 255 strings
+	.equ	errno_strings_count, 79
+
+_strerror:
+	pop	de
+	ex	(sp), hl
+	push	de
+	.local	_strerror.hijack_perror
+_strerror.hijack_perror:
+	; HL = errnum
+	ld	bc, -errno_strings_count
+	push	hl
+	add	hl, bc
+	jr	c, .L.unknown_errnum
+	pop	de
+	ld	hl, _errno_strings
+	xor	a, a
+	; test if errnum is zero
+	cp	a, e
+	ret	z
+.L.loop:
+	; skip to the start of the next string
+	cpir
+	dec	e
+	jr	nz, .L.loop
+	ret
+
+.L.unknown_errnum:
+	; errnum < 0 || errnum >= errno_strings_count
+	ld	hl, _percent_d
+	push	hl
+	; overwrites the numeric portion of "unknown error -8388608"
+	ld	hl, _unknown_errno_string + 14
+	push	hl
+	call	_boot_sprintf
+	pop	hl
+	pop	hl
+	pop	hl
+	ld	hl, _unknown_errno_string
+	ret
+
+	.extern	_boot_sprintf
+
+;-------------------------------------------------------------------------------
+
+	.section	.data._unknown_errno_string
+	.local	_unknown_errno_string
+_unknown_errno_string:
+	.asciz	"unknown error -8388608"
+
+;-------------------------------------------------------------------------------
+
+	.section	.rodata._percent_d
+	.local	_percent_d
+_percent_d:
+	.asciz	"%d"
+
+;-------------------------------------------------------------------------------
+
+	.section	.rodata._errno_strings
+	.local	_errno_strings
+
+; make sure to update errno_strings_count
+_errno_strings:
+	.db	"no error", 0
+	.db	"EPERM", 0
+	.db	"EINVAL", 0
+	.db	"EIO", 0
+	.db	"EDOM", 0
+	.db	"ERANGE", 0
+	.db	"EILSEQ", 0
+	.db	"E2BIG", 0
+	.db	"EACCES", 0
+	.db	"EADDRINUSE", 0
+	.db	"EADDRNOTAVAIL", 0
+	.db	"EAFNOSUPPORT", 0
+	.db	"EAGAIN", 0
+	.db	"EALREADY", 0
+	.db	"EBADF", 0
+	.db	"EBADMSG", 0
+	.db	"EBUSY", 0
+	.db	"ECANCELED", 0
+	.db	"ECHILD", 0
+	.db	"ECONNABORTED", 0
+	.db	"ECONNREFUSED", 0
+	.db	"ECONNRESET", 0
+	.db	"EDEADLK", 0
+	.db	"EDESTADDRREQ", 0
+	.db	"EEXIST", 0
+	.db	"EFAULT", 0
+	.db	"EFBIG", 0
+	.db	"EHOSTUNREACH", 0
+	.db	"EIDRM", 0
+	.db	"EINPROGRESS", 0
+	.db	"EINTR", 0
+	.db	"EISCONN", 0
+	.db	"EISDIR", 0
+	.db	"ELOOP", 0
+	.db	"EMFILE", 0
+	.db	"EMLINK", 0
+	.db	"EMSGSIZE", 0
+	.db	"ENAMETOOLONG", 0
+	.db	"ENETDOWN", 0
+	.db	"ENETRESET", 0
+	.db	"ENETUNREACH", 0
+	.db	"ENFILE", 0
+	.db	"ENOBUFS", 0
+	.db	"ENODATA", 0
+	.db	"ENODEV", 0
+	.db	"ENOENT", 0
+	.db	"ENOEXEC", 0
+	.db	"ENOLCK", 0
+	.db	"ENOLINK", 0
+	.db	"ENOMEM", 0
+	.db	"ENOMSG", 0
+	.db	"ENOPROTOOPT", 0
+	.db	"ENOSPC", 0
+	.db	"ENOSR", 0
+	.db	"ENOSTR", 0
+	.db	"ENOSYS", 0
+	.db	"ENOTCONN", 0
+	.db	"ENOTDIR", 0
+	.db	"ENOTEMPTY", 0
+	.db	"ENOTRECOVERABLE", 0
+	.db	"ENOTSOCK", 0
+	.db	"ENOTSUP", 0
+	.db	"ENOTTY", 0
+	.db	"ENXIO", 0
+	.db	"EOPNOTSUPP", 0
+	.db	"EOVERFLOW", 0
+	.db	"EOWNERDEAD", 0
+	.db	"EPIPE", 0
+	.db	"EPROTO", 0
+	.db	"EPROTONOSUPPORT", 0
+	.db	"EPROTOTYPE", 0
+	.db	"EROFS", 0
+	.db	"ESPIPE", 0
+	.db	"ESRCH", 0
+	.db	"ETIME", 0
+	.db	"ETIMEDOUT", 0
+	.db	"ETXTBSY", 0
+	.db	"EWOULDBLOCK", 0
+	.db	"EXDEV", 0
