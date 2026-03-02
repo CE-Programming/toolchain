@@ -41,6 +41,8 @@ int inchar(void);
 
 void outchar(char character);
 
+void errchar(char character);
+
 FILE *fopen(const char *__restrict filename, const char *__restrict mode);
 
 FILE *freopen(const char *__restrict filename, const char *__restrict mode, FILE *__restrict stream);
