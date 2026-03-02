@@ -19,10 +19,8 @@ _perror:
 	jr	z, .L.empty_string
 	; fprintf(stderr, "%s: ", str)
 	call	.L.errchar_puts
-	ld	a, ':'
-	call	.L.errchar_putchar
-	ld	a, ' '
-	call	.L.errchar_putchar
+	ld	hl, _perror_colon_space_str
+	call	.L.errchar_puts
 
 .L.null_string:
 .L.empty_string:
@@ -51,6 +49,13 @@ _perror:
 
 	.extern	_errno
 	.extern	_errchar
+
+;-------------------------------------------------------------------------------
+
+	.section	.rodata._perror_colon_space_str
+	.local	_perror_colon_space_str
+_perror_colon_space_str:
+	.asciz	": "
 
 ;-------------------------------------------------------------------------------
 
