@@ -71,7 +71,6 @@ __start:
 	ld	sp, (ti.onSP)			; reset stacks
 	call	ti.ResetStacks
 	ld	bc, ___data_len
-	or	a, a
 	sbc	hl, hl
 	adc	hl, bc
 	jr	z, .L.skip_data_copy
