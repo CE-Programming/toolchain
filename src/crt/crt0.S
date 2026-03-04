@@ -387,7 +387,8 @@ _exit:
 	pop	hl
 #endif
 #if HAS_ABORT
-	jr	.L.skip._abort
+	; jr	.L.skip._abort
+	db	$FD				; ld	iy, *
 
 	.global	_abort
 	.type	_abort, @function
