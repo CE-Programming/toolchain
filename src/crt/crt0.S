@@ -72,7 +72,6 @@ __start:
 	ld	sp, (ti.onSP)			; reset stacks
 	call	ti.ResetStacks
 	ld	bc, ___data_len
-	or	a, a
 	sbc	hl, hl
 	adc	hl, bc
 	jr	z, .L.skip_data_copy
@@ -415,7 +414,9 @@ __Exit:
 ;-------------------------------------------------------------------------------
 
 #if HAS_ABORT
-	jr	.L.skip._abort
+	; jr	.L.skip._abort
+	db	$FD				; ld	iy, *
+
 	.global	_abort
 	.type	_abort, @function
 _abort:
