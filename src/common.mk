@@ -84,7 +84,7 @@ ROOT_DIR := $(dir $(realpath $(call NATIVEPATH,$(lastword $(MAKEFILE_LIST)))))
 
 EZCFLAGS := -S -fno-autolink -fno-addrsig -fno-math-errno -ffunction-sections -fdata-sections -ffreestanding
 EZCFLAGS += -Wall -Wextra -Wimplicit-float-conversion -Wimplicit-int-float-conversion -Oz
-EZCFLAGS += -D_EZ80 -D__TICE__
+EZCFLAGS += -D_EZ80 -D__TICE__=1
 EZCFLAGS += -isystem $(call NATIVEPATH,$(ROOT_DIR)libc/include) -I$(call NATIVEPATH,$(ROOT_DIR)ce/include) -I$(call NATIVEPATH,$(ROOT_DIR)fileioc)
 EZCFLAGS += -mllvm -profile-guided-section-prefix=false -mllvm -z80-gas-style
 EZCXXFLAGS := $(EZCFLAGS) -fno-exceptions -fno-rtti
