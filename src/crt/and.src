@@ -17,7 +17,8 @@ __land:
 	push	af
 	and	a, e
 	ld	e, a
-	jr	.L.hijack_land
+	; jr	.L.hijack_land
+	.db	0x3E			; ld a, *
 __iand:
 ; CC: 24*r(PC)+11*r(SPL)+10*w(SPL)+1
 	push	af
