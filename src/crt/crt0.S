@@ -288,11 +288,16 @@ ___libload_libs_ret:
 	res	ti.bTmr1Enable, (hl)
 	set	ti.bTmr1Crystal, (hl)
 	res	ti.bTmr1Overflow, (hl)
-	ld	l, (ti.mpTmr1Counter + 1) & 0xFF
-	ld	de, 0				; Set the counter to zero
-	ld	(hl), de
-	dec	hl
-	ld	(hl), e
+
+	; Set the counter to zero
+	.errif	(ti.mpTmr1Counter & 0xFFFF) != 0
+	ld	l, h				; ld hl, ti.mpTmr1Counter
+	ld	b, 4
+.L.zeroize_counter:
+	ld	(hl), h
+	inc	hl
+	djnz	.L.zeroize_counter
+
 	ld	l, ti.mpTmrCtrl & 0xFF
 	set	ti.bTmr1Enable, (hl)		; Enable the timer
 #endif
