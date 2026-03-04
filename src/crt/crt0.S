@@ -96,6 +96,7 @@ __start:
 	ldir
 	ld	a, ti.kClear
 	jp	ti.JForceCmd
+
 	.local	___app_start
 ___app_start:
 #else
@@ -133,6 +134,7 @@ __start:
 #if HAS_LIBLOAD
 	call	ti.PushRealO1			; save running program name
 	jr	.L.tryfind
+
 .L.inram:
 	call	ti.Arc_Unarc
 .L.tryfind:
@@ -151,6 +153,7 @@ __start:
 	pop	hl				; start of loader (required to be in hl)
 	ld	de, ___libload_libs		; start of relocation data
 	jp	(hl)				; jump to the loader -- it should take care of everything else
+
 .L.notfound:
 	call	ti.PopRealO1			; restore running program name
 	call	ti.ClrScrn
@@ -218,6 +221,7 @@ ___libload_libs_ret:
 	inc	hl
 	ld	b, (hl)
 	jr	.L.parse_ans_next
+
 .L.parse_ans_loop:
 	inc	hl
 	dec	bc
@@ -296,6 +300,7 @@ ___libload_libs_ret:
 #if HAS_INIT_ARRAY
 	ld	hl, __init_array_start
 	jr	.L.init_array_start
+
 .L.init_array_loop:
 	push	hl
 	ld	hl, (hl)
@@ -345,6 +350,7 @@ _exit:
 #if HAS_ATEXIT
 	; input: (sp + 0) = exit status
 	jr	.L.exit_function_start
+
 .L.exit_function_loop:
 	ld	hl, (ix + 1 + 0 * 3)
 	ld	(__atexit_functions), hl
@@ -374,6 +380,7 @@ _exit:
 #if HAS_FINI_ARRAY
 	ld	hl, __fini_array_end
 	jr	.L.fini_array_start
+
 .L.fini_array_loop:
 	dec	hl
 	dec	hl
