@@ -5,15 +5,16 @@
 	.type	__fpupop1, @function
 
 __fpupop1:
-	push	ix
-	ld	ix, 0
-	add	ix, sp
-	push	bc
-	rlc	(ix - 1)	;move high-bit to low-bit
+	push	hl
 	scf
-	rr	(ix - 1)	;carry = exponent low-bit, high-bit = 1
+	sbc	hl, hl
+	add	hl, sp
+	push	bc
+	rlc	(hl)		;move high-bit to low-bit
+	scf
+	rr	(hl)		;carry = exponent low-bit, high-bit = 1
 	pop	bc		;restore modified mantissa
-	rl	a		;compute exponent, carry = sign
+	adc	a, a		;compute exponent, carry = sign
 	ld	d, 0
 	jr	nz, nzero	;skip if exponent non-zero
 
@@ -22,5 +23,5 @@ __fpupop1:
 nzero:
 	rl	d		;set 1 if negative operand
 	or	a, a		;set Z/NZ
-	pop	ix
+	pop	hl
 	ret
