@@ -18,7 +18,8 @@ __lor:
 	push	af
 	or	a, e
 	ld	e, a
-	jr	.L.hijack_lor
+	; jr	.L.hijack_lor
+	.db	0x3E			; ld a, *
 __ior:
 ; CC: 24*r(PC)+11*r(SPL)+10*w(SPL)+1
 	push	af

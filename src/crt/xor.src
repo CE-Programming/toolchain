@@ -18,7 +18,8 @@ __lxor:
 	push	af
 	xor	a, e
 	ld	e, a
-	jr	.L.hijack_lxor
+	; jr	.L.hijack_lxor
+	.db	0x3E			; ld a, *
 __ixor:
 ; CC: 24*r(PC)+11*r(SPL)+10*w(SPL)+1
 	push	af
