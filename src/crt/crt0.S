@@ -291,12 +291,11 @@ ___libload_libs_ret:
 
 	; Set the counter to zero
 	.errif	(ti.mpTmr1Counter & 0xFFFF) != 0
-	ld	l, h				; ld hl, ti.mpTmr1Counter
-	ld	b, 4
+	ld	l, (ti.mpTmr1Counter + 4) & 0xFF
 .L.zeroize_counter:
+	dec	l
 	ld	(hl), h
-	inc	hl
-	djnz	.L.zeroize_counter
+	jr	nz, .L.zeroize_counter
 
 	ld	l, ti.mpTmrCtrl & 0xFF
 	set	ti.bTmr1Enable, (hl)		; Enable the timer
