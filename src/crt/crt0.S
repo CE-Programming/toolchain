@@ -391,6 +391,16 @@ _exit:
 	.extern	__fini_array_start
 	.extern	__fini_array_end
 #endif
+
+	; jr	.L.skip.__Exit
+	db	0x3E				; ld a, *
+	.global	__Exit
+	.type	__Exit, @function
+__Exit:
+	; exit status is currently at (sp + 3), so we need to fix that
+	pop	bc				; destroy return address
+.L.skip.__Exit:
+
 #if HAS_ATEXIT || HAS_FINI_ARRAY || HAS_ABORT
 	pop	hl				; restore exit status
 #endif
