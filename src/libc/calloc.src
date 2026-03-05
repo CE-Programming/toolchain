@@ -34,8 +34,12 @@ _calloc:
 	jr	c, .L.zero_size
 	inc	bc
 	ex	de, hl		; DE = dst
-	; uses the all zeros address range $E40000-$EFFFFF on the Ti84CE
-	ld	hl, $EFFFFF	; HL = src
+	; uses an all zeros address range $FB0000-$FFFFFF on the Ti84CE (327680 bytes)
+	; $FF0000-$FFFFFF (65536 bytes) has 1 wait state.
+	; $FB0000-$FEFFFF has 2 wait states, but a calloc larger than 65536 bytes is basically never.
+	; Since we are only reading zeros, writing to this address range should not interfere with CEmu.
+	scf
+	sbc	hl, hl		; HL = src
 	lddr
 	ex	de, hl
 .L.zero_size:
