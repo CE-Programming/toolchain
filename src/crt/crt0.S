@@ -331,6 +331,7 @@ ___exithl:
 #if HAS_ATEXIT || HAS_FINI_ARRAY
 	push	hl				; preserve exit status
 #endif
+#if HAS_EXIT
 	; jr	.L.exit_function_start
 	db	0x3E				; ld a, *
 	.global	_exit
@@ -338,6 +339,7 @@ ___exithl:
 _exit:
 	; exit status is currently at (sp + 3), so we need to fix that
 	pop	bc				; destroy return address
+#endif
 #if HAS_ATEXIT
 	; input: (sp + 0) = exit status
 	jr	.L.exit_function_start
@@ -389,6 +391,7 @@ _exit:
 	.extern	__fini_array_end
 #endif
 
+#if HAS_C99__EXIT
 	; jr	.L.skip.__Exit
 	db	0x3E				; ld a, *
 	.global	__Exit
@@ -397,6 +400,7 @@ __Exit:
 	; exit status is currently at (sp + 3), so we need to fix that
 	pop	bc				; destroy return address
 .L.skip.__Exit:
+#endif
 
 #if HAS_ATEXIT || HAS_FINI_ARRAY
 	pop	hl				; restore exit status
