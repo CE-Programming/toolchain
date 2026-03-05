@@ -351,21 +351,24 @@ _exit:
 	; exit status is currently at (sp + 3), so we need to fix that
 	pop	bc				; destroy return address
 #endif
+
 #if HAS_ATEXIT
 	; input: (sp + 0) = exit status
 	jr	.L.exit_function_start
 
 .L.exit_function_loop:
-	ld	hl, (ix + 1 + 0 * 3)
+	push	hl
+	pop	ix
+	ld	hl, (hl)			; ld hl, (ix + 0 * 3)
 	ld	(__atexit_functions), hl
 	pop	hl				; exit status
 	push	hl				; exit status
-	ld	de, (ix + 1 + 2 * 3)		; arg
+	ld	de, (ix + 2 * 3)		; arg
 	push	de				; arg
 	push	hl				; exit status
-	ld	hl, (ix + 1 + 1 * 3)		; func
+	ld	hl, (ix + 1 * 3)		; func
 	push	hl				; func
-	pea	ix + 1
+	push	ix
 	call	_free
 	pop	bc				; reset SP
 	pop	hl				; func
@@ -375,12 +378,16 @@ _exit:
 	pop	bc				; reset SP
 	pop	bc				; reset SP
 .L.exit_function_start:
-	ld	ix, (__atexit_functions)
+	ld	hl, (__atexit_functions)
 	; NULL indicates no more atexit functions
-	ld	bc, -1
-	add	ix, bc
-	jr	c, .L.exit_function_loop
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jr	nz, .L.exit_function_loop
+
+	.extern	__atexit_functions
 #endif
+
 #if HAS_FINI_ARRAY
 	ld	hl, __fini_array_end
 	jr	.L.fini_array_start
