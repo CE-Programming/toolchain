@@ -21,7 +21,7 @@ _on_exit:
 	ex	de, hl
 	ld	(__atexit_functions), hl
 	ld	(hl), de
-	pop	de		; return address
+	pop	iy		; return address
 	inc	hl
 	inc	hl
 	inc	hl
@@ -34,8 +34,10 @@ _on_exit:
 	ld	(hl), bc
 	push	bc
 	push	bc
-	ex	de, hl
-	jp	(hl)
+	; return zero on success
+	or	a, a
+	sbc	hl, hl
+	jp	(iy)
 
 	.section	.bss
 	.global	__atexit_functions
