@@ -367,14 +367,11 @@ _exit:
 	push	de				; arg
 	push	hl				; exit status
 	ld	hl, (ix + 1 * 3)		; func
-	push	hl				; func
-	push	ix
-	call	_free
-	pop	bc				; reset SP
-	pop	hl				; func
 	; atexit  : void (*func)(void)
 	; on_exit : void (*func)(int status, void *arg)
 	call	__indcallhl
+	ex	(sp), ix
+	call	_free
 	pop	bc				; reset SP
 	pop	bc				; reset SP
 .L.exit_function_start:
