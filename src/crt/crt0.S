@@ -328,7 +328,7 @@ ___libload_libs_ret:
 	.global	___exithl
 ___exithl:
 
-#if HAS_ATEXIT || HAS_FINI_ARRAY || HAS_ABORT
+#if HAS_ATEXIT || HAS_FINI_ARRAY
 	push	hl				; preserve exit status
 #endif
 	; jr	.L.exit_function_start
@@ -398,7 +398,7 @@ __Exit:
 	pop	bc				; destroy return address
 .L.skip.__Exit:
 
-#if HAS_ATEXIT || HAS_FINI_ARRAY || HAS_ABORT
+#if HAS_ATEXIT || HAS_FINI_ARRAY
 	pop	hl				; restore exit status
 #endif
 
