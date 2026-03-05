@@ -123,6 +123,8 @@ static void write_header_defines(FILE *out, const char *elf_file, struct elf_fil
     fprintf(out, "#define HAS_FINI_ARRAY %d\n", elf_has_section(elf, ".fini_array") ? 1 : 0);
     fprintf(out, "#define HAS_CLOCK %d\n", elf_has_symbol(elf, "_clock") ? 1 : 0);
     fprintf(out, "#define HAS_ABORT %d\n", elf_has_symbol(elf, "_abort") ? 1 : 0);
+    fprintf(out, "#define HAS_EXIT %d\n", elf_has_symbol(elf, "_exit") ? 1 : 0);
+    fprintf(out, "#define HAS_C99__EXIT %d\n", elf_has_symbol(elf, "__Exit") ? 1 : 0);
     fprintf(out, "#define HAS_RUN_PRGM %d\n", elf_has_symbol(elf, "_os_RunPrgm") ? 1 : 0);
     fprintf(out, "#define HAS_MAIN_ARGC_ARGV %d\n", elf_has_defined_symbol(elf, "___main_argc_argv") ? 1 : 0);
     fprintf(out, "#define HAS_ATEXIT %d\n", elf_has_symbol(elf, "__atexit_functions") ? 1 : 0);
