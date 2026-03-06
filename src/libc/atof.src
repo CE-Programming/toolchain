@@ -25,10 +25,9 @@ _atoff:
 	push	bc
 	call	_strtod
 	pop	bc
-	pop	hl
+	pop	bc
 	ret
 
-	.extern	__frameset0
 	.extern	_strtod
 
 .endif
