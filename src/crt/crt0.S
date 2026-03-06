@@ -405,7 +405,7 @@ __Exit:
 .L.skip.__Exit:
 #endif
 
-#if HAS_ATEXIT || HAS_FINI_ARRAY
+#if HAS_ATEXIT || HAS_FINI_ARRAY || HAS_EXIT || HAS_C99__EXIT
 	pop	hl				; restore exit status
 #endif
 
