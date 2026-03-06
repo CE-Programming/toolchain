@@ -51,6 +51,10 @@
 #include <cstring>
 #include <type_traits>
 
+#ifdef _EZ80
+#include <climits>
+#endif // _EZ80
+
 #include "include/ryu/f2s.h"
 #include "include/ryu/d2s.h"
 #include "include/ryu/d2fixed.h"

@@ -35,9 +35,12 @@ OBJECTS += build/bind.cpp.o
 OBJECTS += build/call_once.cpp.o
 OBJECTS += build/charconv.cpp.o
 OBJECTS += build/chrono.cpp.o
+OBJECTS += build/d2fixed.cpp.o
+OBJECTS += build/d2s.cpp.o
 OBJECTS += build/error_category.cpp.o
 OBJECTS += build/exception.cpp.o
 OBJECTS += build/expected.cpp.o
+
 OBJECTS += build/functional.cpp.o
 OBJECTS += build/hash.cpp.o
 OBJECTS += build/legacy_pointer_safety.cpp.o
