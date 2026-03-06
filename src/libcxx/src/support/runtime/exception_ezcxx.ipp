@@ -49,8 +49,10 @@ _LIBCPP_NORETURN void terminate() noexcept {
 #endif // _LIBCPP_HAS_NO_EXCEPTIONS
 }
 
+__attribute__((__weak__))
 bool uncaught_exception() noexcept { return uncaught_exceptions() > 0; }
 
+__attribute__((__weak__))
 int uncaught_exceptions() noexcept {
   __abort_message("uncaught_exceptions not yet implemented\n");
 }
