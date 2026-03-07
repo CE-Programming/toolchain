@@ -381,13 +381,13 @@ gfx_AllocSprite:
 	add	hl, bc
 	ld	d, (hl)			; d = height
 	add	hl, bc
-	ld	hl, (hl)		; hl = malloc
+	ld	iy, (hl)		; iy = malloc
 	push	de
 	mlt	de			; de = width * height
 	inc	de			; +2 to store width and height
 	inc	de			; de = width * height + 2
 	push	de
-	call	_indcallHL		; hl = malloc(width * height + 2)
+	call	ti._indcall		; hl = malloc(width * height + 2)
 	pop	de
 	pop	de			; e = width, d = height, ude = unknown
 	; check if malloc failed (hl == 0)
@@ -3393,11 +3393,6 @@ gfx_SetTextXY:
 	ld	(_TextYPos), hl
 	push	hl			; xpos=don't care, sp=&xpos
 	ex	de, hl			; hl=return address
-;-------------------------------------------------------------------------------
-_indcallHL:
-; Calls HL
-; Inputs:
-;  HL : Address to call
 	jp	(hl)
 
 ;-------------------------------------------------------------------------------
