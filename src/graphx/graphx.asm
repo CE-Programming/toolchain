@@ -3994,13 +3994,17 @@ gfx_SetCharData:
 ;  arg0 : Pointer to character data; if null returns current data
 ; Returns:
 ;  Pointer to character data if null, otherwise pointer to next character
-	ld	iy, 0
-	add	iy, sp
+	ld	hl, 6
+	add	hl, sp
+	ld	de, (hl)	; de -> custom_character_data
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	a, (hl)
 	sbc	hl, hl		; ld hl, 0
-	ld	de, (iy + 6)	; de -> custom_character_data
 	sbc	hl, de		; sets z flag if NULL
 	add	hl, de
-	ld	l, (iy + 3)	; hl = index
+	ld	l, a		; hl = index
 	add	hl, hl
 	add	hl, hl
 	add	hl, hl
