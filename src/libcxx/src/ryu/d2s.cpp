@@ -782,6 +782,7 @@ struct __floating_decimal_64 {
       ++__v.__exponent;
     }
   } else {
+    __abort_message("unavailable: _ZNSt3__15__d2dB8ne190107Eym");
     __v = __d2d(__ieeeMantissa, __ieeeExponent);
   }
 
