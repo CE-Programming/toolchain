@@ -4,9 +4,7 @@
 #include <cdefs.h>
 #include <stdbool.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+__BEGIN_DECLS
 
 #if __has_builtin(__builtin_clzc)
 #define __ez80_clzc __builtin_clzc
@@ -174,8 +172,6 @@ unsigned int __ez80_rotateright24(unsigned int, unsigned char) __NOEXCEPT_CONST;
 unsigned __int48 __ez80_rotateright48(unsigned __int48, unsigned char) __NOEXCEPT_CONST;
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+__END_DECLS
 
 #endif /* _EZ80_BUILTIN_H */

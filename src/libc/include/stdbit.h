@@ -5,9 +5,7 @@
 #include <stdbool.h>
 #include <ez80_builtin.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+__BEGIN_DECLS
 
 #define __STDC_VERSION_STDBIT_H__ 202311L
 
@@ -1027,9 +1025,6 @@ __stdc_rotate_right_ull(x, s)
     unsigned long long: __stdc_rotate_right_ull \
 )(x, s)
 
-
-#ifdef __cplusplus
-}
-#endif
+__END_DECLS
 
 #endif /* _STDBIT_H */

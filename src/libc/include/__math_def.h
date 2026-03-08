@@ -37,9 +37,7 @@
 typedef float float_t;
 typedef double double_t;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+__BEGIN_DECLS
 
 int _fpclassifyf(float) __NOEXCEPT_CONST;
 int _fpclassifyl(long double) __NOEXCEPT_CONST;
@@ -328,8 +326,6 @@ double      trunc(double);
 float       truncf(float);
 long double truncl(long double);
 
-#ifdef __cplusplus
-}
-#endif
+__END_DECLS
 
 #endif /* _MATH_DEF_H */
