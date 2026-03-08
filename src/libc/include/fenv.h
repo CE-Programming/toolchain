@@ -11,6 +11,8 @@ extern __fenv_t __fe_cur_env;
 #ifndef _FENV_H
 #define _FENV_H
 
+#include <cdefs.h>
+
 enum {
     FE_DIVBYZERO  = 1 << 6,
 #define FE_DIVBYZERO  FE_DIVBYZERO
@@ -41,9 +43,7 @@ typedef unsigned char fexcept_t;
 extern const fenv_t __fe_dfl_env;
 #define FE_DFL_ENV (&__fe_dfl_env)
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+__BEGIN_DECLS
 
 inline int feclearexcept(int __excepts) {
     return (__fe_cur_env &= ~((__excepts) & FE_ALL_EXCEPT), 0);
@@ -89,9 +89,7 @@ inline int feupdateenv(const fenv_t *__envp) {
     return (__fe_cur_env = (__fe_cur_env & FE_ALL_EXCEPT) | *(__envp), 0);
 }
 
-#ifdef __cplusplus
-}
-#endif
+__END_DECLS
 
 #endif /* _FENV_P_ONLY */
 
