@@ -1,0 +1,169 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__fpdiv
+	.type	__fpdiv, @function
+
+; IEEE single precision division
+; aubc = aubc / euhl
+__fpdiv: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(float, pair8_24_t, { in.BC, in.A }) / bitcast(float, pair8_24_t, { in.HL, in.E })) && out.DE == in.DE && out.HL == in.HL && out.IX == in.IX && out.IY == in.IY
+	push	de
+	push	hl
+	xor	a, e
+	push	af
+	xor	a, e
+	push	bc
+	call	__fppop1
+	ex	(sp), hl
+	ld	d, e
+	ld	e, a
+	call	__fppop2
+	inc	e
+	jr	z, .L.nonfinite.1
+	ld	a, d
+	inc	a
+	jr	z, .L.nonfinite.2
+	add	a, 080h
+	dec	d
+	jr	nz, .L.exponent.adjust
+	ex	(sp), hl
+	add	hl, bc
+	jr	c, .L.normalize.divisor.done
+	sbc	hl, bc
+	jr	z, .L.divisor.zero
+.L.normalize.divisor.loop:
+	dec	a
+	add	hl, hl
+	add	hl, bc
+	jr	nc, .L.normalize.divisor.loop
+.L.normalize.divisor.done:
+	add	hl, bc
+	ex	(sp), hl
+.L.exponent.adjust:
+	ex	de, hl	; ude=UHL, uhl=UDE
+	ld	h, b
+	rl	b
+	ld	c, a
+	sbc	hl, bc
+	ld	b, h
+	ld	c, l
+	pop	hl
+	add	hl, de	; uhl=UHL+UDE
+	ex	de, hl	; ude=UHL+UDE, uhl=UHL
+	xor	a, a
+	sbc	hl, de	; uhl=-UDE
+	ex	de, hl	; ude=-UDE, uhl=UHL+UDE
+	add	hl, de	; uhl=UHL
+.L.normalize.dividend.loop:
+	add	hl, de
+	jr	c, .L.normalize.dividend.done
+	sbc	hl, de
+	jr	z, .L.dividend.zero
+	dec	bc
+	add	hl, hl
+	jr	nc, .L.normalize.dividend.loop
+	add	hl, de
+.L.normalize.dividend.done:
+	cp	a, b
+	jr	nc, .L.return.overflow
+	dec	bc
+	dec	bc
+	ld	a, c
+	inc	b
+	ld	bc, 0800000h | (23 << 8)
+	jr	z, .L.divide.entry.normal
+	adc	a, b
+	ld	b, a
+	ld	a, c
+	jr	nc, .L.return.underflow
+	push	iy
+	ld	iy, 0
+	jr	nz, .L.divide.entry.subnormal
+	dec	hl
+	add	hl, de
+	jr	.L.subsubnormal
+
+.L.divisor.zero:
+	pop	de
+	sbc	hl, de
+	jr	nz, .L.return.nonfinite
+.L.return.nan:
+	inc	b
+.L.return.overflow:
+	ld	c, b
+.L.return.nonfinite:
+	pop	af
+	pop	hl
+	pop	de
+	or	a, 07Fh
+	ret
+
+.L.nonfinite.1:
+	inc	d
+	pop	de
+	jr	z, .L.return.nan
+	push	hl
+	pop	bc
+	jr	.L.return.nonfinite
+
+.L.nonfinite.2:
+	pop	hl
+	dec	hl
+	add	hl, bc
+	jr	c, .L.return.nan
+.L.return.underflow:
+	sbc	hl, hl
+.L.dividend.zero:
+	pop	de
+	jr	.L.return
+
+.L.divide.entry.normal:
+	push	iy
+	ld	iyl, b
+.L.divide.loop:
+	add	iy, iy
+	add	hl, hl
+	jr	c, .L.divide.overflow
+	add	hl, de
+	jr	c, .L.divide.setbit
+	sbc	hl, de
+	djnz	.L.divide.loop
+	add	hl, hl
+	jr	.L.divide.finish
+.L.divide.overflow:
+	add	hl, de
+.L.divide.setbit:
+.L.divide.entry.subnormal:
+	inc	iy
+	djnz	.L.divide.loop
+	add	hl, hl
+	inc	hl
+.L.divide.finish:
+	jr	c, .L.round
+	dec	de
+	add	hl, de
+.L.round:
+	ccf
+.L.subsubnormal:
+	lea	de, iy + 0
+	pop	iy
+	sbc	hl, hl
+	inc	hl
+	add	hl, de
+	pop	de
+	ld	e, a
+	adc	a, 1
+	srl	e
+	jr	nc, .L.return
+	add	hl, bc
+.L.return:
+	sla	d
+	rra
+	ex	(sp), hl
+	pop	bc
+	pop	de
+	ret
+
+	.extern	__fppop1
+	.extern	__fppop2
