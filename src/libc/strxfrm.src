@@ -1,0 +1,12 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.weak	_strxfrm
+	.type	_strxfrm, @function
+
+_strxfrm:
+	; the only supported locale is the C locale, so strxfrm is equivalent to strlcpy
+	jp	_strlcpy
+
+	.extern	_strlcpy

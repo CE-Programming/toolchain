@@ -1,0 +1,12 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.weak	_strcoll
+	.type	_strcoll, @function
+
+_strcoll:
+	; the only supported locale is the C locale, so strcoll is equivalent to strcmp
+	jp	_strcmp
+
+	.extern	_strcmp
