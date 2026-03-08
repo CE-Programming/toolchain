@@ -320,36 +320,51 @@ ___libload_libs_ret:
 	call	_main
 #endif
 	.equ	__start._main, $ - 3
+
+;-------------------------------------------------------------------------------
+; call atexit/on_exit and fini functions
+;-------------------------------------------------------------------------------
+
 	.global	___exithl
 ___exithl:
-#if HAS_ATEXIT || HAS_FINI_ARRAY || HAS_ABORT
-	push	hl
-	push	de
+
+#if HAS_ATEXIT || HAS_FINI_ARRAY
+	push	hl				; preserve exit status
 #endif
+#if HAS_EXIT
+	; jr	.L.exit_function_start
+	db	0x3E				; ld a, *
 	.global	_exit
 	.type	_exit, @function
 _exit:
+	; exit status is currently at (sp + 3), so we need to fix that
+	pop	bc				; destroy return address
+#endif
 #if HAS_ATEXIT
+	; input: (sp + 0) = exit status
 	jr	.L.exit_function_start
 .L.exit_function_loop:
 	ld	hl, (ix + 1 + 0 * 3)
 	ld	(__atexit_functions), hl
-	pop	hl
-	ld	de, (ix + 1 + 2 * 3)
-	push	hl
-	push	de
-	push	hl
-	ld	hl, (ix + 1 + 1 * 3)
-	push	hl
+	pop	hl				; exit status
+	push	hl				; exit status
+	ld	de, (ix + 1 + 2 * 3)		; arg
+	push	de				; arg
+	push	hl				; exit status
+	ld	hl, (ix + 1 + 1 * 3)		; func
+	push	hl				; func
 	pea	ix + 1
 	call	_free
-	pop	bc
-	pop	hl
+	pop	bc				; reset SP
+	pop	hl				; func
+	; atexit  : void (*func)(void)
+	; on_exit : void (*func)(int status, void *arg)
 	call	__indcallhl
-	pop	bc
-	pop	bc
+	pop	bc				; reset SP
+	pop	bc				; reset SP
 .L.exit_function_start:
 	ld	ix, (__atexit_functions)
+	; NULL indicates no more atexit functions
 	ld	bc, -1
 	add	ix, bc
 	jr	c, .L.exit_function_loop
@@ -375,10 +390,27 @@ _exit:
 	.extern	__fini_array_start
 	.extern	__fini_array_end
 #endif
-#if HAS_ATEXIT || HAS_FINI_ARRAY || HAS_ABORT
-	pop	de
-	pop	hl
+
+#if HAS_C99__EXIT
+	; jr	.L.skip.__Exit
+	db	0x3E				; ld a, *
+	.global	__Exit
+	.type	__Exit, @function
+__Exit:
+	; exit status is currently at (sp + 3), so we need to fix that
+	pop	bc				; destroy return address
+.L.skip.__Exit:
 #endif
+
+#if HAS_ATEXIT || HAS_FINI_ARRAY || HAS_EXIT || HAS_C99__EXIT
+	pop	hl				; restore exit status
+#endif
+
+;-------------------------------------------------------------------------------
+; We have now called all atexit/on_exit and fini functions
+; HL = exit status
+;-------------------------------------------------------------------------------
+
 #if HAS_ABORT
 	jr	.L.skip._abort
 	.global	_abort
