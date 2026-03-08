@@ -84,6 +84,8 @@ build/%.ce.o: %.src
 
 clean:
 	$(Q)$(call RMDIR,build)
+	$(MAKE) -C allocator clean
+	$(MAKE) -C printf clean
 
 install: all
 	$(Q)$(call MKDIR,$(INSTALL_H))
