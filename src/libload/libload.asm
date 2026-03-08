@@ -163,12 +163,11 @@ jump_relative:
 	jp	(ix)
 ld_relative:
 	pop	hl
-	ld	de, (hl)
-	inc	hl
-	inc	hl
+	ld	de, 0
+	ld	e, (hl)
 	inc	hl
 	push	hl
-	add	hl, de			; add hl, relative - 3
+	add	hl, de			; add hl, relative - 1
 	ret
 end relocate
 
@@ -184,7 +183,7 @@ end macro
 
 macro rload? name
 	call	ld_relative
-	dl	name - $ - 3
+	db	name - $ - 1
 end macro
 
 start:
@@ -588,10 +587,12 @@ throw_error:				; draw the error message onscreen
 	call	ti.DrawStatusBar
 	call	ti.ClrScrn		; clean up the screen a bit
 	call	ti.HomeUp		; if we encounter an error
-	pop	hl
 	set	ti.textInverse, (iy + ti.textFlags)
 	ld	a, 2
 	ld	(ti.curCol), a
+	rload	str_error_prefix
+	call	ti.PutS
+	pop	hl
 	call	ti.PutS
 	res	ti.textInverse, (iy + ti.textFlags)
 	call	ti.NewLine
@@ -627,14 +628,16 @@ throw_error:				; draw the error message onscreen
 	xor	a, a			; return with zero in a
 	ret
 
+str_error_prefix:
+	db	"ERROR: Library ", 0
 str_error_version:
-	db	"ERROR: Library Version", 0
+	db	"Version", 0
 str_error_missing:
-	db	"ERROR: Missing Library", 0
+	db	"Missing", 0
 str_error_invalid:
-	db	"ERROR: Invalid Library", 0
+	db	"Invalid", 0
 str_lib_name:
 	db	"Library Name: ", 0
 str_download:
-	db	"Download here: ", 0
+	db	"Download here:", 0
 	db	"https://tiny.cc/clibs", 0
