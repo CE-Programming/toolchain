@@ -10,6 +10,8 @@ _NULL_ptr:
 
 	.section	.text
 
+	.global	_T_malloc
+	.global	_T_calloc
 	.global	_T_bzero
 	.global	_T_memccpy
 	.global	_T_memchr
@@ -41,6 +43,12 @@ _NULL_ptr:
 	.global	_T_strtok_r
 
 ;-------------------------------------------------------------------------------
+
+_T_malloc:
+	jp	_malloc
+
+_T_calloc:
+	jp	_calloc
 
 _T_bzero:
 	jp	_bzero
@@ -131,32 +139,34 @@ _T_strtok_r:
 
 ;-------------------------------------------------------------------------------
 
-	.global	_bzero
-	.global	_memccpy
-	.global	_memchr
-	.global	_memcmp
-	.global	_memcpy
-	.global	_memmem
-	.global	_memmove
-	.global	_mempcpy
-	.global	_memrchr
-	.global	_memrmem
-	.global	_memset
-	.global	_stpcpy
-	.global	_stpncpy
-	.global	_strcat
-	.global	_strchr
-	.global	_strchrnul
-	.global	_strcmp
-	.global	_strcpy
-	.global	_strlcat
-	.global	_strlen
-	.global	_strncat
-	.global	_strncmp
-	.global	_strncpy
-	.global	_strnlen
-	.global	_strrchr
-	.global	_strrstr
-	.global	_strstr
-	.global	_strtok
-	.global	_strtok_r
+	.extern	_malloc
+	.extern	_calloc
+	.extern	_bzero
+	.extern	_memccpy
+	.extern	_memchr
+	.extern	_memcmp
+	.extern	_memcpy
+	.extern	_memmem
+	.extern	_memmove
+	.extern	_mempcpy
+	.extern	_memrchr
+	.extern	_memrmem
+	.extern	_memset
+	.extern	_stpcpy
+	.extern	_stpncpy
+	.extern	_strcat
+	.extern	_strchr
+	.extern	_strchrnul
+	.extern	_strcmp
+	.extern	_strcpy
+	.extern	_strlcat
+	.extern	_strlen
+	.extern	_strncat
+	.extern	_strncmp
+	.extern	_strncpy
+	.extern	_strnlen
+	.extern	_strrchr
+	.extern	_strrstr
+	.extern	_strstr
+	.extern	_strtok
+	.extern	_strtok_r
