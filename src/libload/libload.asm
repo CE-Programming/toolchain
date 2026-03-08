@@ -163,12 +163,11 @@ jump_relative:
 	jp	(ix)
 ld_relative:
 	pop	hl
-	ld	de, (hl)
-	inc	hl
-	inc	hl
+	ld	de, 0
+	ld	e, (hl)
 	inc	hl
 	push	hl
-	add	hl, de			; add hl, relative - 3
+	add	hl, de			; add hl, relative - 1
 	ret
 end relocate
 
@@ -184,7 +183,7 @@ end macro
 
 macro rload? name
 	call	ld_relative
-	dl	name - $ - 3
+	db	name - $ - 1
 end macro
 
 start:
