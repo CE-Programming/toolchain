@@ -706,7 +706,7 @@ struct __floating_decimal_32 {
       return _Large_integer_to_chars(_First, _Last, _Mantissa2, _Exponent2);
     }
   }
-
+  __abort_message("unavailable: _ZNSt3__15__f2dB8nn190107Emm");
   const __floating_decimal_32 __v = __f2d(__ieeeMantissa, __ieeeExponent);
   return __to_chars(_First, _Last, __v, _Fmt, __ieeeMantissa, __ieeeExponent);
 }
