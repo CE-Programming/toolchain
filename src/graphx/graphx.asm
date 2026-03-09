@@ -1673,9 +1673,11 @@ _Circle:
 	ld	hl, (iy - 6)
 	or	a, a
 	sbc	hl, bc
-	jp	p, .check
+	add	hl, hl		; C = sign
+	jr	nc, .check	; positive
 	jp	pe, .sectors
-	jr	.exit
+	; jr	.exit
+	xor	a, a		; sets PE
 .check:
 	jp	po, .sectors
 .exit:
@@ -1798,11 +1800,11 @@ _FillCircle:
 	ld	hl, (ix - 6)
 	or	a, a
 	sbc	hl, bc
-	jp	p, .check
+	add	hl, hl		; C = sign
+	jr	nc, .check	; positive
 	jp	pe, .fillsectors
-	ld	sp, ix
-	pop	ix
-	ret
+	; jr	.ResetStack
+	xor	a, a		; sets PE
 .check:
 	jp	po, .fillsectors
 .ResetStack:
