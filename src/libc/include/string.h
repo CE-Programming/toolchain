@@ -5,7 +5,7 @@
 
 __BEGIN_DECLS
 
-extern void *memcpy(void *__restrict dest, const void *__restrict src, size_t n)
+void *memcpy(void *__restrict dest, const void *__restrict src, size_t n)
     __attribute__((nonnull(1, 2)));
 
 void *memmove(void *dest, const void *src, size_t n)
@@ -24,13 +24,13 @@ void *memchr(const void *s, int c, size_t n)
     __attribute__((nonnull(1)));
 
 void *memrchr(const void *s, int c, size_t n)
-    __NOEXCEPT __attribute__((nonnull(1))) __attribute((__pure__));
+    __NOEXCEPT __attribute__((nonnull(1))) __attribute__((__pure__));
 
 void *memmem(const void *haystack, size_t haystack_len, const void *needle, size_t needle_len)
-    __NOEXCEPT __attribute__((nonnull(1, 3))) __attribute((__pure__));
+    __NOEXCEPT __attribute__((nonnull(1, 3))) __attribute__((__pure__));
 
 void *memrmem(const void *haystack, size_t haystack_len, const void *needle, size_t needle_len)
-    __NOEXCEPT __attribute__((nonnull(1, 3))) __attribute((__pure__));
+    __NOEXCEPT __attribute__((nonnull(1, 3))) __attribute__((__pure__));
 
 void *memccpy(void *__restrict dest, const void *__restrict src, int c, size_t n)
     __NOEXCEPT __attribute__((nonnull(1, 2)));
@@ -119,7 +119,7 @@ int strcasecmp(const char *s1, const char *s2)
 int strncasecmp(const char *s1, const char *s2, size_t n)
     __NOEXCEPT __attribute__((nonnull(1, 2))) __attribute__((__pure__));
 
-char* strerror(int errnum);
+char *strerror(int errnum);
 
 __END_DECLS
 

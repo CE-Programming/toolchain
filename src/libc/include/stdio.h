@@ -112,7 +112,7 @@ int vsnprintf(char *__restrict buffer, size_t count, const char *__restrict form
     __attribute__((format(__printf__, 3, 0)));
 
 int fprintf(FILE *__restrict stream, const char *__restrict format, ...)
-    __attribute__((format (__printf__, 2, 3)));
+    __attribute__((format(__printf__, 2, 3)));
 
 int vfprintf(FILE *__restrict stream, const char *__restrict format, va_list va)
     __attribute__((format(__printf__, 2, 0)));

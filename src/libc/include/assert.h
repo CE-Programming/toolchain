@@ -18,7 +18,7 @@ struct __assert_loc {
     const char *__assertion;
 };
 
-extern void __assert_fail_loc(const struct __assert_loc *__loc)
+void __assert_fail_loc(const struct __assert_loc *__loc)
     __NOEXCEPT __attribute__((__cold__, __noreturn__));
 
 __END_DECLS

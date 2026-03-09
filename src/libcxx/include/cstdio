@@ -6,4 +6,4 @@
 
 #pragma clang system_header
 
-#endif // _EZCXX_CSTDINT
+#endif // _EZCXX_CSTDIO
