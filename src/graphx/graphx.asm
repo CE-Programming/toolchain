@@ -3143,7 +3143,7 @@ _Tilemap:
 	ld	(.tilemethod), hl
 	push	ix
 	ld	ix, 0
-	lea	bc, ix
+	inc.s	bc			; clear UBC
 	add	ix, sp
 	lea	hl, ix - 12
 	ld	sp, hl
@@ -3151,16 +3151,16 @@ _Tilemap:
 
 	ld	hl, (ix + y_offset)
 	ld	c, (iy + t_tile_height)
-	ld	a, (iy + t_type_height)
-	or	a, a
-	jr	nz, .heightpow2
+	ld	b, (iy + t_type_height)
+	inc	b
+	djnz	.heightpow2
+	; UBC and B are zero
 	call	ti._idvrmu
 	ex	de, hl
 	push	de
 	pop	bc
 	jr	.heightnotpow2
 .heightpow2:				; compute as power of 2 height using shifts
-	ld	b, a
 	dec	c
 	ld	a, l
 	and	a, c
@@ -3175,16 +3175,16 @@ _Tilemap:
 
 	ld	c, (iy + t_tile_width)
 	ld	hl, (ix + x_offset)	; x offset
-	ld	a, (iy + t_type_width)
-	or	a, a
-	jr	nz, .widthpow2
+	ld	b, (iy + t_type_width)
+	inc	b
+	djnz	.widthpow2
+	; UBC and B are zero
 	call	ti._idvrmu
 	ex	de, hl
 	push	de
 	pop	bc
 	jr	.widthnotpow2
 .widthpow2:
-	ld	b, a
 	dec	c
 	ld	a, l
 	and	a, c
@@ -3295,22 +3295,21 @@ gfx_TilePtr:
 ;  uint8_t *gfx_TilePtr(gfx_tilemap_t *tilemap, unsigned x_offset, unsigned y_offset) {
 ;      return &tilemap->map[(x_offset/tilemap->tile_width)+((y_offset/tilemap->tile_height)*tilemap->width)];
 ;  }
-	ld	hl, 3
+	ld	bc, 3
+	push	bc
+	pop	hl
 	add	hl, sp
 	ld	iy, (hl)
-	inc	hl
-	inc	hl
-	inc	hl
+	add	hl, bc
 	ld	hl, (hl)
-	ld	a, (iy + t_type_width)
-	or	a, a
-	jr	nz, .fastdiv0
-	ld	bc, 0
+	ld	b, (iy + t_type_width)
+	inc	b
+	djnz	.fastdiv0
+	; UBC and B are zero
 	ld	c, (iy + t_tile_width)
 	call	ti._idvrmu
 	jr	.widthnotpow2
 .fastdiv0:
-	ld	b, a
 .div0:
 	srl	h
 	rr	l
@@ -3320,10 +3319,10 @@ gfx_TilePtr:
 	ld	hl, 9
 	add	hl, sp
 	ld	hl, (hl)
-	ld	a, (iy + t_type_height)
-	or	a, a
-	jr	nz, .fastdiv1
-	ld	bc, 0
+	ld	b, (iy + t_type_height)
+	inc	b
+	djnz	.fastdiv1
+	; UBC and B are zero
 	ld	c, (iy + t_tile_height)
 	push	de
 	call	ti._idvrmu
@@ -3331,7 +3330,6 @@ gfx_TilePtr:
 	pop	de
 	jr	.heightnotpow2
 .fastdiv1:
-	ld	b, a
 .div1:
 	srl	h
 	rr	l
