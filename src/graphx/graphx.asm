@@ -1645,18 +1645,19 @@ _Circle:
 	inc	bc
 	ld	(iy - 3), bc
 	ld	bc, (iy - 9)
-	ld	hl, $800000
-	or	a, a
-	sbc	hl, bc
+
+	sbc	hl, hl
+	adc	hl, bc		; set Z/NZ
+	add	hl, hl		; C = sign
 	ld	hl, (iy - 3)
-	jp	pe, .cmp1	; BC > 0
-	; BC <= 0
-.cmp2:
+	jr	z, .cmp2	; BC == 0
+	jr	nc, .cmp1	; BC > 0
+.cmp2:	; BC <= 0
 	add	hl, hl
 	inc	hl
 	add	hl, bc
 	jr	.loop
-.cmp1:
+.cmp1:	; BC > 0
 	ld	bc, (iy - 6)
 	dec	bc
 	ld	(iy - 6), bc
@@ -1769,18 +1770,19 @@ _FillCircle:
 	inc	bc
 	ld	(ix - 3), bc
 	ld	bc, (hl)	; ld bc, (ix - 9)
-	ld	hl, $800000
-	or	a, a
-	sbc	hl, bc
+
+	sbc	hl, hl
+	adc	hl, bc		; set Z/NZ
+	add	hl, hl		; C = sign
 	ld	hl, (ix - 3)
-	jp	pe, .cmp2	; BC > 0
-	; BC <= 0
-.cmp1:
+	jr	z, .cmp2	; BC == 0
+	jr	nc, .cmp1	; BC > 0
+.cmp2:	; BC <= 0
 	add	hl, hl
 	inc	hl
 	add	hl, bc
 	jr	.loop
-.cmp2:
+.cmp1:	; BC > 0
 	ld	bc, (ix - 6)
 	dec	bc
 	ld	(ix - 6), bc
@@ -1890,18 +1892,19 @@ _FillCircle_NoClip:
 	inc	bc
 	ld	(ix - 3), bc
 	ld	bc, (ix - 9)
-	ld	hl, $800000
-	or	a, a
-	sbc	hl, bc
+
+	sbc	hl, hl
+	adc	hl, bc		; set Z/NZ
+	add	hl, hl		; C = sign
 	ld	hl, (ix - 3)
-	jp	pe, .cmp2	; BC > 0
-	; BC <= 0
-.cmp1:
+	jr	z, .cmp2	; BC == 0
+	jr	nc, .cmp1	; BC > 0
+.cmp2:	; BC <= 0
 	add	hl, hl
 	inc	hl
 	add	hl, bc
 	jr	.loop
-.cmp2:
+.cmp1:	; BC > 0
 	ld	bc, (ix - 6)
 	dec	bc
 	ld	(ix - 6), bc
