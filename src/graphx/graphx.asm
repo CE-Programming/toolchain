@@ -3295,18 +3295,19 @@ gfx_TilePtr:
 ;  uint8_t *gfx_TilePtr(gfx_tilemap_t *tilemap, unsigned x_offset, unsigned y_offset) {
 ;      return &tilemap->map[(x_offset/tilemap->tile_width)+((y_offset/tilemap->tile_height)*tilemap->width)];
 ;  }
-	push	ix
-	ld	ix, 0
-	add	ix, sp
-	ld	iy, (ix + 6)
-	ld	hl, (ix + 9)
+	ld	hl, 3
+	add	hl, sp
+	ld	iy, (hl)
+	inc	hl
+	inc	hl
+	inc	hl
+	ld	hl, (hl)
 	ld	a, (iy + t_type_width)
 	or	a, a
 	jr	nz, .fastdiv0
 	ld	bc, 0
 	ld	c, (iy + t_tile_width)
 	call	ti._idvrmu
-	ex	de, hl
 	jr	.widthnotpow2
 .fastdiv0:
 	ld	b, a
@@ -3314,9 +3315,11 @@ gfx_TilePtr:
 	srl	h
 	rr	l
 	djnz	.div0
-.widthnotpow2:
 	ex	de, hl
-	ld	hl, (ix + 12)
+.widthnotpow2:
+	ld	hl, 9
+	add	hl, sp
+	ld	hl, (hl)
 	ld	a, (iy + t_type_height)
 	or	a, a
 	jr	nz, .fastdiv1
@@ -3329,7 +3332,8 @@ gfx_TilePtr:
 	jr	.heightnotpow2
 .fastdiv1:
 	ld	b, a
-.div1:	srl	h
+.div1:
+	srl	h
 	rr	l
 	djnz	.div1
 .heightnotpow2:
@@ -3338,7 +3342,6 @@ gfx_TilePtr:
 	add	hl, de
 	ld	de, (iy + t_data)
 	add	hl, de
-	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------
