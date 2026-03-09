@@ -18,29 +18,29 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #include <stdlib.h>
 #include <time.h>
 
-static const char *wday_ab[] =
+static char const * const wday_ab[] =
 {
     "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
 };
 
-static const char *wday[] =
+static char const * const wday[] =
 {
     "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
 };
 
-static const char *mon_ab[] =
+static char const * const mon_ab[] =
 {
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 };
 
-static const char *mon[] =
+static char const * const mon[] =
 {
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
 };
 
-static char *putstr(char *d, const char *s)
+static char *putstr(char *__restrict d, const char *__restrict s)
 {
     while (*s)
     {
@@ -74,7 +74,7 @@ static char *puti(char *s, unsigned long n, int wid, int zpad)
     return s + wid;
 }
 
-size_t strftime(char *s, size_t n, const char *f, const struct tm *tm)
+size_t strftime(char *__restrict s, size_t n, const char *__restrict f, const struct tm *__restrict tm)
 {
     const char *beg = s;
     const char *e = s + n;
