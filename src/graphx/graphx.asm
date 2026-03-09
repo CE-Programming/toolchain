@@ -5912,6 +5912,7 @@ smcByte _YSpan
 	ld	hl, (ix - 15)
 
 	jr	.whileloop
+
 .forloop2:
 	inc	bc
 	inc	de
@@ -5921,15 +5922,13 @@ smcByte _YSpan
 	add	hl, bc
 	jr	c, .done
 	ld	a, (de)
-	cp	a, 0
+	xor	a, 0
 .oldcolor2 = $-1
 	jr	nz, .forloop2
-
-.done:
+	; Z and NC
+.done:	; <-- NZ and C
 	ld	(ix + 6), bc
 	ld	(ix - 11), bc		; l = x;
-	or	a, a
-	sbc	hl, bc
 	jp	nc, .forloop1start	; } while ((unsigned)x<=x2);
 
 	ld	hl, 0
