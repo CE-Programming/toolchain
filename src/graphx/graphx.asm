@@ -4825,7 +4825,7 @@ gfx_ScaleSprite:
 	call	_UCDivA			; ca = du = (source_width*256)/target_width
 	pop	hl			; hl->src_data
 	pop	de			; de->tgt_data
-	ld	iy, 0
+	inc.s	iy			; clear IYU
 	ld	iyl, a
 	ld	ixh, c			; (.du) = bc:iyl, ixl = target_height
 
