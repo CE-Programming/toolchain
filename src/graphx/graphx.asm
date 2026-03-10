@@ -381,13 +381,13 @@ gfx_AllocSprite:
 	add	hl, bc
 	ld	d, (hl)			; d = height
 	add	hl, bc
-	ld	hl, (hl)		; hl = malloc
+	ld	iy, (hl)		; iy = malloc
 	push	de
 	mlt	de			; de = width * height
 	inc	de			; +2 to store width and height
 	inc	de			; de = width * height + 2
 	push	de
-	call	_indcallHL		; hl = malloc(width * height + 2)
+	call	ti._indcall		; hl = malloc(width * height + 2)
 	pop	de
 	pop	de			; e = width, d = height, ude = unknown
 	; check if malloc failed (hl == 0)
@@ -2698,8 +2698,8 @@ gfx_TransparentSprite:
 ; Returns:
 ;  None
 	push	ix			; save ix sp
+	; returns directly to the caller of gfx_(Transparent)Sprite when offscreen
 	call	_ClipCoordinates
-	jr	nc, .culled
 	;	iyl = new width (next)
 	;	iyh = new height
 	ld	(.amount), a
@@ -2718,7 +2718,6 @@ smcByte _TransparentColor
 	add	ix, de
 	dec	iyh
 	jr	nz, .loop
-.culled:
 	pop	ix
 	ret
 
@@ -2779,8 +2778,8 @@ gfx_Sprite:
 ; Returns:
 ;  None
 	push	ix			; save ix sp
+	; returns directly to the caller of gfx_(Transparent)Sprite when offscreen
 	call	_ClipCoordinates
-	jr	nc, .culled
 	;	iyl = new width (next)
 	;	iyh = new height
 	wait_quick
@@ -2794,7 +2793,6 @@ gfx_Sprite:
 	add	hl, bc			; move to next line
 	dec	iyh
 	jr	nz, .loop
-.culled:
 	pop	ix			; restore ix sp
 	ret
 
@@ -2941,10 +2939,15 @@ smcByte _TransparentColor
 	add	ix, de
 	dec	iyh			; loop for height
 	jr	nz, .loop
+_ClipCoordinates_Restore_IX:
 	pop	ix			; restore stack pointer
 	ret
 
 ;-------------------------------------------------------------------------------
+_ClipCoordinates_Offscreen:
+	; return directly to the caller of gfx_(Transparent)Sprite
+	pop	hl	; return address for gfx_(Transparent)Sprite
+	jr	_ClipCoordinates_Restore_IX
 _ClipCoordinates:
 ; Clipping stuff
 ; Arguments:
@@ -2952,6 +2955,7 @@ _ClipCoordinates:
 ;  arg1 : X coordinate
 ;  arg2 : Y coordinate
 ; Returns:
+;  Offscreen: returns directly to the caller of gfx_(Transparent)Sprite
 ;  A  : How much to add to the sprite per iteration
 ;  BCU: 0
 ;  B  : 0
@@ -2959,7 +2963,6 @@ _ClipCoordinates:
 ;  IYL: New sprite width
 ;  HL : Sprite pixel pointer
 ;  IX : Buffer pixel pointer
-;  NC : If offscreen
 	ld	ix, 6			; get pointer to arguments
 	add	ix, sp
 	ld	hl, (ix + 3)		; hl -> sprite data
@@ -2995,7 +2998,7 @@ smcByte _YSpan
 	sub	a, l			; a = negated relative y
 .cliptop:
 	add	hl, bc			; is partially clipped top?
-	ret	nc
+	jr	nc, _ClipCoordinates_Offscreen
 	ex	de, hl			; e = new height - 1
 	ld	c, a			; c = negated relative y
 	ld	b, iyl			; b = width
@@ -3040,7 +3043,7 @@ smcWord _XSpan
 	sub	a, l			; a = negated relative x
 .clipleft:
 	add	hl, bc			; is partially clipped left?
-	ret	nc			; return if offscreen
+	jr	nc, _ClipCoordinates_Offscreen
 	ex	de, hl			; e = new width - 1
 	ld	c, a			; bc = negated relative x
 	ld	hl, (ix + 3)		; hl -> sprite data
@@ -3068,7 +3071,6 @@ smcWord _XMin
 	inc	hl
 	ld	ix, (CurrentBuffer)
 	add	ix, de
-	scf				; set carry for success
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -3141,7 +3143,7 @@ _Tilemap:
 	ld	(.tilemethod), hl
 	push	ix
 	ld	ix, 0
-	lea	bc, ix
+	inc.s	bc			; clear UBC
 	add	ix, sp
 	lea	hl, ix - 12
 	ld	sp, hl
@@ -3149,16 +3151,16 @@ _Tilemap:
 
 	ld	hl, (ix + y_offset)
 	ld	c, (iy + t_tile_height)
-	ld	a, (iy + t_type_height)
-	or	a, a
-	jr	nz, .heightpow2
+	ld	b, (iy + t_type_height)
+	inc	b
+	djnz	.heightpow2
+	; UBC and B are zero
 	call	ti._idvrmu
 	ex	de, hl
 	push	de
 	pop	bc
 	jr	.heightnotpow2
 .heightpow2:				; compute as power of 2 height using shifts
-	ld	b, a
 	dec	c
 	ld	a, l
 	and	a, c
@@ -3173,16 +3175,16 @@ _Tilemap:
 
 	ld	c, (iy + t_tile_width)
 	ld	hl, (ix + x_offset)	; x offset
-	ld	a, (iy + t_type_width)
-	or	a, a
-	jr	nz, .widthpow2
+	ld	b, (iy + t_type_width)
+	inc	b
+	djnz	.widthpow2
+	; UBC and B are zero
 	call	ti._idvrmu
 	ex	de, hl
 	push	de
 	pop	bc
 	jr	.widthnotpow2
 .widthpow2:
-	ld	b, a
 	dec	c
 	ld	a, l
 	and	a, c
@@ -3293,32 +3295,34 @@ gfx_TilePtr:
 ;  uint8_t *gfx_TilePtr(gfx_tilemap_t *tilemap, unsigned x_offset, unsigned y_offset) {
 ;      return &tilemap->map[(x_offset/tilemap->tile_width)+((y_offset/tilemap->tile_height)*tilemap->width)];
 ;  }
-	push	ix
-	ld	ix, 0
-	add	ix, sp
-	ld	iy, (ix + 6)
-	ld	hl, (ix + 9)
-	ld	a, (iy + t_type_width)
-	or	a, a
-	jr	nz, .fastdiv0
-	ld	bc, 0
+	ld	bc, 3
+	push	bc
+	pop	hl
+	add	hl, sp
+	ld	iy, (hl)
+	add	hl, bc
+	ld	hl, (hl)
+	ld	b, (iy + t_type_width)
+	inc	b
+	djnz	.fastdiv0
+	; UBC and B are zero
 	ld	c, (iy + t_tile_width)
 	call	ti._idvrmu
-	ex	de, hl
 	jr	.widthnotpow2
 .fastdiv0:
-	ld	b, a
 .div0:
 	srl	h
 	rr	l
 	djnz	.div0
-.widthnotpow2:
 	ex	de, hl
-	ld	hl, (ix + 12)
-	ld	a, (iy + t_type_height)
-	or	a, a
-	jr	nz, .fastdiv1
-	ld	bc, 0
+.widthnotpow2:
+	ld	hl, 9
+	add	hl, sp
+	ld	hl, (hl)
+	ld	b, (iy + t_type_height)
+	inc	b
+	djnz	.fastdiv1
+	; UBC and B are zero
 	ld	c, (iy + t_tile_height)
 	push	de
 	call	ti._idvrmu
@@ -3326,8 +3330,8 @@ gfx_TilePtr:
 	pop	de
 	jr	.heightnotpow2
 .fastdiv1:
-	ld	b, a
-.div1:	srl	h
+.div1:
+	srl	h
 	rr	l
 	djnz	.div1
 .heightnotpow2:
@@ -3336,7 +3340,6 @@ gfx_TilePtr:
 	add	hl, de
 	ld	de, (iy + t_data)
 	add	hl, de
-	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -3398,11 +3401,6 @@ gfx_SetTextXY:
 	ld	(_TextYPos), hl
 	push	hl			; xpos=don't care, sp=&xpos
 	ex	de, hl			; hl=return address
-;-------------------------------------------------------------------------------
-_indcallHL:
-; Calls HL
-; Inputs:
-;  HL : Address to call
 	jp	(hl)
 
 ;-------------------------------------------------------------------------------
@@ -4004,13 +4002,17 @@ gfx_SetCharData:
 ;  arg0 : Pointer to character data; if null returns current data
 ; Returns:
 ;  Pointer to character data if null, otherwise pointer to next character
-	ld	iy, 0
-	add	iy, sp
+	ld	hl, 6
+	add	hl, sp
+	ld	de, (hl)	; de -> custom_character_data
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	a, (hl)
 	sbc	hl, hl		; ld hl, 0
-	ld	de, (iy + 6)	; de -> custom_character_data
 	sbc	hl, de		; sets z flag if NULL
 	add	hl, de
-	ld	l, (iy + 3)	; hl = index
+	ld	l, a		; hl = index
 	add	hl, hl
 	add	hl, hl
 	add	hl, hl
@@ -4823,7 +4825,7 @@ gfx_ScaleSprite:
 	call	_UCDivA			; ca = du = (source_width*256)/target_width
 	pop	hl			; hl->src_data
 	pop	de			; de->tgt_data
-	ld	iy, 0
+	inc.s	iy			; clear IYU
 	ld	iyl, a
 	ld	ixh, c			; (.du) = bc:iyl, ixl = target_height
 
@@ -5708,16 +5710,17 @@ gfx_FloodFill:
 	ld	bc, (ix + 6)
 	call	_GetPixel		; ov = p(x, y);
 
-	ld	(.oldcolor0), a
-	ld	(.oldcolor1), a
-	ld	(.oldcolor2), a
 	ld	b, (ix + 12)
 	cp	a, b			; return if same color
 	jq	z, .return
 
-	ld	a, b
-	ld	(.newcolor0), a
-	ld	(.newcolor1), a
+	ld	iy, _FloodFill_smc_base
+	ld	(iy + (.oldcolor0 - _FloodFill_smc_base)), a
+	ld	(iy + (.oldcolor1 - _FloodFill_smc_base)), a
+	ld	(.oldcolor2), a
+
+	ld	(iy + (.newcolor0 - _FloodFill_smc_base)), b
+	ld	(iy + (.newcolor1 - _FloodFill_smc_base)), b
 
 	lea	iy, ix
 	ld	bc, -3224
@@ -5847,6 +5850,8 @@ smcWord _XMaxMinus1
 .oldcolor1 = $-1
 	jr	z, .forloop1
 
+_FloodFill_smc_base := $
+
 .ovat:
 	ld	(ix + 6), bc
 	lea	de, ix - 24		; push(y, l, x-1, dy);
@@ -5914,26 +5919,25 @@ smcByte _YSpan
 	add	hl, de
 	ex	de, hl			; de -> draw location
 	ld	hl, (ix - 15)
-
+	; carry is cleared here
 	jr	.whileloop
+
 .forloop2:
 	inc	bc
 	inc	de
 .whileloop:
-	or	a, a
+	; or	a, a
 	sbc	hl, bc
 	add	hl, bc
 	jr	c, .done
 	ld	a, (de)
-	cp	a, 0
+	xor	a, 0
 .oldcolor2 = $-1
 	jr	nz, .forloop2
-
-.done:
+	; Z and NC
+.done:	; <-- NZ and C
 	ld	(ix + 6), bc
 	ld	(ix - 11), bc		; l = x;
-	or	a, a
-	sbc	hl, bc
 	jp	nc, .forloop1start	; } while ((unsigned)x<=x2);
 
 	ld	hl, 0
