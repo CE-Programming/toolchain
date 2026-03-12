@@ -2952,8 +2952,8 @@ assert endpointDescriptor.wMaxPacketSize+2 = endpointDescriptor.bInterval
 	inc	hl
 	ld	b,(hl)
 	inc	b
-	djnz	.validInterval
-	jq	.invalidParam
+	dec	b
+	jq	z, .invalidParam
 .validInterval:
 	ex	de,hl
 	inc.s	hl
