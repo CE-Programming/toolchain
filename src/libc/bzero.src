@@ -7,6 +7,13 @@
 
 .ifdef __TICE__
 
+.ifdef PREFER_OS_LIBC
+
+	; ti.boot.memclear
+	.set	_bzero, 0x0000B0
+
+.else
+
 ; uses the hardware specific $E40000 memory location
 
 ; void bzero(void* buf, size_t n)
@@ -23,6 +30,8 @@ _bzero:
 	ld	hl, $E40000	; large region of all zeros on the Ti84CE
 	ldir
 	ret
+
+.endif
 
 .else
 
