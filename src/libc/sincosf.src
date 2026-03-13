@@ -1,0 +1,93 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	_sinf
+	.type	_sinf, @function
+	.global	_sin
+	.type	_sin, @function
+
+.ifdef PREFER_OS_LIBC
+
+	.set	_sinf, 0x022118
+	.set	_sin, _sinf
+
+.else
+
+; float _f32_sinus(int quad, float arg)
+_sin:
+_sinf:
+	ld	hl, 6
+	add	hl, sp
+	ld	e, (hl)		; exponent
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	hl, (hl)	; mantissa
+	ld	a, e
+	add	a, a		; clear signbit
+	sub	a, 117		; |x| < 2^-10 or 0x3affffff
+	ret	c		; sin(x) = x for small arguments
+	ld	a, e
+	res	7, e		; x = fabsf(x)
+	push	de		; exponent
+	push	hl		; mantissa
+	rlca
+	add	a, a
+	ld	e, a
+	push	de
+	.local	_sinf.hijack
+_sinf.hijack:
+	call	__f32_sinus
+	pop	bc
+	pop	bc
+	pop	bc
+	; you can ret here if clamping is not needed
+	; clamp the result to [-1.0, +1.0]
+	ld	a, e
+	add	a, a
+	sub	a, 126
+	ret	nz		; |y| < 0.5f
+	push	hl
+	add	hl, hl
+	pop	hl
+	ret	nc		; |y| < 1.0f
+	ld	l, h		; zero out the lower 8 bits of the mantissa
+	ret
+
+	.extern	__f32_sinus
+
+.endif
+
+	.section	.text
+
+	.global	_cosf
+	.type	_cosf, @function
+	.global	_cos
+	.type	_cos, @function
+
+.ifdef PREFER_OS_LIBC
+
+	.set	_cosf, 0x02211C
+	.set	_cos, _cosf
+
+.else
+
+; float _f32_sinus(int quad, float arg)
+_cos:
+_cosf:
+	ld	hl, 6
+	add	hl, sp
+	ld	e, (hl)		; exponent
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	hl, (hl)	; mantissa
+	res	7, e		; fabsf(x)
+	push	de
+	push	hl
+	scf			; quad 1, N reset, C set
+	push	af
+	jr	_sinf.hijack
+
+.endif
