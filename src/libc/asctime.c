@@ -1,5 +1,6 @@
 #include <time.h>
 #include <stdio.h>
+#include <ti/sprintf.h>
 
 char *asctime(const struct tm *timeptr)
 {
@@ -21,19 +22,20 @@ char *asctime(const struct tm *timeptr)
         timeptr->tm_hour < 0 || timeptr->tm_hour > 23 ||
         timeptr->tm_min < 0  || timeptr->tm_min > 59  ||
         timeptr->tm_sec < 0  || timeptr->tm_sec > 60  ||
-        timeptr->tm_year < -1900 || timeptr->tm_year > 8099)
-    {
+        timeptr->tm_year < -1900 || timeptr->tm_year > 8099
+    ) {
         return NULL;
     }
 
-    sprintf(result, "%.3s %.3s %2d %.2d:%.2d:%.2d %d\n",
+    boot_sprintf(result, "%.3s %.3s %2d %.2d:%.2d:%.2d %d\n",
         wday_name[timeptr->tm_wday],
         mon_name[timeptr->tm_mon],
         timeptr->tm_mday,
         timeptr->tm_hour,
         timeptr->tm_min,
         timeptr->tm_sec,
-        1900 + timeptr->tm_year);
+        1900 + timeptr->tm_year
+    );
 
     return result;
 }
