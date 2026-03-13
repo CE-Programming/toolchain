@@ -9,7 +9,6 @@
 _cimagl:
 	ld	iy, 0
 	add	iy, sp
-	ld	sp, iy
 	ld	hl, (iy + 11)
 	ld	de, (iy + 14)
 	ld	bc, (iy + 17)

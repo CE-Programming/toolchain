@@ -10,9 +10,11 @@
 ; float cimagf(float _Complex)
 _cimagf:
 _cimag:
-	ld	iy, 0
-	add	iy, sp
-	ld	sp, iy
-	ld	hl, (iy + 7)
-	ld	e, (iy + 10)
+	ld	hl, 10
+	add	hl, sp
+	ld	e, (hl)
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	hl, (hl)
 	ret
