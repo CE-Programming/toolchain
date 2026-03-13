@@ -1645,40 +1645,39 @@ _Circle:
 	inc	bc
 	ld	(iy - 3), bc
 	ld	bc, (iy - 9)
-	or	a, a
+
 	sbc	hl, hl
-	sbc	hl, bc
-	jp	m, .cmp0
-	jp	pe, .cmp1
-	jr	.cmp2
-.cmp0:
-	jp	po, .cmp1
-.cmp2:
+	adc	hl, bc		; set Z/NZ
+	add	hl, hl		; C = sign
 	ld	hl, (iy - 3)
+	jr	z, .cmp2	; BC == 0
+	jr	nc, .cmp1	; BC > 0
+.cmp2:	; BC <= 0
 	add	hl, hl
 	inc	hl
 	add	hl, bc
-	jr	.next
-.cmp1:
+	jr	.loop
+.cmp1:	; BC > 0
 	ld	bc, (iy - 6)
 	dec	bc
 	ld	(iy - 6), bc
-	ld	hl, (iy - 3)
 	or	a, a
 	sbc	hl, bc
 	add	hl, hl
 	inc	hl
 	ld	de, (iy - 9)
 	add	hl, de
-.next:
+.loop:
 	ld	(iy - 9), hl
 	ld	bc, (iy - 3)
 	ld	hl, (iy - 6)
 	or	a, a
 	sbc	hl, bc
-	jp	p, .check
+	add	hl, hl		; C = sign
+	jr	nc, .check	; positive
 	jp	pe, .sectors
-	jr	.exit
+	; jr	.exit
+	xor	a, a		; sets PE
 .check:
 	jp	po, .sectors
 .exit:
@@ -1706,7 +1705,7 @@ gfx_Circle:
 	inc	hl
 	sbc	hl, bc	; HL = 1 - BC
 	call	gfx_Wait
-	jr	_Circle.next
+	jr	_Circle.loop
 
 ;-------------------------------------------------------------------------------
 _FillCircle:
@@ -1772,43 +1771,40 @@ _FillCircle:
 	ld	bc, (ix - 3)
 	inc	bc
 	ld	(ix - 3), bc
-	ld	bc, (ix - 9)
-	or	a, a
+	ld	bc, (hl)	; ld bc, (ix - 9)
+
 	sbc	hl, hl
-	sbc	hl, bc
-	jp	m, .cmp0
-	jp	pe, .cmp2
-	jr	.cmp1
-.cmp0:
-	jp	po, .cmp2
-.cmp1:
+	adc	hl, bc		; set Z/NZ
+	add	hl, hl		; C = sign
 	ld	hl, (ix - 3)
+	jr	z, .cmp2	; BC == 0
+	jr	nc, .cmp1	; BC > 0
+.cmp2:	; BC <= 0
 	add	hl, hl
 	inc	hl
 	add	hl, bc
-	jr	.cmp3
-.cmp2:
+	jr	.loop
+.cmp1:	; BC > 0
 	ld	bc, (ix - 6)
 	dec	bc
 	ld	(ix - 6), bc
-	ld	hl, (ix - 3)
 	ld	de, (ix - 9)
 	or	a, a
 	sbc	hl, bc
 	add	hl, hl
 	inc	hl
 	add	hl, de
-.cmp3:
+.loop:
 	ld	(ix - 9), hl
 	ld	bc, (ix - 3)
 	ld	hl, (ix - 6)
 	or	a, a
 	sbc	hl, bc
-	jp	p, .check
+	add	hl, hl		; C = sign
+	jr	nc, .check	; positive
 	jp	pe, .fillsectors
-	ld	sp, ix
-	pop	ix
-	ret
+	; jr	.ResetStack
+	xor	a, a		; sets PE
 .check:
 	jp	po, .fillsectors
 .ResetStack:
@@ -1837,7 +1833,7 @@ gfx_FillCircle:
 	ld	(ix - 3), hl
 	inc	hl
 	sbc	hl, bc	; HL = 1 - BC
-	jr	_FillCircle.cmp3
+	jr	_FillCircle.loop
 
 ;-------------------------------------------------------------------------------
 _FillCircle_NoClip:
@@ -1898,25 +1894,22 @@ _FillCircle_NoClip:
 	inc	bc
 	ld	(ix - 3), bc
 	ld	bc, (ix - 9)
-	or	a, a
+
 	sbc	hl, hl
-	sbc	hl, bc
-	jp	m, .cmp0
-	jp	pe, .cmp2
-	jr	.cmp1
-.cmp0:
-	jp	po, .cmp2
-.cmp1:
+	adc	hl, bc		; set Z/NZ
+	add	hl, hl		; C = sign
 	ld	hl, (ix - 3)
+	jr	z, .cmp2	; BC == 0
+	jr	nc, .cmp1	; BC > 0
+.cmp2:	; BC <= 0
 	add	hl, hl
 	inc	hl
 	add	hl, bc
 	jr	.loop
-.cmp2:
+.cmp1:	; BC > 0
 	ld	bc, (ix - 6)
 	dec	bc
 	ld	(ix - 6), bc
-	ld	hl, (ix - 3)
 	or	a, a
 	sbc	hl, bc
 	add	hl, hl
