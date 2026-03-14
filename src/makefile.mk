@@ -314,10 +314,39 @@ MATH_ERRNO = -fno-math-errno
 endif
 
 # define the compiler/assembler flags
-EZLLVMFLAGS = -mllvm -profile-guided-section-prefix=false -mllvm -z80-gas-style -ffunction-sections -fdata-sections -fno-addrsig -fno-autolink -fno-threadsafe-statics $(MATH_ERRNO)
-EZCOMMONFLAGS = -nostdinc -isystem $(call QUOTE_ARG,$(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/include)) -I$(SRCDIR) -Xclang -fforce-mangle-main-argc-argv $(EZLLVMFLAGS) -D__TICE__=1 $(CC_CUSTOMFILE)
-EZCFLAGS = $(EZCOMMONFLAGS) $(CFLAGS) $(CC_DEBUG)
-EZCXXFLAGS = $(EZCOMMONFLAGS) -isystem $(call QUOTE_ARG,$(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/include/c++)) -fno-exceptions -fno-use-cxa-atexit $(CXXFLAGS) $(CC_DEBUG)
+
+EZLLVMFLAGS =
+EZLLVMFLAGS += -fno-autolink
+EZLLVMFLAGS += -fno-addrsig
+EZLLVMFLAGS += -fno-threadsafe-statics
+EZLLVMFLAGS += -mllvm -profile-guided-section-prefix=false
+EZLLVMFLAGS += -mllvm -z80-gas-style
+EZLLVMFLAGS += -ffunction-sections
+EZLLVMFLAGS += -fdata-sections
+EZLLVMFLAGS += $(MATH_ERRNO)
+
+EZCOMMONFLAGS =
+EZCOMMONFLAGS += -nostdinc
+EZCOMMONFLAGS += -Xclang -fforce-mangle-main-argc-argv
+EZCOMMONFLAGS += $(EZLLVMFLAGS)
+EZCOMMONFLAGS += -D__TICE__=1
+EZCOMMONFLAGS += $(CC_CUSTOMFILE)
+
+EZLIBCINCLUDE = -isystem $(call QUOTE_ARG,$(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/include))
+EZLIBCINCLUDE += -I$(SRCDIR)
+
+EZLIBCXXINCLUDE = -isystem $(call QUOTE_ARG,$(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/include/c++))
+
+EZCFLAGS = $(EZCOMMONFLAGS) $(EZLIBCINCLUDE)
+EZCFLAGS += $(CFLAGS) $(CC_DEBUG)
+
+# The C++ standard requires libcxx headers to be searched before libc headers
+# this means include/c++/math.h must be included before include/math.h
+EZCXXFLAGS = $(EZCOMMONFLAGS) $(EZLIBCXXINCLUDE) $(EZLIBCINCLUDE)
+EZCXXFLAGS += -fno-exceptions
+EZCXXFLAGS += -fno-use-cxa-atexit
+EZCXXFLAGS += $(CXXFLAGS) $(CC_DEBUG)
+
 EZLTOFLAGS = $(EZLLVMFLAGS) $(LTOFLAGS)
 EZASFLAGS = -march=ez80+full $(ASFLAGS)
 

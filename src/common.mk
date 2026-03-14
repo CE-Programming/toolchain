@@ -82,13 +82,39 @@ endif
 QUOTE_NATIVE = $(call QUOTE_ARG,$(call NATIVEPATH,$1))
 ROOT_DIR := $(dir $(realpath $(call NATIVEPATH,$(lastword $(MAKEFILE_LIST)))))
 
-EZCFLAGS := -S -fno-autolink -fno-addrsig -fno-math-errno -ffunction-sections -fdata-sections -ffreestanding
-EZCFLAGS += -Wall -Wextra -Wimplicit-float-conversion -Wimplicit-int-float-conversion -Oz
-EZCFLAGS += -D_EZ80 -D__TICE__=1
-EZCFLAGS += -isystem $(call NATIVEPATH,$(ROOT_DIR)libc/include) -I$(call NATIVEPATH,$(ROOT_DIR)ce/include) -I$(call NATIVEPATH,$(ROOT_DIR)fileioc)
-EZCFLAGS += -mllvm -profile-guided-section-prefix=false -mllvm -z80-gas-style
-EZCXXFLAGS := $(EZCFLAGS) -fno-exceptions -fno-rtti
-EZCXXFLAGS += -isystem $(call NATIVEPATH,$(ROOT_DIR)libcxx/include)
+EZLLVMFLAGS :=
+EZLLVMFLAGS += -fno-autolink
+EZLLVMFLAGS += -fno-addrsig
+EZLLVMFLAGS += -fno-threadsafe-statics
+EZLLVMFLAGS += -mllvm -profile-guided-section-prefix=false
+EZLLVMFLAGS += -mllvm -z80-gas-style
+EZLLVMFLAGS += -ffunction-sections
+EZLLVMFLAGS += -fdata-sections
+EZLLVMFLAGS += -fno-math-errno
+
+EZCOMMONFLAGS := -S
+EZCOMMONFLAGS += -ffreestanding
+EZCOMMONFLAGS += $(EZLLVMFLAGS)
+EZCOMMONFLAGS += -Oz
+EZCOMMONFLAGS += -Wall -Wextra -Wshadow
+EZCOMMONFLAGS += -Wimplicit-float-conversion -Wimplicit-int-float-conversion
+EZCOMMONFLAGS += -Wimplicit-int-conversion
+EZCOMMONFLAGS += -D_EZ80 -D__TICE__=1
+
+EZLIBCINCLUDE := -isystem $(call NATIVEPATH,$(ROOT_DIR)libc/include)
+EZLIBCINCLUDE += -I$(call NATIVEPATH,$(ROOT_DIR)ce/include)
+EZLIBCINCLUDE += -I$(call NATIVEPATH,$(ROOT_DIR)fileioc)
+
+EZLIBCXXINCLUDE := -isystem $(call NATIVEPATH,$(ROOT_DIR)libcxx/include)
+
+EZCFLAGS := $(EZCOMMONFLAGS) $(EZLIBCINCLUDE)
+
+# The C++ standard requires libcxx headers to be searched before libc headers
+# this means include/c++/math.h must be included before include/math.h
+EZCXXFLAGS := $(EZCOMMONFLAGS) $(EZLIBCXXINCLUDE) $(EZLIBCINCLUDE)
+EZCXXFLAGS += -fno-exceptions
+EZCXXFLAGS += -fno-rtti
+
 EZASFLAGS := -march=ez80+full
 EZASFLAGS += --defsym __TICE__=1
 
