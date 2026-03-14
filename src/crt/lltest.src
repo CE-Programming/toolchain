@@ -1,0 +1,36 @@
+	.assume	adl=1
+
+	.section	.text
+	.global	__lltest
+	.type	__lltest, @function
+
+__lltest:
+	; Z flag = ((BC:UDE:UHL & SP64) == 0)
+	; all other flags are destroyed
+	; (sp + 18) = [48:63]
+	; (sp + 15) = [24:47]
+	; (sp + 12) = [ 0:23]
+	; (sp +  9) = ret
+	push	bc	; (sp + 6)
+	push	de	; (sp + 3)
+	push	hl	; (sp + 0)
+	ld	hl, 18
+	add	hl, sp
+	ld	bc, (hl)
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	de, (hl)
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	hl, (hl)
+	call	__lland
+	call	__llcmpzero
+	pop	hl
+	pop	de
+	pop	bc
+	ret
+
+	.extern	__lland
+	.extern	__llcmpzero

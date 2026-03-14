@@ -1,0 +1,19 @@
+	.assume	adl=1
+
+	.section	.text
+	.global	__i48test
+	.type	__i48test, @function
+
+__i48test:
+	; Z flag = ((UDE:UHL & UIY:UBC) == 0)
+	; all other flags are destroyed
+	push	hl
+	push	de
+	call	__i48and
+	call	__i48cmpzero
+	pop	de
+	pop	hl
+	ret
+
+	.extern	__i48and
+	.extern	__i48cmpzero

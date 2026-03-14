@@ -1,0 +1,20 @@
+	.assume	adl=1
+
+	.section	.text
+	.global	__ltest
+	.type	__ltest, @function
+
+__ltest:
+	; Z flag = ((E:UHL & A:UBC) == 0)
+	; all other flags are destroyed
+	tst	a, e
+	ret	nz
+	push	hl
+	call	__iand
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	pop	hl
+	ret
+
+	.extern	__iand
