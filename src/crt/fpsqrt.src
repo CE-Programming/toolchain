@@ -18,7 +18,7 @@ __fpsqrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)sq
 	sbc	hl, bc
 	jr	z, .L.zero
 	rlca
-	jr	c, .L.nan
+	jr	c, .L.return_nan
 	inc	e
 	jr	z, .L.nonfinite
 	push	hl
@@ -107,7 +107,9 @@ __fpsqrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)sq
 	pop	de
 	ret
 
-.L.nan:
+.L.return_nan:
+	; input was negative and not -0.0
+	; return negative NaN
 	sbc	a, a
 	set	7, b
 	pop	hl
