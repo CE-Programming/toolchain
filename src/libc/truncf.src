@@ -7,8 +7,30 @@
 	.global	_trunc
 	.type	_trunc, @function
 
+.if 1
+
 _trunc:
 _truncf:
+	; Size-Optimization: wraps __fptrunc to improve code sharing.
+	pop	de
+	pop	bc
+	ex	(sp), hl
+	ld	a, l
+	call	__fptrunc
+	push	bc
+	ex	(sp), hl
+	push	de
+	ld	e, a
+	ret
+
+	.extern	__fptrunc
+
+.else
+
+_trunc:
+_truncf:
+	; Speed-Optimization: Slightly faster than wrapping __fptrunc as no
+	; calling convention conversions need to be performed.
 	ld	hl, 6
 	add	hl, sp
 	ld	e, (hl)
@@ -51,3 +73,5 @@ _truncf:
 
 	.extern	__ishl
 	.extern	__iand
+
+.endif

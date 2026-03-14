@@ -1,0 +1,22 @@
+	.assume	adl=1
+
+	.section	.text
+	.global	_cbrtf
+	.type	_cbrtf, @function
+	.global	_cbrt
+	.type	_cbrt, @function
+
+_cbrt:
+_cbrtf:
+	pop	de
+	pop	bc
+	ex	(sp), hl
+	ld	a, l
+	call	__fpcbrt
+	push	bc
+	ex	(sp), hl
+	push	de
+	ld	e, a
+	ret
+
+	.extern	__fpcbrt
