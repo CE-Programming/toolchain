@@ -1,0 +1,18 @@
+	.assume	adl=1
+
+	.section	.text
+	.global	__stest
+	.type	__stest, @function
+
+__stest:
+	; Z flag = ((HL & BC) == 0)
+	; all other flags are destroyed
+	push	hl
+	call	__sand
+	add	hl, bc
+	or	a, a
+	sbc.s	hl, bc
+	pop	hl
+	ret
+
+	.extern	__sand
