@@ -1,10 +1,10 @@
 	.assume	adl=1
 
 	.section	.text
-	.global	_ceil
 	.global	_ceilf
-	.type	_ceil, @function
 	.type	_ceilf, @function
+	.global	_ceil
+	.type	_ceil, @function
 
 .ifdef PREFER_OS_LIBC
 
@@ -15,29 +15,18 @@
 
 _ceil:
 _ceilf:
-	call	__frameset0
-	ld	bc, (ix+6)
-	ld	a, (ix+9)
-	call	__fneg
-	ld	l, a
-	ld	h, 0
-	push	hl
+	pop	de
+	pop	bc
+	ex	(sp), hl
+	ld	a, l
 	push	bc
-	call	_floor
-	pop	bc
-	pop	bc
-	push	hl
-	pop	bc
-	ld	a, e
-	call	__fneg
-	ld	e, a
+	push	de
+	call	__fpceil
 	push	bc
 	pop	hl
-	pop	ix
+	ld	e, a
 	ret
 
-	.extern	__frameset0
-	.extern	__fneg
-	.extern	_floor
+	.extern	__fpceil
 
 .endif

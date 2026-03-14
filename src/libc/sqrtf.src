@@ -1,0 +1,31 @@
+	.assume	adl=1
+
+	.section	.text
+	.global	_sqrtf
+	.type	_sqrtf, @function
+	.global	_sqrt
+	.type	_sqrt, @function
+
+.ifdef PREFER_OS_LIBC
+
+	.set	_sqrtf, 0x000298
+	.set	_sqrt, _sqrtf
+
+.else
+
+_sqrt:
+_sqrtf:
+	pop	de
+	pop	bc
+	ex	(sp), hl
+	ld	a, l
+	call	__fpsqrt
+	push	bc
+	ex	(sp), hl
+	push	de
+	ld	e, a
+	ret
+
+	.extern	__fpsqrt
+
+.endif
