@@ -18,7 +18,7 @@ char* __attribute__((weak)) fgets(char *__restrict str, int num, FILE *__restric
         {
             break;
         }
-        *p++ = c;
+        *p++ = (char)c;
         if (c == '\n')
         {
             break;

@@ -22,6 +22,7 @@ OBJECTS += $(patsubst %.cpp,build/%.cpp.o,$(wildcard *.cpp))
 OBJECTS += $(patsubst %.src,build/%.o,$(wildcard *.src))
 
 EZCFLAGS += -Iinclude
+EZCFLAGS += -Wno-implicit-int-conversion
 
 WILDCARD_H := $(wildcard include/*.h)
 
