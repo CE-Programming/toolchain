@@ -1,0 +1,50 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__fpmin
+	.type	__fpmin, @function
+	.global	__fpmax
+	.type	__fpmax, @function
+
+; IEEE single precision minimum
+; aubc = fmin(aubc, euhl)
+__fpmin: ; CHECK: sameignzerosign(bitcast(float, pair8_24_t, { out.BC, out.A }), fminf(quiet(bitcast(float, pair8_24_t, { in.BC, in.A })), quiet(bitcast(float, pair8_24_t, { in.HL, in.E })))) && out.DE == in.DE && out.HL == in.HL && out.IX == in.IX && out.IY == in.IY
+	call	__fpcmpo
+	ret	p
+	jr	nc, __fpmax.unordered
+	.local	__fpmin.return
+__fpmin.return:
+	push	hl
+	pop	bc
+	ld	a, e
+	ret
+
+; IEEE single precision maximum
+; aubc = fmax(aubc, euhl)
+__fpmax: ; CHECK: sameignzerosign(bitcast(float, pair8_24_t, { out.BC, out.A }), fmaxf(quiet(bitcast(float, pair8_24_t, { in.BC, in.A })), quiet(bitcast(float, pair8_24_t, { in.HL, in.E })))) && out.DE == in.DE && out.HL == in.HL && out.IX == in.IX && out.IY == in.IY
+	call	__fpcmpo
+	ret	c
+	jp	p, __fpmin.return
+	.local	__fpmax.unordered
+__fpmax.unordered:
+	; Compare the low 31 bits (ignoring sign) and return the smaller one, which is non-NaN if either one is
+	sbc	hl, bc
+	ccf
+	sbc	a, e
+	add	hl, bc
+	ccf
+	adc	a, e
+	; Carry into bit 31 is equivalent to carry XOR overflow
+	jr	nc, __fpmax.nocarry
+	ret	po
+;	jq	__fpmax.return
+	db	$30	; jr nc, *
+	.local	__fpmax.nocarry
+__fpmax.nocarry:
+	ret	pe
+	.local	__fpmax.return
+__fpmax.return:
+	jr	__fpmin.return
+
+	.extern	__fpcmpo
