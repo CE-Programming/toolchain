@@ -1,10 +1,10 @@
 	.assume	adl=1
 
 	.section	.text
-	.global	__llshru_1_fast
-	.type	__llshru_1_fast, @function
+	.global	__llshru_1
+	.type	__llshru_1, @function
 
-__llshru_1_fast:
+__llshru_1:
 	push	hl
 	push	de
 	ld	hl, 2

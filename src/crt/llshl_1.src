@@ -1,10 +1,10 @@
 	.assume	adl=1
 
 	.section	.text
-	.global	__llshl_1_fast
-	.type	__llshl_1_fast, @function
+	.global	__llshl_1
+	.type	__llshl_1, @function
 
-__llshl_1_fast:
+__llshl_1:
 	add	hl, hl
 	ex	de, hl
 	adc	hl, hl

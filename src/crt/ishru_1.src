@@ -1,14 +1,14 @@
 	.assume	adl=1
 
 	.section	.text
-	.global	__ishrs_1_fast
-	.type	__ishrs_1_fast, @function
+	.global	__ishru_1
+	.type	__ishru_1, @function
 
-__ishrs_1_fast:
+__ishru_1:
 	push	hl
 	ld	hl, 2
 	add	hl, sp
-	sra	(hl)
+	srl	(hl)
 	pop	hl
 	rr	h
 	rr	l
