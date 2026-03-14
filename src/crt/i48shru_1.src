@@ -1,18 +1,16 @@
 	.assume	adl=1
 
 	.section	.text
-	.global	__llshrs_1
-	.type	__llshrs_1, @function
+	.global	__i48shru_1
+	.type	__i48shru_1, @function
 
-__llshrs_1:
+__i48shru_1:
 	push	hl
 	scf
 	sbc	hl, hl
 	add	hl, sp
 	push	de
-	sra	b
-	rr	c
-	rr	(hl)
+	srl	(hl)
 	pop	de
 	inc	hl
 	inc	hl

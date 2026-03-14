@@ -6,9 +6,10 @@
 
 __llshru_1:
 	push	hl
-	push	de
-	ld	hl, 2
+	scf
+	sbc	hl, hl
 	add	hl, sp
+	push	de
 	srl	b
 	rr	c
 	rr	(hl)
