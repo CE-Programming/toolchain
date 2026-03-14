@@ -1,29 +1,30 @@
+#include <stdint.h>
 #include "abort_message.h"
 
 // https://itanium-cxx-abi.github.io/cxx-abi/abi.html#dso-dtor-runtime-api
 
+// __int64_t
+typedef int64_t __guard;
+
 extern "C" {
-void __cxa_pure_virtual();
-void __cxa_deleted_virtual();
-int __cxa_guard_acquire(long long *);
-int __cxa_guard_release(long long *);
-int __cxa_guard_abort(long long *);
+[[noreturn, gnu::cold]] void __cxa_pure_virtual(void);
+[[noreturn, gnu::cold]] void __cxa_deleted_virtual(void);
+[[gnu::cold]] int __cxa_guard_acquire(__guard *);
+[[gnu::cold]] void __cxa_guard_release(__guard *);
+[[noreturn, gnu::cold]] void __cxa_guard_abort(__guard *);
 }
 
-__attribute__((__cold__))
-void __cxa_pure_virtual() {
+void __cxa_pure_virtual(void) {
     __abort_message("__cxa_pure_virtual");
 }
 
-__attribute__((__cold__))
-void __cxa_deleted_virtual() {
+void __cxa_deleted_virtual(void) {
     __abort_message("__cxa_deleted_virtual");
 }
 
-__attribute__((__cold__))
-int __cxa_guard_acquire(long long *guard_object) {
-    unsigned char const *ptr = (unsigned char const *)guard_object;
-    if (*ptr == 0) {
+int __cxa_guard_acquire(__guard *guard_object) {
+    unsigned char const *flag = (unsigned char const *)guard_object;
+    if (*flag == 0) {
         // initialization not yet complete
         return 1;
     }
@@ -31,15 +32,12 @@ int __cxa_guard_acquire(long long *guard_object) {
     return 0;
 }
 
-__attribute__((__cold__))
-int __cxa_guard_release(long long *guard_object) {
-    unsigned char *ptr = (unsigned char *)guard_object;
+void __cxa_guard_release(__guard *guard_object) {
+    unsigned char *flag = (unsigned char *)guard_object;
     // set to a non-zero value
-    *ptr = 1;
-    return 0;
+    *flag = 1;
 }
 
-__attribute__((__cold__))
-int __cxa_guard_abort(__attribute__((__unused__)) long long *guard_object) {
+void __cxa_guard_abort([[maybe_unused]] __guard *guard_object) {
     __abort_message("__cxa_guard_abort");
 }
