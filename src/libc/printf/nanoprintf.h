@@ -766,9 +766,9 @@ static npf_cnt_putc_ctx_t pc_cnt;
 #endif
 
 static void npf_putc_cnt(int c, void *ctx) {
-  npf_cnt_putc_ctx_t *pc_cnt = (npf_cnt_putc_ctx_t *)ctx;
-  ++pc_cnt->n;
-  pc_cnt->pc(c, pc_cnt->ctx); // sibling-call optimization
+  npf_cnt_putc_ctx_t *pc_putc_cnt = (npf_cnt_putc_ctx_t *)ctx;
+  ++pc_putc_cnt->n;
+  pc_putc_cnt->pc(c, pc_putc_cnt->ctx); // sibling-call optimization
 }
 
 #ifdef NANOPRINTF_STATIC_GLOBALS

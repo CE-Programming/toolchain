@@ -75,7 +75,7 @@ long long llroundl(long double x) {
     FE_UPWARD     == softfloat_round_max)
 
 // assumes fenv.h macros match softfloat_roundingModes
-#define GET_FENV_SOFTFLOAT_ROUNDING() (fegetround())
+#define GET_FENV_SOFTFLOAT_ROUNDING() ((uint_fast8_t)fegetround())
 
 #else
     static uint_fast8_t GET_FENV_SOFTFLOAT_ROUNDING(void) {

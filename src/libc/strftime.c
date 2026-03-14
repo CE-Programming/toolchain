@@ -81,7 +81,7 @@ size_t strftime(char *__restrict s, size_t n, const char *__restrict f, const st
 
     while (s + 1 < e && *f)
     {
-        int c = *f++;
+        char c = *f++;
         int val;
 
         if (c != '%')
