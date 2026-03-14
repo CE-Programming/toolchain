@@ -19,13 +19,26 @@ _sqrtf:
 	pop	bc
 	ex	(sp), hl
 	ld	a, l
+	; assumes [-infinity, -FLT_TRUE_MIN] returns -NaN
 	call	__fpsqrt
 	push	bc
 	ex	(sp), hl
 	push	de
 	ld	e, a
+	inc	a		; test if the result was -NaN
+	; +NaN returns here while -NaN falls through to raise EDOM/FE_INVALID.
+	; Distinguishing them properly is not worth the extra cost.
+	ret	nz
+	push	hl
+	ld	hl, 4		; EDOM
+	ld	(_errno), hl
+	ld	hl, ___fe_cur_env
+	set	4, (hl)		; FE_INVALID
+	pop	hl
 	ret
 
 	.extern	__fpsqrt
+	.extern	_errno
+	.extern	___fe_cur_env
 
 .endif
