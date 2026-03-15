@@ -5,7 +5,12 @@ int __attribute__((weak)) fputc(int c, FILE *stream)
 {
     int ret;
 
-    if (stream == NULL || stream == stdin)
+    if (stream == NULL)
+    {
+        return EOF;
+    }
+
+    if (stream == stdin)
     {
         ret = EOF;
     }

@@ -5,9 +5,12 @@ int __attribute__((weak)) fgetc(FILE *stream)
 {
     int c;
 
-    if (stream == NULL ||
-        stream == stdout ||
-        stream == stderr)
+    if (stream == NULL)
+    {
+        return EOF;
+    }
+
+    if (stream == stdout || stream == stderr)
     {
         c = EOF;
     }
