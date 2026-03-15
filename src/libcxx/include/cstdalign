@@ -1,0 +1,9 @@
+// -*- C++ -*-
+#ifndef _EZCXX_CSTDALIGN
+#define _EZCXX_CSTDALIGN
+
+#include <stdalign.h>
+
+#pragma clang system_header
+
+#endif // _EZCXX_CSTDALIGN
