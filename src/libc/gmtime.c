@@ -82,7 +82,7 @@ struct tm *gmtime(const time_t *tp)
         tm2.tm_min++;
     }
 
-    tm2.tm_sec = t;
+    tm2.tm_sec = (int)t;
 
     return &tm2;
 }

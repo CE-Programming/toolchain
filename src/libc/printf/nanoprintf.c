@@ -18,7 +18,7 @@
 
 static void npf_putc_std(int c, void *ctx) {
   (void)ctx;
-  outchar(c);
+  outchar((char)c);
 }
 
 static void npf_fputc_std(int c, void *ctx) {

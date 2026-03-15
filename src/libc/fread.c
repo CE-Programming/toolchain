@@ -24,7 +24,7 @@ size_t __attribute__((weak)) fread(void *ptr, size_t size, size_t count, FILE *_
             {
                 break;
             }
-            *p++ = c;
+            *p++ = (char)c;
         }
 
         return count;
