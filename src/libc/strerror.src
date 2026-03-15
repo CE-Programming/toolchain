@@ -1,0 +1,165 @@
+.assume adl = 1
+
+;;
+;;//>>> strs = ["EPERM", "EINVAL", "EIO", "EDOM", "ERANGE", "EILSEQ", "E2BIG", "EACCES", "EADDRINUSE", "EADDRNOTAVAIL", "EAFNOSUPPORT", "EAGAIN", "EALREADY", "EBADF", "EBADMSG", "EBUSY", "ECANCELED", "ECHILD", "ECONNABORTED", "ECONNREFUSED", "ECONNRESET", "EDEADLK", "EDESTADDRREQ", "EEXIST", "EFAULT", "EFBIG", "EHOSTUNREACH", "EIDRM", "EINPROGRESS", "EINTR", "EISCONN", "EISDIR", "ELOOP", "EMFILE", "EMLINK", "EMSGSIZE", "ENAMETOOLONG", "ENETDOWN", "ENETRESET", "ENETUNREACH", "ENFILE", "ENOBUFS", "ENODATA", "ENODEV", "ENOENT", "ENOEXEC", "ENOLCK", "ENOLINK", "ENOMEM", "ENOMSG", "ENOPROTOOPT", "ENOSPC", "ENOSR", "ENOSTR", "ENOSYS", "ENOTCONN", "ENOTDIR", "ENOTEMPTY", "ENOTRECOVERABLE", "ENOTSOCK", "ENOTSUP", "ENOTTY", "ENXIO", "EOPNOTSUPP", "EOVERFLOW", "EOWNERDEAD", "EPIPE", "EPROTO", "EPROTONOSUPPORT", "EPROTOTYPE", "EROFS", "ESPIPE", "ESRCH", "ETIME", "ETIMEDOUT", "ETXTBSY", "EWOULDBLOCK", "EXDEV"]
+;;//>>> len(strs)
+;;static const int _strerror_max = 78;
+__strerror_max = 78
+
+;;
+;;//>>> max([len(str) for str in strs])
+;;static const int _strerror_max_length = 15;
+__strerror_max_length = 15
+
+
+.section .rodata.__strerror
+
+;;
+;;//>>> [int(b[::-1], 2) for b in (lambda s, n: [s[i:i+n] for i in range(0, len(s), n)])(''.join([bin(x + 32)[3:] for xs in [[ord(c) - (ord('A') - 1) if c >= 'A' and c <= 'Z' else ord(c) - ord('0') + (ord('Z') + 1 - (ord('A') - 1)) for c in str[:0:-1]] + [0] for str in strs] for x in xs]), 8)][::-1]
+;;static const unsigned char _strerror_data_reversed[] = {0, 201, 70, 131, 190, 169, 136, 131, 123, 26, 1, 70, 84, 102, 96, 44, 173, 66, 122, 165, 1, 101, 106, 3, 41, 192, 129, 144, 200, 52, 2, 124, 204, 128, 41, 241, 124, 89, 134, 128, 10, 124, 95, 59, 217, 168, 67, 228, 148, 1, 79, 139, 224, 6, 65, 160, 61, 215, 81, 36, 164, 8, 15, 54, 137, 97, 189, 208, 120, 46, 241, 115, 80, 132, 14, 28, 188, 7, 120, 165, 152, 29, 226, 230, 161, 3, 188, 92, 251, 26, 3, 188, 84, 211, 30, 109, 19, 4, 26, 128, 119, 139, 75, 4, 179, 3, 188, 82, 73, 32, 119, 139, 143, 57, 192, 119, 179, 60, 129, 222, 201, 82, 7, 123, 41, 3, 189, 144, 224, 14, 240, 83, 226, 251, 193, 40, 29, 235, 103, 128, 119, 173, 75, 1, 222, 52, 157, 160, 59, 198, 198, 128, 239, 80, 116, 192, 29, 234, 56, 160, 119, 137, 70, 129, 222, 36, 11, 0, 59, 200, 171, 50, 7, 50, 70, 160, 29, 66, 213, 201, 164, 48, 32, 58, 133, 77, 51, 66, 129, 212, 41, 61, 215, 1, 208, 181, 11, 239, 27, 206, 224, 45, 158, 102, 75, 160, 44, 105, 59, 64, 179, 36, 106, 0, 222, 240, 65, 44, 146, 73, 4, 179, 143, 57, 192, 147, 138, 144, 73, 193, 79, 184, 154, 103, 32, 145, 19, 96, 11, 217, 45, 92, 154, 67, 2, 3, 17, 46, 1, 144, 169, 138, 10, 14, 89, 40, 9, 76, 150, 4, 34, 83, 72, 128, 148, 129, 13, 160, 99, 206, 114, 105, 154, 20, 24, 243, 156, 154, 50, 185, 161, 1, 143, 57, 208, 71, 146, 90, 16, 24, 20, 140, 64, 98, 14, 197, 13, 66, 1, 21, 204, 192, 136, 18, 217, 224, 17, 2, 48, 16, 50, 105, 2, 76, 16, 228, 36, 224, 65, 142, 246, 106, 16, 249, 37, 4, 8, 68, 187, 197, 131, 97, 35, 2, 4, 34, 100, 234, 230, 128, 134, 49, 76, 130, 232, 151, 1, 35, 102, 145, 2, 96, 238, 80, 4, 245, 129, 47, 2, 78, 108, 12, 0, 209, 54};
+	db	0, 201, 70, 131, 190, 169, 136, 131, 123, 26, 1, 70, 84, 102, 96, 44, 173, 66, 122, 165, 1, 101, 106, 3, 41, 192, 129, 144, 200, 52, 2, 124, 204, 128, 41, 241, 124, 89, 134, 128, 10, 124, 95, 59, 217, 168, 67, 228, 148, 1, 79, 139, 224, 6, 65, 160, 61, 215, 81, 36, 164, 8, 15, 54, 137, 97, 189, 208, 120, 46, 241, 115, 80, 132, 14, 28, 188, 7, 120, 165, 152, 29, 226, 230, 161, 3, 188, 92, 251, 26, 3, 188, 84, 211, 30, 109, 19, 4, 26, 128, 119, 139, 75, 4, 179, 3, 188, 82, 73, 32, 119, 139, 143, 57, 192, 119, 179, 60, 129, 222, 201, 82, 7, 123, 41, 3, 189, 144, 224, 14, 240, 83, 226, 251, 193, 40, 29, 235, 103, 128, 119, 173, 75, 1, 222, 52, 157, 160, 59, 198, 198, 128, 239, 80, 116, 192, 29, 234, 56, 160, 119, 137, 70, 129, 222, 36, 11, 0, 59, 200, 171, 50, 7, 50, 70, 160, 29, 66, 213, 201, 164, 48, 32, 58, 133, 77, 51, 66, 129, 212, 41, 61, 215, 1, 208, 181, 11, 239, 27, 206, 224, 45, 158, 102, 75, 160, 44, 105, 59, 64, 179, 36, 106, 0, 222, 240, 65, 44, 146, 73, 4, 179, 143, 57, 192, 147, 138, 144, 73, 193, 79, 184, 154, 103, 32, 145, 19, 96, 11, 217, 45, 92, 154, 67, 2, 3, 17, 46, 1, 144, 169, 138, 10, 14, 89, 40, 9, 76, 150, 4, 34, 83, 72, 128, 148, 129, 13, 160, 99, 206, 114, 105, 154, 20, 24, 243, 156, 154, 50, 185, 161, 1, 143, 57, 208, 71, 146, 90, 16, 24, 20, 140, 64, 98, 14, 197, 13, 66, 1, 21, 204, 192, 136, 18, 217, 224, 17, 2, 48, 16, 50, 105, 2, 76, 16, 228, 36, 224, 65, 142, 246, 106, 16, 249, 37, 4, 8, 68, 187, 197, 131, 97, 35, 2, 4, 34, 100, 234, 230, 128, 134, 49, 76, 130, 232, 151, 1, 35, 102, 145, 2, 96, 238, 80, 4, 245, 129, 47, 2, 78, 108, 12, 0, 209, 54
+;;
+;;static const char _strerror_no_error[] = "no error";
+.local __strerror_no_error
+__strerror_no_error:
+	db	"no error", 0
+
+
+.section .data.__strerror
+
+;;
+;;#define UNKNOWN_ERROR_ "unknown error "
+;;static char _strerror_unknown_error[sizeof(UNKNOWN_ERROR_) + _strerror_max_length] = UNKNOWN_ERROR_;
+;;static char* const _strerror_buffer = &_strerror_unknown_error[sizeof(UNKNOWN_ERROR_) - 1];
+.local __strerror_unknown_error
+__strerror_unknown_error:
+	db	"unknown error "
+.local __strerror_buffer
+__strerror_buffer:
+	ds	__strerror_max_length + 1
+
+
+.section .text._strerror
+
+;;
+;;char* strerror(int errnum)
+;;{
+.global _strerror
+.type _strerror, @function
+_strerror:
+	pop	de
+	ex	(sp), hl
+	push	de
+.global _strerror.hijack_hl
+.type _strerror.hijack_hl, @function
+_strerror.hijack_hl:
+	ex	de, hl
+.global _strerror.hijack_de
+.type _strerror.hijack_de, @function
+_strerror.hijack_de:
+
+;;  if (errnum >= 0 && errnum <= _strerror_max)
+;;  {
+	ld	hl, -(__strerror_max + 1)
+	add	hl, de
+	jr	c, .L.unknown_error
+
+;;    if (!errnum) return (char*)_strerror_no_error;
+	inc	e
+	dec	e
+	ld	hl, __strerror_no_error
+	ret	z
+;;
+;;    const unsigned char* data = &_strerror_data_reversed[sizeof(_strerror_data_reversed)];
+;;    char* dest;
+;;
+;;    for (unsigned char c = 1, b = errnum; b; --b)
+;;    {
+;;      dest = &_strerror_buffer[_strerror_max_length];
+	ld	c, 1
+	ld	b, e
+
+.L.copy_next:
+	ld	de, __strerror_buffer + __strerror_max_length
+;;
+;;      for (unsigned char a, first = true; true; first = false)
+;;      {
+;;        if (!first)
+;;        {
+	jr	.L.read_data_5b
+
+;;          a -= 1 - 'A' + (a <= 'Z' - 'A' + 1 ? 0 : ('Z' + 1) - '0');
+.L.decode_5b:
+	sub	a, 'Z' - 'A' + 1 + 1
+	sub	a, -('Z' + 1)
+	jr	nc, .L.write_char
+	sub	a, ('Z' + 1) - '0'
+
+;;          *--dest = a;
+.L.write_char:
+	dec	de
+	ld	(de), a
+
+;;        }
+;;
+;;        a = -(1 << (8 - (5 - 1)));
+;;        for (bool more = true; more;)
+;;        {
+.L.read_data_5b:
+	ld	a, -(1 << (8 - (5 - 1)))
+
+;;          bool read_data_byte = c == 1;
+;;          if (read_data_byte)
+;;          {
+;;            c = *--data;
+;;          }
+;;          more = a >> 7;
+;;          a = (a << 1) + (c & 1);
+;;          c = (c >> 1) + (read_data_byte << 7);
+;;        }
+.L.read_data_bit:
+	srl	c
+	jr	nz, .L.no_read_data_byte
+	dec	hl
+	ld	c, (hl)
+	rr	c
+.L.no_read_data_byte:
+	adc	a, a
+	jr	c, .L.read_data_bit
+;;
+;;        if (!a) break;
+;;      }
+	jr	nz, .L.decode_5b
+
+;;    }
+	djnz	.L.copy_next
+;;
+;;    *--dest = 'E';
+	ex	de, hl
+	dec	hl
+	ld	(hl), 'E'
+
+;;    return dest;
+	ret
+
+;;  }
+.L.unknown_error:
+;;
+;;  boot_sprintf(_strerror_buffer, "%d", errnum);
+	push	de
+	call	.L.format_d.end
+	db	"%d", 0
+.L.format_d.end:
+	ld	hl, __strerror_buffer
+	push	hl
+.extern _boot_sprintf
+	call	_boot_sprintf
+	pop	hl
+	pop	hl
+	pop	hl
+
+;;  return _strerror_unknown_error;
+	ld	hl, __strerror_unknown_error
+	ret
+
+;;}

@@ -1,0 +1,59 @@
+	.assume	adl=1
+
+;-------------------------------------------------------------------------------
+
+	.section	.text
+	.global	_perror
+	.type	_perror, @function
+
+; void perror(const char*)
+_perror:
+	pop	de
+	ex	(sp), hl
+	push	de
+	add	hl, bc
+	xor	a, a
+	sbc	hl, bc
+	jr	z, .L.null_string
+	cp	a, (hl)
+	jr	z, .L.empty_string
+	; fprintf(stderr, "%s: ", str)
+	call	.L.errchar_puts
+	ld	hl, _perror_colon_space_str
+	call	.L.errchar_puts
+
+.L.null_string:
+.L.empty_string:
+	ld	hl, (_errno)
+	call	_strerror.hijack_hl
+	call	.L.errchar_puts
+	ld	a, $0A		; '\n'
+.L.errchar_putchar:
+	; input:
+	; - A = character to display
+	; - HL = nul terminated string to display afterward
+	; output:
+	; - HL points to nul terminator
+	push	hl
+	ld	l, a
+	push	hl
+	call	_errchar
+	pop	hl
+	pop	hl
+.L.errchar_puts:
+	ld	a, (hl)
+	or	a, a
+	ret	z
+	inc	hl
+	jr	.L.errchar_putchar
+
+	.extern	_errno
+	.extern	_errchar
+	.extern	_strerror.hijack_hl
+
+;-------------------------------------------------------------------------------
+
+	.section	.rodata._perror_colon_space_str
+	.local	_perror_colon_space_str
+_perror_colon_space_str:
+	.asciz	": "
