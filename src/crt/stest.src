@@ -7,12 +7,16 @@
 __stest:
 	; Z flag = ((HL & BC) == 0)
 	; all other flags are destroyed
-	push	hl
-	call	__sand
-	add	hl, bc
-	or	a, a
-	sbc.s	hl, bc
-	pop	hl
+	push	de
+	ld	e, a
+	; test low 8 bits
+	ld	a, l
+	and	a, c
+	jr	nz, .L.non_zero
+	; test high 8 bits
+	ld	a, h
+	and	a, b
+.L.non_zero:
+	ld	a, e
+	pop	de
 	ret
-
-	.extern	__sand
