@@ -105,7 +105,11 @@ private:
   __adhoc_pool __adhoc_pool_;
   __fixed_pool* __fixed_pools_;
   int __num_fixed_pools_;
+#ifndef _EZ80
   uint32_t __options_max_blocks_per_chunk_;
+#else // _EZ80
+  size_t __options_max_blocks_per_chunk_;
+#endif // _EZ80
 };
 
 } // namespace pmr

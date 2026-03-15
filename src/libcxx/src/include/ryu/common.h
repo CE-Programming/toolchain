@@ -48,7 +48,11 @@
 
 _LIBCPP_BEGIN_NAMESPACE_STD
 
+#ifndef _EZ80
 [[nodiscard]] _LIBCPP_HIDE_FROM_ABI inline uint32_t __decimalLength9(const uint32_t __v) {
+#else // _EZ80
+[[nodiscard]] _LIBCPP_HIDE_FROM_ABI inline unsigned __decimalLength9(const uint32_t __v) {
+#endif // _EZ80
   // Function precondition: __v is not a 10-digit number.
   // (f2s: 9 digits are sufficient for round-tripping.)
   // (d2fixed: We print 9-digit blocks.)

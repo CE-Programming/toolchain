@@ -216,7 +216,7 @@ strstreambuf::pos_type strstreambuf::seekoff(off_type __off, ios_base::seekdir _
     // min(pbase, newpos), newpos, epptr()
     __off = epptr() - newpos;
     setp(min(pbase(), newpos), epptr());
-    __pbump((epptr() - pbase()) - __off);
+    __pbump(static_cast<streamsize>((epptr() - pbase()) - __off));
   }
   return pos_type(newoff);
 }
@@ -242,7 +242,7 @@ strstreambuf::pos_type strstreambuf::seekpos(pos_type __sp, ios_base::openmode _
     // min(pbase, newpos), newpos, epptr()
     off_type temp = epptr() - newpos;
     setp(min(pbase(), newpos), epptr());
-    __pbump((epptr() - pbase()) - temp);
+    __pbump(static_cast<streamsize>((epptr() - pbase()) - temp));
   }
   return pos_type(newoff);
 }

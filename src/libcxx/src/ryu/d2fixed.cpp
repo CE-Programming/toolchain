@@ -236,8 +236,11 @@ void __append_nine_digits(uint32_t __digits, char* const __result) {
 #else // _EZ80
 [[nodiscard]] to_chars_result __d2fixed_buffered_n(char* _First, char* const _Last, const long double __d,
 #endif // _EZ80
-
+#ifndef _EZ80
   const uint32_t __precision) {
+#else // _EZ80
+  const unsigned __precision) {
+#endif // _EZ80
   char* const _Original_first = _First;
 
   const uint64_t __bits = __double_to_bits(__d);
@@ -317,10 +320,18 @@ void __append_nine_digits(uint32_t __digits, char* const __result) {
   }
   if (__e2 < 0) {
     const int32_t __idx = -__e2 / 16;
+  #ifndef _EZ80
     const uint32_t __blocks = __precision / 9 + 1;
+  #else // _EZ80
+    const unsigned __blocks = __precision / 9 + 1;
+  #endif // _EZ80
     // 0 = don't round up; 1 = round up unconditionally; 2 = round up if odd.
     int __roundUp = 0;
+  #ifndef _EZ80
     uint32_t __i = 0;
+  #else // _EZ80
+    unsigned __i = 0;
+  #endif // _EZ80
     if (__blocks <= __MIN_BLOCK_2[__idx]) {
       __i = __blocks;
       if (_Last - _First < static_cast<ptrdiff_t>(__precision)) {
@@ -342,7 +353,11 @@ void __append_nine_digits(uint32_t __digits, char* const __result) {
       if (__p >= __POW10_OFFSET_2[__idx + 1]) {
         // If the remaining digits are all 0, then we might as well use memset.
         // No rounding required in this case.
+      #ifndef _EZ80
         const uint32_t __fill = __precision - 9 * __i;
+      #else // _EZ80
+        const unsigned __fill = __precision - 9 * __i;
+      #endif // _EZ80
         if (_Last - _First < static_cast<ptrdiff_t>(__fill)) {
           return { _Last, errc::value_too_large };
         }
@@ -431,7 +446,11 @@ void __append_nine_digits(uint32_t __digits, char* const __result) {
 #else // _EZ80
 [[nodiscard]] to_chars_result __d2exp_buffered_n(char* _First, char* const _Last, const long double __d,
 #endif // _EZ80
+#ifndef _EZ80
   uint32_t __precision) {
+#else // _EZ80
+  unsigned __precision) {
+#endif // _EZ80
   char* const _Original_first = _First;
 
   const uint64_t __bits = __double_to_bits(__d);
@@ -473,8 +492,13 @@ void __append_nine_digits(uint32_t __digits, char* const __result) {
   const bool __printDecimalPoint = __precision > 0;
   ++__precision;
   uint32_t __digits = 0;
+#ifndef _EZ80
   uint32_t __printedDigits = 0;
   uint32_t __availableDigits = 0;
+#else // _EZ80
+  unsigned __printedDigits = 0;
+  unsigned __availableDigits = 0;
+#endif // _EZ80
   int32_t __exp = 0;
   if (__e2 >= -52) {
     const uint32_t __idx = __e2 < 0 ? 0 : __indexForExponent(static_cast<uint32_t>(__e2));
@@ -564,7 +588,11 @@ void __append_nine_digits(uint32_t __digits, char* const __result) {
     }
   }
 
+#ifndef _EZ80
   const uint32_t __maximum = __precision - __printedDigits;
+#else // _EZ80
+  const unsigned __maximum = __precision - __printedDigits;
+#endif // _EZ80
   if (__availableDigits == 0) {
     __digits = 0;
   }
