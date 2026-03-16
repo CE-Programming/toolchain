@@ -523,8 +523,7 @@ srl_GetCDCStandardDescriptors:
 	jq	nz,.noserial
 
 	ld	a,3
-	ld	hl,.device+deviceDescriptor.iSerialNumber
-	ld	(hl),a
+	ld	(.device+deviceDescriptor.iSerialNumber),a
 
 	ld	de,.stringserialnum + 2
 	ld	hl,ti.OP4
@@ -550,9 +549,7 @@ srl_GetCDCStandardDescriptors:
 	jq	c,.store
 	add	a,'A'-'9'-1
 .store:
-	ex	de,hl
-	ld	(hl),a
-	ex	de,hl
+	ld	(de),a
 	inc	de
 	inc	de
 	ret
@@ -615,15 +612,12 @@ srl_UsbEventCallback:
 	push	de
 	push	de
 	call	usb_FindDevice
-	pop	de
-	pop	de
-	pop	de
+	ld	sp, ix
 	ld	de, 0
 	push	de
 	push	hl
 	call	usb_GetDeviceEndpoint
-	pop	de
-	pop	de
+	ld	sp, ix
 	ld	de, 0
 	push	de
 	push	de
@@ -634,11 +628,7 @@ srl_UsbEventCallback:
 	push	hl
 	call	usb_ScheduleControlTransfer
 	ld	bc, 1
-	pop	hl
-	pop	hl
-	pop	hl
-	pop	hl
-	pop	hl
+	ld	sp, ix
 .BB0_5:
 	push	bc
 	pop	hl
@@ -668,7 +658,7 @@ get_device_type:
 	call	next_descriptor
 	inc	hl
 	inc	hl
-	ld	de,0
+	inc.s	de	; clear UDE
 	ld	e,(hl)	; total descriptor length
 	inc	hl
 	ld	d,(hl)
@@ -828,7 +818,7 @@ set_rate_cdc:
 	ld	(.linecoding),hl
 	ld	bc,0
 	push	bc	; transferred
-	ld	bc,50
+	ld	c,50	; ld bc, 50
 	push	bc	; num retries
 	ld	bc,.linecoding
 	push	bc	; data
@@ -984,8 +974,8 @@ ring_buf_push:
 	sbc	hl,hl					; check if bc is 0
 	adc	hl,bc
 	ret	z
+	ld	hl,(xring_buf_ctrl.data_end)
 	ex	de,hl					; hl = data
-	ld	de,(xring_buf_ctrl.data_end)
 	push	bc
 	ldir						; de = data_end + len
 	ld	(xring_buf_ctrl.data_end),de
