@@ -2495,32 +2495,49 @@ util_get_cluster_offset:
 
 ;-------------------------------------------------------------------------------
 util_cluster_entry_to_block:
-	ld	e,a
-	xor	a,a
-	ld	bc,128
-	call	ti._ldivu
-	ld	bc,(yfat.fat_pos)
+	; input:
+	; - A:UHL
+	; output:
+	; - A:UHL = floor(A:UHL / 128) + (yfat.fat_pos)
+	; destroys:
+	; - BC, flags
+	push	hl
+	pop	bc
+	ld	l,7
+	call	ti._lshru
+	ld	hl,(yfat.fat_pos)
 	add	hl,bc
-	adc	a,e
+	adc	a,0
 	ret
 
 ;-------------------------------------------------------------------------------
 util_ceil_byte_size_to_block_size:
+	; input:
+	; - A:UHL
+	; output:
+	; - A:UHL = ceil(A:UHL / 512)
+	; - A = 0
+	; destroys:
+	; - BC, flags
 	compare_auhl_zero
 	ret	z
-	ld	e,a
-	push	hl,de
-	xor	a,a
-	ld	bc,512
-	push	bc
-	call	ti._lremu
-	compare_hl_zero
-	pop	bc,de,hl
+	; test if the low 9 bits are non-zero
+	inc	l
+	dec	l
+	jr	nz,.round_up
+	bit	0,h
+.round_up:
 	push	af
-	xor	a,a
-	call	ti._ldivu
+	push	hl
+	pop	bc
+	ld	l,9
+	call	ti._lshru
+	push	bc
+	pop	hl
 	pop	af
+	ld	a,0
 	ret	z
+	; round up
 	inc	hl
 	ret
 
