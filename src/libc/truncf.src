@@ -31,7 +31,7 @@ _truncf:
 	neg
 	ld	d, c	; store C
 	ld	c, a
-	call	__ishl
+	call	__ishl_nz
 	ld	c, d	; restore C
 	jp	__iand
 
@@ -49,5 +49,5 @@ _truncf:
 	sbc	hl, hl
 	ret
 
-	.extern	__ishl
+	.extern	__ishl_nz
 	.extern	__iand

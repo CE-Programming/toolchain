@@ -71,9 +71,9 @@ __ftod:
 .L.subnormal:
 	; since this is subnormal, the LSB of the exponent is already zero
 	call	__ictlz
-	ld	c, a
+	ld	c, a	; A is [1, 23]
 	; shift until the MSB of the mantissa is the LSB of the exponent
-	call	__ishl
+	call	__ishl_nz
 	; (Float64_bias - Float32_bias) = $0380
 	; expon = (Float64_bias - Float32_bias) - clz_result
 	add	hl, hl
@@ -101,4 +101,4 @@ __ftod:
 	jr	.L.shift_28
 
 	.extern	__ictlz
-	.extern	__ishl
+	.extern	__ishl_nz

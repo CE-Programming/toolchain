@@ -50,7 +50,7 @@ __dtoull:
 	ld	l, a
 	ex	(sp), hl
 	; shift is non-zero and [1, 11] in the non-UB case
-	call	c, __llshl
+	call	c, __llshl_nz
 	jr	.finish
 .shift_right:
 	; A is [-1, -52]
@@ -85,5 +85,5 @@ __dtoull:
 	jr	.finish_zero_or_one
 
 	.extern	__llneg
-	.extern	__llshl
+	.extern	__llshl_nz
 	.extern	__llshru

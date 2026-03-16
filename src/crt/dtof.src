@@ -32,7 +32,7 @@ __dtof_helper:
 	push	de
 	pop	bc
 	ld	l, 5
-	call	__lshru
+	call	__lshru_nz
 	push	bc
 	pop	hl
 .L.finish_inf_nan:
@@ -101,7 +101,8 @@ __dtof:
 	and	a, $1F
 .L.round_up:
 .L.round_down:
-	call	__llshru
+	; BC:UDE:UHL >>= 29
+	call	__llshru_nz
 	; B, C, and UDE are zero here
 	or	a, a
 	jr	z, .L.no_round
@@ -192,7 +193,7 @@ __dtof:
 	and	a, $0F
 	or	a, $10
 
-	call	__lshru
+	call	__lshru_nz
 	xor	a, a	; subnormal exponent
 	; HL = BC >> 1
 	scf
@@ -216,5 +217,5 @@ __dtof:
 
 	.extern	__lland
 	.extern	__llcmpzero
-	.extern	__llshru
-	.extern	__lshru
+	.extern	__llshru_nz
+	.extern	__lshru_nz

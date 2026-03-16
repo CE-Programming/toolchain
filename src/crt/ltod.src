@@ -69,7 +69,7 @@ __lltod:
 	pop	bc
 
 	ex	(sp), hl	; (SP) = shift
-	call	__llshru
+	call	__llshru_nz
 	add	a, 51 - 1	; compensate for the implicit mantissa bit
 
 	; BC/exponent = [$434*, $43E*]
@@ -174,7 +174,7 @@ __ltod:
 	.extern	__lctlz
 	.extern	__llctlz
 	.extern	__llshl
-	.extern	__llshru
+	.extern	__llshru_nz
 	.extern	__llneg
 	.extern	__lladd_1
 	.extern	___fe_cur_env
