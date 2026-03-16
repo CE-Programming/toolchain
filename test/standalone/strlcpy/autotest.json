@@ -23,7 +23,7 @@
   "hashes": {
     "1": {
       "description": "First set of tests passed",
-	  "timeout": 5000,
+      "timeout": 5000,
       "start": "vram_start",
       "size": "vram_16_size",
       "expected_CRCs": [
@@ -32,7 +32,7 @@
     },
     "2": {
       "description": "Second set of tests passed",
-	  "timeout": 5000,
+      "timeout": 5000,
       "start": "vram_start",
       "size": "vram_16_size",
       "expected_CRCs": [
@@ -41,7 +41,7 @@
     },
     "3": {
       "description": "Third set of tests passed",
-	  "timeout": 5000,
+      "timeout": 5000,
       "start": "vram_start",
       "size": "vram_16_size",
       "expected_CRCs": [
