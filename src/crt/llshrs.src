@@ -4,9 +4,15 @@
 
 	.global	__llshru
 	.type	__llshru, @function
+	.global	__llshru_nz
+	.type	__llshru_nz, @function
+
 	.global	__llshrs
 	.type	__llshrs, @function
+	.global	__llshrs_nz
+	.type	__llshrs_nz, @function
 
+__llshru_nz:
 __llshru:
 ; Suboptimal for large shift amounts
 	push	af
@@ -21,6 +27,7 @@ __llshru:
 	srl	b
 	jr	.L.hijack_llshru
 
+__llshrs_nz:
 __llshrs:
 ; Suboptimal for large shift amounts
 	push	af

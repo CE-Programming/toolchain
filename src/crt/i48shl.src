@@ -6,9 +6,13 @@
 	.assume	adl=1
 
 	.section	.text
+
 	.global	__i48shl
 	.type	__i48shl, @function
+	.global	__i48shl_nz
+	.type	__i48shl_nz, @function
 
+__i48shl_nz:
 __i48shl:
 	push	bc
 	ld	b, a

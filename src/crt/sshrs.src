@@ -1,12 +1,16 @@
 	.assume	adl=1
 
 	.section	.text
+
 	.global	__sshrs
 	.type	__sshrs, @function
+	.global	__sshrs_nz
+	.type	__sshrs_nz, @function
 
 .ifdef PREFER_OS_CRT
 
 	.set	__sshrs, 0x000248
+	.set	__sshrs_nz, __sshrs
 
 .else
 
@@ -17,6 +21,7 @@ __sshrs:
 	inc	c
 	dec	c
 	ret	z
+__sshrs_nz:
 	push	bc
 	ld	b, c
 .L.loop:

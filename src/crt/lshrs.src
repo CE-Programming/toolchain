@@ -1,14 +1,18 @@
 	.assume	adl=1
 
 	.section	.text
+
 	.global	__lshrs
 	.type	__lshrs, @function
+	.global	__lshrs_nz
+	.type	__lshrs_nz, @function
 	.global	__lshrs.hijack_lshru
 	.type	__lshrs.hijack_lshru, @function
 
 .ifdef PREFER_OS_CRT
 
 	.set	__lshrs, 0x0001E8
+	.set	__lshrs_nz, __lshrs
 
 .else
 
@@ -19,6 +23,7 @@ __lshrs:
 	inc	l
 	dec	l
 	ret	z
+__lshrs_nz:
 	push	hl
 	push	bc
 	ld	b, l

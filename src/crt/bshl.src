@@ -1,12 +1,16 @@
 	.assume	adl=1
 
 	.section	.text
+
 	.global	__bshl
 	.type	__bshl, @function
+	.global	__bshl_nz
+	.type	__bshl_nz, @function
 
 .ifdef PREFER_OS_CRT
 
 	.set	__bshl, 0x000100
+	.set	__bshl_nz, __bshl
 
 .else
 
@@ -16,6 +20,7 @@ __bshl:
 	inc	b
 	dec	b
 	ret	z
+__bshl_nz:
 	push	bc
 .L.loop:
 	add	a, a

@@ -1,18 +1,28 @@
 	.assume	adl=1
 
 	.section	.text
+
 	.global	__ishl
 	.type	__ishl, @function
+	.global	__ishl_nz
+	.type	__ishl_nz, @function
+
 	.global	__sshl
 	.type	__sshl, @function
+	.global	__sshl_nz
+	.type	__sshl_nz, @function
 
 .ifdef PREFER_OS_CRT
 
 	.set	__ishl, 0x000174
+	.set	__ishl_nz, __ishl
+
 	.set	__sshl, 0x000240
+	.set	__sshl_nz, __sshl
 
 .else
 
+__ishl_nz:
 __ishl:
 ; CC: if 0<=C<8:   23*r(PC)+3*r(SPL)+4+(C&1==0)+(C&2!=0)*(1*r(PC)-1)+(C&4!=0)*(3*r(PC)-1)
 ;     if 8<=C<16:  30*r(PC)+3*r(SPL)+5+(C&1==0)+(C&2!=0)*(1*r(PC)-1)+(C&4!=0)*(3*r(PC)-1)
@@ -52,5 +62,6 @@ __ishl_8:
 	ret
 
 	.set	__sshl, __ishl
+	.set	__sshl_nz, __ishl_nz
 
 .endif

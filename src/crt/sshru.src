@@ -1,12 +1,16 @@
 	.assume	adl=1
 
 	.section	.text
+
 	.global	__sshru
 	.type	__sshru, @function
+	.global	__sshru_nz
+	.type	__sshru_nz, @function
 
 .ifdef PREFER_OS_CRT
 
 	.set	__sshru, 0x000250
+	.set	__sshru_nz, __sshru
 
 .else
 
@@ -17,6 +21,7 @@ __sshru:
 	inc	c
 	dec	c
 	ret	z
+__sshru_nz:
 	push	bc
 	ld	b, c
 .L.loop:

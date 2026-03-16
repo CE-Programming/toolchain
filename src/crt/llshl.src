@@ -1,9 +1,13 @@
 	.assume	adl=1
 
 	.section	.text
+
 	.global	__llshl
 	.type	__llshl, @function
+	.global	__llshl_nz
+	.type	__llshl_nz, @function
 
+__llshl_nz:
 __llshl:
 ; Suboptimal for large shift amounts
 	push	af

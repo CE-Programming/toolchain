@@ -3,10 +3,13 @@
 	.section	.text
 	.global	__lshl
 	.type	__lshl, @function
+	.global	__lshl_nz
+	.type	__lshl_nz, @function
 
 .ifdef PREFER_OS_CRT
 
 	.set	__lshl, 0x0001E4
+	.set	__lshl_nz, __lshl
 
 .else
 
@@ -17,6 +20,7 @@ __lshl:
 	inc	l
 	dec	l
 	ret	z
+__lshl_nz:
 	push	bc
 	ld	b, l
 	ex	(sp), hl

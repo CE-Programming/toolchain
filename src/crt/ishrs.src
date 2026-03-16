@@ -1,24 +1,35 @@
 	.assume	adl=1
 
 	.section	.text
+
 	.global	__ishrs
 	.type	__ishrs, @function
+	.global	__ishrs_nz
+	.type	__ishrs_nz, @function
+
 	.global	__ishru
 	.type	__ishru, @function
+	.global	__ishru_nz
+	.type	__ishru_nz, @function
 
 .ifdef PREFER_OS_CRT
 
 	.set	__ishrs, 0x00017C
+	.set	__ishrs_nz, __ishrs
+
 	.set	__ishru, 0x000184
+	.set	__ishru_nz, __ishru
 
 .else
 
+__ishru_nz:
 __ishru:
 	push	af
 	xor	a, a
 	add	hl, hl
 	rla
 	db	$DA	; push af \ add hl, hl \ sbc a, a -> jp c, *
+__ishrs_nz:
 __ishrs:
 ; CC: if 0<=C<8:   35*r(PC)+9*r(SPL)+9*w(SPL)+4+(C&1==0)*(1*r(PC)-1)+(C&2==0)*(3*r(PC)-1)+(C&4==0)*(7*r(PC)-1)
 ;     if 8<=C<16:  34*r(PC)+9*r(SPL)+6*w(SPL)+5+(C&1==0)*(1*r(PC)-1)+(C&2==0)*(3*r(PC)-1)+(C&4==0)*(7*r(PC)-1)

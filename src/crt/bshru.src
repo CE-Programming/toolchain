@@ -1,12 +1,16 @@
 	.assume	adl=1
 
 	.section	.text
+
 	.global	__bshru
 	.type	__bshru, @function
+	.global	__bshru_nz
+	.type	__bshru_nz, @function
 
 .ifdef PREFER_OS_CRT
 
 	.set	__bshru, 0x000104
+	.set	__bshru_nz, __bshru
 
 .else
 
@@ -16,6 +20,7 @@ __bshru:
 	inc	b
 	dec	b
 	ret	z
+__bshru_nz:
 	push	bc
 .L.loop:
 	srl	a
