@@ -7,7 +7,11 @@ e81339fdc7bc5eea0a794f4ecdbad5b349d32a10
 63ffd83c10a3cb6eacbf5b320dfe4872bdd7b255
 # trailing whitespace
 5c9d44bb46397476f1e95d9b1032b310ea61d585
+
 # assembly whitespace
 cbb89d45dd1738d8b40cf5e079990041d01174e3
 # libc whitespace
 24d5225e9ac537c32638d922cfbffcf0fba30939
+
+# autotest.json whitespace
+f9de2aa21c5fdff2bf27646c6dd594a3780553c4
