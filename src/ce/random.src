@@ -75,13 +75,14 @@ _random:
 	xor	a,(iy+3*4+1)		; a = t1u ^ zh == t2u ^ s2u == t3u
 	ld	(iy+3*4+2),a		; u(state[3]) = t3u
 ; Calculate s1.
-	xor	a,a			; a = 0
-	add.s	hl,hl
-	adc	a,a
-	add.s	hl,hl
-	adc	a,a
-	add.s	hl,hl
-	adc	a,a			; ahl = (t1 >> 16) << 3
+	ld	a,h
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	rlca
+	rlca
+	rlca
+	and	a,$07			; ahl = (t1 >> 16) << 3
 					; ah = ((t1 >> 16) << 3) >> 8 == t1 >> 21 == s1hl
 					; a = s1h
 					; h = s1l
