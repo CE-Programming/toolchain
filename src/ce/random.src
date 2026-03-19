@@ -96,12 +96,11 @@ _random:
 	ld	(iy+3*4+0),a		; l(state[3]) = t3l
 ; Calculate result.
 	ld	hl,(iy+3*4)
-	ld	a,b			; auhl = t3
-	ld	de,(iy+2*4)
-	ld	c,(iy+2*4+3)		; cude = state[2]
+	ld	a,b			; a:uhl = t3
+	ld	de,(iy+2*4)		; (iy+2*4+3):ude = state[2]
 	add	hl,de
-	adc	a,c			; auhl = t3 + state[2] = result
-	ld	e,a			; euhl = result
+	adc	a,(iy+2*4+3)		; a:uhl = t3 + state[2] = result
+	ld	e,a			; e:uhl = result
 	ret
 
 ; ---
@@ -115,11 +114,11 @@ _random:
 _srandom:
 	pop	bc
 	pop	de
-	ex	(sp),hl			; lude = seed
+	ex	(sp),hl			; l:ude = seed
 	push	de
 	push	bc
 	ex	de,hl
-	ld	a,e			; auhl = seed
+	ld	a,e			; a:uhl = seed
 	.global	__setstate
 	.type	__setstate, @function
 
