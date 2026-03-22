@@ -1,4 +1,4 @@
-	.assume	adl = 1
+	.assume	adl=1
 
 	.section	.rodata._NULL_ptr
 

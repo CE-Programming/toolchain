@@ -1,6 +1,6 @@
 #include "crt.h"
 
-	.assume	adl = 1
+	.assume	adl=1
 
 	.equ	ti.mpTmr1Counter, 0x0F20000
 	.equ	ti.mpTmrCtrl, 0x0F20030
