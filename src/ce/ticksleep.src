@@ -41,5 +41,5 @@ _ticksleep:
 	jp	___sleep_common.1
 
 
-	extern	___sleep_common.1
-	extern	_clock
+	.extern	___sleep_common.1
+	.extern	_clock

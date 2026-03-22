@@ -454,7 +454,7 @@ ___prgm_to_run:
 ___prgm_to_run_size:
 	.d24	0
 
-	section	.data.___prgm_caller
+	.section	.data.___prgm_caller
 	.global	___prgm_caller
 ___prgm_caller:
 	.zero	9

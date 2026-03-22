@@ -68,6 +68,6 @@ _delay:
 
 	.set	_msleep, _delay
 
-	extern	___sleep_common.3
-	extern	__lmulu
-	extern	_clock
+	.extern	___sleep_common.3
+	.extern	__lmulu
+	.extern	_clock
