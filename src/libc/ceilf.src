@@ -2,8 +2,8 @@
 
 	.section	.text
 	.global	_ceil
-	.global	_ceilf
 	.type	_ceil, @function
+	.global	_ceilf
 	.type	_ceilf, @function
 
 .ifdef PREFER_OS_LIBC

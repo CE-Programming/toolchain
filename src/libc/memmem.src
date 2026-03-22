@@ -5,7 +5,6 @@
 	.global	_memmem
 	.type	_memmem, @function
 	.local	_memcmp_fast
-	.type	_memcmp_fast, @function
 
 ; void *memmem(const void *haystack, size_t haystack_len, const void *needle, size_t needle_len)
 	.equ	haystack, 3

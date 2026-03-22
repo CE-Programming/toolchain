@@ -2,6 +2,7 @@
 
 	.section	.text
 	.global	_strcspn
+	.type	_strcspn, @function
 _strcspn:
 	call	__strcspn_strpbrk_common
 	sbc	hl, de		; Calculate number of mismatching characters
@@ -9,6 +10,7 @@ _strcspn:
 
 	.section	.text
 	.global	_strpbrk
+	.type	_strpbrk, @function
 _strpbrk:
 	call	__strcspn_strpbrk_common
 	ret	nz		; Return pointer if not end of string

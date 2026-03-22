@@ -45,7 +45,6 @@ _lz4_Decompress:
 	; Fallthrough
 
 	.local	lz4_decompress_block_internal
-	.type	lz4_decompress_block_internal, @function
 
 	; Input: IY = compressed block, DE = decompression buffer, BC = size of block
 	; Output: IY = after compressed block, DE = after decompressed data, carry flag clear

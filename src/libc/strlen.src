@@ -2,6 +2,7 @@
 
 	.section	.text
 	.global	_strlen
+	.type	_strlen, @function
 
 .ifdef PREFER_OS_LIBC
 

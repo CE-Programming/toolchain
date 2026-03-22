@@ -2,6 +2,7 @@
 
 	.section	.text._softfloat_isSigNaNF32UI
 	.global	_softfloat_isSigNaNF32UI
+	.type	_softfloat_isSigNaNF32UI, @function
 
 _softfloat_isSigNaNF32UI:
 	jp	__issignalingf

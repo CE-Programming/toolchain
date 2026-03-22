@@ -3,6 +3,7 @@
 	.section	.text
 
 	.global	_softfloat_propagateNaNF64UI
+	.type	_softfloat_propagateNaNF64UI, @function
 
 ; at least one of the arguments is NaN
 ; returns x if it is NaN, otherwise returns y
