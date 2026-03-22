@@ -1,4 +1,4 @@
-	.assume	adl = 1
+	.assume	adl=1
 
 	.global	_errno
 	.equ	_errno, 0xD008DC
