@@ -2,8 +2,11 @@
 
 	.section	.text
 	.global	__land_fast
+	.type	__land_fast, @function
 	.global	__iand_fast
+	.type	__iand_fast, @function
 	.global	__sand_fast
+	.type	__sand_fast, @function
 
 __land_fast:
 ; CC: 24*r(PC)+8*r(SPL)+7*w(SPL)+1

@@ -2,7 +2,7 @@
 
 	.section	.text
 	.global	_abs
-	.type	_abs,@function
+	.type	_abs, @function
 _abs:
 	pop	hl
 	pop	de

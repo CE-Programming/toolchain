@@ -3,6 +3,7 @@
 	.section	.text
 
 	.global	_softfloat_shortShiftRightJam64
+	.type	_softfloat_shortShiftRightJam64, @function
 
 	; shift amount is [1, 63]
 _softfloat_shortShiftRightJam64:
@@ -16,6 +17,7 @@ _softfloat_shortShiftRightJam64:
 	.section	.text
 
 	.global	_softfloat_shiftRightJam64
+	.type	_softfloat_shiftRightJam64, @function
 
 	; shift amount is non-zero
 _softfloat_shiftRightJam64:

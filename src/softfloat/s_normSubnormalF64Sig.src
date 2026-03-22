@@ -3,6 +3,7 @@
 	.section	.text
 
 	.global	_softfloat_normSubnormalF64Sig
+	.type	_softfloat_normSubnormalF64Sig, @function
 
 ; saves 78 bytes
 ; this function is called in the float64_ldexp tests

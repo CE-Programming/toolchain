@@ -2,16 +2,22 @@
 
 	.section	.text
 
-	.global	__ulltod	; (long double)unsigned long long
-	.global	__lltod		; (long double)long long
-	.global	__ultod		; (long double)unsigned long
-	.global	__ltod		; (long double)long
+	.global	__ulltod
+	.type	__ulltod, @function
+	.global	__lltod
+	.type	__lltod, @function
+	.global	__ultod
+	.type	__ultod, @function
+	.global	__ltod
+	.type	__ltod, @function
 
 __ulltod:
+	; (long double)unsigned long long
 	cp	a, a		; set Z flag
 	push	af
 	jr	.L.lltod_common
 __lltod:
+	; (long double)long long
 	bit	7, b
 	push	af
 	call	nz, __llneg	; abs(BC:UDE:UHL)
@@ -115,10 +121,12 @@ __lltod:
 	jr	.L.int_to_f64_shl.finish
 
 __ultod:
+	; (long double)unsigned long
 	cp	a, a		; set Z flag
 	push	af
 	jr	.L.ltod_common
 __ltod:
+	; (long double)long
 	bit	7, e
 	push	af
 	call	nz, __lneg	; abs(E:UHL)

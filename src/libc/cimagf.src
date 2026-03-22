@@ -3,8 +3,8 @@
 	.section	.text
 
 	.global	_cimagf
-	.global	_cimag
 	.type	_cimagf, @function
+	.global	_cimag
 	.type	_cimag, @function
 
 ; float cimagf(float _Complex)

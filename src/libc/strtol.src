@@ -105,6 +105,7 @@ ___strtoui:
 	.section	.text._strtoul
 
 	.global	_strtoul
+	.type	_strtoul, @function
 _strtoul:
 	call	.L__strtol_common
 	; overflow occured if B is non-zero

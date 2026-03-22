@@ -2,8 +2,10 @@
 
 	.section	.text
 	.global	__land
+	.type	__land, @function
 	.section	.text
 	.global	__iand
+	.type	__iand, @function
 
 .ifdef PREFER_OS_CRT
 

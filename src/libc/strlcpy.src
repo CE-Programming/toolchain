@@ -2,6 +2,7 @@
 
 	.section	.text
 	.global	_strlcpy
+	.type	_strlcpy, @function
 
 ; BSD variant of strncpy that ensures the destination is null-terminated.
 ; OpenBSD reference: https://github.com/openbsd/src/blob/master/lib/libc/string/strlcpy.c

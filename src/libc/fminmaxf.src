@@ -96,7 +96,9 @@ _fminmaxf_common.x_maybe_NaN:
 	.section	.text
 
 	.global	_fmaxf
+	.type	_fmaxf, @function
 	.global	_fmax
+	.type	_fmax, @function
 
 _fmaxf:
 _fmax:
