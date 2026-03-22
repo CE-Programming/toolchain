@@ -146,4 +146,4 @@ _os_GetStringInput:
 	ld	(ti.curRow), hl
 	jp	.L.start
 
-	extern	__frameset0
+	.extern	__frameset0

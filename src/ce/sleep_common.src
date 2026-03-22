@@ -7,7 +7,7 @@ ___sleep_common:
 ; Timing assumes fetching from RAM (4cc) and the first timer read being valid.
 
 ; Calculate the end time.
-	section	.text
+
 	.global	___sleep_common.1
 	.type	___sleep_common.1, @function
 ___sleep_common.1:
@@ -56,4 +56,4 @@ ___sleep_common.3:
 ; 202 - 75 + 31 + 48 + 13 + 24 = 243 cc after end time captured
 
 
-	extern	_clock
+	.extern	_clock

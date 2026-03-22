@@ -65,7 +65,7 @@ _logbf:
 	add	a, 130
 	jr	.L.int_to_float
 
-	extern	__ltof
-	extern	__ictlz
-	extern	___fe_cur_env
-	extern	_errno
+	.extern	__ltof
+	.extern	__ictlz
+	.extern	___fe_cur_env
+	.extern	_errno

@@ -45,6 +45,6 @@ _sleep:
 	jp	___sleep_common.1
 
 
-	extern	___sleep_common.1
-	extern	__lmulu
-	extern	_clock
+	.extern	___sleep_common.1
+	.extern	__lmulu
+	.extern	_clock

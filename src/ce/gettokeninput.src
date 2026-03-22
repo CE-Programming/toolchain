@@ -146,4 +146,4 @@ _os_GetTokenInput:
 	ex	de, hl
 	jp	.L.start
 
-	extern	__frameset0
+	.extern	__frameset0

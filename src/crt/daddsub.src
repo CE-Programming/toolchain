@@ -53,4 +53,5 @@ __daddsub:
 	pop	af
 	ret
 
-	.extern	_softfloat_addMagsF64, _softfloat_subMagsF64
+	.extern	_softfloat_addMagsF64
+	.extern	_softfloat_subMagsF64
