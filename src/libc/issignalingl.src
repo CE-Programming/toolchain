@@ -5,7 +5,7 @@
 	.global	__issignalingl
 	.type	__issignalingl, @function
 
-; .assumes quiet NaN is NaN with bit 51 set
+; assumes quiet NaN is NaN with bit 51 set
 ; bool _issignalingl(long double)
 __issignalingl:
 	ld	hl, 9

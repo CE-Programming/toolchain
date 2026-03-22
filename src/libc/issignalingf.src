@@ -5,7 +5,7 @@
 	.global	__issignalingf
 	.type	__issignalingf, @function
 
-; .assumes quiet NaN is NaN with bit 22 set
+; assumes quiet NaN is NaN with bit 22 set
 ; bool _issignalingf(float)
 __issignalingf:
 	; based off __isnanf, unoptimized
