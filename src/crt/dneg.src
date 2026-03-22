@@ -5,7 +5,7 @@
 	.global	__dneg
 	.type	__dneg, @function
 
-; .assumes BC:UDE:UHL
+; assumes BC:UDE:UHL
 __dneg:
 	rl	b
 	ccf
