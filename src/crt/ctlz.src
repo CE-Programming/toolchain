@@ -5,16 +5,16 @@
 	.type	__bctlz, @function
 
 __bctlz:
-	cp	a, 010h
+	cp	a, 0x10
 	jr	c, .L.low4
-	cp	a, 040h
+	cp	a, 0x40
 	jr	c, .L.low6
 	add	a, a
 	sbc	a, a
 	inc	a
 	ret
 .L.low6:
-	add	a, -020h
+	add	a, -0x20
 	sbc	a, a
 	add	a, 3
 	ret
