@@ -6,7 +6,7 @@
 
 __fpupop2:
 	push	bc
-	ld	bc, 0800000h
+	ld	bc, 0x800000
 	add	hl, bc
 	jr	nc, .ncarry
 	add	hl, bc
