@@ -86,6 +86,7 @@ EZLLVMFLAGS :=
 EZLLVMFLAGS += -fno-autolink
 EZLLVMFLAGS += -fno-addrsig
 EZLLVMFLAGS += -fno-threadsafe-statics
+EZLLVMFLAGS += -fno-aligned-allocation
 EZLLVMFLAGS += -mllvm -profile-guided-section-prefix=false
 EZLLVMFLAGS += -mllvm -z80-gas-style
 EZLLVMFLAGS += -ffunction-sections
