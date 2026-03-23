@@ -26,9 +26,9 @@ _softfloat_normSubnormalF64Sig:
 	inc	hl
 	ld	(iy + 0), hl
 	; z.sig = sig<<shiftDist;
-	ld	l, a
+	ld	h, a
 	ex	(sp), hl
-	call	__llshl
+	call	__llshl_alt
 	pop	af	; reset SP
 	ld	(iy + 2), hl
 	ld	(iy + 5), de
@@ -37,6 +37,6 @@ _softfloat_normSubnormalF64Sig:
 	lea	hl, iy + 0	; ABI struct ptr
 	ret
 
-	.extern	__llshl
+	.extern	__llshl_alt
 	.extern	__llctlz
 	.extern	__ineg

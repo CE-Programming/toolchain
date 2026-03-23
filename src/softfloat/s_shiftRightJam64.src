@@ -33,13 +33,14 @@ _softfloat_shiftRightJam64:
 	ld	de, (iy + 7)
 	ld	bc, (iy + 10)
 	jr	nc, .L.overflow_shift
+	ld	h, l
 	push	hl	; >> shift
 	sub	a, l	; A = 0 - L
 	and	a, $3F
-	ld	l, a
+	ld	h, a
 	push	hl	; << shift
 	ld	hl, (iy + 4)
-	call	__llshl
+	call	__llshl_alt
 	xor	a, a
 	call	__llcmpzero
 	jr	z, .L.no_round
@@ -49,7 +50,7 @@ _softfloat_shiftRightJam64:
 	ld	hl, (iy + 4)
 	ld	de, (iy + 7)
 	ld	bc, (iy + 10)
-	call	__llshru
+	call	__llshru_alt
 	or	a, l
 	ld	l, a
 	pop	af	; reset SP
@@ -70,5 +71,5 @@ _softfloat_shiftRightJam64:
 	ret
 
 	.extern	__llcmpzero
-	.extern	__llshl
-	.extern	__llshru
+	.extern	__llshl_alt
+	.extern	__llshru_alt

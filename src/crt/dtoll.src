@@ -47,19 +47,19 @@ __dtoull:
 	inc	a	; A is one less than it should be here to allow for the CPL trick in shift_right
 	; C is [16, 31]
 	cp	a, c	; only call __llshl if the shift amount is [0, 63]
-	ld	l, a
+	ld	h, a
 	ex	(sp), hl
 	; shift is non-zero and [1, 11] in the non-UB case
-	call	c, __llshl
+	call	c, __llshl_alt
 	jr	.finish
 .shift_right:
 	; A is [-1, -52]
 	; expon is [0, 51]
 	cpl
-	ld	l, a
+	ld	h, a
 	ex	(sp), hl
 	; shift is [0, 51]
-	call	__llshru
+	call	__llshru_alt
 .finish:
 	pop	af	; reset SP
 	pop	af
@@ -85,5 +85,5 @@ __dtoull:
 	jr	.finish_zero_or_one
 
 	.extern	__llneg
-	.extern	__llshl
-	.extern	__llshru
+	.extern	__llshl_alt
+	.extern	__llshru_alt

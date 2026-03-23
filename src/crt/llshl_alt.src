@@ -1,0 +1,33 @@
+	.assume	adl=1
+
+	.section	.text
+	.global	__llshl_alt
+	.type	__llshl_alt, @function
+
+__llshl_alt:
+; Suboptimal for large shift amounts
+	push	af
+	ld	a, b
+
+	push	hl
+	ld	hl, 10
+	add	hl, sp
+	ld	b, (hl)
+	pop	hl
+
+	inc	b
+	jr	.L.begin
+
+.L.loop:
+	add	hl, hl
+	ex	de, hl
+	adc	hl, hl
+	ex	de, hl
+	rl	c
+	rla
+.L.begin:
+	djnz	.L.loop
+
+	ld	b, a
+	pop	af
+	ret

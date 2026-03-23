@@ -63,13 +63,13 @@ __lltod:
 .else
 .L.no_round_inexact:
 .endif
-	ld	h, b
+	ld	l, b
 	ld	a, c
-	ld	l, c
+	ld	h, c
 	pop	bc
 
 	ex	(sp), hl	; (SP) = shift
-	call	__llshru
+	call	__llshru_alt
 	add	a, 51 - 1	; compensate for the implicit mantissa bit
 
 	; BC/exponent = [$434*, $43E*]
@@ -79,11 +79,10 @@ __lltod:
 	add	a, a
 	add	a, c
 	ld	c, a
-	pop	af		; A = rounding
-	or	a, a		; NZ = round-up, Z = no-round
+	pop	af		; C = round-up, NC = no-round
 	ld	b, $43
 .if 0
-	jr	z, .L.int_to_f64_shl.no_round
+	jr	nc, .L.int_to_f64_shl.no_round
 	; inlined __lladd_1
 	inc	hl
 	add	hl, de
@@ -97,7 +96,7 @@ __lltod:
 	inc	bc
 	jr	.L.int_to_f64_shl.finish
 .else
-	call	nz, __lladd_1	; round up to even
+	call	c, __lladd_1	; round up to even
 	jr	.L.int_to_f64_shl.finish
 .endif
 
@@ -138,13 +137,13 @@ __ltod:
 	; Maximum exponent: $434 (2^52)
 	; It is assumed that A is [0, 51] here, or [-52, -1] before adding 52
 	push	hl
-	ld	l, a
+	ld	h, a
 	ex	(sp), hl	; (SP) = shift
-	call	__llshl
-	ex	(sp), hl	; (SP) = shifted HL, L = shift
+	call	__llshl_alt
+	ex	(sp), hl	; (SP) = shifted HL, H = shift
 
 	ld	a, 51
-	sub	a, l
+	sub	a, h
 
 	; exponent = ($400 + (base2_logarithm - 1)) << 4
 	; BC = $4PPM
@@ -173,8 +172,8 @@ __ltod:
 	.extern	__lneg
 	.extern	__lctlz
 	.extern	__llctlz
-	.extern	__llshl
-	.extern	__llshru
+	.extern	__llshl_alt
+	.extern	__llshru_alt
 	.extern	__llneg
 	.extern	__lladd_1
 	.extern	___fe_cur_env

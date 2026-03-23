@@ -1,0 +1,62 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__llshru_alt
+	.type	__llshru_alt, @function
+	.global	__llshrs_alt
+	.type	__llshrs_alt, @function
+
+__llshru_alt:
+; Suboptimal for large shift amounts
+	push	af
+	push	iy
+	ld	iy, 0
+	add	iy, sp
+	ld	a, (iy + 10)
+	or	a, a
+	jr	z, .L.finish
+	push	de
+	push	hl
+	srl	b
+	jr	.L.hijack_llshru_alt
+
+__llshrs_alt:
+; Suboptimal for large shift amounts
+	push	af
+	push	iy
+	ld	iy, 0
+	add	iy, sp
+	ld	a, (iy + 10)
+	or	a, a
+	jr	z, .L.finish
+	push	de
+	push	hl
+
+	.local	__llshr_alt_common
+__llshr_alt_common:
+.L.loop:
+	sra	b
+.L.hijack_llshru_alt:
+	rr	c
+	rr	(iy - 1)
+	rr	d
+	rr	e
+	rr	(iy - 4)
+	rr	h
+	rr	l
+	dec	a
+	jr	nz, .L.loop
+
+	ld	(iy - 3), e
+	ld	(iy - 2), d
+	ex	de, hl
+	pop	hl
+	ld	l, e
+	ld	h, d
+	pop	de
+	.local	.L.finish
+.L.finish:
+	pop	iy
+	pop	af
+	ret

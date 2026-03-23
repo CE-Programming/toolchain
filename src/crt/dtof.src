@@ -75,8 +75,8 @@ __dtof:
 	add	hl, hl
 	add	hl, hl
 	; offset = -$380 - -$47F = $FF = -1 ; therefore decrement
-	; H = exponent + 1
-	ld	l, 29		; f64_mant_bits - f32_mant_bits = 52 - 23 = 29
+	ld	l, h		; L = exponent + 1
+	ld	h, 29		; f64_mant_bits - f32_mant_bits = 52 - 23 = 29
 	ex	(sp), hl	; (SP) = exponent/shift, HL = lo24
 
 	; clear exponent
@@ -101,14 +101,15 @@ __dtof:
 	and	a, $1F
 .L.round_up:
 .L.round_down:
-	call	__llshru
+	call	__llshru_alt
 	; B, C, and UDE are zero here
+	pop	bc	; C = exponent + 1
 	or	a, a
 	jr	z, .L.no_round
 	inc	hl	; does not overflow
 .L.no_round:
-	pop	af	; a = exponent + 1, flags = 29 = ---5H3V-C
-	sbc	a, b	; decrement exponent and clear carry
+	ld	a, c
+	dec	a
 	rra
 	jr	nc, .L.even_exponent
 	ld	bc, $800000
@@ -216,5 +217,5 @@ __dtof:
 
 	.extern	__lland
 	.extern	__llcmpzero
-	.extern	__llshru
+	.extern	__llshru_alt
 	.extern	__lshru
