@@ -5,6 +5,12 @@
 	.type	__llshl_1, @function
 
 __llshl_1:
+	; Input:
+	; - BC:UDE:UHL
+	; Output:
+	; - BC:UDE:UHL <<= 1
+	; - Carry = shifted-out bit
+	; Cost: 10 bytes | 11F + 3R + 1
 	add	hl, hl
 	ex	de, hl
 	adc	hl, hl

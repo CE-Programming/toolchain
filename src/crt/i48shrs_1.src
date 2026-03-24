@@ -5,6 +5,12 @@
 	.type	__i48shrs_1, @function
 
 __i48shrs_1:
+	; Input:
+	; - UDE:UHL
+	; Output:
+	; - UDE:UHL >>= 1 (signed)
+	; - Carry = shifted-out bit
+	; Cost: 24 bytes | 25F + 11R + 8W + 3
 	push	hl
 	scf
 	sbc	hl, hl
