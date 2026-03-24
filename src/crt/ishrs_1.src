@@ -5,6 +5,12 @@
 	.type	__ishrs_1, @function
 
 __ishrs_1:
+	; Input:
+	; - UHL
+	; Output:
+	; - UHL >>= 1 (signed)
+	; - Carry = shifted-out bit
+	; Cost: 14 bytes | 15F + 7R + 4W + 2
 	push	hl
 	ld	hl, 2
 	add	hl, sp

@@ -5,6 +5,12 @@
 	.type	__ishru_1, @function
 
 __ishru_1:
+	; Input:
+	; - UHL
+	; Output:
+	; - UHL >>= 1 (unsigned)
+	; - Carry = shifted-out bit
+	; Cost: 14 bytes | 15F + 7R + 4W + 2
 	push	hl
 	ld	hl, 2
 	add	hl, sp

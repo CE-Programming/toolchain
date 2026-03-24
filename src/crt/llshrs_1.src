@@ -5,6 +5,12 @@
 	.type	__llshrs_1, @function
 
 __llshrs_1:
+	; Input:
+	; - BC:UDE:UHL
+	; Output:
+	; - BC:UDE:UHL >>= 1 (signed)
+	; - Carry = shifted-out bit
+	; Cost: 28 bytes | 29F + 11R + 8W + 3
 	push	hl
 	scf
 	sbc	hl, hl
