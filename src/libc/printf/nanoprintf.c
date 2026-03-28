@@ -14,7 +14,7 @@
  * @remarks don't set this above 40, or there is a chance that
  * frameset will exceed 127 (generating slower code).
  */
-#define NANOPRINTF_CONVERSION_BUFFER_SIZE 36
+#define NANOPRINTF_CONVERSION_BUFFER_SIZE 24
 
 static void npf_putc_std(int c, void *ctx) {
   (void)ctx;
@@ -26,19 +26,26 @@ static void npf_fputc_std(int c, void *ctx) {
 }
 
 // This is a custom nanoprintf flag
-#define NANOPRINTF_PROMOTE_TO_LONG_DOUBLE 1
+#define NANOPRINTF_USE_LONG_DOUBLE_PRECISION 1
 
-#if NANOPRINTF_PROMOTE_TO_LONG_DOUBLE == 1
+#if NANOPRINTF_USE_LONG_DOUBLE_PRECISION == 1
 #define NANOPRINTF_CONVERSION_FLOAT_TYPE unsigned long long
+#else
+#define NANOPRINTF_CONVERSION_FLOAT_TYPE unsigned long
 #endif
 
 #define NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS 1
 #define NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS 1
 #define NANOPRINTF_USE_FLOAT_FORMAT_SPECIFIERS 1
 #define NANOPRINTF_USE_LARGE_FORMAT_SPECIFIERS 1
+#define NANOPRINTF_USE_SMALL_FORMAT_SPECIFIERS 1
 #define NANOPRINTF_USE_BINARY_FORMAT_SPECIFIERS 1
 #define NANOPRINTF_USE_WRITEBACK_FORMAT_SPECIFIERS 1
 #define NANOPRINTF_USE_ALT_FORM_FLAG 1
+#define NANOPRINTF_USE_FLOAT_HEX_FORMAT_SPECIFIER 0
+
+// Not applicable since sizeof(float) == sizeof(double) on the ez80
+#define NANOPRINTF_USE_FLOAT_SINGLE_PRECISION 0
 
 #include "nanoprintf.h"
 
@@ -50,13 +57,14 @@ int vsnprintf(char *__restrict buffer, size_t bufsz, char const *__restrict form
 
   npf_putc const pc = buffer ? npf_bufputc : npf_bufputc_nop;
   int const n = npf_vpprintf(pc, &bufputc_ctx, format, vlist);
-  pc('\0', &bufputc_ctx);
 
+  if (buffer && bufsz) {
 #ifdef NANOPRINTF_SNPRINTF_SAFE_EMPTY_STRING_ON_OVERFLOW
-  if (bufsz && (n >= (int)bufsz)) { buffer[0] = '\0'; }
+    buffer[(n < 0 || (unsigned)n >= bufsz) ? 0 : n] = '\0';
 #else
-  if (bufsz && (n >= (int)bufsz)) { buffer[bufsz - 1] = '\0'; }
+    buffer[n < 0 ? 0 : NPF_MIN((unsigned)n, bufsz - 1)] = '\0';
 #endif
+  }
 
   return n;
 }
