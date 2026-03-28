@@ -54,6 +54,8 @@ extern "C" {
 #endif
 #endif
 
+#ifndef _EZ80
+
 NPF_VISIBILITY int npf_snprintf_(char * NPF_RESTRICT buffer,
                                  size_t bufsz,
                                  const char * NPF_RESTRICT format, ...)
@@ -83,6 +85,8 @@ NPF_VISIBILITY int npf_vpprintf(npf_putc pc,
                                 void * NPF_RESTRICT pc_ctx,
                                 char const * NPF_RESTRICT format,
                                 va_list vlist) NPF_PRINTF_ATTR(3, 0);
+
+#endif /* _EZ80 */
 
 #ifdef __cplusplus
 }
@@ -488,7 +492,9 @@ static int npf_parse_format_spec(char const *format, npf_format_spec_t *out_spec
 #endif
       break;
 #if NANOPRINTF_USE_FLOAT_FORMAT_SPECIFIERS == 1
+#if !defined(_EZ80) || NANOPRINTF_USE_LONG_DOUBLE_PRECISION
     case 'L': out_spec->length_modifier = NPF_FMT_SPEC_LEN_MOD_LONG_DOUBLE; break;
+#endif /* _EZ80 */
 #endif
 #if NANOPRINTF_USE_LARGE_FORMAT_SPECIFIERS == 1
     case 'j': out_spec->length_modifier = NPF_FMT_SPEC_LEN_MOD_LARGE_INTMAX; break;
@@ -587,6 +593,10 @@ static NPF_NOINLINE int npf_utoa_rev(
   typedef float npf_real_t;
   #define NPF_REAL_MANT_DIG FLT_MANT_DIG
   #define NPF_REAL_MAX_EXP  FLT_MAX_EXP
+#elif NANOPRINTF_USE_LONG_DOUBLE_PRECISION
+  typedef long double npf_real_t;
+  #define NPF_REAL_MANT_DIG LDBL_MANT_DIG
+  #define NPF_REAL_MAX_EXP  LDBL_MAX_EXP
 #else
   typedef double npf_real_t;
   #define NPF_REAL_MANT_DIG DBL_MANT_DIG
@@ -643,7 +653,11 @@ static NPF_FORCE_INLINE npf_real_bin_t npf_real_to_int_rep(npf_real_t f) {
   npf_real_bin_t bin = 0;
   char const *src = (char const *)&f;
   char *dst = (char *)&bin;
+#ifndef _EZ80
   for (uint_fast8_t i = 0; i < sizeof(f); ++i) { dst[i] = src[i]; }
+#else /* _EZ80 */
+  __builtin_memcpy(dst, src, sizeof(f));
+#endif /* _EZ80 */
   return bin;
 }
 
@@ -813,7 +827,11 @@ static NPF_FORCE_INLINE npf_double_bin_t npf_double_to_int_rep(double f) {
   npf_double_bin_t bin = 0;
   char const *src = (char const *)&f;
   char *dst = (char *)&bin;
+#ifndef _EZ80
   for (uint_fast8_t i = 0; i < sizeof(f); ++i) { dst[i] = src[i]; }
+#else /* _EZ80 */
+  __builtin_memcpy(dst, src, sizeof(f));
+#endif /* _EZ80 */
   return bin;
 }
 #else
@@ -932,13 +950,22 @@ typedef struct npf_cnt_putc_ctx {
   int n;
 } npf_cnt_putc_ctx_t;
 
+#ifdef NANOPRINTF_STATIC_GLOBALS
+static npf_cnt_putc_ctx_t pc_cnt;
+#endif
+
 static void npf_putc_cnt(int c, void *ctx) {
-  npf_cnt_putc_ctx_t *pc_cnt = (npf_cnt_putc_ctx_t *)ctx;
-  ++pc_cnt->n;
-  pc_cnt->pc(c, pc_cnt->ctx); // sibling-call optimization
+  npf_cnt_putc_ctx_t *pc_putc_cnt = (npf_cnt_putc_ctx_t *)ctx;
+  ++pc_putc_cnt->n;
+  pc_putc_cnt->pc(c, pc_putc_cnt->ctx); // sibling-call optimization
 }
 
+#ifdef NANOPRINTF_STATIC_GLOBALS
+static void NPF_PUTC_IMPL(char VAL) { npf_putc_cnt((int)(VAL), &pc_cnt); }
+#define NPF_PUTC(VAL) NPF_PUTC_IMPL(VAL)
+#else
 #define NPF_PUTC(VAL) do { npf_putc_cnt((int)(VAL), &pc_cnt); } while (0)
+#endif
 
 #define NPF_EXTRACT(MOD, CAST_TO, EXTRACT_AS) \
   case NPF_FMT_SPEC_LEN_MOD_##MOD: val = (CAST_TO)va_arg(args, EXTRACT_AS); break
@@ -949,7 +976,9 @@ static void npf_putc_cnt(int c, void *ctx) {
 int npf_vpprintf(npf_putc pc, void *pc_ctx, char const *format, va_list args) {
   npf_format_spec_t fs;
   char const *cur = format;
+#ifndef NANOPRINTF_STATIC_GLOBALS
   npf_cnt_putc_ctx_t pc_cnt;
+#endif
   pc_cnt.pc = pc;
   pc_cnt.ctx = pc_ctx;
   pc_cnt.n = 0;
@@ -1319,6 +1348,8 @@ int npf_vpprintf(npf_putc pc, void *pc_ctx, char const *format, va_list args) {
 #undef NPF_EXTRACT
 #undef NPF_WRITEBACK
 
+#ifndef _EZ80
+
 int npf_vsnprintf(char * NPF_RESTRICT buffer,
                   size_t bufsz,
                   char const * NPF_RESTRICT format,
@@ -1363,6 +1394,8 @@ int npf_snprintf_(char * NPF_RESTRICT buffer,
   va_end(val);
   return rv;
 }
+
+#endif /* _EZ80 */
 
 #if NPF_HAVE_GCC_WARNING_PRAGMAS
   #pragma GCC diagnostic pop
