@@ -300,7 +300,17 @@ LIB_SOFTFLOAT = $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/lib/softfloat/libsoftfloa
 
 # include printf
 ifeq ($(HAS_PRINTF),YES)
-LIB_PRINTF = $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/lib/libc/libnanoprintf.a)
+
+ifeq ($(PRINTF_LONG_DOUBLE),YES)
+LIB_PRINTF = $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/lib/libc/libnanoprintf_longdouble.a)
+else
+ifeq ($(PRINTF_NO_FLOAT),YES)
+LIB_PRINTF = $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/lib/libc/libnanoprintf_nofloat.a)
+else
+LIB_PRINTF = $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/lib/libc/libnanoprintf_default.a)
+endif
+endif
+
 else
 LIB_PRINTF =
 SPRINTF_SYMBOL = --defsym _sprintf=0x0000BC

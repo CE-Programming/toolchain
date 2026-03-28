@@ -1,3 +1,22 @@
+//------------------------------------------------------------------------------
+// Common Config
+//------------------------------------------------------------------------------
+
+#define NANOPRINTF_IMPLEMENTATION
+#define NANOPRINTF_VISIBILITY_STATIC
+#define NANOPRINTF_STATIC_GLOBALS
+
+#if NANOPRINTF_USE_LONG_DOUBLE_PRECISION == 1
+#define NANOPRINTF_CONVERSION_FLOAT_TYPE unsigned long long
+#else
+#define NANOPRINTF_CONVERSION_FLOAT_TYPE unsigned long
+#endif
+
+// Not applicable since sizeof(float) == sizeof(double) on the ez80
+#define NANOPRINTF_USE_FLOAT_SINGLE_PRECISION 0
+
+//------------------------------------------------------------------------------
+
 #include <inttypes.h>
 #include <limits.h>
 #include <stdbool.h>
@@ -5,16 +24,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h> /* malloc */
-
-#define NANOPRINTF_IMPLEMENTATION
-#define NANOPRINTF_VISIBILITY_STATIC
-#define NANOPRINTF_STATIC_GLOBALS
-
-/**
- * @remarks don't set this above 40, or there is a chance that
- * frameset will exceed 127 (generating slower code).
- */
-#define NANOPRINTF_CONVERSION_BUFFER_SIZE 24
 
 static void npf_putc_std(int c, void *ctx) {
   (void)ctx;
@@ -24,28 +33,6 @@ static void npf_putc_std(int c, void *ctx) {
 static void npf_fputc_std(int c, void *ctx) {
   fputc(c, (FILE*)ctx);
 }
-
-// This is a custom nanoprintf flag
-#define NANOPRINTF_USE_LONG_DOUBLE_PRECISION 1
-
-#if NANOPRINTF_USE_LONG_DOUBLE_PRECISION == 1
-#define NANOPRINTF_CONVERSION_FLOAT_TYPE unsigned long long
-#else
-#define NANOPRINTF_CONVERSION_FLOAT_TYPE unsigned long
-#endif
-
-#define NANOPRINTF_USE_FIELD_WIDTH_FORMAT_SPECIFIERS 1
-#define NANOPRINTF_USE_PRECISION_FORMAT_SPECIFIERS 1
-#define NANOPRINTF_USE_FLOAT_FORMAT_SPECIFIERS 1
-#define NANOPRINTF_USE_LARGE_FORMAT_SPECIFIERS 1
-#define NANOPRINTF_USE_SMALL_FORMAT_SPECIFIERS 1
-#define NANOPRINTF_USE_BINARY_FORMAT_SPECIFIERS 1
-#define NANOPRINTF_USE_WRITEBACK_FORMAT_SPECIFIERS 1
-#define NANOPRINTF_USE_ALT_FORM_FLAG 1
-#define NANOPRINTF_USE_FLOAT_HEX_FORMAT_SPECIFIER 0
-
-// Not applicable since sizeof(float) == sizeof(double) on the ez80
-#define NANOPRINTF_USE_FLOAT_SINGLE_PRECISION 0
 
 #include "nanoprintf.h"
 

@@ -16,18 +16,27 @@
 
 include $(CURDIR)/../../common.mk
 
-OBJECTS =
-OBJECTS += $(patsubst %.c,build/%.c.o,$(wildcard *.c))
-OBJECTS += $(patsubst %.cpp,build/%.cpp.o,$(wildcard *.cpp))
-OBJECTS += $(patsubst %.src,build/%.o,$(wildcard *.src))
+OBJECTS_DEFAULT = build/nanoprintf_default.c.o
+OBJECTS_NOFLOAT = build/nanoprintf_nofloat.c.o
+OBJECTS_LONGDOUBLE = build/nanoprintf_longdouble.c.o
 
-LIB_NANOPRINTF := libnanoprintf.a
+LIB_NANOPRINTF_DEFAULT := libnanoprintf_default.a
+LIB_NANOPRINTF_NOFLOAT := libnanoprintf_nofloat.a
+LIB_NANOPRINTF_LONGDOUBLE := libnanoprintf_longdouble.a
 
 .SECONDARY:
 
-all: build/$(LIB_NANOPRINTF)
+all: build/$(LIB_NANOPRINTF_DEFAULT) build/$(LIB_NANOPRINTF_NOFLOAT) build/$(LIB_NANOPRINTF_LONGDOUBLE)
 
-build/$(LIB_NANOPRINTF): $(OBJECTS)
+build/$(LIB_NANOPRINTF_DEFAULT): $(OBJECTS_DEFAULT)
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZAR) rcs $@ $^
+
+build/$(LIB_NANOPRINTF_NOFLOAT): $(OBJECTS_NOFLOAT)
+	$(Q)$(call MKDIR,build)
+	$(Q)$(EZAR) rcs $@ $^
+
+build/$(LIB_NANOPRINTF_LONGDOUBLE): $(OBJECTS_LONGDOUBLE)
 	$(Q)$(call MKDIR,build)
 	$(Q)$(EZAR) rcs $@ $^
 
@@ -44,6 +53,8 @@ clean:
 
 install: all
 	$(Q)$(call MKDIR,$(INSTALL_LIBC))
-	$(Q)$(call COPY,$(call NATIVEPATH,build/$(LIB_NANOPRINTF)),$(INSTALL_LIBC))
+	$(Q)$(call COPY,$(call NATIVEPATH,build/$(LIB_NANOPRINTF_DEFAULT)),$(INSTALL_LIBC))
+	$(Q)$(call COPY,$(call NATIVEPATH,build/$(LIB_NANOPRINTF_NOFLOAT)),$(INSTALL_LIBC))
+	$(Q)$(call COPY,$(call NATIVEPATH,build/$(LIB_NANOPRINTF_LONGDOUBLE)),$(INSTALL_LIBC))
 
 .PHONY: all clean install

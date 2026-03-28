@@ -8,13 +8,11 @@ DESCRIPTION = "CE C Toolchain Demo"
 COMPRESSED = NO
 ARCHIVED = NO
 
-CFLAGS = -Wall -Wextra -Wformat=2 -Wshadow -Oz
-CXXFLAGS = -Wall -Wextra -Wformat=2 -Wshadow -Oz
+CFLAGS = -Wall -Wextra -Wshadow -Oz
+CXXFLAGS = -Wall -Wextra -Wshadow -Oz
 
-HAS_MATH_ERRNO = YES
-PREFER_OS_LIBC = NO
 HAS_PRINTF = YES
-PRINTF_LONG_DOUBLE = YES
+PRINTF_NO_FLOAT = YES
 
 # ----------------------------
 
