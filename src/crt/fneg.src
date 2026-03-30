@@ -23,13 +23,23 @@
 	.type	__fneg, @function
 
 __fneg:
-	or	a,a
-	jr	nz,__noexit
+	; Common case (A != 0) :  5F + 3R + 0W + 2
+	; A:UBC == 0.0f        : 12F + 6R + 3W + 3
+	; positive subnormal   : 14F + 6R + 3W + 3
+	add	a, $7F
+	inc	a
+	ret	po
+	; input == [+0.0f, +FLT_MIN * 2.0f)
+	; we need to make sure we do not output -0.0f, so we need to make sure that the mantissa is not zero.
+	; A is $80 here
+	rla			; set carry (and set A to $00)
 	push	hl
-	sbc	hl,hl
-	sbc	hl,bc
+	sbc	hl, hl
+	add	hl, bc
 	pop	hl
-	ret	z
-__noexit:
-	xor	a,80h
+.if 1
+	; we can optionally return here to make the A:UBC == 0.0f case slightly faster.
+	ret	nc
+.endif
+	rra			; A = (BC != 0) ? $80 : $00
 	ret
