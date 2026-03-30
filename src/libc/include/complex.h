@@ -7,10 +7,6 @@
 
 #else /* __cplusplus */
 
-#ifndef __FAST_MATH__
-#warning "-ffast-math is required for complex multiplication and division to work properly at this time"
-#endif
-
 #define complex _Complex
 
 #ifdef _Imaginary

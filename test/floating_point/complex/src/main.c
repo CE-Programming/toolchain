@@ -57,6 +57,16 @@ double _Complex T_conj(double _Complex);
 float _Complex T_conjf(float _Complex);
 long double _Complex T_conjl(long double _Complex);
 
+_Complex float T__addsc3(float a, float b, float c, float d);
+_Complex float T__subsc3(float a, float b, float c, float d);
+_Complex float T__mulsc3(float a, float b, float c, float d);
+_Complex float T__divsc3(float a, float b, float c, float d);
+
+_Complex long double T__adddc3(long double a, long double b, long double c, long double d);
+_Complex long double T__subdc3(long double a, long double b, long double c, long double d);
+_Complex long double T__muldc3(long double a, long double b, long double c, long double d);
+_Complex long double T__divdc3(long double a, long double b, long double c, long double d);
+
 static size_t run_test(void) {
     /* test float _Complex without any Clang chicanery */
     {
@@ -182,6 +192,40 @@ static size_t run_test(void) {
         c64.c = conjl(CMPLXL(cimagl(c64.c), creall(c64.c)));
         if (creall(c64.c) != -CF64_IM) { return __LINE__; }
         if (cimagl(c64.c) != -CF64_RE) { return __LINE__; }
+    }
+
+    /* test that float complex CRT functions work */
+    {
+        complex float val;
+        val = T__addsc3(1.0f, 2.0f, 4.0f, 8.0f);
+        if (crealf(val) != 5.0f) { return __LINE__; }
+        if (cimagf(val) != 10.0f) { return __LINE__; }
+        val = T__subsc3(1.0f, 2.0f, 4.0f, 8.0f);
+        if (crealf(val) != -3.0f) { return __LINE__; }
+        if (cimagf(val) != -6.0f) { return __LINE__; }
+        val = T__mulsc3(3.0f, 2.0f, 0.25f, -4.0f);
+        if (crealf(val) != 8.75f) { return __LINE__; }
+        if (cimagf(val) != -11.5f) { return __LINE__; }
+        val = T__divsc3(-4.0f, 8.0f, -2.0f, 2.0f);
+        if (crealf(val) != 3.0f) { return __LINE__; }
+        if (cimagf(val) != -1.0f) { return __LINE__; }
+    }
+
+    /* test that long double complex CRT functions work */
+    {
+        complex long double val;
+        val = T__adddc3(1.0L, 2.0L, 4.0L, 8.0L);
+        if (creall(val) != 5.0L) { return __LINE__; }
+        if (cimagl(val) != 10.0L) { return __LINE__; }
+        val = T__subdc3(1.0L, 2.0L, 4.0L, 8.0L);
+        if (creall(val) != -3.0L) { return __LINE__; }
+        if (cimagl(val) != -6.0L) { return __LINE__; }
+        val = T__muldc3(3.0L, 2.0L, 0.25L, -4.0L);
+        if (creall(val) != 8.75L) { return __LINE__; }
+        if (cimagl(val) != -11.5L) { return __LINE__; }
+        val = T__divdc3(-4.0L, 8.0L, -2.0L, 2.0L);
+        if (creall(val) != 3.0L) { return __LINE__; }
+        if (cimagl(val) != -1.0L) { return __LINE__; }
     }
 
     /* passed all */
