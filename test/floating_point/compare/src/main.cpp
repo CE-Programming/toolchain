@@ -15,7 +15,7 @@
 //------------------------------------------------------------------------------
 
 // define to 0 or 1
-#define DEBUG_DIAGNOSTICS 0
+#define DEBUG_DIAGNOSTICS 1
 
 //------------------------------------------------------------------------------
 // Tables
@@ -176,11 +176,28 @@ static inline uint64_t f64_to_u64(long double x) {
 //------------------------------------------------------------------------------
 
 extern "C" {
+uint8_t crt_fcmp(uint32_t LHS, uint32_t RHS);
 uint8_t crt_fcmpo(uint32_t LHS, uint32_t RHS);
 uint8_t crt_fcmpu(uint32_t LHS, uint32_t RHS);
+uint8_t crt_dcmp(uint64_t LHS, uint64_t RHS);
 uint8_t crt_dcmpo(uint64_t LHS, uint64_t RHS);
 uint8_t crt_dcmpu(uint64_t LHS, uint64_t RHS);
 }
+
+static constexpr bool  EQ_O = true;
+static constexpr bool NEQ_U = false;
+
+static constexpr bool  LT_O = true;
+static constexpr bool NLT_U = false;
+
+static constexpr bool NGE_U = true;
+static constexpr bool  GE_O = false;
+
+static constexpr bool NLG_U = true;
+static constexpr bool  LG_O = false;
+
+static constexpr bool ORDER = true;
+static constexpr bool UNORD = false;
 
 static bool test_fcmp(
     uint32_t LHS, uint32_t RHS,
@@ -190,17 +207,29 @@ static bool test_fcmp(
     bool truth_u_zero,
     bool truth_u_carry
 ) {
+    uint8_t cmpc = crt_fcmp(LHS, RHS);
     uint8_t cmpo = crt_fcmpo(LHS, RHS);
     uint8_t cmpu = crt_fcmpu(LHS, RHS);
+    bool ordered = (truth_u_carry == ORDER);
+    bool truth_c_zero = truth_o_zero;
+    bool truth_c_sign = truth_o_sign;
+    bool cmpc_fail = (ordered && (
+        (((cmpc & (1 << 6)) != 0) != truth_c_zero ) ||
+        (((cmpc & (1 << 7)) != 0) != truth_c_sign )
+    ));
     if (
         (((cmpo & (1 << 6)) != 0) != truth_o_zero ) ||
         (((cmpo & (1 << 0)) != 0) != truth_o_carry) ||
         (((cmpo & (1 << 7)) != 0) != truth_o_sign ) ||
         (((cmpu & (1 << 6)) != 0) != truth_u_zero ) ||
-        (((cmpu & (1 << 0)) != 0) != truth_u_carry)
+        (((cmpu & (1 << 0)) != 0) != truth_u_carry) ||
+        cmpc_fail
     ) {
         test_printf(
-            "LHS %08lX\nRHS %08lX\nOT %c%c-----%c !=\nOG %08b\nUT -%c-----%c !=\nUG %08b\n",
+            "LHS %08lX\nRHS %08lX\n"
+            "OT %c%c-----%c !=\nOG %08b\n"
+            "UT -%c-----%c !=\nUG %08b\n"
+            "CT %c%c------ %c=\nCG %08b\n",
             LHS, RHS,
             truth_o_sign ? '1' : '0',
             truth_o_zero ? '1' : '0',
@@ -208,7 +237,11 @@ static bool test_fcmp(
             cmpo,
             truth_u_zero ? '1' : '0',
             truth_u_carry ? '1' : '0',
-            cmpu
+            cmpu,
+            !ordered ? '?' : (truth_c_sign ? '1' : '0'),
+            !ordered ? '?' : (truth_c_zero ? '1' : '0'),
+            !ordered ? '?' : '!',
+            cmpc
         );
         return false;
     }
@@ -223,17 +256,29 @@ static bool test_dcmp(
     bool truth_u_zero,
     bool truth_u_carry
 ) {
+    uint8_t cmpc = crt_dcmp(LHS, RHS);
     uint8_t cmpo = crt_dcmpo(LHS, RHS);
     uint8_t cmpu = crt_dcmpu(LHS, RHS);
+    bool ordered = (truth_u_carry == ORDER);
+    bool truth_c_zero = truth_o_zero;
+    bool truth_c_sign = truth_o_sign;
+    bool cmpc_fail = (ordered && (
+        (((cmpc & (1 << 6)) != 0) != truth_c_zero ) ||
+        (((cmpc & (1 << 7)) != 0) != truth_c_sign )
+    ));
     if (
         (((cmpo & (1 << 6)) != 0) != truth_o_zero ) ||
         (((cmpo & (1 << 0)) != 0) != truth_o_carry) ||
         (((cmpo & (1 << 7)) != 0) != truth_o_sign ) ||
         (((cmpu & (1 << 6)) != 0) != truth_u_zero ) ||
-        (((cmpu & (1 << 0)) != 0) != truth_u_carry)
+        (((cmpu & (1 << 0)) != 0) != truth_u_carry) ||
+        cmpc_fail
     ) {
         test_printf(
-            "LHS %016llX\nRHS %016llX\nOT %c%c-----%c !=\nOG %08b\nUT -%c-----%c !=\nUG %08b\n",
+            "LHS %016llX\nRHS %016llX\n"
+            "OT %c%c-----%c !=\nOG %08b\n"
+            "UT -%c-----%c !=\nUG %08b\n"
+            "CT %c%c------ %c=\nCG %08b\n",
             LHS, RHS,
             truth_o_sign ? '1' : '0',
             truth_o_zero ? '1' : '0',
@@ -241,7 +286,11 @@ static bool test_dcmp(
             cmpo,
             truth_u_zero ? '1' : '0',
             truth_u_carry ? '1' : '0',
-            cmpu
+            cmpu,
+            !ordered ? '?' : (truth_c_sign ? '1' : '0'),
+            !ordered ? '?' : (truth_c_zero ? '1' : '0'),
+            !ordered ? '?' : '!',
+            cmpc
         );
         return false;
     }
@@ -283,21 +332,6 @@ static bool test_dcmp(
         truth_u_carry
     );
 }
-
-static constexpr bool  EQ_O = true;
-static constexpr bool NEQ_U = false;
-
-static constexpr bool  LT_O = true;
-static constexpr bool NLT_U = false;
-
-static constexpr bool NGE_U = true;
-static constexpr bool  GE_O = false;
-
-static constexpr bool NLG_U = true;
-static constexpr bool  LG_O = false;
-
-static constexpr bool ORDER = true;
-static constexpr bool UNORD = false;
 
 int fcmp_basic_test(void) {
     // test signed zero
