@@ -26,7 +26,7 @@ _strtoll.maybe_out_of_range:
 	; negative
 	; check that the result is not an exact INT_MIN
 	ld	b, a		; B = (B << 1)
-	call	__llcmpzero
+	call	__llequzero
 	set	7, b
 	ret	z		; exact INT_MIN
 _strtoll.underflow:
@@ -344,4 +344,4 @@ __strtoll_common.set_overflow_bit:
 
 	.extern	_errno
 	.extern	__llneg
-	.extern	__llcmpzero
+	.extern	__llequzero

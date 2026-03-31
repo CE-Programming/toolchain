@@ -173,7 +173,7 @@ __dtof:
 	; BC:UDE:UHL = 1 << shift
 	; (SP) = X
 	call	__lland
-	call	__llcmpzero
+	call	__llequzero
 	pop	hl
 	; DE and BC are swapped here
 	pop	bc
@@ -215,6 +215,6 @@ __dtof:
 	jr	.L.ret_copysign
 
 	.extern	__lland
-	.extern	__llcmpzero
+	.extern	__llequzero
 	.extern	__llshru
 	.extern	__lshru

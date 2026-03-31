@@ -1,10 +1,18 @@
 	.assume	adl=1
 
 	.section	.text
+
+	.global	__lequzero
+	.type	__lequzero, @function
+
 	.global	__lcmpzero
 	.type	__lcmpzero, @function
 
+__lequzero:
+	; Zero flag = (E:UHL == 0)
 __lcmpzero:
+	; Zero flag = (E:UHL == 0)
+	; Sign flag = (E:UHL < 0)
 	inc	e
 	dec	e
 	ret	nz
