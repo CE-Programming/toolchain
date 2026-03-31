@@ -6,10 +6,18 @@
 	.assume	adl=1
 
 	.section	.text
+
+	.global	__i48equzero
+	.type	__i48equzero, @function
+
 	.global	__i48cmpzero
 	.type	__i48cmpzero, @function
 
+__i48equzero:
+	; Zero flag = (UDE:UHL == 0)
 __i48cmpzero:
+	; Zero flag = (UDE:UHL == 0)
+	; Sign flag = (UDE:UHL < 0)
 ; CC: 13 bytes
 ; Minimum:  8F + 3R + 2
 ; Maximum: 14F + 3R + 3

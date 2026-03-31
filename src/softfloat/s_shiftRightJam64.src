@@ -43,7 +43,7 @@ _softfloat_shiftRightJam64:
 	ld	hl, (iy + 4)
 	call	__llshl
 	xor	a, a
-	call	__llcmpzero
+	call	__llequzero
 	jr	z, .L.no_round
 	inc	a	; ld a, 1
 .L.no_round:
@@ -60,7 +60,7 @@ _softfloat_shiftRightJam64:
 .L.overflow_shift:
 	; A is zero here
 	ld	hl, (iy + 4)
-	call	__llcmpzero
+	call	__llequzero
 	ret	z
 	xor	a, a
 	sbc	hl, hl
@@ -71,6 +71,6 @@ _softfloat_shiftRightJam64:
 	inc	hl
 	ret
 
-	.extern	__llcmpzero
+	.extern	__llequzero
 	.extern	__llshl
 	.extern	__llshru
