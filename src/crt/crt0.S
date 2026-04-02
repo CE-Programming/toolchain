@@ -66,6 +66,7 @@ __header:
 	.equ	ti.ClrTxtShd, 0x020818
 
 	.global	__start
+	.type	__start, @function
 __start:
 	ld	iy, ti.flags
 	ld	sp, (ti.onSP)			; reset stacks
@@ -100,6 +101,7 @@ __start:
 ___app_start:
 #else
 	.global	__start
+	.type	__start, @function
 __start:
 	ld	iy, ti.flags
 #endif
@@ -321,6 +323,7 @@ ___libload_libs_ret:
 #endif
 	.equ	__start._main, $ - 3
 	.global	___exithl
+	.type	___exithl, @function
 ___exithl:
 #if HAS_ATEXIT || HAS_FINI_ARRAY || HAS_ABORT
 	push	hl
