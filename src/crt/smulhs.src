@@ -7,21 +7,21 @@
 
 ; HL = ((int32_t)HL * (int32_t)BC) >> 16
 __smulhs:
-	push	bc
-	push	hl
+	push	de
+	ld	d, h
+	ld	e, l
 	call	__smulhu
 
 	; if (BC < 0) { result -= HL; }
 	bit	7, b
-	pop	bc
 	jr	z, .L.positive_hl
 	or	a, a
-	sbc	hl, bc
+	sbc	hl, de
 .L.positive_hl:
 
 	; if (HL < 0) { result -= BC; }
-	bit	7, b
-	pop	bc
+	bit	7, d
+	pop	de
 	ret	z
 	or	a, a
 	sbc	hl, bc

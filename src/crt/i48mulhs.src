@@ -13,21 +13,22 @@ __i48mulhs:
 	push	de
 	push	hl
 
-	push	hl
-	lea	hl, iy + 0
+	push	de
+	ex	de, hl
 	add	hl, hl
 	sbc	a, a
 
-	ld	hl, $800000
-	add	hl, de
-	pop	hl
+	lea	hl, iy + 0
+	add	hl, hl
 	rla
+	ex	de, hl
+	pop	de
 
 	call	__i48mulhu
 
 	; if (UDE:UHL < 0) { result -= UIY:UBC; }
-	rrca
-	call	c, __i48sub
+	or	a, a
+	call	m, __i48sub
 
 	pop	bc
 	pop	iy
