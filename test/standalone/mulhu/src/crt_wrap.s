@@ -3,6 +3,7 @@
 	.section	.data._prev_reg
 
 	.global	_prev_reg
+	.type	_prev_reg, @function
 _prev_reg:
 	;	L H U  E D U  C B U  A  Y I U  X I U
 	db	0,0,0, 0,0,0, 0,0,0, 0, 0,0,0, 0,0,0
@@ -10,6 +11,7 @@ _prev_reg:
 	.section	.data._next_reg
 
 	.global	_next_reg
+	.type	_next_reg, @function
 _next_reg:
 	;	L H U  E D U  C B U  A  Y I U  X I U
 	db	0,0,0, 0,0,0, 0,0,0, 0, 0,0,0, 0,0,0
@@ -37,6 +39,7 @@ _set_next_reg:
 	ret
 
 	.global	_CRT_smulhu
+	.type	_CRT_smulhu, @function
 _CRT_smulhu:
 	push	iy
 	ld	iy, 0
@@ -51,6 +54,7 @@ _CRT_smulhu:
 	jp	_set_next_reg
 
 	.global	_CRT_smulhs
+	.type	_CRT_smulhs, @function
 _CRT_smulhs:
 	push	iy
 	ld	iy, 0
@@ -65,6 +69,7 @@ _CRT_smulhs:
 	jp	_set_next_reg
 
 	.global	_CRT_imulhu
+	.type	_CRT_imulhu, @function
 _CRT_imulhu:
 	push	iy
 	ld	iy, 0
@@ -77,6 +82,7 @@ _CRT_imulhu:
 	jp	_set_next_reg
 
 	.global	_CRT_imulhs
+	.type	_CRT_imulhs, @function
 _CRT_imulhs:
 	push	iy
 	ld	iy, 0
@@ -89,6 +95,7 @@ _CRT_imulhs:
 	jp	_set_next_reg
 
 	.global	_CRT_lmulhu
+	.type	_CRT_lmulhu, @function
 _CRT_lmulhu:
 	push	iy
 	ld	iy, 0
@@ -103,6 +110,7 @@ _CRT_lmulhu:
 	jp	_set_next_reg
 
 	.global	_CRT_lmulhs
+	.type	_CRT_lmulhs, @function
 _CRT_lmulhs:
 	push	iy
 	ld	iy, 0
@@ -117,6 +125,7 @@ _CRT_lmulhs:
 	jp	_set_next_reg
 
 	.global	_CRT_i48mulhu
+	.type	_CRT_i48mulhu, @function
 _CRT_i48mulhu:
 	ld	iy, 0
 	add	iy, sp
@@ -129,6 +138,7 @@ _CRT_i48mulhu:
 	jp	_set_next_reg
 
 	.global	_CRT_i48mulhs
+	.type	_CRT_i48mulhs, @function
 _CRT_i48mulhs:
 	ld	iy, 0
 	add	iy, sp
@@ -141,6 +151,7 @@ _CRT_i48mulhs:
 	jp	_set_next_reg
 
 	.global	_CRT_llmulhu
+	.type	_CRT_llmulhu, @function
 _CRT_llmulhu:
 	ld	iy, 0
 	add	iy, sp
@@ -159,6 +170,7 @@ _CRT_llmulhu:
 	jp	_set_next_reg
 
 	.global	_CRT_llmulhs
+	.type	_CRT_llmulhs, @function
 _CRT_llmulhs:
 	ld	iy, 0
 	add	iy, sp

@@ -8,16 +8,16 @@
   },
   "sequence": [
     "action|launch",
-    "delay|2000",
+    "delay|6000",
     "hashWait|1",
     "key|enter",
-    "delay|300",
+    "delay|400",
     "hashWait|2"
   ],
   "hashes": {
     "1": {
       "description": "All tests passed",
-	  "timeout": 5000,
+      "timeout": 8000,
       "start": "vram_start",
       "size": "vram_16_size",
       "expected_CRCs": [
