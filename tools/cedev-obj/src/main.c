@@ -122,14 +122,8 @@ static void write_header_defines(FILE *out, const char *elf_file, struct elf_fil
     fprintf(out, "#define HAS_INIT_ARRAY %d\n", elf_has_section(elf, ".init_array") ? 1 : 0);
     fprintf(out, "#define HAS_FINI_ARRAY %d\n", elf_has_section(elf, ".fini_array") ? 1 : 0);
     fprintf(out, "#define HAS_CLOCK %d\n", elf_has_symbol(elf, "_clock") ? 1 : 0);
-    #if 0
-        fprintf(out, "#define HAS_ABORT %d\n", elf_has_symbol(elf, "_abort") ? 1 : 0);
-        fprintf(out, "#define HAS_EXIT %d\n", elf_has_symbol(elf, "_exit") ? 1 : 0);
-    #else
-        // elf_has_symbol has some false negatives, so always emit these functions for now.
-        fprintf(out, "#define HAS_ABORT %d\n", /* _abort */ 1);
-        fprintf(out, "#define HAS_EXIT %d\n", /* _exit */ 1);
-    #endif
+    fprintf(out, "#define HAS_ABORT %d\n", elf_has_symbol(elf, "_abort") ? 1 : 0);
+    fprintf(out, "#define HAS_EXIT %d\n", elf_has_symbol(elf, "_exit") ? 1 : 0);
     fprintf(out, "#define HAS_C99__EXIT %d\n", elf_has_symbol(elf, "__Exit") ? 1 : 0);
     fprintf(out, "#define HAS_RUN_PRGM %d\n", elf_has_symbol(elf, "_os_RunPrgm") ? 1 : 0);
     fprintf(out, "#define HAS_MAIN_ARGC_ARGV %d\n", elf_has_defined_symbol(elf, "___main_argc_argv") ? 1 : 0);

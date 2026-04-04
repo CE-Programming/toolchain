@@ -391,14 +391,15 @@ $(BINDIR)/$(TARGETOBJ): $(CRT0_OBJ) $(OBJDIR)/$(TARGETTMP) $(MAKEFILE_LIST) $(DE
 		$(EXTRA_LDFLAGS) \
 		$(OBJDIR)/$(TARGETTMP) \
 		$(CRT0_OBJ) \
-		$(LIB_ALLOCATOR) \
 		--start-group \
-		$(LIB_SOFTFLOAT) \
+		$(LIB_ALLOCATOR) \
+		$(LIB_PRINTF) \
 		$(LIB_CRT) \
-		--end-group \
+		$(LIB_CE) \
+		$(LIB_SOFTFLOAT) \
 		$(LIB_C) \
 		$(LIB_CXX) \
-		$(LIB_CE) \
+		--end-group \
 		-o $(call QUOTE_ARG,$@)
 
 ifneq ($(ICON_SRC),)
@@ -496,14 +497,16 @@ $(OBJDIR)/$(TARGETTMP): $(OBJECTS) $(LIB_ALLOCATOR) $(LIB_PRINTF) $(LIB_CXX) $(L
 		$(EXTRA_PRE_LDFLAGS) \
 		$(OBJECTS) \
 		$(ICON_OBJ) \
+		$(EXTRA_LIBS) \
+		--start-group \
 		$(LIB_ALLOCATOR) \
 		$(LIB_PRINTF) \
-		$(LIB_CXX) \
-		$(LIB_CE) \
 		$(LIB_CRT) \
-		$(LIB_C) \
+		$(LIB_CE) \
 		$(LIB_SOFTFLOAT) \
-		$(EXTRA_LIBS) \
+		$(LIB_C) \
+		$(LIB_CXX) \
+		--end-group \
 		-o $(call QUOTE_ARG,$@)
 	$(Q)$(STRIP_CMD) $(call QUOTE_ARG,$@)
 
