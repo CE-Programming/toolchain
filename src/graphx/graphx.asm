@@ -2082,10 +2082,10 @@ OutcodeOutOutcode1:
 gfx_Line_NoClip:
 ; Draws an unclipped arbitrary line
 ; Arguments:
-;  arg0 : X1 coordinate (hl)
-;  arg1 : Y1 coordinate (b)
-;  arg2 : X2 coordinate (de)
-;  arg3 : Y2 coordinate (c)
+;  arg0 : X0 coordinate (hl)
+;  arg1 : Y0 coordinate (b)
+;  arg2 : X1 coordinate (de)
+;  arg3 : Y1 coordinate (a)
 ; Returns:
 ;  None
 	ld	iy, 0
@@ -2094,18 +2094,24 @@ _Line_NoClip:	; <-- carry is cleared
 	ld	hl, (iy + 3)
 	ld	de, (iy + 9)
 	ld	b, (iy + 6)
-	ld	c, (iy + 12)		; line from hl, b to de, c
+	ld	a, (iy + 12)		; line from hl, b to de, a
 ;	or	a, a
 	sbc	hl, de
 	add	hl, de
 	jr	c, _draw_left_to_right	; draw left to right
 	ex	de, hl
+	ld	c, a
 	ld	a, b
 	ld	b, c
-	ld	c, a
 _draw_left_to_right:
-	push	bc
-	pop	iy
+
+	sub	a, b			; dy = y1 - y0
+	ld	iy, 320
+	jr	nc, .positive_dy
+	ld	iy, -320
+	neg				; abs(dy)
+.positive_dy:
+
 	push	hl
 	ld	hl, (CurrentBuffer)
 	ld	c, 160
@@ -2121,29 +2127,9 @@ _draw_left_to_right:
 	push	hl
 	pop	bc			; bc = dx
 
-	xor	a, a
-	ld	h, a
-	ld	d, a
-	ld	e, iyl			; y0
-	ex.s	de, hl
-	ld	e, iyh			; y1
-
-	sbc	hl, de
-
-	jr	nc, .positive_dy
-	ex	de, hl
 	or	a, a
 	sbc	hl, hl
-	sbc	hl, de			; abs(dy)
-.positive_dy:
-
-	ld	a, iyl
-	sub	a, iyh
-	ld	iy, -320
-	jr	c, .use_negative_IY
-	ld	iy, 320
-.use_negative_IY:
-	or	a, a
+	ld	l, a
 	sbc	hl, bc
 	add	hl, bc			; hl = dy
 	jr	nc, dl_vertical
@@ -2157,7 +2143,7 @@ dl_horizontal:
 	ld	(_smc_dl_jr_0 + 0), a ; write smc
 	ld	(_smc_dl_width_1 + 1), iy ; write smc
 	ex	de, hl
-;	or	a, a	; or a, h clears carry
+;	or	a, a			; or a, h clears carry
 	sbc	hl, hl
 	sbc	hl, de
 	ld	(_smc_dl_dx_1 + 1), bc ; write smc
@@ -2190,13 +2176,15 @@ _smc_dl_dx_1:
 _smc_dl_dy_1:
 	ld	de, 0			; dy
 	jr	dl_hloop
+
 dl_vertical:
 	lea	de, iy
 	ld	b, c
 	ld	a, l
 	ld	iyl, a
 	ld	c, a
-	srl	a			; a = dy / 2
+	; or	a, a
+	rra				; a = dy / 2
 	inc	c
 	pop	hl
 	wait_quick
