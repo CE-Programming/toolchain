@@ -130,9 +130,18 @@ LINKER_SCRIPT ?= $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/meta/linker_script.ld)
 # allocator (malloc/realloc/free)
 ifeq ($(ALLOCATOR),STANDARD)
 LIB_ALLOCATOR = $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/lib/libc/allocator_standard.a)
-endif
-ifeq ($(ALLOCATOR),SIMPLE)
+else ifeq ($(ALLOCATOR),SIMPLE)
 LIB_ALLOCATOR = $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/lib/libc/allocator_simple.a)
+else ifeq ($(ALLOCATOR),CUSTOM)
+LIB_ALLOCATOR =
+else
+$(error ALLOCATOR must be one of STANDARD, SIMPLE, or CUSTOM)
+endif
+
+ifeq ($(ALLOCATOR),CUSTOM)
+CUSTOM_ALLOCATOR_SYMBOLS = --undefined _malloc --undefined _free --undefined _realloc
+else
+CUSTOM_ALLOCATOR_SYMBOLS =
 endif
 
 # ensure always a hexadecimal value
@@ -481,7 +490,7 @@ $(OBJDIR)/%.$(CPP_EXTENSION).bc: $$(call UPDIR_RM,$$*).$(CPP_EXTENSION) $(EXTRA_
 	$(Q)$(CC) -MD -c -emit-llvm $(EZCXXFLAGS) $(call QUOTE_ARG,$<) -o $(call QUOTE_ARG,$@)
 
 # crt
-$(OBJDIR)/$(TARGETTMP): $(OBJECTS) $(LIB_ALLOCATOR) $(LIB_PRINTF) $(LIB_CXX) $(LIB_CE) $(LIB_SOFTFLOAT) $(LIB_CRT) $(LIB_C) $(ICON_OBJ) $(EXTRA_LIBS) $(MAKEFILE_LIST) $(DEPS)
+$(OBJDIR)/$(TARGETTMP): $(OBJECTS) $(LIB_PRINTF) $(LIB_CXX) $(LIB_CE) $(LIB_SOFTFLOAT) $(LIB_CRT) $(LIB_C) $(ICON_OBJ) $(EXTRA_LIBS) $(MAKEFILE_LIST) $(DEPS)
 	$(Q)$(call MKDIR,$(@D))
 	$(Q)$(LD) \
 		-i \
@@ -491,6 +500,7 @@ $(OBJDIR)/$(TARGETTMP): $(OBJECTS) $(LIB_ALLOCATOR) $(LIB_PRINTF) $(LIB_CXX) $(L
 		--gc-sections \
 		--omagic \
 		--defsym __TICE__=1 \
+		$(CUSTOM_ALLOCATOR_SYMBOLS) \
 		$(SPRINTF_SYMBOL) \
 		$(LD_DEBUG) \
 		$(EXTRA_PRE_LDFLAGS) \
@@ -499,7 +509,6 @@ $(OBJDIR)/$(TARGETTMP): $(OBJECTS) $(LIB_ALLOCATOR) $(LIB_PRINTF) $(LIB_CXX) $(L
 		$(EXTRA_LIBS) \
 		--whole-archive $(LIB_PRINTF) --no-whole-archive \
 		--start-group \
-		$(LIB_ALLOCATOR) \
 		$(LIB_CRT) \
 		$(LIB_CE) \
 		$(LIB_SOFTFLOAT) \
