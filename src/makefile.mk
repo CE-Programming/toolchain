@@ -393,7 +393,6 @@ $(BINDIR)/$(TARGETOBJ): $(CRT0_OBJ) $(OBJDIR)/$(TARGETTMP) $(MAKEFILE_LIST) $(DE
 		$(CRT0_OBJ) \
 		--start-group \
 		$(LIB_ALLOCATOR) \
-		$(LIB_PRINTF) \
 		$(LIB_CRT) \
 		$(LIB_CE) \
 		$(LIB_SOFTFLOAT) \
@@ -498,9 +497,9 @@ $(OBJDIR)/$(TARGETTMP): $(OBJECTS) $(LIB_ALLOCATOR) $(LIB_PRINTF) $(LIB_CXX) $(L
 		$(OBJECTS) \
 		$(ICON_OBJ) \
 		$(EXTRA_LIBS) \
+		--whole-archive $(LIB_PRINTF) --no-whole-archive \
 		--start-group \
 		$(LIB_ALLOCATOR) \
-		$(LIB_PRINTF) \
 		$(LIB_CRT) \
 		$(LIB_CE) \
 		$(LIB_SOFTFLOAT) \
