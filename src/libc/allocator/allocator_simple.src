@@ -1,6 +1,6 @@
 	.assume	adl=1
 
-	.section	.text._malloc
+	.section	.text
 
 	.global	_malloc
 	.type	_malloc, @function
