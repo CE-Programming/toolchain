@@ -1,10 +1,10 @@
 // -*- C++ -*-
-#ifndef _EZCXX_CMATH
-#define _EZCXX_CMATH
+#ifndef _EZCXX_MATH_H
+#define _EZCXX_MATH_H
 
-#include <__math_def.h>
+#include <stdlib.h>
+#include_next <math.h>
 #include <type_traits>
-#include <__abs_overloads>
 
 #pragma clang system_header
 
@@ -830,4 +830,4 @@ using std::islessequal;
 using std::islessgreater;
 using std::isunordered;
 
-#endif // _EZCXX_CMATH
+#endif // _EZCXX_MATH_H
