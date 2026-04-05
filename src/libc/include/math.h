@@ -1,13 +1,9 @@
 #ifndef _MATH_H
 #define _MATH_H
 
-#ifdef __cplusplus
-
-#include <cmath>
-
-#else /* __cplusplus */
-
 #include <__math_def.h>
+
+#ifndef __cplusplus
 
 static inline __attribute__((__always_inline__))
 bool __signbitf(float __x) {
