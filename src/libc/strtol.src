@@ -1,5 +1,12 @@
 	.assume	adl=1
 
+	.include	"errno.inc"
+
+.if	ERANGE & 0xFF != ERANGE
+	.print	"ERANGE is assumed to be between 1 and 255"
+	.err
+.endif
+
 	; until we figure out how to get FASMG require or etc working correctly
 	.equ	HAVE_WE_FIGURED_OUT_BINUTILS_YET, 0
 
@@ -32,7 +39,7 @@ ___strtoi:
 	ret	p		; 0 <= x <= INT_MAX
 .L.out_of_range:
 	or	a, a		; test sign (Z = negative)
-	ld	hl, 5		; ERANGE
+	ld	hl, ERANGE
 	ld	(_errno), hl
 	ld	hl, $7FFFFF	; overflow
 	ret	nz
@@ -72,7 +79,7 @@ _strtol.underflow:
 _strtol.out_of_range:
 _strtol.overflow:
 	ld	e, $80
-	ld	hl, 5		; ERANGE
+	ld	hl, ERANGE
 	ld	(_errno), hl
 	ld	l, h		; ld hl, 0
 	ret	z		; underflow
@@ -108,7 +115,7 @@ ___strtoui:
 	.local	_strtoul.out_of_range
 _strtoul.out_of_range:
 .endif
-	ld	hl, 5		; ERANGE
+	ld	hl, ERANGE
 	ld	(_errno), hl
 	ld	l, h		; ld hl, 0
 	dec	hl
@@ -129,7 +136,7 @@ _strtoul:
 .if HAVE_WE_FIGURED_OUT_BINUTILS_YET
 .else
 _strtoul.out_of_range:
-	ld	hl, 5		; ERANGE
+	ld	hl, ERANGE
 	ld	(_errno), hl
 	ld	l, h		; ld hl, 0
 	dec	hl

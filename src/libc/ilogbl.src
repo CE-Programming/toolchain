@@ -1,5 +1,23 @@
 	.assume	adl=1
 
+	.include	"errno.inc"
+	.include	"fenv.inc"
+	.include	"math.inc"
+
+.if	EDOM & 0xFF != EDOM
+	.print	"EDOM is assumed to be between 1 and 255"
+	.err
+.endif
+
+.if	!(FP_ILOGBNAN == 0x7FFFFF)
+	.print	"ilogbl assumes that FP_ILOGBNAN == 0x7FFFFF (INT_MAX)"
+	.err
+.endif
+.if	!(FP_ILOGB0 - 1 == FP_ILOGBNAN)
+	.print	"ilogbl assumes FP_ILOGB0 - 1 == FP_ILOGBNAN"
+	.err
+.endif
+
 	.section	.text
 
 	.global	_ilogbl
@@ -58,10 +76,10 @@ _ilogbl:
 	add	hl, de	; FP_ILOGB0 when DE is one
 	ex	de, hl
 	;	DE was zero or one, so HL is now zero or one
-	ld	l, 4	; EDOM
+	ld	l, EDOM
 	ld	(_errno), hl
 	ld	hl, ___fe_cur_env
-	set	4, (hl)	; FE_INVALID
+	set	FE_INVALID_BIT, (hl)
 	ex	de, hl
 	ret
 

@@ -1,5 +1,12 @@
 	.assume	adl=1
 
+	.include	"errno.inc"
+
+.if	EDOM & 0xFF != EDOM
+	.print	"EDOM is assumed to be between 1 and 255"
+	.err
+.endif
+
 	.section	.text
 	.global	_acos
 	.type	_acos, @function
@@ -36,7 +43,7 @@ _acosf:
 	jp	p, .L2
 
 .L1:
-	ld	hl,4
+	ld	hl, EDOM
 	ld	(_errno),hl
 	ld	l,h
 	ld	e,h

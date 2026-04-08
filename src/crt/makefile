@@ -26,6 +26,8 @@ OBJECTS_CE += $(patsubst %.c,build/%.c.ce.o,$(wildcard *.c))
 OBJECTS_CE += $(patsubst %.cpp,build/%.cpp.ce.o,$(wildcard *.cpp))
 OBJECTS_CE += $(patsubst %.src,build/%.ce.o,$(wildcard *.src))
 
+EZASFLAGS += -I$(call NATIVEPATH,$(CURDIR)/../libc)
+
 .SECONDARY:
 
 all: build/libcrt.a build/libcrt_os.a

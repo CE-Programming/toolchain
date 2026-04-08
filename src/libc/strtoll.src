@@ -1,5 +1,12 @@
 	.assume	adl=1
 
+	.include	"errno.inc"
+
+.if	ERANGE & 0xFF != ERANGE
+	.print	"ERANGE is assumed to be between 1 and 255"
+	.err
+.endif
+
 ;-------------------------------------------------------------------------------
 
 	.section	.text
@@ -34,7 +41,7 @@ _strtoll.underflow:
 _strtoll.out_of_range:
 _strtoll.overflow:
 	ld	b, $80
-	ld	hl, 5		; ERANGE
+	ld	hl, ERANGE
 	ld	c, h
 	ld	(_errno), hl
 	ld	l, h		; ld hl, 0
@@ -67,7 +74,7 @@ _strtoull:
 	jp	__llneg
 
 _strtoull.out_of_range:
-	ld	hl, 5		; ERANGE
+	ld	hl, ERANGE
 	ld	(_errno), hl
 	ld	l, h		; ld hl, 0
 	dec	hl

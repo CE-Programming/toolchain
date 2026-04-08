@@ -1,5 +1,13 @@
 	.assume	adl=1
 
+	.include	"errno.inc"
+	.include	"fenv.inc"
+
+.if	EDOM & 0xFF != EDOM
+	.print	"EDOM is assumed to be between 1 and 255"
+	.err
+.endif
+
 	.section	.text
 
 	.global	_logbf
@@ -46,11 +54,10 @@ _logbf:
 
 .L.ret_zero:
 	; HL is zero here
-	ld	l, 4	; EDOM
+	ld	l, EDOM
 	ld	(_errno), hl
-	; FE_DIVBYZERO
 	ld	hl, ___fe_cur_env
-	set	6, (hl)
+	set	FE_DIVBYZERO_BIT, (hl)
 	; -HUGE_VALF
 	ld	hl, $800000
 	ld	e, b	; ld e, $FF
