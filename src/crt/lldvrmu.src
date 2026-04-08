@@ -6,6 +6,8 @@
 	.global	__lldvrmu.hijack
 	.type	__lldvrmu.hijack, @function
 
+.if 1
+
 __lldvrmu:
 ; Atrociously slow.
 
@@ -109,3 +111,122 @@ __lldvrmu.hijack:
 	ret	po
 	ei
 	ret
+
+.else
+
+__lldvrmu:
+__lldvrmu.hijack:
+; Atrociously slow.
+
+	push	hl
+	ex	(sp), ix
+	ld	iy, 0
+	add	iy, sp
+
+	push	bc
+	push	de
+	; or	a, a
+	sbc	hl, hl
+	ex	de, hl
+	sbc	hl, hl
+	ld	c, l
+	ld	b, l
+	ld	a, 64
+	jr	.L.start
+
+	; (iy + 21) = denominator [48:63]
+	; (iy + 18) = denominator [24:47]
+	; (iy + 15) = denominator [ 0:23]
+	; (iy + 12) = caller return address
+	; (iy +  9) = preserved IY
+	; (iy +  6) = preserved AF
+	; (iy +  3) = return address
+	; (iy +  0) = preserved IX
+	; IX        = numerator [ 0:23]
+	; (iy -  3) = numerator [48:63]
+	; (iy -  6) = numerator [24:47]
+	; SP        = iy - 6
+
+.L.loop:
+	dec	a
+	jr	z, .L.finish
+.L.start:
+	; [0:63] <<= 1
+	add	ix, ix
+	ex	(sp), hl
+	adc	hl, hl
+	ex	(sp), hl
+	rl	(iy - 3)
+	rl	(iy - 2)
+
+	; [64:127] <<= 1
+	adc	hl, hl
+	ex	de, hl
+	adc	hl, hl
+	ex	de, hl
+	rl	c
+	rl	b
+
+	; test if R >= D
+
+	; inlined __llcmpu
+	or	a, a
+	push	hl
+	ld	hl, (iy + 21)
+	sbc.s	hl, bc
+	jr	nz, .L.cmpu_ne
+	ld	hl, (iy + 18)
+	sbc	hl, de
+	jr	nz, .L.cmpu_ne
+	pop	hl
+	push	bc
+	ld	bc, (iy + 15)
+	sbc	hl, bc
+	add	hl, bc
+	pop	bc
+	jr	.L.finish_cmpu
+
+.L.cmpu_ne:
+	ccf
+	pop	hl
+.L.finish_cmpu:
+	jr	c, .L.loop	; R < D
+	; R >= D
+
+	inc	ix		; increment quotient
+	; inlined __llsub
+	push	bc
+	ld	bc, (iy + 15)
+	sbc	hl, bc
+	ex	de, hl
+	ld	bc, (iy + 18)
+	sbc	hl, bc
+	ex	de, hl
+	ex	(sp), hl
+	ld	bc, (iy + 21)
+	sbc	hl, bc
+	ld	c, l
+	ld	b, h
+	pop	hl
+	jr	.L.loop
+
+.L.finish:
+	; BC:UDE:UHL = remainder
+	; [iy - 6, iy - 2]:IX = quotient
+	ld	(iy + 15), ix
+	pop	ix		; ld ix, (iy - 6)
+	ld	(iy + 18), ix
+.if 0
+	; pop	ix		; ld ix, (iy - 3)
+	; overwrites iy + 23 which is used by __lldivs/__llrems for the quotient sign
+	; ld	(iy + 21), ix
+.else
+	ex	(sp), hl	; ld hl, (iy - 3)
+	ld	(iy + 21), l
+	ld	(iy + 22), h
+	pop	hl
+.endif
+	pop	ix
+	ret
+
+.endif
