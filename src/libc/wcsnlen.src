@@ -27,17 +27,16 @@ _wcsnlen:
 	cp	a, c		; cp a, 0
 	ret	nz		; high byte was non-zero
 	dec	hl
-	; ret	; We can use the RET PO below since overflow won't be set
-.L.loop_lo:
-	ret	po
-.L.loop_hi:
+	ret
+
+.L.loop:
 	inc	hl
 .L.loop_start:
 	cpi
-	jr	nz, .L.loop_lo
 	ret	po
+	jr	nz, .L.loop
 	cp	a, (hl)
-	jr	nz, .L.loop_hi
+	jr	nz, .L.loop
 	ex	de, hl
 	pop	de		; reset SP
 	scf
