@@ -16,13 +16,9 @@
 	.type	_fminf, @function
 	.global	_fmin
 	.type	_fmin, @function
-	.global	_fmaxf
-	.type	_fmaxf, @function
-	.global	_fmax
-	.type	_fmax, @function
 
-_fminf:
 _fmin:
+_fminf:
 	ld	iy, 0
 	add	iy, sp
 	ld	bc, $010000
@@ -38,20 +34,20 @@ _fmin:
 	; (X-, Y-): A =  0 NC  Z ; invert compare
 	; (X-, Y+): A = -1  C NZ ; X < Y
 	; (X+, Y-): A = +1 NC NZ ; X > Y
-	jr	nz, .L_fmin.different_sign
-; .L_fmin.same_sign:
+	jr	nz, _fminf.different_sign
+; _fminf.same_sign:
 	sbc	hl, de		; X - Y
 	add	hl, de
-	jr	nz, .L_fmin.x_and_y_diff
+	jr	nz, _fminf.x_and_y_diff
 	ld	a, (iy + 3)
 	cp	a, (iy + 9)
-.L_fmin.x_and_y_diff:
+_fminf.x_and_y_diff:
 	sbc	a, a
 	xor	a, (iy + 6)	; invert the comparison
 	add	a, a
-.L_fmin.different_sign:
+_fminf.different_sign:
 	jr	c, _fminmaxf_common.no_swap
-; .L_fmin.swap:
+; _fminf.swap:
 	ex	de, hl
 	add	hl, bc		; overflows for NaN and Inf
 	jr	c, _fminmaxf_common.y_maybe_NaN
@@ -100,8 +96,8 @@ _fminmaxf_common.x_maybe_NaN:
 	.global	_fmax
 	.type	_fmax, @function
 
-_fmaxf:
 _fmax:
+_fmaxf:
 	ld	iy, 0
 	add	iy, sp
 	ld	bc, $010000
@@ -117,24 +113,24 @@ _fmax:
 	; (X-, Y-): A =  0 NC  Z ; invert compare
 	; (X-, Y+): A = -1  C NZ ; X < Y
 	; (X+, Y-): A = +1 NC NZ ; X > Y
-	jr	nz, .L_fmax.different_sign
-; .L_fmax.same_sign:
+	jr	nz, _fmaxf.different_sign
+; _fmaxf.same_sign:
 	sbc	hl, de		; X - Y
 	add	hl, de
-	jr	nz, .L_fmax.x_and_y_diff
+	jr	nz, _fmaxf.x_and_y_diff
 	ld	a, (iy + 3)
 	cp	a, (iy + 9)
-.L_fmax.x_and_y_diff:
+_fmaxf.x_and_y_diff:
 	sbc	a, a
 	xor	a, (iy + 6)	; invert the comparison
 	add	a, a
-.L_fmax.different_sign:
+_fmaxf.different_sign:
 	jr	nc, _fminmaxf_common.no_swap
-; .L_fmax.swap:
+; _fmaxf.swap:
 	ex	de, hl
 	add	hl, bc		; overflows for NaN and Inf
 	jr	c, _fminmaxf_common.y_maybe_NaN
-.L_fmax.return_y:
+_fmaxf.return_y:
 	ld	hl, (iy + 9)
 	ld	e, (iy + 12)
 	ret

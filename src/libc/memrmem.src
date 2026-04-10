@@ -88,10 +88,10 @@ _memrcmp_fast:
 	; NZ = no match
 	inc	hl
 	ld	bc, (iy + needle_len)
-.L_memrcmp_fast.loop:
+.L.cmp_loop:
 	cpd
 	ret	po
 	dec	de
 	ld	a, (de)
-	jr	z, .L_memrcmp_fast.loop
+	jr	z, .L.cmp_loop
 	ret
