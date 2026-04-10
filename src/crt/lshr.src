@@ -11,31 +11,39 @@
 .else
 
 __lshrs:
+; (int32_t)A:UBC >>= L
 ; Suboptimal for large shift amounts
-; CC: if C!=0: C*(15*r(PC)+3*r(SPL)+3*w(SPL)+4)+13*r(PC)+9*r(SPL)+6*w(SPL)+1
-;     if C==0: 4*r(PC)+3*r(SPL)+2
+; CC:
+; L == 0:   4F +  3R +  0W +  2
+; L >= 1:  34F + 13R + 10W +  2 + (10F + 1) * (L - 1)
+; Max CC: 334F + 13R + 10W + 32
 	inc	l
 	dec	l
 	ret	z
 	push	hl
+	push	de
 	push	bc
+	ld	d, b
 	ld	b, l
-	or	a, a
-	sbc	hl, hl
+	ld	hl, 2
 	add	hl, sp
+	ld	e, a
+	ld	a, (hl)
 .L.loop:
-	sra	a
+	sra	e	; A
 	.local	__lshrs.hijack_lshru
 __lshrs.hijack_lshru:
-	inc	hl
-	inc	hl
-	rr	(hl)
-	dec	hl
-	rr	(hl)
-	dec	hl
-	rr	(hl)
+	rra		; UBC
+	rr	d	; B
+	rr	c	; C
 	djnz	.L.loop
+	ld	(hl), a
+	ld	l, c
 	pop	bc
+	ld	b, d
+	ld	c, l
+	ld	a, e
+	pop	de
 	pop	hl
 	ret
 
@@ -52,20 +60,26 @@ __lshrs.hijack_lshru:
 .else
 
 __lshru:
+; (uint32_t)A:UBC >>= L
 ; Suboptimal for large shift amounts
-; CC: if C!=0: C*(15*r(PC)+3*r(SPL)+3*w(SPL)+4)+17*r(PC)+9*r(SPL)+6*w(SPL)+2
-;     if C==0: 4*r(PC)+3*r(SPL)+2
+; CC:
+; L == 0:   4F +  3R +  0W +  2
+; L >= 1:  36F + 13R + 10W +  2 + (10F + 1) * (L - 1)
+; Max CC: 336F + 13R + 10W + 32
 	inc	l
 	dec	l
 	ret	z
 	push	hl
+	push	de
 	push	bc
+	ld	d, b
 	ld	b, l
-	or	a, a
-	sbc	hl, hl
-	add	hl, sp
-.L.loop:
-	srl	a
+	ld	hl, 2
+	add	hl, sp		; clears carry
+	rra			; cheaper than doing srl e later on
+	ld	e, a
+	ld	a, (hl)
+	; srl	e
 	jr	__lshrs.hijack_lshru
 
 .endif
