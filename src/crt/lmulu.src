@@ -13,6 +13,7 @@
 
 .else
 
+; note: __lmuls is deprecated, use __lmulu instead
 __lmuls:
 __lmulu:
 

@@ -1,12 +1,9 @@
 	.assume	adl=1
 
 	.section	.text
-	.global	__smuls_fast
-	.type	__smuls_fast, @function
 	.global	__smulu_fast
 	.type	__smulu_fast, @function
 
-__smuls_fast:
 __smulu_fast:
 
 ; Multiplies HL by BC and returns the 16-bit product hl.

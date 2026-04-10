@@ -1,12 +1,9 @@
 	.assume	adl=1
 
 	.section	.text
-	.global	__lmuls_fast
-	.type	__lmuls_fast, @function
 	.global	__lmulu_fast
 	.type	__lmulu_fast, @function
 
-__lmuls_fast:
 __lmulu_fast:
 
 ; Multiplies EUHL by AUBC and returns the 32-bit product euhl.
