@@ -9,9 +9,9 @@ __lmulu_b_fast:
 ; Multiplies EUHL by A and returns the 32-bit product euhl.
 ;    I: A=multiplier, EUHL=multiplicand, ADL=1
 ;    O: euhl=EUHL*A
-;   CC: 37*r(PC)+6*r(SPL)+3*w(SPL)+17
-;   CC: 36 bytes | 37F + 6R + 3W + 17
-.L.Mul_EUHL_A_EUHL:
+;   CC: 37*r(PC)+9*r(SPL)+6*w(SPL)+17
+;   CC: 36 bytes | 37F + 9R + 6W + 17
+; Mul_EUHL_A_EUHL:
 	dec	sp
 	push	hl
 	inc	sp

@@ -282,11 +282,11 @@ __strtol_common:
 	;
 	; decimal digit : 36F +  1R +  3W +  4 + __lmulu_b
 	; other digit   : 42F +  1R +  3W +  4 + __lmulu_b
-	; __lmulu_b     : 43F + 12R +  9W + 17
+	; __lmulu_b     : 43F + 15R + 12W + 17
 	;
 	; Total CC per digit:
-	; decimal digit : 79F + 13R + 12W + 21
-	; other digit   : 85F + 13R + 12W + 21
+	; decimal digit : 79F + 16R + 15W + 21
+	; other digit   : 85F + 16R + 15W + 21
 .L.check_decimal:
 	cp	a, d
 	jr	nc, .L.end_loop

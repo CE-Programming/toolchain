@@ -15,7 +15,7 @@ __smulu_fast:
 ;   FO: sz(h), p/v=?, c=?
 ;   CC: 16*r(PC)+(ADL?3*r(SPL):2*r(SPS))+13
 				; a		ubc		ude		uhl
-.L.Mul_HL_BC_HL_Fast:		;--------------+---------------+---------------+----------------
+; Mul_HL_BC_HL_Fast:		;--------------+---------------+---------------+----------------
 	ld	d, b
 	ld	e, l		;				 de=BL
 	ld	b, h		;		 bc=HC

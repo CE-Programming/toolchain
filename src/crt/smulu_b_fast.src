@@ -14,7 +14,7 @@ __smulu_b_fast:
 ;    O: hl=HL*A
 ;   CC: 12*r(PC)+3*r(SPL)+9
 ;   CC: 11 bytes | 12F + 3R + 9
-.L.Mul_HL_A_HL_Fast:
+; Mul_HL_A_HL_Fast:
 ; destroys DE and A. You can swap DE with BC to destroy BC instead
 	ld	e, a
 	ld	d, h

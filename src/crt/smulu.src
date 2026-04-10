@@ -22,7 +22,7 @@ __smulu:
 ;   FO: c=!ADL&&(L*C+(H*C+L*B<<8&0xFFFF)>>16)
 ;   CC: 20*r(PC)+(ADL?6*r(SPL)+3*w(SPL):4*r(SPS)+2*w(SPS))+13
 				; ude		uhl		u(sp)
-.L.Mul_HL_BC_HL:			;--------------+---------------+----------------
+; Mul_HL_BC_HL:			;--------------+---------------+----------------
 	push	de		;				u(sp)=UDE
 	ld	d, h		;  d =H
 	ld	e, c		;  de=HC

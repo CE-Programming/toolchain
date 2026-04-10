@@ -10,9 +10,9 @@ __imulu_b_fast:
 ; Multiplies UHL by A (unsigned) and returns the 24-bit product uhl.
 ;    I: A=multiplier, UHL=multiplicand, ADL=1
 ;    O: uhl=UHL*A
-;   CC: 28*r(PC)+9*r(SPL)+6*w(SPL)+13
-;   CC: 27 bytes | 28F + 9R + 6W + 13
-.L.Mul_UHL_A_UHL_Fast:
+;   CC: 28*r(PC)+6*r(SPL)+3*w(SPL)+13
+;   CC: 27 bytes | 28F + 6R + 3W + 13
+; Mul_UHL_A_UHL_Fast:
 	dec	sp
 	push	hl
 	inc	sp
