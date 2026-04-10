@@ -1,5 +1,8 @@
 	.assume	adl=1
 
+	; until we figure out how to get FASMG require or etc working correctly
+	.equ	HAVE_WE_FIGURED_OUT_BINUTILS_YET, 0
+
 ;-------------------------------------------------------------------------------
 
 	.section	.text.___strtoi
@@ -9,7 +12,7 @@
 
 ___strtoi:
 	; Similar to strtol, except that it will raise ERANGE and return INT_MIN/INT_MAX when out of range
-	call	.L__strtol_common
+	call	__strtol_common
 	; overflow occured if B is non-zero
 	djnz	.L.out_of_range
 	inc	e
@@ -44,30 +47,30 @@ ___strtoi:
 	.type	_strtol, @function
 
 _strtol:
-	call	.L__strtol_common
+	call	__strtol_common
 	; overflow occured if B is non-zero
-	djnz	.L_strtol.out_of_range
+	djnz	_strtol.out_of_range
 	ld	a, e
 	rla
-	jr	c, .L_strtol.maybe_out_of_range
+	jr	c, _strtol.maybe_out_of_range
 	ret	nz
 	jp	__lneg
 
-.L_strtol.maybe_out_of_range:
+_strtol.maybe_out_of_range:
 	; greater than INT_MAX
-	jr	nz, .L_strtol.overflow
+	jr	nz, _strtol.overflow
 	; negative
 	; check that the result is not an exact INT_MIN
 	or	a, a
 	adc	hl, hl
-	jr	nz, .L_strtol.underflow
+	jr	nz, _strtol.underflow
 	ld	a, e
 	adc	a, a
 	ret	z		; exact INT_MIN
-.L_strtol.underflow:
+_strtol.underflow:
 	xor	a, a		; set Z
-.L_strtol.out_of_range:
-.L_strtol.overflow:
+_strtol.out_of_range:
+_strtol.overflow:
 	ld	e, $80
 	ld	hl, 5		; ERANGE
 	ld	(_errno), hl
@@ -87,14 +90,20 @@ _strtol:
 
 ___strtoui:
 	; Similar to strtoul, except that it will raise ERANGE and return UINT_MAX when out of range
-	call	.L__strtol_common
+	call	__strtol_common
 	; overflow occured if B is non-zero
-	djnz	.L_strtoui.out_of_range
+	djnz	_strtoul.out_of_range
 	call	z, __ineg
 	inc	e
 	dec	e
 	ret	z
-.L_strtoui.out_of_range:
+
+.if HAVE_WE_FIGURED_OUT_BINUTILS_YET
+	.section	.text._strtoul.out_of_range
+
+	.local	_strtoul.out_of_range
+_strtoul.out_of_range:
+.endif
 	ld	hl, 5		; ERANGE
 	ld	(_errno), hl
 	ld	l, h		; ld hl, 0
@@ -107,19 +116,30 @@ ___strtoui:
 	.global	_strtoul
 	.type	_strtoul, @function
 _strtoul:
-	call	.L__strtol_common
+	call	__strtol_common
 	; overflow occured if B is non-zero
-	djnz	.L_strtoui.out_of_range
+	djnz	_strtoul.out_of_range
 	ret	nz
 	jp	__lneg
+
+.if HAVE_WE_FIGURED_OUT_BINUTILS_YET
+.else
+_strtoul.out_of_range:
+	ld	hl, 5		; ERANGE
+	ld	(_errno), hl
+	ld	l, h		; ld hl, 0
+	dec	hl
+	ld	e, l
+	ret
+.endif
 
 ;-------------------------------------------------------------------------------
 
 	.section	.text.__strtol_common
 
-	.local	.L__strtol_common
+	.local	__strtol_common
 
-.L__strtol_common:
+__strtol_common:
 	; output: E:UHL
 	; B = 1 if no overflow
 	; Z means that A is zero = negate return value

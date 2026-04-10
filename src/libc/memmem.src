@@ -70,10 +70,10 @@ _memcmp_fast:
 	; Z = match
 	; NZ = no match
 	ld	bc, (iy + needle_len)
-.L_memcmp_fast.loop:
+.L.cmp_loop:
 	cpi
 	ret	po
 	inc	de
 	ld	a, (de)
-	jr	z, .L_memcmp_fast.loop
+	jr	z, .L.cmp_loop
 	ret
