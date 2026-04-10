@@ -22,7 +22,7 @@ __imulu_b:
 ;    O: uhl=UHL*A
 ;   CC: 32*r(PC)+12*r(SPL)+9*w(SPL)+13
 ;   CC: 31 bytes | 32F + 12R + 9W + 13
-.L.Mul_UHL_A_UHL:
+; Mul_UHL_A_UHL:
 	push	de
 	push	af	; preserve A
 
