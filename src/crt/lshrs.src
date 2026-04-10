@@ -3,8 +3,6 @@
 	.section	.text
 	.global	__lshrs
 	.type	__lshrs, @function
-	.global	__lshrs.hijack_lshru
-	.type	__lshrs.hijack_lshru, @function
 
 .ifdef PREFER_OS_CRT
 
@@ -27,6 +25,7 @@ __lshrs:
 	add	hl, sp
 .L.loop:
 	sra	a
+	.local	__lshrs.hijack_lshru
 __lshrs.hijack_lshru:
 	inc	hl
 	inc	hl
@@ -39,5 +38,34 @@ __lshrs.hijack_lshru:
 	pop	bc
 	pop	hl
 	ret
+
+.endif
+
+	.section	.text
+	.global	__lshru
+	.type	__lshru, @function
+
+.ifdef PREFER_OS_CRT
+
+	.set	__lshru, 0x0001EC
+
+.else
+
+__lshru:
+; Suboptimal for large shift amounts
+; CC: if C!=0: C*(15*r(PC)+3*r(SPL)+3*w(SPL)+4)+17*r(PC)+9*r(SPL)+6*w(SPL)+2
+;     if C==0: 4*r(PC)+3*r(SPL)+2
+	inc	l
+	dec	l
+	ret	z
+	push	hl
+	push	bc
+	ld	b, l
+	or	a, a
+	sbc	hl, hl
+	add	hl, sp
+.L.loop:
+	srl	a
+	jr	__lshrs.hijack_lshru
 
 .endif
