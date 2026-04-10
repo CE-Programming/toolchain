@@ -13,17 +13,17 @@
 	.set	ti.keyExtend, 0xD0058E
 	.set	ti.curRow, 0xD00595
 	.set	ti.curUnder, 0xD00599
-	.set	ti.PutS, 0x207C0
-	.set	ti.PutC, 0x207B8
-	.set	ti.PutPS, 0x207C8
-	.set	ti.GetKey, 0x20D8C
-	.set	ti.CursorOn, 0x208B0
-	.set	ti.CursorOff, 0x208A8
-	.set	ti.PullDownChk, 0x208BC
-	.set	ti.ConvKeyToTok, 0x20E40
-	.set	ti.GetTokString, 0x20874
-	.set	ti.PutTokString, 0x20D74
-	.set	ti.ClrTxtShd, 0x20818
+	.set	ti.PutS, 0x0207C0
+	.set	ti.PutC, 0x0207B8
+	.set	ti.PutPS, 0x0207C8
+	.set	ti.GetKey, 0x020D8C
+	.set	ti.CursorOn, 0x0208B0
+	.set	ti.CursorOff, 0x0208A8
+	.set	ti.PullDownChk, 0x0208BC
+	.set	ti.ConvKeyToTok, 0x020E40
+	.set	ti.GetTokString, 0x020874
+	.set	ti.PutTokString, 0x020D74
+	.set	ti.ClrTxtShd, 0x020818
 
 	.section	.text
 	.global	_os_GetTokenInput

@@ -7,7 +7,7 @@
 _inchar:
 	ld	iy,$d00080	; ti.flags
 .L.loop:
-	call	$2014C		; ti.GetCSC
+	call	$02014C		; ti.GetCSC
 	or	a, a
 	jr	z, .L.loop
 	sbc	hl, hl

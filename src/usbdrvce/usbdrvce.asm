@@ -2440,7 +2440,7 @@ _PowerVbusForRole:
 	bitmsk	ROLE_DEVICE,a
 	jq	nz,.unpower
 .power:
-	call	$21B70
+	call	$021B70
 	res	ti.bUsbABusDrop,(hl)
 	set	ti.bUsbABusReq,(hl)
 	ld	l,ti.usbSts+1
@@ -2467,7 +2467,7 @@ _PowerVbusForRole:
 	pop	de,hl
 	set	ti.bUsbABusDrop,(hl)
 	res	ti.bUsbABusReq,(hl)
-	jq	$21C68
+	jq	$021C68
 
 ;-------------------------------------------------------------------------------
 _DefaultHandler:
