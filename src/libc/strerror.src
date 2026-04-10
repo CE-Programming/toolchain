@@ -152,8 +152,13 @@ _strerror.hijack_de:
 .L.format_d.end:
 	ld	hl, __strerror_buffer
 	push	hl
-	.extern	_boot_sprintf
+.ifdef __TICE__
 	call	_boot_sprintf
+	.extern	_boot_sprintf
+.else
+	call	_sprintf
+	.extern	_sprintf
+.endif
 	pop	hl
 	pop	hl
 	pop	hl

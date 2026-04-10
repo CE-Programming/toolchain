@@ -1,6 +1,8 @@
 #include <time.h>
 #include <stdio.h>
+#ifdef __TICE__
 #include <ti/sprintf.h>
+#endif
 
 char *asctime(const struct tm *timeptr)
 {
@@ -26,8 +28,12 @@ char *asctime(const struct tm *timeptr)
     ) {
         return NULL;
     }
-
-    boot_sprintf(result, "%.3s %.3s %2d %.2d:%.2d:%.2d %d\n",
+#ifdef __TICE__
+    boot_sprintf(
+#else
+    sprintf(
+#endif
+        result, "%.3s %.3s %2d %.2d:%.2d:%.2d %d\n",
         wday_name[timeptr->tm_wday],
         mon_name[timeptr->tm_mon],
         timeptr->tm_mday,
