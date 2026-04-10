@@ -13,6 +13,7 @@
 
 .else
 
+; note: __smuls is deprecated, use __smulu instead
 __smuls:
 __smulu:
 

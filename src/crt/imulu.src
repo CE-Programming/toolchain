@@ -13,6 +13,7 @@
 
 .else
 
+; note: __imuls is deprecated, use __imulu instead
 __imuls:
 __imulu:
 
