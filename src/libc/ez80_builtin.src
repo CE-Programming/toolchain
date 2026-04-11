@@ -285,17 +285,20 @@ ___ez80_bitreverse48:
 	.type	___ez80_rotateleft24, @function
 ___ez80_rotateleft24:
 	; unoptimized
-	ld	iy, 0
-	lea	de, iy + 0
-	add	iy, sp
-	ld	hl, (iy + 3)
-	ld	a, (iy + 6)
-	ld	c, 24
+	ld	hl, 6
+	add	hl, sp
+	ld	a, (hl)
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	hl, (hl)
+	ld	de, 24
 ___ez80_rotateleft24.mod24:
-	sub	a, c
+	sub	a, e
 	jr	nc, ___ez80_rotateleft24.mod24
-	add	a, c
+	add	a, e
 	ret	z
+	ld	e, d		; ld de, 0
 	ld	b, a
 ___ez80_rotateleft24.loop:
 	add	hl, hl
@@ -312,18 +315,17 @@ ___ez80_rotateleft24.loop:
 ___ez80_rotateleft48:
 	; unoptimized
 	ld	iy, 0
-	lea	bc, iy + 0
+	lea	bc, iy + 48	; ld bc, 48
 	add	iy, sp
 	ld	hl, (iy + 3)
 	ld	de, (iy + 6)
 	ld	a, (iy + 9)
-	ld	c, 48
 ___ez80_rotateleft48.mod48:
 	sub	a, c
 	jr	nc, ___ez80_rotateleft48.mod48
 	add	a, c
 	ret	z
-	ld	c, 0
+	ld	c, b		; ld bc, 0
 ___ez80_rotateleft48.loop:
 	add	hl, hl
 	ex	de, hl
@@ -342,18 +344,21 @@ ___ez80_rotateleft48.loop:
 	.type	___ez80_rotateright24, @function
 ___ez80_rotateright24:
 	; unoptimized
-	ld	iy, 0
-	lea	de, iy + 0
-	add	iy, sp
-	ld	hl, (iy + 3)
-	ld	a, (iy + 6)
-	ld	c, 24
+	ld	hl, 6
+	add	hl, sp
+	ld	a, (hl)
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	hl, (hl)
+	ld	de, 24
 ___ez80_rotateright24.mod24:
-	sub	a, c
+	sub	a, e
 	jr	nc, ___ez80_rotateright24.mod24
 	neg
-	cp	a, c
+	cp	a, e
 	ret	z
+	ld	e, d		; ld de, 0
 	ld	b, a
 ___ez80_rotateright24.loop:
 	add	hl, hl
@@ -370,19 +375,18 @@ ___ez80_rotateright24.loop:
 ___ez80_rotateright48:
 	; unoptimized
 	ld	iy, 0
-	lea	bc, iy + 0
+	lea	bc, iy + 48	; ld bc, 48
 	add	iy, sp
 	ld	hl, (iy + 3)
 	ld	de, (iy + 6)
 	ld	a, (iy + 9)
-	ld	c, 48
 ___ez80_rotateright48.mod48:
 	sub	a, c
 	jr	nc, ___ez80_rotateright48.mod48
 	neg
 	cp	a, c
 	ret	z
-	ld	c, 0
+	ld	c, b		; ld bc, 0
 ___ez80_rotateright48.loop:
 	add	hl, hl
 	ex	de, hl
