@@ -1,8 +1,7 @@
 #ifndef _FLOAT_H
 #define _FLOAT_H
 
-#define _FENV_P_ONLY
-#include <fenv.h>
+#include <__fenv_def.h>
 
 #define  FLT_RADIX        __FLT_RADIX__
 
