@@ -1,17 +1,8 @@
-#ifndef _FENV_P
-#define _FENV_P
-typedef unsigned char __fenv_t;
-extern __fenv_t __fe_cur_env;
-#endif
-
-#ifdef _FENV_P_ONLY
-#undef _FENV_P_ONLY
-#else
-
 #ifndef _FENV_H
 #define _FENV_H
 
 #include <cdefs.h>
+#include <__fenv_def.h>
 
 enum {
     FE_DIVBYZERO  = 1 << 6,
@@ -91,6 +82,4 @@ inline int feupdateenv(const fenv_t *__envp) {
 
 __END_DECLS
 
-#endif /* _FENV_P_ONLY */
-
-#endif /* _FENV_P */
+#endif /* _FENV_H */
