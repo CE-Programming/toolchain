@@ -3,24 +3,58 @@
 const fenv_t __fe_dfl_env = FE_TONEAREST;
 fenv_t __fe_cur_env = __fe_dfl_env;
 
-extern inline int feclearexcept(int __excepts);
+#undef feclearexcept
+#undef fegetexceptflag
+#undef feraiseexcept
+#undef fesetexceptflag
+#undef fetestexcept
+#undef fegetround
+#undef fesetround
+#undef fegetenv
+#undef feholdexcept
+#undef fesetenv
+#undef feupdateenv
 
-extern inline int fegetexceptflag(fexcept_t *__flagp, int __excepts);
+int feclearexcept(int __excepts) {
+    return __feclearexcept(__excepts);
+}
 
-extern inline int feraiseexcept(int __excepts);
+int fegetexceptflag(fexcept_t *__flagp, int __excepts) {
+    return __fegetexceptflag(__flagp, __excepts);
+}
 
-extern inline int fesetexceptflag(const fexcept_t *__flagp, int __excepts);
+int feraiseexcept(int __excepts) {
+    return __feraiseexcept(__excepts);
+}
 
-extern inline int fetestexcept(int __excepts);
+int fesetexceptflag(const fexcept_t *__flagp, int __excepts) {
+    return __fesetexceptflag(__flagp, __excepts);
+}
 
-extern inline int fegetround(void);
+int fetestexcept(int __excepts) {
+    return __fetestexcept(__excepts);
+}
 
-extern inline int fesetround(int __rounding_mode);
+int fegetround(void) {
+    return __fegetround();
+}
 
-extern inline int fegetenv(fenv_t *__envp);
+int fesetround(int __rounding_mode) {
+    return __fesetround(__rounding_mode);
+}
 
-extern inline int feholdexcept(fenv_t *__envp);
+int fegetenv(fenv_t *__envp) {
+    return __fegetenv(__envp);
+}
 
-extern inline int fesetenv(const fenv_t *__envp);
+int feholdexcept(fenv_t *__envp) {
+    return __feholdexcept(__envp);
+}
 
-extern inline int feupdateenv(const fenv_t *__envp);
+int fesetenv(const fenv_t *__envp) {
+    return __fesetenv(__envp);
+}
+
+int feupdateenv(const fenv_t *__envp) {
+    return __feupdateenv(__envp);
+}
