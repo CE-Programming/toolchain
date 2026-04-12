@@ -1058,25 +1058,17 @@ gfx_SetDraw:
 ;  arg0: buffer or screen
 ; Returns:
 ;  None
-	pop	de
-	ex	(sp), hl
-	ld	a, l
-	or	a, a
-	ld	hl, (ti.mpLcdBase)	; get current base
-	ld	bc, ti.vRam
-	jr	z, .match
-	sbc	hl, bc
-	jr	nz, .swap		; if not the same, swap
-.set:
-	ld	bc, ti.vRam + LcdSize
-.swap:
-	ld	(CurrentBuffer), bc
+	ld	hl, 3
+	add	hl, sp
+	dec	(hl)
+	ld	hl, (ti.mpLcdBase)
+	jr	nz, .screen
 	ex	de, hl
-	jp	(hl)
-.match:
-	sbc	hl, bc
-	jr	z, .swap		; if the same, swap
-	jr	.set
+	ld	hl, (ti.vRam + (ti.vRam + LcdSize)) and $FFFFFF
+	sbc	hl, de
+.screen:
+	ld	(CurrentBuffer), hl
+	ret
 
 ;-------------------------------------------------------------------------------
 gfx_GetDraw:
@@ -1085,8 +1077,10 @@ gfx_GetDraw:
 ;  None
 ; Returns:
 ;  Returns true if drawing on the buffer
-	ld	a, (ti.mpLcdBase+2)	; comparing upper byte only is sufficient
-	ld	hl, CurrentBuffer+2
+	ld	hl, CurrentBuffer+2	; comparing upper byte only is sufficient
+	ld	a, (hl)
+	assert CurrentBuffer and -$100 = ti.mpLcdRange
+	ld	l, ti.lcdBase+2
 	xor	a, (hl)			; always 0 or 1
 	ret
 
@@ -2242,7 +2236,7 @@ gfx_BlitLines:
 	mlt	hl
 	add	hl, hl			; hl -> offset to start at
 	push	hl
-	call	util.getbuffer		; determine blit buffers
+	call	util.getbuffer.no_carry	; determine blit buffers
 	pop	bc
 	add	hl, bc
 	ex	de, hl
@@ -2264,45 +2258,42 @@ gfx_BlitRectangle:
 ;  None
 	ld	iy, 0
 	add	iy, sp
-	ld	de, (iy + 6)		; de = x coordinate
-	ld	l, (iy + 9)		; l = y coordinate
-	ld	h, ti.lcdWidth / 2
-	mlt	hl
-	add	hl, hl
-	add	hl, de			; hl = amount to increment
-	push	hl			; save amount to increment
 	ld	a, (iy + 3)		; a = buffer to blit from
-	call	util.getbuffer		; determine blit buffers
-	pop	bc
-	add	hl, bc
+	call	util.getbuffer.no_carry	; determine blit buffers
+	sbc	hl, de
 	ex	de, hl
+	ld	bc, (iy + 6)		; bc = x coordinate
 	add	hl, bc
-	ex	de, hl
-	ld	bc, (iy + 12)		; the width of things
-	ld	(.width), bc
+	ld	c, (iy + 9)		; c = y coordinate
+	ld	b, ti.lcdWidth / 2
+	mlt	bc
+	add	hl, bc
+	add	hl, bc
+	ex	de, hl			; de = start of copy dst
+	ld	a, (iy + 15)		; a = rectangle height
+	ld	iy, (iy + 12)		; iy = rectangle width
+.copy_forward_add:
+	add	hl, de			; hl = start of copy src
+.copy_forward:
 	push	hl
+	lea	bc, iy
 	ld	hl, ti.lcdWidth
-	or	a, a
-	sbc	hl, bc			; change in width for rectangle
-	ld	(.delta), hl
-	pop	hl
-	ld	a, (iy + 15)
-	ld	iy, 0
-	add	iy, de
+	or	a,a
+	sbc	hl, bc
+	ex	(sp), hl
+	ex	(sp), ix		; ix = rectangle stride
 	call	gfx_Wait
 .loop:
-	ld	bc, 0			; smc for speedz
-.width := $-3
+	lea	bc, iy			; copy width
 	ldir
-	inc	b
-	ld	c, $40			; increment to next line
-	add	iy, bc
-	lea	de, iy
-	ld	bc, 0			; increment to next line
-.delta := $-3
+	lea	bc, ix			; increment to next line
 	add	hl, bc
+	ex	de, hl
+	add	hl, bc
+	ex	de, hl
 	dec	a
 	jr	nz, .loop
+	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -2321,54 +2312,60 @@ gfx_CopyRectangle:
 ;  None
 	ld	iy, 0
 	add	iy, sp
-	ld	de, (iy + 9)		; de = x coordinate src
-	ld	l, (iy + 12)		; l = y coordinate src
-	ld	h, ti.lcdWidth / 2
-	mlt	hl
-	add	hl, hl
-	add	hl, de			; hl = offset in src
-	push	hl
-	ld	a, (iy + 3)		; a = buffer src
-	call	util.getbuffer
-	pop	bc
-	add	hl, bc			; hl = start of copy src
-	push	hl
-	ld	de, (iy + 15)		; de = x coordinate dst
-	ld	l, (iy + 18)		; l = y coordinate dst
-	ld	h, ti.lcdWidth / 2
-	mlt	hl
-	add	hl, hl
-	add	hl, de			; hl = offset in dst
-	push	hl
 	ld	a, (iy + 6)		; a = buffer dst
-	call	util.getbuffer
-	pop	bc
+	call	util.getbuffer.no_carry ; hl = dst buffer, de = opposite buffer
+	cp	a, (iy + 3)		; compare to buffer src
+	jr	nz, .different_buffers
+	push	hl
+	pop	de
+.different_buffers:			; de = src buffer
+	ld	bc, (iy + 15)		; bc = x coordinate dst
+	add	hl, bc
+	ld	c, (iy + 18)		; c = y coordinate dst
+	ld	b, ti.lcdWidth / 2
+	mlt	bc
+	add	hl, bc
 	add	hl, bc
 	ex	de, hl			; de = start of copy dst
-	ld	bc, (iy + 21)		; rectangle width
-	ld	(.width), bc
-	ld	hl, ti.lcdWidth
-	or	a, a
-	sbc	hl, bc			; rectangle stride
-	ld	(.stride), hl
-	pop	hl			; hl = start of copy src
-	ld	a, (iy + 24)
-	ld	iy, 0
-	add	iy, de
+	ld	bc, (iy + 9)		; bc = x coordinate src
+	add	hl, bc
+	ld	c, (iy + 12)		; c = y coordinate src
+	ld	b, ti.lcdWidth / 2
+	mlt	bc
+	add	hl, bc
+	add	hl, bc			; hl = start of copy src
+	ld	a, (iy + 24)		; a = rectangle height
+	ld	iy, (iy + 21)		; iy = rectangle width
+	; always copy forward between different buffers to reduce tearing
+	jr	nz, gfx_BlitRectangle.copy_forward
+	; copy forward if src offset >= dst offset
+	sbc	hl, de
+	jr	nc, gfx_BlitRectangle.copy_forward_add
+	ld	c, a			; c = rectangle height
+	ld	b, ti.lcdWidth / 2
+	mlt	bc
+	ex	de, hl
+	add	hl, bc
+	add	hl, bc
+	dec	hl
+	ex	de, hl			; de = end of copy dst
+	add	hl, de			; hl = end of copy src
+	push	ix
+	lea	ix, iy
+	ld	bc, -ti.lcdWidth
+	add	ix, bc			; ix = negative rectangle stride
 	call	gfx_Wait
 .loop:
-	ld	bc, 0			; smc for speedz
-.width := $-3
-	ldir
-	inc	b
-	ld	c, $40
-	add	iy, bc
-	lea	de, iy
-	ld	bc, 0			; increment to next line
-.stride := $-3
+	lea	bc, ix			; decrement to previous line
 	add	hl, bc
+	ex	de, hl
+	add	hl, bc
+	ex	de, hl
+	lea	bc, iy			; copy width
+	lddr
 	dec	a
 	jr	nz, .loop
+	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -6893,14 +6890,11 @@ smcWord _YMaxMinus1
 
 ;-------------------------------------------------------------------------------
 util.getbuffer:
-	ld	hl, ti.vRam + LcdSize
-	ld	de, (ti.mpLcdBase)
 	or	a, a
+.no_carry:
+	ld	hl, (ti.vRam + (ti.vRam + LcdSize)) and $FFFFFF
+	ld	de, (ti.mpLcdBase)
 	sbc	hl, de
-	add	hl, de
-	jr	nz, .check
-	ld	hl, ti.vRam
-.check:
 	or	a, a			; if 0, copy buffer to screen
 	ret	nz
 	ex	de, hl
