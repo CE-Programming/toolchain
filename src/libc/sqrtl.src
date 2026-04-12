@@ -11,7 +11,7 @@ _sqrtl:
 	add	hl, sp
 	ld	a, (hl)
 	rlca
-	and	1
+	and	a, 1
 	inc	hl
 	ld	(hl), a
 	jp	___f64_sqrt
