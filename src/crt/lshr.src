@@ -15,36 +15,36 @@ __lshrs:
 ; Suboptimal for large shift amounts
 ; CC:
 ; L == 0:   4F +  3R +  0W +  2
-; L >= 1:  34F + 13R + 10W +  2 + (10F + 1) * (L - 1)
-; Max CC: 334F + 13R + 10W + 32
+; L >= 1:  27F + 15R + 12W +  2 + (10F + 1) * (L - 1)
+; Max CC: 327F + 15R + 12W + 32
 	inc	l
 	dec	l
 	ret	z
-	push	hl
 	push	de
-	push	bc
-	ld	d, b
-	ld	b, l
-	ld	hl, 2
-	add	hl, sp
 	ld	e, a
-	ld	a, (hl)
+	ld	a, c
+	push	bc
+	ld	b, l
+
+	; destroys the value of C on the stack (due to interrupts)
+	inc	sp
+	; note that UHL will contain the preserved value for E
+	ex	(sp), hl
+
 .L.loop:
 	sra	e	; A
 	.local	__lshrs.hijack_lshru
 __lshrs.hijack_lshru:
-	rra		; UBC
-	rr	d	; B
-	rr	c	; C
+	rr	h	; UBC
+	rr	l	; B
+	rra		; C
 	djnz	.L.loop
-	ld	(hl), a
-	ld	l, c
+	ex	(sp), hl
+	dec	sp
 	pop	bc
-	ld	b, d
-	ld	c, l
+	ld	c, a
 	ld	a, e
 	pop	de
-	pop	hl
 	ret
 
 .endif
@@ -64,22 +64,23 @@ __lshru:
 ; Suboptimal for large shift amounts
 ; CC:
 ; L == 0:   4F +  3R +  0W +  2
-; L >= 1:  36F + 13R + 10W +  2 + (10F + 1) * (L - 1)
-; Max CC: 336F + 13R + 10W + 32
+; L >= 1:  30F + 15R + 12W +  2 + (10F + 1) * (L - 1)
+; Max CC: 330F + 15R + 12W + 32
 	inc	l
 	dec	l
 	ret	z
-	push	hl
 	push	de
-	push	bc
-	ld	d, b
-	ld	b, l
-	ld	hl, 2
-	add	hl, sp		; clears carry
-	rra			; cheaper than doing srl e later on
 	ld	e, a
-	ld	a, (hl)
-	; srl	e
+	ld	a, c
+	push	bc
+	ld	b, l
+
+	; destroys the value of C on the stack (due to interrupts)
+	inc	sp
+	; note that UHL will contain the preserved value for E
+	ex	(sp), hl
+
+	srl	e	; A
 	jr	__lshrs.hijack_lshru
 
 .endif
