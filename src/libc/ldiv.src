@@ -5,7 +5,7 @@
 	.type	_ldiv, @function
 
 _ldiv:
-
+.if 1
 	pop	hl
 	pop	iy
 	pop	de
@@ -52,6 +52,62 @@ _ldiv:
 .L.ei_skip:
 	jp	(hl)
 
+.else
+	pop	hl		; return address
+	pop	iy		; ldiv_t pointer
+	pop	de		; [ 0:23] numerator
+	pop	bc		; [24:31] numerator
+	ld	a, c
+	pop	bc		; [ 0:23] denominator
+	ex	(sp), hl	; [24:31] denominator
+	ex	de, hl
+
+	push	ix		; preserve IX since __ldvrmu destroys it
+	ld	d, a
+	xor	a, e
+	push	af		; quotient sign
+
+	ld	a, e
+	ld	e, d
+	push	de		; remainder sign
+
+	bit	7, e
+	call	__ldivs_lrems_common
+
+	push	iy		; preserve IY since __ldvrmu destroys it
+	; E:UHL = numerator
+	; A:UBC = denominator
+	call	__ldvrmu
+	; E:UIX = quotient
+	; A:UHL = remainder
+	pop	iy		; restore IY = ldiv_t pointer
+
+	ld	d, e		; preserve E
+	ld	e, a
+	pop	af		; remainder sign
+
+	; E:UHL = remainder
+	call	m, __lneg
+	ld	(iy + 4), hl
+	ld	(iy + 7), e
+
+	pop	af		; quotient sign
+
+	lea	hl, ix + 0
+	pop	ix		; restore IX
+	ld	e, d		; restore E
+	; E:UHL = quotient
+	call	m, __lneg
+	ld	(iy), hl
+	ld	(iy + 3), e
+
+	ex	(sp), hl	; HL = return address
+	push	de
+	push	de
+	push	de
+	push	de
+	jp	(hl)
+.endif
 
 	.extern	__ldivs_lrems_common
 	.extern	__ldvrmu
