@@ -2365,29 +2365,68 @@ gfx_CopyRectangle:
 	add	hl, bc
 	ex	de, hl			; de = start of copy dst
 	ld	bc, (iy + 21)		; rectangle width
-	ld	(.width), bc
+	ld	(.fwidth), bc
+	ld	(.bwidth), bc
 	ld	hl, ti.lcdWidth
 	or	a, a
 	sbc	hl, bc			; rectangle stride
-	ld	(.stride), hl
+	ld	(.fstride), hl
+	ld	(.bstride), hl
 	pop	hl			; hl = start of copy src
-	ld	a, (iy + 24)
-	ld	iy, 0
-	add	iy, de
 	call	gfx_Wait
-.loop:
+	ld	a, (iy + 24)
+	or	a, a
+	sbc	hl, de
+	add	hl, de
+	jr	c, .backward_setup
+.forward_loop:
 	ld	bc, 0			; smc for speedz
-.width := $-3
+.fwidth := $-3
 	ldir
-	inc	b
-	ld	c, $40
-	add	iy, bc
-	lea	de, iy
-	ld	bc, 0			; increment to next line
-.stride := $-3
-	add	hl, bc
 	dec	a
-	jr	nz, .loop
+	ret	z
+	ld	bc, 0			; increment to next line
+.fstride := $-3
+	add	hl, bc
+	ex	de, hl
+	add	hl, bc
+	ex	de, hl
+	jr	.forward_loop
+
+.backward_setup:
+	push	hl			; save start of copy src
+	ld	a, (iy + 24)
+	dec	a
+	ld	l, a
+	ld	h, ti.lcdWidth / 2
+	mlt	hl
+	add	hl, hl
+	ld	bc, (iy + 21)
+	dec	bc
+	add	hl, bc			; hl = ((height - 1) * 320) + (width - 1)
+	push	hl
+	pop	bc			; bc = offset to row end
+	pop	hl			; hl = start of copy src
+	add	hl, bc			; hl = end of copy src
+	ex	de, hl
+	add	hl, bc			; hl = end of copy dst
+	ex	de, hl			; de = end of copy dst
+	ld	a, (iy + 24)
+.backward_loop:
+	ld	bc, 0			; smc for speedz
+.bwidth := $-3
+	lddr
+	dec	a
+	ret	z
+	ld	bc, 0			; decrement to previous line
+.bstride := $-3
+	or	a, a
+	sbc	hl, bc
+	ex	de, hl
+	or	a, a
+	sbc	hl, bc
+	ex	de, hl
+	jr	.backward_loop
 	ret
 
 ;-------------------------------------------------------------------------------
