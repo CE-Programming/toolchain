@@ -1148,9 +1148,9 @@ void gfx_BlitRectangle(gfx_location_t src,
 
 /**
  * Copies a rectangular region between graphics buffers or to the same graphics buffer.
- * The behavior is undefined when the rectangles overlap.
+ * Overlapping rectangles are supported, using memmove-like copy semantics.
  * No clipping is performed as it is a copy not a draw.
- * @param[in] src Graphics buffer to copy from.i
+ * @param[in] src Graphics buffer to copy from.
  * @param[in] dst Graphics buffer to copy to.
  * @param[in] src_x X coordinate on src.
  * @param[in] src_y Y coordinate on src.

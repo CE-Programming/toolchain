@@ -1,0 +1,63 @@
+{
+  "transfer_files":
+  [
+    "bin/DEMO.8xp"
+  ],
+  "target":
+  {
+    "name": "DEMO",
+    "isASM": true
+  },
+  "sequence":
+  [
+    "action|launch",
+    "delay|300",
+    "hashWait|1",
+    "key|enter",
+    "hashWait|2",
+    "key|enter",
+    "hashWait|3",
+    "key|enter",
+    "hashWait|4",
+    "key|enter",
+    "hashWait|5"
+  ],
+  "hashes":
+  {
+    "1":
+    {
+      "description": "Horizontal overlap right",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "9D4993C1" ]
+    },
+    "2":
+    {
+      "description": "Horizontal overlap left",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "BBD76F1C" ]
+    },
+    "3":
+    {
+      "description": "Vertical overlap down",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "7C8FC7BE" ]
+    },
+    "4":
+    {
+      "description": "Vertical overlap up",
+      "start": "vram_start",
+      "size": "vram_8_size",
+      "expected_CRCs": [ "1C46A70A" ]
+    },
+    "5":
+    {
+      "description": "Test program exit",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "FFAF89BA", "101734A5", "9DA19F44", "A32840C8", "349F4775" ]
+    }
+  }
+}
