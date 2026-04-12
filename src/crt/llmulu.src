@@ -7,6 +7,8 @@
 __llmulu:
 ; Really slow
 
+.if 1
+; clobbers SP.S
 	push	ix
 	push	iy
 	push	af
@@ -74,3 +76,76 @@ __llmulu:
 	pop	iy
 	pop	ix
 	ret
+
+.else
+
+; fallback routine that does not clobber SP.S
+	push	ix
+	push	iy
+	push	af
+
+	ld	ix, 0
+	lea	iy, ix - 6
+	add	iy, sp		; cf=1
+
+	push	de
+	push	hl
+	push	bc
+
+	lea	hl, iy + 18
+	ld	b, 8
+.L.push_loop:
+	push	af
+	ld	a, (hl)
+	inc	hl
+	or	a, a		; cf=0
+	djnz	.L.push_loop
+
+	sbc	hl, hl
+	ld	e, l
+	ld	d, h
+
+.L.byte_loop:
+	scf
+	adc	a, a
+
+.L.bit_loop:
+	push	af
+	add	ix, ix
+	adc	hl, hl
+	ex	de, hl
+	adc	hl, hl
+	ex	de, hl
+	pop	af
+
+	jr	nc, .L.add_end
+	ld	bc, (iy)
+	add	ix, bc
+	ld	bc, (iy + 3)
+	adc	hl, bc
+	ex	de, hl
+	ld	bc, (iy - 3)
+	adc	hl, bc
+	ex	de, hl
+.L.add_end:
+
+	add	a, a
+	jr	nz, .L.bit_loop
+
+	pop	af
+	jr	nc, .L.byte_loop
+
+	ld	b, d
+	ld	c, e
+	ex	de, hl
+	lea	hl, ix + 0
+
+	pop	af
+	pop	af
+	pop	af
+	pop	af
+	pop	iy
+	pop	ix
+	ret
+
+.endif
