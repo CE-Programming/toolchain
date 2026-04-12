@@ -1,0 +1,90 @@
+{
+  "transfer_files":
+  [
+    "bin/DEMO.8xp"
+  ],
+  "target":
+  {
+    "name": "DEMO",
+    "isASM": true
+  },
+  "sequence":
+  [
+    "action|launch",
+    "delay|100",
+    "hashWait|1",
+    "key|enter",
+    "hashWait|2",
+    "key|enter",
+    "hashWait|3",
+    "key|enter",
+    "hashWait|4",
+    "key|enter",
+    "hashWait|5",
+    "key|enter",
+    "hashWait|6",
+    "key|enter",
+    "hashWait|7",
+    "key|enter",
+    "hashWait|8"
+  ],
+  "hashes":
+  {
+    "1":
+    {
+      "description": "ZX7 1/2/3-byte streams",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "B39BF42F" ]
+    },
+    "2":
+    {
+      "description": "ZX7 zero-run stream",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "C5DFEB86" ]
+    },
+    "3":
+    {
+      "description": "ZX0 1/2/3-byte streams",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "37B36AE1" ]
+    },
+    "4":
+    {
+      "description": "ZX0 zero-run stream",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "093389F1" ]
+    },
+    "5":
+    {
+      "description": "Far offset >128",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "D87DFC95" ]
+    },
+    "6":
+    {
+      "description": "Long overlap repeat",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "A1BF7211" ]
+    },
+    "7":
+    {
+      "description": "All stages passed",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "6C8AE6B1" ]
+    },
+    "8":
+    {
+      "description": "Test program exit",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "FFAF89BA", "101734A5", "9DA19F44", "A32840C8", "349F4775" ]
+    }
+  }
+}
