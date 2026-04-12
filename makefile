@@ -71,7 +71,7 @@ $(addprefix install-,$(LIBS)): $(TOOLS)
 	$(Q)$(MAKE) -C $(call SRCDIR,$(patsubst install-%,%,$@)) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 
 libs: $(LIBS) $(TOOLS)
-	$(Q)$(call NATIVEEXE,tools/convbin/bin/convbin) --oformat 8xg-auto-extract \
+	$(Q)$(call NATIVEEXE,tools/convbin/bin/convbin) --oformat 8xg-auto-extract --iformat 8x \
 		$(foreach library,$(LIBS),$(addprefix --input ,$(call SRCDIR,$(library))/$(library).8xv)) --output clibs.8xg
 
 libs-zip:
