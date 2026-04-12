@@ -11,10 +11,12 @@ _fmal:
 	add	iy, sp
 	ld	a, (iy + 28)
 	rlca
+	and	1
 	ld	(iy + 11), a	; signC
 	ld	a, (iy + 10)
 	xor	a, (iy + 19)
 	rlca
+	and	1
 	ld	(iy + 20), a	; signZ
 	jp	_softfloat_mulAddF64
 
