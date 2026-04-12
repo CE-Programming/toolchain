@@ -13,6 +13,8 @@
 	.global	__i48dvrmu
 	.type	__i48dvrmu, @function
 
+.if 1
+
 __i48dvrmu:
 	; backup af
 	push	af
@@ -86,3 +88,90 @@ __i48dvrmu:
 .skipEI:
 	pop	af
 	ret
+
+.else
+
+__i48dvrmu:
+; fallback routine that does not disable interrupts or use shadow registers
+	push	af
+	push	bc
+	ex	(sp), ix	; IX = divisor[0:23]
+	push	de
+	ex	(sp), iy	; IY = dividend[24:47]
+	pop	bc		; BC = divisor[24:47]
+	push	hl		; (SP) = dividend[0:23]
+
+	; Initialize remainder to 0
+	or	a, a
+	sbc	hl, hl
+	ex	de, hl
+	sbc	hl, hl
+
+	; Handle dividend[24:47] and return quotient[24:47]
+	ld	a, 24
+	call	.L.loop
+
+	ex	(sp), iy	; IY = dividend[0:23], (SP) = quotient[24:47]
+
+	; Handle dividend[0:23] and return quotient[0:23]
+	ld	a, 24
+	call	.L.loop
+
+	push	de
+	ex	(sp), iy	; IY = remainder[24:47]
+	ex	(sp), hl	; HL = quotient[0:23]
+	pop	bc		; BC = remainder[0:23]
+	pop	de		; DE = quotient[24:47]
+	pop	ix
+	pop	af
+	ret
+
+.L.cmp_lower:
+	; Subtract [48:71]
+	sbc	hl, bc
+	jr	nc, .L.subtracted
+
+	; Restore [48:71]
+	add	hl, bc
+	pop	bc
+	ex	de, hl
+.L.restore:
+	; Restore [72:95]
+	add	hl, bc
+	ex	de, hl
+	dec	a
+	ret	z
+
+	; Process 24 quotient bits
+	; DE:HL is the remainder, BC:IX is the divisor, IY is 24 bits of the dividend/quotient
+.L.loop:
+	; [24:47] <<= 1
+	add	iy, iy
+
+	; [48:95] <<= 1
+	adc	hl, hl
+	ex	de, hl
+	adc	hl, hl
+
+	; Subtract [72:95]
+	sbc	hl, bc
+	jr	c, .L.restore
+	ex	de, hl
+	push	bc
+	lea	bc, ix + 0
+	jr	z, .L.cmp_lower
+
+	; Subtract [48:71]
+	sbc	hl, bc
+
+	; Borrow into [72:95]
+	jr	nc, .L.subtracted
+	dec	de
+.L.subtracted:
+	pop	bc
+	inc	iy		; Increment quotient
+	dec	a
+	jr	nz, .L.loop
+	ret
+
+.endif
