@@ -4,8 +4,8 @@
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3e, by John R. Hauser.
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016 The Regents of the University of
-California.  All rights reserved.
+Copyright 2011, 2012, 2013, 2014 The Regents of the University of California.
+All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -34,16 +34,50 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
+#include <stdbool.h>
 #include <stdint.h>
 #include "platform.h"
+#include "internals.h"
+#include "softfloat.h"
 
-#ifndef softfloat_shortShiftRightJam64
-
-uint64_t softfloat_shortShiftRightJam64( uint64_t a, uint_fast8_t dist )
+static
+float64_t __f64_sub( float64_t a, float64_t b )
 {
+    union ui64_f64 uA;
+    uint_fast64_t uiA;
+    bool signA;
+    union ui64_f64 uB;
+    uint_fast64_t uiB;
+    bool signB;
+#if ! defined INLINE_LEVEL || (INLINE_LEVEL < 2)
+    float64_t (*magsFuncPtr)( uint_fast64_t, uint_fast64_t, bool );
+#endif
 
-    return a>>dist | ((a & (((uint_fast64_t) 1<<dist) - 1)) != 0);
+    uA.f = a;
+    uiA = uA.ui;
+    signA = signF64UI( uiA );
+    uB.f = b;
+    uiB = uB.ui;
+    signB = signF64UI( uiB );
+#if defined INLINE_LEVEL && (2 <= INLINE_LEVEL)
+    if ( signA == signB ) {
+        return softfloat_subMagsF64( uiA, uiB, signA );
+    } else {
+        return softfloat_addMagsF64( uiA, uiB, signA );
+    }
+#else
+    magsFuncPtr =
+        (signA == signB) ? softfloat_subMagsF64 : softfloat_addMagsF64;
+    return (*magsFuncPtr)( uiA, uiB, signA );
+#endif
 
 }
 
-#endif
+long double __dsub_c(long double const *__restrict y_ptr, long double x) {
+    long double y = *y_ptr;
+    F64_pun arg_x, arg_y, ret;
+    arg_x.flt = x;
+    arg_y.flt = y;
+    ret.soft = __f64_sub(arg_x.soft, arg_y.soft);
+    return ret.flt;
+}

@@ -90,6 +90,18 @@ enum {
     softfloat_round_odd         = 6
 };
 
+#if 1
+static inline uint_fast8_t GET_FENV_SOFTFLOAT_ROUNDING(void) {
+    switch(fegetround()) {
+        default:
+        case FE_TONEAREST : return softfloat_round_near_even ;
+        case FE_TOWARDZERO: return softfloat_round_minMag    ;
+        case FE_DOWNWARD  : return softfloat_round_min       ;
+        case FE_UPWARD    : return softfloat_round_max       ;
+    }
+}
+#endif
+
 /*----------------------------------------------------------------------------
 | Software floating-point exception flags.
 *----------------------------------------------------------------------------*/
@@ -239,8 +251,8 @@ bool __f32_isSignalingNaN( float32_t );
 *----------------------------------------------------------------------------*/
 uint_fast32_t __f64_to_ui32( float64_t, uint_fast8_t, bool );
 uint_fast64_t __f64_to_ui64( float64_t, uint_fast8_t, bool );
-int_fast32_t __f64_to_i32( float64_t, uint_fast8_t, bool );
-int_fast64_t __f64_to_i64( float64_t, uint_fast8_t, bool );
+// int_fast32_t __f64_to_i32( float64_t, uint_fast8_t, bool );
+// int_fast64_t __f64_to_i64( float64_t, uint_fast8_t, bool );
 uint_fast32_t __f64_to_ui32_r_minMag( float64_t, bool );
 uint_fast64_t __f64_to_ui64_r_minMag( float64_t, bool );
 int_fast32_t __f64_to_i32_r_minMag( float64_t, bool );
@@ -253,21 +265,13 @@ float128_t __f64_to_f128( float64_t );
 #endif
 void __f64_to_extF80M( float64_t, extFloat80_t * );
 void __f64_to_f128M( float64_t, float128_t * );
-float64_t __f64_roundToInt( float64_t, uint_fast8_t, bool );
-#if 0
-float64_t __f64_add( float64_t, float64_t );
-float64_t __f64_sub( float64_t, float64_t );
-#endif
-#if 0
-float64_t __f64_mul( float64_t, const float64_t* );
-float64_t __f64_div( float64_t, const float64_t* );
-float64_t __f64_rem( float64_t, const float64_t* );
-#else
-float64_t __f64_mul( bool, float64_t, float64_t *__restrict );
-float64_t __f64_div( bool, float64_t, float64_t *__restrict );
-float64_t __f64_rem( bool, float64_t, float64_t *__restrict );
-#endif
-float64_t __f64_mulAdd( float64_t, float64_t, float64_t );
+// float64_t __f64_roundToInt( float64_t, uint_fast8_t, bool );
+// float64_t __f64_add( float64_t, float64_t );
+// float64_t __f64_sub( float64_t, float64_t );
+// float64_t __f64_mul( float64_t, float64_t );
+// float64_t __f64_mulAdd( float64_t, float64_t, float64_t );
+// float64_t __f64_div( float64_t, float64_t );
+// float64_t __f64_rem( float64_t, float64_t );
 // float64_t __f64_sqrt( float64_t );
 bool __f64_eq( float64_t, float64_t );
 bool __f64_le( float64_t, float64_t );

@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat.h"
 
+static
 int_fast64_t __f64_to_i64( float64_t a, uint_fast8_t roundingMode, bool exact )
 {
     union ui64_f64 uA;
@@ -99,4 +100,16 @@ int_fast64_t __f64_to_i64( float64_t a, uint_fast8_t roundingMode, bool exact )
         (exp == 0x7FF) && fracF64UI( uiA ) ? i64_fromNaN
             : sign ? i64_fromNegOverflow : i64_fromPosOverflow;
 
+}
+
+long long llroundl(long double x) {
+    F64_pun arg_x;
+    arg_x.flt = x;
+    return __f64_to_i64(arg_x.soft, softfloat_round_near_maxMag, false);
+}
+
+long long llrintl(long double x) {
+    F64_pun arg_x;
+    arg_x.flt = x;
+    return __f64_to_i64(arg_x.soft, GET_FENV_SOFTFLOAT_ROUNDING(), true);
 }

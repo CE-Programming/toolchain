@@ -2,11 +2,11 @@
 
 	.section	.text
 
-	.global	__ddiv
-	.type	__ddiv, @function
+	.global	__dadd
+	.type	__dadd, @function
 
-; long double __ddiv_c(long double const *__restrict y, long double x)
-__ddiv:
+; long double __dadd_c(long double const *__restrict y, long double x)
+__dadd:
 	push	iy
 	push	af
 
@@ -16,7 +16,7 @@ __ddiv:
 	ld	hl, 18
 	add	hl, sp
 	push	hl
-	call	___ddiv_c
+	call	___dadd_c
 	pop	af
 	pop	af
 	pop	af
@@ -26,4 +26,4 @@ __ddiv:
 	pop	iy
 	ret
 
-	.extern	___ddiv_c
+	.extern	___dadd_c

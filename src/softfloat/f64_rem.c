@@ -41,11 +41,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat.h"
 
-float64_t __f64_rem( bool signA, float64_t a, float64_t *__restrict b )
+static
+float64_t __f64_rem( float64_t a, float64_t b )
 {
     union ui64_f64 uA;
     uint_fast64_t uiA;
-    // bool signA;
+    bool signA;
     int_fast16_t expA;
     uint_fast64_t sigA;
     union ui64_f64 uB;
@@ -66,10 +67,10 @@ float64_t __f64_rem( bool signA, float64_t a, float64_t *__restrict b )
     *------------------------------------------------------------------------*/
     uA.f = a;
     uiA = uA.ui;
-    // signA = signF64UI( uiA );
+    signA = signF64UI( uiA );
     expA  = expF64UI( uiA );
     sigA  = fracF64UI( uiA );
-    uB.f = *b;
+    uB.f = b;
     uiB = uB.ui;
     expB = expF64UI( uiB );
     sigB = fracF64UI( uiB );
@@ -185,4 +186,21 @@ float64_t __f64_rem( bool signA, float64_t a, float64_t *__restrict b )
     uZ.ui = uiZ;
     return uZ.f;
 
+}
+
+long double fmodl(long double x, long double y) {
+    F64_pun arg_x, arg_y, ret;
+    arg_x.flt = x;
+    arg_y.flt = y;
+    ret.soft = __f64_rem(arg_x.soft, arg_y.soft);
+    return ret.flt;
+}
+
+long double __drem_c(long double const *__restrict y_ptr, long double x) {
+    long double y = *y_ptr;
+    F64_pun arg_x, arg_y, ret;
+    arg_x.flt = x;
+    arg_y.flt = y;
+    ret.soft = __f64_rem(arg_x.soft, arg_y.soft);
+    return ret.flt;
 }

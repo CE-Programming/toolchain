@@ -5,29 +5,25 @@
 	.global	__drem
 	.type	__drem, @function
 
-; float64_t f64_rem(bool, float64_t, const float64_t*)
+; long double __drem_c(long double const *__restrict y, long double x)
 __drem:
+	push	iy
 	push	af
-	push	iy
-	ld	iy, 9
-	add	iy, sp
-	push	iy
+
 	push	bc
 	push	de
 	push	hl
+	ld	hl, 18
+	add	hl, sp
+	push	hl
+	call	___drem_c
+	pop	af
+	pop	af
+	pop	af
+	pop	af
 
-	rl	b
-	push	af	; Carry = signbit(x)
-
-	call	___f64_rem
-
-	pop	af
-	pop	af
-	pop	af
-	pop	af
 	pop	af
 	pop	iy
-	pop	af	; restore
 	ret
 
-	.extern	___f64_rem
+	.extern	___drem_c
