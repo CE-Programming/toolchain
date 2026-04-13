@@ -1,0 +1,149 @@
+{
+  "transfer_files": [
+    "bin/DEMO.8xp"
+  ],
+  "target": {
+    "name": "DEMO",
+    "isASM": true
+  },
+  "sequence": [
+    "action|launch",
+    "delay|1000",
+    "hashWait|1",
+    "key|enter",
+    "delay|300",
+    "hashWait|2",
+    "key|enter",
+    "delay|300",
+    "hashWait|3",
+    "key|enter",
+    "delay|300",
+    "hashWait|4",
+    "key|enter",
+    "delay|300",
+    "hashWait|5",
+    "key|enter",
+    "delay|300",
+    "hashWait|6",
+    "key|enter",
+    "delay|300",
+    "hashWait|7",
+    "key|enter",
+    "delay|300",
+    "hashWait|8",
+    "key|enter",
+    "delay|300",
+    "hashWait|9",
+    "key|enter",
+    "delay|300",
+    "hashWait|10",
+    "key|enter",
+    "delay|300",
+    "hashWait|11",
+    "key|enter",
+    "delay|300",
+    "hashWait|12"
+  ],
+  "hashes": {
+    "1": {
+      "description": "ctor_func_0",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "93A83427"
+      ]
+    },
+    "2": {
+      "description": "ctor_func_50",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "367D84B4"
+      ]
+    },
+    "3": {
+      "description": "both_ctor_dtor_100",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "3329A0B3"
+      ]
+    },
+    "4": {
+      "description": "ctor_func_120",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "37390D1E"
+      ]
+    },
+    "5": {
+      "description": "ctor_func_none",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "D9CA5C91"
+      ]
+    },
+    "6": {
+      "description": "main_func",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "35FF4554"
+      ]
+    },
+    "7": {
+      "description": "dtor_func_none",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "7BEBECC4"
+      ]
+    },
+    "8": {
+      "description": "dtor_func_120",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "9518BD4B"
+      ]
+    },
+    "9": {
+      "description": "both_ctor_dtor_100",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "3329A0B3"
+      ]
+    },
+    "10": {
+      "description": "dtor_func_50",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "945C34E1"
+      ]
+    },
+    "11": {
+      "description": "dtor_func_0",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "31898472"
+      ]
+    },
+    "12": {
+      "description": "Exit",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "FFAF89BA",
+        "101734A5",
+        "9DA19F44",
+        "A32840C8",
+        "349F4775"
+      ]
+    }
+  }
+}
