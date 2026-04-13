@@ -1,0 +1,61 @@
+{
+  "transfer_files": [
+    "bin/DEMO.8xp"
+  ],
+  "target": {
+    "name": "DEMO",
+    "isASM": true
+  },
+  "sequence": [
+    "action|launch",
+    "delay|1000",
+    "hashWait|1",
+    "key|enter",
+    "delay|300",
+    "hashWait|2",
+    "key|enter",
+    "delay|300",
+    "hashWait|3",
+    "key|enter",
+    "delay|300",
+    "hashWait|4"
+  ],
+  "hashes": {
+    "1": {
+      "description": "test for errors from at_quick_exit",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "A1280E53"
+      ]
+    },
+    "2": {
+      "description": "test for most recent at_quick_exit function",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "FE361C99"
+      ]
+    },
+    "3": {
+      "description": "test for first at_quick_exit function",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "9E047358"
+      ]
+    },
+    "4": {
+      "description": "quick_exit calls _Exit",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "FFAF89BA",
+        "101734A5",
+        "9DA19F44",
+        "A32840C8",
+        "349F4775"
+      ]
+    }
+  }
+}
