@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat.h"
 
+static
 float64_t __f64_roundToInt( float64_t a, uint_fast8_t roundingMode, bool exact )
 {
     union ui64_f64 uA;
@@ -116,4 +117,46 @@ float64_t __f64_roundToInt( float64_t a, uint_fast8_t roundingMode, bool exact )
     uZ.ui = uiZ;
     return uZ.f;
 
+}
+
+long double floorl(long double x) {
+    F64_pun arg_x, ret;
+    arg_x.flt = x;
+    ret.soft = __f64_roundToInt(arg_x.soft, softfloat_round_min, false);
+    return ret.flt;
+}
+
+long double ceill(long double x) {
+    F64_pun arg_x, ret;
+    arg_x.flt = x;
+    ret.soft = __f64_roundToInt(arg_x.soft, softfloat_round_max, false);
+    return ret.flt;
+}
+
+long double roundl(long double x) {
+    F64_pun arg_x, ret;
+    arg_x.flt = x;
+    ret.soft = __f64_roundToInt(arg_x.soft, softfloat_round_near_maxMag, false);
+    return ret.flt;
+}
+
+long double roundevenl(long double x) {
+    F64_pun arg_x, ret;
+    arg_x.flt = x;
+    ret.soft = __f64_roundToInt(arg_x.soft, softfloat_round_near_even, false);
+    return ret.flt;
+}
+
+long double nearbyintl(long double x) {
+    F64_pun arg_x, ret;
+    arg_x.flt = x;
+    ret.soft = __f64_roundToInt(arg_x.soft, GET_FENV_SOFTFLOAT_ROUNDING(), false);
+    return ret.flt;
+}
+
+long double rintl(long double x) {
+    F64_pun arg_x, ret;
+    arg_x.flt = x;
+    ret.soft = __f64_roundToInt(arg_x.soft, GET_FENV_SOFTFLOAT_ROUNDING(), true);
+    return ret.flt;
 }

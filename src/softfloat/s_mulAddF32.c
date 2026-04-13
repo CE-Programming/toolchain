@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat.h"
 
+static
 float32_t
  softfloat_mulAddF32(
      uint_fast32_t uiA, uint_fast32_t uiB, uint_fast32_t uiC, uint_fast8_t op )
@@ -221,3 +222,15 @@ float32_t
     return uZ.f;
 
 }
+
+float fmaf(float x, float y, float z) {
+    F32_pun arg_x, arg_y, arg_z, ret;
+    arg_x.flt = x;
+    arg_y.flt = y;
+    arg_z.flt = z;
+    // ret.soft = __f32_mulAdd(arg_x.soft, arg_y.soft, arg_z.soft);
+    ret.soft = softfloat_mulAddF32(arg_x.soft, arg_y.soft, arg_z.soft, 0);
+    return ret.flt;
+}
+
+double fma(double, double, double) __attribute__((alias("fmaf")));

@@ -52,11 +52,26 @@ typedef struct { uint16_t v; } float16_t;
 typedef struct { uint32_t v; } float32_t;
 typedef struct { uint64_t v; } float64_t;
 #else
+// we do this to avoid returning values via the struct ABI
 typedef uint16_t float16_t;
 typedef uint32_t float32_t;
 typedef uint64_t float64_t;
 #endif
 typedef struct { uint64_t v[2]; } float128_t;
+
+#if 1
+typedef union F32_pun {
+    float flt;
+    float32_t soft;
+    uint32_t bin;
+} F32_pun;
+
+typedef union F64_pun {
+    long double flt;
+    float64_t soft;
+    uint64_t bin;
+} F64_pun;
+#endif
 
 /*----------------------------------------------------------------------------
 | The format of an 80-bit extended floating-point number in memory.  This

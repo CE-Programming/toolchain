@@ -41,11 +41,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat.h"
 
-float64_t __f64_sqrt( f64_param A )
+static
+float64_t __f64_sqrt( float64_t a )
 {
     union ui64_f64 uA;
     uint_fast64_t uiA;
-    bool signA = A.sign;
+    bool signA;
     int_fast16_t expA;
     uint_fast64_t sigA, uiZ;
     struct exp16_sig64 normExpSig;
@@ -55,13 +56,12 @@ float64_t __f64_sqrt( f64_param A )
     uint32_t q;
     uint_fast64_t sigZ, shiftedSigZ;
     union ui64_f64 uZ;
-    uint_fast64_t a = A.ui;
 
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     uA.f = a;
     uiA = uA.ui;
-    // signA = signF64UI( uiA );
+    signA = signF64UI( uiA );
     expA  = expF64UI( uiA );
     sigA  = fracF64UI( uiA );
     /*------------------------------------------------------------------------
@@ -130,4 +130,11 @@ float64_t __f64_sqrt( f64_param A )
     uZ.ui = uiZ;
     return uZ.f;
 
+}
+
+long double sqrtl(long double x) {
+    F64_pun arg_x, ret;
+    arg_x.flt = x;
+    ret.soft = __f64_sqrt(arg_x.soft);
+    return ret.flt;
 }

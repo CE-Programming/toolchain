@@ -5,32 +5,25 @@
 	.global	__dmul
 	.type	__dmul, @function
 
-; float64_t f64_mul(bool, float64_t, const float64_t*)
+; long double __dmul_c(long double const *__restrict y, long double x)
 __dmul:
+	push	iy
 	push	af
-	push	iy
-	ld	iy, 9
-	add	iy, sp
 
-	push	iy
 	push	bc
 	push	de
 	push	hl
+	ld	hl, 18
+	add	hl, sp
+	push	hl
+	call	___dmul_c
+	pop	af
+	pop	af
+	pop	af
+	pop	af
 
-	ld	a, b	; signbit(x)
-	xor	a, (iy + 7)	; signbit(y)
-	rla
-	push	af	; Carry = (signbit(x) != signbit(y))
-
-	call	___f64_mul
-
-	pop	af
-	pop	af
-	pop	af
-	pop	af
 	pop	af
 	pop	iy
-	pop	af	; restore
 	ret
 
-	.extern	___f64_mul
+	.extern	___dmul_c

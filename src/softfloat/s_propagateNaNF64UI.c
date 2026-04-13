@@ -34,8 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
-#if 0
-
 #include <stdbool.h>
 #include <stdint.h>
 #include "platform.h"
@@ -62,5 +60,3 @@ uint_fast64_t
     return (isNaNF64UI( uiA ) ? uiA : uiB) | UINT64_C( 0x0008000000000000 );
 
 }
-
-#endif

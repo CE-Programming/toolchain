@@ -41,19 +41,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "specialize.h"
 #include "softfloat.h"
 
-float64_t __f64_div( bool signZ, float64_t a, float64_t *__restrict b )
+static
+float64_t __f64_div( float64_t a, float64_t b )
 {
     union ui64_f64 uA;
     uint_fast64_t uiA;
-    // bool signA;
+    bool signA;
     int_fast16_t expA;
     uint_fast64_t sigA;
     union ui64_f64 uB;
     uint_fast64_t uiB;
-    // bool signB;
+    bool signB;
     int_fast16_t expB;
     uint_fast64_t sigB;
-    // bool signZ;
+    bool signZ;
     struct exp16_sig64 normExpSig;
     int_fast16_t expZ;
     uint32_t recip32, sig32Z, doubleTerm;
@@ -67,15 +68,15 @@ float64_t __f64_div( bool signZ, float64_t a, float64_t *__restrict b )
     *------------------------------------------------------------------------*/
     uA.f = a;
     uiA = uA.ui;
-    // signA = signF64UI( uiA );
+    signA = signF64UI( uiA );
     expA  = expF64UI( uiA );
     sigA  = fracF64UI( uiA );
-    uB.f = *b;
+    uB.f = b;
     uiB = uB.ui;
-    // signB = signF64UI( uiB );
+    signB = signF64UI( uiB );
     expB  = expF64UI( uiB );
     sigB  = fracF64UI( uiB );
-    // signZ = signA ^ signB;
+    signZ = signA ^ signB;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     if ( expA == 0x7FF ) {
@@ -168,4 +169,13 @@ float64_t __f64_div( bool signZ, float64_t a, float64_t *__restrict b )
     uZ.ui = uiZ;
     return uZ.f;
 
+}
+
+long double __ddiv_c(long double const *__restrict y_ptr, long double x) {
+    long double y = *y_ptr;
+    F64_pun arg_x, arg_y, ret;
+    arg_x.flt = x;
+    arg_y.flt = y;
+    ret.soft = __f64_div(arg_x.soft, arg_y.soft);
+    return ret.flt;
 }

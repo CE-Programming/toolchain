@@ -4,8 +4,8 @@
 This C source file is part of the SoftFloat IEEE Floating-Point Arithmetic
 Package, Release 3e, by John R. Hauser.
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 The Regents of the
-University of California.  All rights reserved.
+Copyright 2011, 2012, 2013, 2014 The Regents of the University of California.
+All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -38,44 +38,46 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdint.h>
 #include "platform.h"
 #include "internals.h"
-#include "specialize.h"
 #include "softfloat.h"
 
-uint_fast32_t __f64_to_ui32( float64_t a, uint_fast8_t roundingMode, bool exact )
+static
+float64_t __f64_add( float64_t a, float64_t b )
 {
     union ui64_f64 uA;
     uint_fast64_t uiA;
-    bool sign;
-    int_fast16_t exp;
-    uint_fast64_t sig;
-    int_fast16_t shiftDist;
+    bool signA;
+    union ui64_f64 uB;
+    uint_fast64_t uiB;
+    bool signB;
+#if ! defined INLINE_LEVEL || (INLINE_LEVEL < 2)
+    float64_t (*magsFuncPtr)( uint_fast64_t, uint_fast64_t, bool );
+#endif
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
     uA.f = a;
     uiA = uA.ui;
-    sign = signF64UI( uiA );
-    exp  = expF64UI( uiA );
-    sig  = fracF64UI( uiA );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-#if (ui32_fromNaN != ui32_fromPosOverflow) || (ui32_fromNaN != ui32_fromNegOverflow)
-    if ( (exp == 0x7FF) && sig ) {
-#if (ui32_fromNaN == ui32_fromPosOverflow)
-        sign = 0;
-#elif (ui32_fromNaN == ui32_fromNegOverflow)
-        sign = 1;
-#else
-        softfloat_raiseFlags( softfloat_flag_invalid );
-        return ui32_fromNaN;
-#endif
+    signA = signF64UI( uiA );
+    uB.f = b;
+    uiB = uB.ui;
+    signB = signF64UI( uiB );
+#if defined INLINE_LEVEL && (2 <= INLINE_LEVEL)
+    if ( signA == signB ) {
+        return softfloat_addMagsF64( uiA, uiB, signA );
+    } else {
+        return softfloat_subMagsF64( uiA, uiB, signA );
     }
+#else
+    magsFuncPtr =
+        (signA == signB) ? softfloat_addMagsF64 : softfloat_subMagsF64;
+    return (*magsFuncPtr)( uiA, uiB, signA );
 #endif
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    if ( exp ) sig |= UINT64_C( 0x0010000000000000 );
-    shiftDist = 0x427 - exp;
-    if ( 0 < shiftDist ) sig = softfloat_shiftRightJam64( sig, shiftDist );
-    return softfloat_roundToUI32( sign, sig, roundingMode, exact );
 
+}
+
+long double __dadd_c(long double const *__restrict y_ptr, long double x) {
+    long double y = *y_ptr;
+    F64_pun arg_x, arg_y, ret;
+    arg_x.flt = x;
+    arg_y.flt = y;
+    ret.soft = __f64_add(arg_x.soft, arg_y.soft);
+    return ret.flt;
 }

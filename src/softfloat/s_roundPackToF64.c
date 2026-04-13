@@ -107,7 +107,7 @@ float64_t
     if ( ! sig ) exp = 0;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-#if SOFTFLOAT_ROUND_ODD
+#ifdef SOFTFLOAT_ROUND_ODD
  packReturn:
 #endif
     uiZ = packToF64UI( sign, exp, sig );
