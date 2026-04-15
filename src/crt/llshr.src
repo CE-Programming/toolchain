@@ -9,11 +9,18 @@
 
 __llshru:
 ; Suboptimal for large shift amounts
+; shift == 0       :   26F +  10R +   6W +  2
+; shift [ 1, 47]   :   64F +  18R +  16W +  3 + (shift - 1) * (24F + 2R + 2W + 3)
+; shift == 48      :   42F +  10R +  16W +  2
+; shift [49, 63]   :   42F +  10R +  19W +  2 + __ishrs
+; max CC (shift 47): 1168F + 110R + 108W + 141
 	push	af
 	push	iy
 	ld	iy, 0
 	add	iy, sp
 	ld	a, (iy + 9)
+	cp	a, 48
+	jr	nc, .L.llshru_48_63
 	or	a, a
 	jr	z, .L.finish
 	push	de
@@ -21,20 +28,43 @@ __llshru:
 	srl	b
 	jr	.L.hijack_llshru
 
+.L.llshrs_48_63:
+	rlc	b
+	rrc	b
+	; Carry = Sign
+.L.llshru_48_63:	; <-- Carry is cleared
+	sbc	hl, hl
+	ex	de, hl
+	sbc	hl, hl
+	ld	l, c
+	ld	h, b
+	sub	a, 48
+	ld	c, a
+	; this can be converted to call __ishrs if needed
+	call	nz, __ishrs
+	ld	b, e
+	ld	c, e
+	jr	.L.finish
+
 __llshrs:
 ; Suboptimal for large shift amounts
+; shift == 0       :   26F +  10R +   6W +   2
+; shift [ 1, 47]   :   61F +  18R +  16W +   3 + (shift - 1) * (24F + 2R + 2W + 3)
+; shift == 48      :   46F +  10R +  16W +   2
+; shift [49, 63]   :   46F +  10R +  19W +   2 + __ishrs
+; max CC (shift 47): 1165F + 110R + 108W + 141
 	push	af
 	push	iy
 	ld	iy, 0
 	add	iy, sp
 	ld	a, (iy + 9)
+	cp	a, 48
+	jr	nc, .L.llshrs_48_63
 	or	a, a
 	jr	z, .L.finish
 	push	de
 	push	hl
 
-	.local	__llshr_common
-__llshr_common:
 .L.loop:
 	sra	b
 .L.hijack_llshru:
@@ -55,7 +85,6 @@ __llshr_common:
 	ld	l, e
 	ld	h, d
 	pop	de
-	.local	.L.finish
 .L.finish:
 	pop	iy
 	pop	af
