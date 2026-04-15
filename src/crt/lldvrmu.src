@@ -116,6 +116,8 @@ __lldvrmu.hijack:
 
 __lldvrmu:
 __lldvrmu.hijack:
+; Fallback routine that does not disable interrupts or use shadow registers.
+; Uses a special fast path for 8-bit denominators (0 - 255).
 ; Atrociously slow.
 
 	push	hl
@@ -123,16 +125,30 @@ __lldvrmu.hijack:
 	ld	iy, 0
 	add	iy, sp
 
+	; test if the denominator is less than 256 (fast path)
 	push	bc
+	; test bits [8, 55]
+	ld	hl, (iy + 16)
+	ld	bc, (iy + 19)
+	adc	hl, bc
+	jr	nz, .L.not_8_bit
+	; note that bits [8, 55] are non-zero if carry is set
+	ld	a, l		; ld a, 0
+	; test if bits [56, 63] are non-zero or if carry was set from before
+	sbc	a, (iy + 22)
+	jr	nc, .L.denominator_is_8_bit
+.L.not_8_bit:
+	; denominator >= 256
+
 	push	de
-	; or	a, a
+	or	a, a
 	sbc	hl, hl
 	ex	de, hl
 	sbc	hl, hl
 	ld	c, l
 	ld	b, l
-	ld	a, 64
-	jr	.L.start
+	ld	a, 64 + 1
+	; jr	.L.start
 
 	; (iy + 21) = denominator [48:63]
 	; (iy + 18) = denominator [24:47]
@@ -148,6 +164,7 @@ __lldvrmu.hijack:
 	; SP        = iy - 6
 
 .L.loop:
+	; worst-case CC per iter: 85F + 38R + 20W + 2
 	dec	a
 	jr	z, .L.finish
 .L.start:
@@ -226,6 +243,46 @@ __lldvrmu.hijack:
 	ld	(iy + 22), h
 	pop	hl
 .endif
+	pop	ix
+	ret
+
+.L.denominator_is_8_bit:
+	; A is zero and carry is cleared
+	ex	de, hl
+	pop	de
+	ld	c, (iy + 15)	; denominator
+	ld	b, 64
+.L.loop_8_bit:
+	; worst-case CC per iter: 20F + 1
+	add	ix, ix		; UHL
+	adc	hl, hl		; UDE
+	rl	e		; C
+	rl	d		; B
+	rla			; remainder
+	jr	c, .L.bit_1
+	cp	a, c
+	jr	c, .L.bit_0
+.L.bit_1:
+	sub	a, c
+	inc	ixl
+.L.bit_0:
+	djnz	.L.loop_8_bit
+	; B is zero here
+
+	; store the 64-bit quotient
+	ld	(iy + 15), ix
+	ld	(iy + 18), hl
+	ld	(iy + 21), e
+	ld	(iy + 22), d
+
+	; store the 8-bit remainder
+	ex.s	de, hl		; zero UHL and UDE
+	ld	c, b
+	ld	e, b
+	ld	d, b
+	ld	h, b
+	ld	l, a		; remainder
+
 	pop	ix
 	ret
 
