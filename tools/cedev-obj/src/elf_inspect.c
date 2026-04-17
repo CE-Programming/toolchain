@@ -312,6 +312,21 @@ static bool load_symbol_table(struct elf_file *elf)
     return true;
 }
 
+static bool is_empty_string(const char *str) {
+    // test for a null string
+    if (!str)
+    {
+        return true;
+    }
+    // test for an empty string
+    if (*str == '\0')
+    {
+        return true;
+    }
+    // string contains at least one character
+    return false;
+}
+
 struct elf_file *elf_open(const char *filename)
 {
     struct elf_file *elf = calloc(1, sizeof(struct elf_file));
@@ -399,7 +414,7 @@ void elf_close(struct elf_file *elf)
 
 bool elf_has_symbol(struct elf_file *elf, const char *symbol_name)
 {
-    if (!elf || !symbol_name)
+    if (!elf || is_empty_string(symbol_name))
     {
         return false;
     }
@@ -421,7 +436,7 @@ bool elf_has_symbol(struct elf_file *elf, const char *symbol_name)
 
 bool elf_has_defined_symbol(struct elf_file *elf, const char *symbol_name)
 {
-    if (!elf || !symbol_name)
+    if (!elf || is_empty_string(symbol_name))
     {
         return false;
     }
@@ -443,7 +458,7 @@ bool elf_has_defined_symbol(struct elf_file *elf, const char *symbol_name)
 
 bool elf_has_section(struct elf_file *elf, const char *section_name)
 {
-    if (!elf || !section_name)
+    if (!elf || is_empty_string(section_name))
     {
         return false;
     }
@@ -466,7 +481,7 @@ bool elf_has_section(struct elf_file *elf, const char *section_name)
 
 bool elf_has_section_prefix(struct elf_file *elf, const char *section_prefix)
 {
-    if (!elf || !section_prefix)
+    if (!elf || is_empty_string(section_prefix))
     {
         return false;
     }
