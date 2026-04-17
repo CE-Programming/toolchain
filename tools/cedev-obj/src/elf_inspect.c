@@ -464,6 +464,30 @@ bool elf_has_section(struct elf_file *elf, const char *section_name)
     return false;
 }
 
+bool elf_has_section_prefix(struct elf_file *elf, const char *section_prefix)
+{
+    if (!elf || !section_prefix)
+    {
+        return false;
+    }
+
+    const size_t prefix_len = strlen(section_prefix);
+    for (uint16_t i = 0; i < elf->ehdr.e_shnum; i++)
+    {
+        if (elf->section_headers[i].sh_name < elf->shstrtab_size)
+        {
+            const char *name = elf->shstrtab + elf->section_headers[i].sh_name;
+            if (strncmp(name, section_prefix, prefix_len) == 0)
+            {
+                /* Section exists - check if it's non-empty */
+                return elf->section_headers[i].sh_size > 0;
+            }
+        }
+    }
+
+    return false;
+}
+
 const char *elf_get_error(struct elf_file *elf)
 {
     return elf ? elf->error : "Invalid ELF handle";

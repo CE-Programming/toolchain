@@ -119,8 +119,15 @@ static bool parse_arguments(int argc, char **argv, options_t *opts)
 static void write_header_defines(FILE *out, const char *elf_file, struct elf_file *elf)
 {
     fprintf(out, "/* generated from: %s */\n", elf_file);
-    fprintf(out, "#define HAS_INIT_ARRAY %d\n", elf_has_section(elf, ".init_array") ? 1 : 0);
-    fprintf(out, "#define HAS_FINI_ARRAY %d\n", elf_has_section(elf, ".fini_array") ? 1 : 0);
+
+    /*
+     * We check for the prefix so that both forms will be correctly detected:
+     * .section\t.init_array,"aw",@init_array
+     * .section\t.init_array.123,"aw",@init_array
+     */
+    fprintf(out, "#define HAS_INIT_ARRAY %d\n", elf_has_section_prefix(elf, ".init_array") ? 1 : 0);
+    fprintf(out, "#define HAS_FINI_ARRAY %d\n", elf_has_section_prefix(elf, ".fini_array") ? 1 : 0);
+
     fprintf(out, "#define HAS_CLOCK %d\n", elf_has_symbol(elf, "_clock") ? 1 : 0);
     #if 0
         fprintf(out, "#define HAS_ABORT %d\n", elf_has_symbol(elf, "_abort") ? 1 : 0);

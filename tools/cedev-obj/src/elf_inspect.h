@@ -42,6 +42,9 @@ bool elf_has_defined_symbol(struct elf_file *elf, const char *symbol_name);
 /* Check if a section exists and is non-empty */
 bool elf_has_section(struct elf_file *elf, const char *section_name);
 
+/* Check if any section with a given prefix exists and is non-empty */
+bool elf_has_section_prefix(struct elf_file *elf, const char *section_prefix);
+
 /* Get last error message (valid until next call or elf_close) */
 const char *elf_get_error(struct elf_file *elf);
 
