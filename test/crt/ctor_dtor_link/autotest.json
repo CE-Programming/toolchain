@@ -1,0 +1,85 @@
+{
+  "transfer_files": [
+    "bin/DEMO.8xp"
+  ],
+  "target": {
+    "name": "DEMO",
+    "isASM": true
+  },
+  "sequence": [
+    "action|launch",
+    "delay|1000",
+    "hashWait|1",
+    "key|enter",
+    "delay|300",
+    "hashWait|2",
+    "key|enter",
+    "delay|300",
+    "hashWait|3",
+    "key|enter",
+    "delay|300",
+    "hashWait|4",
+    "key|enter",
+    "delay|300",
+    "hashWait|5",
+    "key|enter",
+    "delay|300",
+    "hashWait|6",
+    "key|enter",
+    "delay|300",
+    "hashWait|7",
+    "key|enter",
+    "delay|300",
+    "hashWait|8",
+    "key|enter",
+    "delay|300",
+    "hashWait|9",
+    "key|enter",
+    "delay|300",
+    "hashWait|10",
+    "key|enter",
+    "delay|300",
+    "hashWait|11",
+    "key|enter",
+    "delay|300",
+    "hashWait|12"
+  ],
+  "hashes": {
+    "1": {
+      "description": "ctor_func",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "19E9ED5F"
+      ]
+    },
+    "2": {
+      "description": "main_func",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "35FF4554"
+      ]
+    },
+    "3": {
+      "description": "dtor_func",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "BBC85D0A"
+      ]
+    },
+    "4": {
+      "description": "Exit",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [
+        "FFAF89BA",
+        "101734A5",
+        "9DA19F44",
+        "A32840C8",
+        "349F4775"
+      ]
+    }
+  }
+}
