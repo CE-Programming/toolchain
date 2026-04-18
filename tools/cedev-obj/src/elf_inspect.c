@@ -312,7 +312,8 @@ static bool load_symbol_table(struct elf_file *elf)
     return true;
 }
 
-static bool is_empty_string(const char *str) {
+static bool is_empty_string(const char *str)
+{
     // test for a null string
     if (!str)
     {
@@ -470,12 +471,35 @@ bool elf_has_section(struct elf_file *elf, const char *section_name)
             const char *name = elf->shstrtab + elf->section_headers[i].sh_name;
             if (strcmp(name, section_name) == 0)
             {
-                /* Section exists - check if it's non-empty */
+                /* Section exists - check if it is non-empty */
                 return elf->section_headers[i].sh_size > 0;
             }
         }
     }
 
+    return false;
+}
+
+static bool matches_prefix(const char *name, const char *section_prefix, const size_t prefix_len)
+{
+    // match exactly "string" or a prefix of "string."
+    if (strcmp(name, section_prefix) == 0)
+    {
+        // exact match
+        return true;
+    }
+
+    if (strncmp(name, section_prefix, prefix_len) == 0)
+    {
+        if (name[prefix_len] == '.')
+        {
+            // "string."
+            return true;
+        }
+        // not the same prefix (such as "string_word" or "string_word.")
+        return false;
+    }
+    // no match
     return false;
 }
 
@@ -492,9 +516,9 @@ bool elf_has_section_prefix(struct elf_file *elf, const char *section_prefix)
         if (elf->section_headers[i].sh_name < elf->shstrtab_size)
         {
             const char *name = elf->shstrtab + elf->section_headers[i].sh_name;
-            if (strncmp(name, section_prefix, prefix_len) == 0)
+            if (matches_prefix(name, section_prefix, prefix_len))
             {
-                /* Section exists - check if it's non-empty */
+                /* Section exists - check if it is non-empty */
                 return elf->section_headers[i].sh_size > 0;
             }
         }
