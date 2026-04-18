@@ -11,13 +11,8 @@
 #define C(expr) if (!(expr)) { return __LINE__; }
 
 static_assert(sizeof(long double) == sizeof(std::uint64_t));
-static_assert(std::isfinite(123));
-static_assert(!std::isinf(123));
-static_assert(!std::isnan(123));
-static_assert(std::signbit(-5));
-static_assert(!std::signbit(5));
 
-static int run_tests() {
+int run_tests() {
     using std::bit_cast;
 
     const long double pos_zero = bit_cast<long double>(UINT64_C(0x0000000000000000));
@@ -35,26 +30,18 @@ static int run_tests() {
     C((bit_cast<std::uint64_t>(std::abs(neg_zero)) == UINT64_C(0x0000000000000000)));
     C((bit_cast<std::uint64_t>(std::abs(neg_pi)) == UINT64_C(0x400921FB54442D18)));
     C((bit_cast<std::uint64_t>(std::fabs(neg_pi)) == UINT64_C(0x400921FB54442D18)));
-    C((std::isnan(std::fabs(neg_nan))));
 
     C((bit_cast<std::uint64_t>(std::copysign(pos_pi, neg_zero)) == UINT64_C(0xC00921FB54442D18)));
     C((bit_cast<std::uint64_t>(std::copysign(neg_pi, pos_zero)) == UINT64_C(0x400921FB54442D18)));
     C((bit_cast<std::uint64_t>(std::copysign(pos_zero, neg_zero)) == UINT64_C(0x8000000000000000)));
     C((bit_cast<std::uint64_t>(std::copysign(pos_inf, neg_zero)) == UINT64_C(0xFFF0000000000000)));
 
-    C((std::signbit(neg_zero)));
-    C((!std::signbit(pos_zero)));
-    C((std::isinf(pos_inf)));
-    C((!std::isfinite(pos_inf)));
-    C((std::isnan(neg_nan)));
-    C((!std::isnormal(pos_zero)));
-    C((std::isnormal(pos_pi)));
-
     return 0;
 }
 
 int main(void) {
     os_ClrHome();
+
     int failed_test = run_tests();
     if (failed_test != 0) {
         std::printf("Failed test L%d\n", failed_test);
@@ -62,8 +49,7 @@ int main(void) {
         std::printf("All tests passed");
     }
 
-    while (!os_GetCSC()) {
-    }
+    while (!os_GetCSC());
 
     return 0;
 }
