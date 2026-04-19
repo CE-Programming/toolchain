@@ -858,7 +858,7 @@ fat_SetFileBlockOffset:
 	add	hl,de
 	jq	nc,.invalid
 	ld	de,(yfatFile.block_index)
-	or	a,a
+	xor	a,a
 	sbc	hl,de
 	ret	z				; if at the same block position, done (return 0)
 	add	hl,de				; hl = new block_index, de = current block_index
@@ -866,9 +866,7 @@ fat_SetFileBlockOffset:
 	; check if block is within current cluster
 	; we can optimize by just changing the block position
 	ld	(yfatFile.block_index),hl
-	ld	a,(yfatFile.blocks_per_cluster)
-	dec	a
-	cpl
+	sub	a,(yfatFile.blocks_per_cluster)
 	ld	c,a				; mask for number of blocks
 	and	a,l
 	ld	l,a
@@ -2298,16 +2296,14 @@ util_fat_read_write:
 	compare_hl_zero				; no more blocks left, exit
 	jq	z,.return
 
-	ld	d,(xfatFile.blocks_per_cluster)
-	ld	a,d
-	dec	a
-	and	a,(xfatFile.block_index)	; mask off the number of blocks remaining in this cluster
-	ld	e,a
-	ld	a,d
-	sub	a,e
-	ld	de,0
-	ld	e,a
-	ex	de,hl				; de = total remaining, hl = remaining in cluster
+	ex	de,hl				; de = total remaining
+	xor	a,a
+	sub	a,(xfatFile.blocks_per_cluster)	; mask for number of blocks
+	or	a,(xfatFile.block_index)	; mask the negative number of blocks remaining in this cluster
+	cpl
+	inc	a
+	sbc	hl,hl
+	ld	l,a				; hl = remaining in cluster
 	compare_hl_de
 	jr	nc,.singleclusterread
 .multicluster:
@@ -2343,11 +2339,9 @@ util_fat_read_write:
 	ld	hl,(xfatFile.block_index)
 	add	hl,de
 	ld	(xfatFile.block_index),hl
-	ld	h,(xfatFile.blocks_per_cluster)
-	ld	a,h
+	ld	a,(xfatFile.blocks_per_cluster)
 	dec	a
-	and	a,l
-	or	a,a				; if at end of cluster, get the next one
+	and	a,l				; if at end of cluster, get the next one
 	call	z,.getnextcluster
 .return:
 	ld	hl,(xfatFile.block_index)
