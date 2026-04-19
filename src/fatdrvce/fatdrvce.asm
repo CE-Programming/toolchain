@@ -2519,16 +2519,13 @@ util_ceil_byte_size_to_block_size:
 	; - A:UHL
 	; output:
 	; - A:UHL = ceil(A:UHL / 512)
-	; - A = BCU = B = 0
+	; - A = 0
 	; destroys:
-	; - BC, flags
+	; - C, flags
 
-	; add 511 to A:UHL and shift the 33-bit result right by 9
-	ld	bc,511
-	add	hl,bc
-	dec	b
-	adc	a,b
-	rra
+	; UHL = A:UHL >> 9
+	ld	c,l
+	srl	a
 	push	af
 	inc	sp
 	push	hl
@@ -2537,6 +2534,11 @@ util_ceil_byte_size_to_block_size:
 	inc	sp
 	rr	h
 	rr	l
+	; round up if any shifted-out bits were non-zero
+	sbc	a,a
+	or	a,c
+	ret	z
+	inc	hl
 	xor	a,a
 	ret
 
