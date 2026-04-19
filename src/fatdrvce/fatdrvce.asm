@@ -2198,17 +2198,16 @@ util_block_to_cluster:
 	or	a,a
 	sbc	hl,bc
 	sbc	a,(yfat.data_region + 3)
-	ld	de,(yfat.blocks_per_cluster - 2)
-	ld	d,0
-	ld	e,a
+	; AC:UHL = A:UHL << (8 - log2(blocks_per_cluster))
+	ld	c,a
+	ld	a,(yfat.blocks_per_cluster)
 .loop:
 	add	hl,hl
-	ex	de,hl
-	adc	hl,hl
-	ex	de,hl
+	rl	c
+	rla
 	jr	nc,.loop
-	ld	a,d
-	push	de
+	; A:UHL = (AC:UHL >> 8) + 2
+	push	bc
 	push	hl
 	inc	sp
 	pop	hl
@@ -2551,23 +2550,28 @@ util_ceil_byte_size_to_cluster_size:
 	; destroys:
 	; - A, BC, flags
 
-	; First, get ceiling block size
-	call	util_ceil_byte_size_to_block_size
-
-	; Now, get ceiling cluster size by adding (blocks_per_cluster-1) and dividing by blocks_per_cluster
-	ld	c,(yfat.blocks_per_cluster)
-	ld	a,c
-	dec	c
-	; Note: ceiling block size is at most $800000 so this addition cannot overflow
-	add	hl,bc
+	; BC:UHL = A:UHL << (7 - log2(blocks_per_cluster))
+	ld	b,(yfat.blocks_per_cluster)
+	or	a,a
+	jr	.enter
 .loop:
 	add	hl,hl
 	rla
+.enter:
+	rl	b
 	jr	nc,.loop
-	push	af
-	inc	sp
+	ld	c,a
+	; check if HL != 0
+	ld	a,h
+	or	a,l
+	; UHL = BC:UHL >> 16
+	push	bc
 	push	hl
+	inc	sp
 	inc	sp
 	pop	hl
 	inc	sp
+	; round up if any shifted-out bits were non-zero
+	ret	z
+	inc	hl
 	ret
