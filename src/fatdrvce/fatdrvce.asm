@@ -818,7 +818,7 @@ fat_SetFileSize:
 	ret
 .writegood:
 	ld	a,hl,(yfat.working_size)
-	call	util_ceil_byte_size_to_blocks_per_cluster
+	call	util_ceil_byte_size_to_cluster_size
 	pop	iy
 	ret
 
@@ -911,20 +911,21 @@ fat_SetFileBlockOffset:
 	ld	hl,(yfatFile.block_index)
 .followchain:
 	ld	c,(yfatFile.blocks_per_cluster)
-	xor	a,a
-	ld	b,24
+	ld	a,c
+	dec	a
+	and	a,l
+	ld	(.cluster_block),a
+	ld	a,c
 .divloop:
 	add	hl,hl
 	rla
-	cp	a,c
-	jr	c,.divskip
-	sub	a,c
-	inc	l
-.divskip:
-	djnz	.divloop
-	ld	(.cluster_block),a
+	jr	nc,.divloop
+	push	af
+	inc	sp
 	push	hl
+	inc	sp
 	pop	bc
+	inc	sp
 	ld	a,hl,(yfatFile.current_cluster)
 	jr	.entergetpos
 .getclusterpos:
@@ -2501,13 +2502,22 @@ util_cluster_entry_to_block:
 	; - A:UHL = floor(A:UHL / 128) + (yfat.fat_pos)
 	; destroys:
 	; - BC, flags
+
+	; shift A:UHL left by 1 and shift the 33-bit result right by 8
+	add	hl,hl
+	rla
+	push	af
+	inc	sp
 	push	hl
-	pop	bc
-	ld	l,7
-	call	ti._lshru
-	ld	hl,(yfat.fat_pos)
+	inc	sp
+	pop	hl
+	inc	sp
+	ccf
+	sbc	a,a
+	; the increment to set A to 0 or 1 is deferred until the adc below
+	ld	bc,(yfat.fat_pos)
 	add	hl,bc
-	adc	a,0
+	adc	a,1
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -2516,53 +2526,54 @@ util_ceil_byte_size_to_block_size:
 	; - A:UHL
 	; output:
 	; - A:UHL = ceil(A:UHL / 512)
-	; - A = 0
+	; - A = BCU = B = 0
 	; destroys:
 	; - BC, flags
 
-	; if A:UHL == 0, abort
-	compare_hl_zero
-	jr	nz, .dec_hl
-	or	a, a
-	ret	z
-	; A:UHL--
-	dec	a
-.dec_hl:
-	dec	hl
-
-	; A:UHL /= 512
+	; add 511 to A:UHL and shift the 33-bit result right by 9
+	ld	bc,511
+	add	hl,bc
+	dec	b
+	adc	a,b
+	rra
+	push	af
+	inc	sp
 	push	hl
-	pop	bc
-	ld	l,9
-	call	ti._lshru
-	push	bc
+	inc	sp
 	pop	hl
-
-	; A:UHL++
-	inc	hl
+	inc	sp
+	rr	h
+	rr	l
+	xor	a,a
 	ret
 
 ;-------------------------------------------------------------------------------
-util_ceil_byte_size_to_blocks_per_cluster:
-	compare_auhl_zero
-	ret	z
-	push	af,hl
-	xor	a,a
-	sbc	hl,hl
-	ld	h,(yfat.blocks_per_cluster)
+util_ceil_byte_size_to_cluster_size:
+	; input:
+	; - A:UHL
+	; - IY = fat struct
+	; output:
+	; - UHL = ceil(A:UHL / (512 * blocks_per_cluster))
+	; destroys:
+	; - A, BC, flags
+
+	; First, get ceiling block size
+	call	util_ceil_byte_size_to_block_size
+
+	; Now, get ceiling cluster size by adding (blocks_per_cluster-1) and dividing by blocks_per_cluster
+	ld	c,(yfat.blocks_per_cluster)
+	ld	a,c
+	dec	c
+	; Note: ceiling block size is at most $800000 so this addition cannot overflow
+	add	hl,bc
+.loop:
 	add	hl,hl
-	push	hl
-	pop	bc
-	pop	hl,de
-	ld	e,d
-	push	hl,de,bc
-	call	ti._lremu
-	compare_hl_zero
-	pop	bc,de,hl
+	rla
+	jr	nc,.loop
 	push	af
-	xor	a,a
-	call	ti._ldivu
-	pop	af
-	ret	z
-	inc	hl
+	inc	sp
+	push	hl
+	inc	sp
+	pop	hl
+	inc	sp
 	ret
