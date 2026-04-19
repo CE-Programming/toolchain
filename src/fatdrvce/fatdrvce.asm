@@ -2519,25 +2519,26 @@ util_ceil_byte_size_to_block_size:
 	; - A = 0
 	; destroys:
 	; - BC, flags
-	compare_auhl_zero
+
+	; if A:UHL == 0, abort
+	compare_hl_zero
+	jr	nz, .dec_hl
+	or	a, a
 	ret	z
-	; test if the low 9 bits are non-zero
-	inc	l
-	dec	l
-	jr	nz,.round_up
-	bit	0,h
-.round_up:
-	push	af
+	; A:UHL--
+	dec	a
+.dec_hl:
+	dec	hl
+
+	; A:UHL /= 512
 	push	hl
 	pop	bc
 	ld	l,9
 	call	ti._lshru
 	push	bc
 	pop	hl
-	pop	af
-	ld	a,0
-	ret	z
-	; round up
+
+	; A:UHL++
 	inc	hl
 	ret
 
