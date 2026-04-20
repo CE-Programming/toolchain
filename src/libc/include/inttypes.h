@@ -97,7 +97,7 @@
 #define PRIXMAX          __UINTMAX_FMTX__
 
 #define PRIdPTR           __INTPTR_FMTd__
-#define PRIiPTR          __ INTPTR_FMTi__
+#define PRIiPTR           __INTPTR_FMTi__
 #define PRIoPTR          __UINTPTR_FMTo__
 #define PRIuPTR          __UINTPTR_FMTu__
 #define PRIxPTR          __UINTPTR_FMTx__
