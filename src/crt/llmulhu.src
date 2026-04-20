@@ -103,7 +103,7 @@ __llmulhu:
 	jr	nz, .L.bit_loop
 
 	pop	af
-	jr 	nc, .L.byte_loop
+	jr	nc, .L.byte_loop
 
 	; ld	b, d
 	; ld	c, e
@@ -132,59 +132,60 @@ __llmulhu:
 	; fallback routine that does not disable interrupts or use shadow registers
 	push	ix
 	push	iy
-	ld	ix, -36
+
+	push	bc			; ld	(ix - 3), bc
+	push	de			; ld	(ix - 6), de
+	push	hl			; ld	(ix - 9), hl
+
+	ld	c, e			; preserve E
+	ld	ix, -36 + 12 + 9
+	lea	de, ix + 36 - 12 - 9	; ld de, 0
+	push	de			; ld	(ix - 12), $000000
+
 	add	ix, sp
 	ld	sp, ix
-	lea	ix, ix + 36
-
-	ld	(ix - 3), bc
-	ld	(ix - 6), de
-	ld	(ix - 9), hl
-
-	ld	bc, 0
-	ld	(ix - 10), b
-	ld	(ix - 13), bc
-	ld	(ix - 30), bc
-	ld	c, (ix + 12)
-	ld	(ix - 33), bc
-	ld	iy, (ix + 9)
-	ld	(ix - 36), iy
+	lea	ix, ix + 36 - 9
+	ld	(ix - 13), e
+	push	de			; ld	(ix - 30), $000000
+	ld	e, (ix + 12)
+	push	de			; ld	(ix - 33), de
+	ld	e, c			; restore E
+	ld	bc, (ix + 9)
+	push	bc			; ld	(ix - 36), bc
 
 	; x_lo * y_lo
-	ld	c, b
-	ld	d, b
-	inc	de
-	dec.s	de
+	ld	c, d
+	ld	b, d
 	call	__llmulu
-	inc	bc
-	dec.s	bc
-	ld	(ix - 16), bc
 	ld	(ix - 19), de
-	ld	b, 0
-	ld	c, b
+	inc.s	de
+	ld	e, c
+	ld	d, b
+	ld	(ix - 16), de		; BC, UBC = 0
 
 	; x_hi * y_lo
-	inc.s	de
-	ld	d, b
+	ld	d, 0
+	ld	c, d
+	ld	b, d
 	ld	e, (ix - 2)
 	ld	hl, (ix - 5)
 	call	__llmulu
-	inc	bc
-	dec.s	bc
-	ld	(ix - 21), bc
 	ld	(ix - 24), de
+	inc.s	de
+	ld	e, c
+	ld	d, b
+	ld	(ix - 21), de		; BC, UBC = 0
 	ld	(ix - 27), hl
 
 	ld	c, (ix + 16)
 	ld	(ix - 33), c
-	ld	iy, (ix + 13)
-	ld	(ix - 36), iy
+	ld	bc, (ix + 13)
+	ld	(ix - 36), bc
 
 	; x_lo * y_hi
-	ld	b, 0
-	ld	c, b
-	inc.s	de
-	ld	d, b
+	ld	d, 0
+	ld	c, d
+	ld	b, d
 	ld	e, (ix - 6)
 	ld	hl, (ix - 9)
 	call	__llmulu
@@ -196,18 +197,19 @@ __llmulhu:
 	call	.L.__llmulhu_i72add
 	ld	(ix - 16), bc
 	ld	(ix - 19), de
-	ld	bc, 0
+	inc.s	de
+	ld	d, 0
+	ld	c, d
+	ld	b, d
 
 	; x_hi * y_hi
-	inc.s	de
-	ld	d, b
 	ld	e, (ix - 2)
 	ld	hl, (ix - 5)
 	call	__llmulu
-	inc	bc
-	dec.s	bc
 	lea	iy, ix - 18
 	call	.L.__llmulhu_i72add
+	; BC:UDE:UHL = result
+	; UBC = unknown
 	ld	sp, ix
 	pop	iy
 	pop	ix
