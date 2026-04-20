@@ -15,9 +15,10 @@
 
 .else
 
-__ldvrmu:
 ; REMEMBER to also modify ldivu.src, lremu.src, and ldiv.src if you change this
-if 1
+.if 1
+
+__ldvrmu:
 ; I: EUHL=dividend, AUBC=divisor
 ; O: a[uhl']=EUHL%AUBC, bcu=0, b=A, c=?, euhl=EUHL/AUBC, eubc'=AUBC, zf=!IEF2
 
@@ -90,6 +91,8 @@ if 1
 ;;; }
 
 .else
+
+__ldvrmu:
 ; I: EUHL=dividend, AUBC=divisor
 ; O: auhl=EUHL%AUBC, euix=EUHL/AUBC, iyh=A, iyl=0
 

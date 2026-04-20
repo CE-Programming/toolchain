@@ -4,10 +4,10 @@
 	.global	__llmulu
 	.type	__llmulu, @function
 
+.if 1
+
 __llmulu:
 ; Really slow
-
-.if 1
 ; clobbers SP.S
 	push	ix
 	push	iy
@@ -79,6 +79,8 @@ __llmulu:
 
 .else
 
+__llmulu:
+; Really slow
 ; fallback routine that does not clobber SP.S
 	push	ix
 	push	iy

@@ -4,8 +4,9 @@
 	.global	_ldiv
 	.type	_ldiv, @function
 
-_ldiv:
 .if 1
+
+_ldiv:
 	pop	hl
 	pop	iy
 	pop	de
@@ -53,6 +54,8 @@ _ldiv:
 	jp	(hl)
 
 .else
+
+_ldiv:
 	pop	hl		; return address
 	pop	iy		; ldiv_t pointer
 	pop	de		; [ 0:23] numerator
@@ -107,6 +110,7 @@ _ldiv:
 	push	de
 	push	de
 	jp	(hl)
+
 .endif
 
 	.extern	__ldivs_lrems_common

@@ -10,11 +10,11 @@
 
 .else
 
+.if 1
+
 __ldivu:
 ; I: EUHL=dividend, AUBC=divisor
 ; O: euhl=EUHL/AUBC
-
-.if 1
 	push	bc
 
 	call	__ldvrmu
@@ -27,6 +27,10 @@ __ldivu:
 	ret
 
 .else
+
+__ldivu:
+; I: EUHL=dividend, AUBC=divisor
+; O: euhl=EUHL/AUBC
 	push	ix
 	push	iy
 
