@@ -5,11 +5,9 @@
 
 	.assume	adl=1
 
-	.section	.text
+	.section	.text.__i48neg
 	.global	__i48neg
 	.type	__i48neg, @function
-	.global	__uiyubcNeg
-	.type	__uiyubcNeg, @function
 
 __i48neg:
 ; CC: 17 bytes
@@ -30,6 +28,10 @@ __i48neg:
 	ret	z		; Return if -HL = 0, meaning no carry when negating the low half
 	dec	de		; Carry adjustment
 	ret
+
+	.section	.text.__uiyubcNeg
+	.global	__uiyubcNeg
+	.type	__uiyubcNeg, @function
 
 ; Used by i48divs and i48rems, uiy:ubc = -uiy:ubc
 __uiyubcNeg:
