@@ -26,7 +26,7 @@ int main(void)
     /* Set a font to use. */
     font_pack = fontlib_GetFontByIndex(font_pack_name, 1);
     if (font_pack) {
-        fontlib_SetFont(font_pack, 0);
+        fontlib_LoadFont(font_pack, 0);
         fontlib_DrawString(test_str);
     }
     else
@@ -38,7 +38,7 @@ int main(void)
     font_pack = fontlib_GetFontByStyle(font_pack_name, 9, 10, FONTLIB_NORMAL, FONTLIB_NORMAL, 0, FONTLIB_SERIF);
     if (font_pack)
     {
-        fontlib_SetFont(font_pack, 0);
+        fontlib_LoadFont(font_pack, 0);
         fontlib_DrawString(test_str);
     }
     else
@@ -50,7 +50,7 @@ int main(void)
     font_pack = fontlib_GetFontByStyle(font_pack_name, 30, 50, FONTLIB_NORMAL, FONTLIB_NORMAL, FONTLIB_SERIF, 0);
     if (font_pack)
     {
-        fontlib_SetFont(font_pack, 0);
+        fontlib_LoadFont(font_pack, 0);
         fontlib_DrawString(test_str);
     }
     else

@@ -15,7 +15,7 @@
 int run_tests(void) {
 
     /* 256 glyph test */
-    fontlib_SetFont(test_font, 0);
+    fontlib_LoadFont(test_font, 0);
     C(fontlib_GetFirstGlyph() == 0);
     C(fontlib_GetTotalGlyphs() == 256);
     C(fontlib_GetTotalGlyphs() == 256);
@@ -27,7 +27,7 @@ int run_tests(void) {
     /* 255 glyph test */
     test_font->first_glyph = 1;
     test_font->total_glyphs = 255;
-    fontlib_SetFont(test_font, 0);
+    fontlib_LoadFont(test_font, 0);
     C(fontlib_GetFirstGlyph() == 1);
     C(fontlib_GetTotalGlyphs() == 255);
     C(fontlib_GetGlyphWidth(0) == 0);
@@ -39,7 +39,7 @@ int run_tests(void) {
     /* 128 glyph test */
     test_font->first_glyph = 0;
     test_font->total_glyphs = 128;
-    fontlib_SetFont(test_font, 0);
+    fontlib_LoadFont(test_font, 0);
     C(fontlib_GetFirstGlyph() == 0);
     C(fontlib_GetTotalGlyphs() == 128);
     for (unsigned i = 0; i <= 127; i++) {
@@ -54,7 +54,7 @@ int run_tests(void) {
     /* 64 glyph test */
     test_font->first_glyph = 32;
     test_font->total_glyphs = 64;
-    fontlib_SetFont(test_font, 0);
+    fontlib_LoadFont(test_font, 0);
     C(fontlib_GetFirstGlyph() == 32);
     C(fontlib_GetTotalGlyphs() == 64);
     for (unsigned i = 0; i <= 31; i++) {

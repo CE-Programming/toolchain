@@ -3,7 +3,7 @@ include '../include/library.inc'
 include '../include/include_library.inc'
 ;-------------------------------------------------------------------------------
 
-library FONTLIBC,2
+library FONTLIBC,3
 
 ;-------------------------------------------------------------------------------
 ; Dependencies
@@ -78,7 +78,11 @@ include_library '../graphx/graphx.asm'
 	export fontlib_ScrollWindowUp
 	export fontlib_Home
 	export fontlib_HomeUp
-
+;-------------------------------------------------------------------------------
+; v3 functions
+;-------------------------------------------------------------------------------
+	; replacement for fontlib_SetFont
+	export fontlib_LoadFont
 
 ;-------------------------------------------------------------------------------
 CurrentBuffer	:= ti.mpLcdLpbase
@@ -140,6 +144,11 @@ virtual at 0
 strucFontPackHeader strucFontPackHeader
 end virtual
 
+;-------------------------------------------------------------------------------
+; fontlib_load_options_t
+
+bLoadOption_IgnoreLineSpacing := 0
+mLoadOption_IgnoreLineSpacing := 1 shl bLoadOption_IgnoreLineSpacing
 
 ;-------------------------------------------------------------------------------
 macro mIsHLLessThanDE?
@@ -405,6 +414,17 @@ fontlib_Home:
 
 ;-------------------------------------------------------------------------------
 fontlib_SetFont:
+	; performs fontlib_LoadFont(font_data, FONTLIB_IGNORE_LINE_SPACING)
+	ld	hl,arg1
+	add	hl,sp
+	ld	bc,mLoadOption_IgnoreLineSpacing
+	ld	(hl),bc
+
+; Fall through to fontlib_LoadFont
+assert $ = fontlib_LoadFont
+
+;-------------------------------------------------------------------------------
+fontlib_LoadFont:
 ; Sets the current font to the data at the pointer given
 ; Arguments:
 ;  arg0: Pointer to font
@@ -435,12 +455,12 @@ fontlib_SetFont:
 	or	a,a
 	ret	z			; Also unreasonable: a zero-height font
 	and	a,$80
-	jr	nz,.false
+	jr	nz,.failure
 	ld	a,63
 	cp	a,(iy + strucFont.spaceAbove)
-	jr	c,.false
+	jr	c,.failure
 	cp	a,(iy + strucFont.spaceBelow)
-	jr	c,.false
+	jr	c,.failure
 .validateOffsets:
 ; Now convert offsets into actual pointers
 ; Validate that offset is at least semi-reasonable
@@ -459,21 +479,20 @@ fontlib_SetFont:
 	add	hl,bc
 	ld	(iy + strucFont.bitmapsTablePtr),hl
 ; Check for the ignore line spacing flag
-; Due to a bug, flags must be ignored, and treated as FONTLIB_IGNORE_LINE_SPACING
-	; ld	hl,arg1
-	; add	hl,sp
-	; ld	a,(hl)
-	; or	a,a
-	; jr	z,.true
+	ld	hl,arg1
+	add	hl,sp
+	bit	bLoadOption_IgnoreLineSpacing,(hl)
+	jr	z,.finish_load
 	lea	hl,iy + strucFont.spaceAbove
 	xor	a,a
 	ld	(hl),a
 	inc	hl
 	ld	(hl),a
-.true:
+.finish_load:
 	ld	a,1
 	ret
-.false:
+
+.failure:
 	xor	a,a
 	ret
 
