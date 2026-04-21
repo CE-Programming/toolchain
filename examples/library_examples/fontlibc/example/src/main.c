@@ -17,7 +17,7 @@ int main(void)
     gfx_ZeroScreen();
 
     /* Set a font to use.  DrawString will display garbage if you don't give it a font! */
-    fontlib_SetFont(test_font, 0);
+    fontlib_LoadFont(test_font, 0);
 
     /* First, we'll display centered text in a window */
     /* Add some vertical padding around our text */

@@ -49,9 +49,8 @@ typedef enum {
 } fontlib_newline_options_t;
 
 /**
- * @warning Flags are currently ignored due to a bug, and treated as FONTLIB_IGNORE_LINE_SPACING
  * Options for controlling how SetFont functions.
- * @see fontlib_SetFont
+ * @see fontlib_LoadFont
  */
 typedef enum {
     /**
@@ -162,7 +161,7 @@ typedef struct fontlib_metadata_t {
  *  unsigned char baseline;
  *  fontlib_font_t *my_font = fontlib_GetFontByStyle("FONTPACK", 12, 12,
  *      FONTLIB_NORMAL, FONTLIB_NORMAL, FONTLIB_SERIF, 0);
- *  if (!my_font || !fontlib_SetFont(my_font))
+ *  if (!my_font || !fontlib_LoadFont(my_font, 0))
  *      return;
  *  baseline = my_font->baseline_height;
  * @endcode
@@ -383,15 +382,23 @@ void fontlib_HomeUp();
 void fontlib_Home();
 
 /**
- * Sets the current font
- * @param[in] font_data Pointer to font data
- * @param[in] Unused and treated as FONTLIB_IGNORE_LINE_SPACING
- * @return Returns false if the font seems invalid for any reason
- * @warning If false is returned, no valid font is currently loaded and trying
- * @note Flags are currently ignored due to a bug, and treated as FONTLIB_IGNORE_LINE_SPACING
- * to print will print garbage!
+ * @warning fontlib_SetFont is deprecated, use fontlib_LoadFont instead.
+ * @note due to a bug, fontlib_SetFont ignores flags and assumes
+ * FONTLIB_IGNORE_LINE_SPACING. This has been fixed with fontlib_LoadFont
  */
 bool fontlib_SetFont(const fontlib_font_t *font_data, fontlib_load_options_t flags);
+
+#define fontlib_SetFont _Pragma("GCC warning \"'fontlib_SetFont' is deprecated, use 'fontlib_LoadFont' instead\"") fontlib_SetFont
+
+/**
+ * Sets the current font
+ * @param[in] font_data Pointer to font data
+ * @param[in] flags Information about how to process the font
+ * @return Returns false if the font seems invalid for any reason
+ * @warning If false is returned, no valid font is currently loaded and trying
+ * to print will print garbage!
+ */
+bool fontlib_LoadFont(const fontlib_font_t *font_data, fontlib_load_options_t flags);
 
 /**
  * Sets the current foreground color FontLibC will use for drawing.
