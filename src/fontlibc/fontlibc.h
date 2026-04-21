@@ -49,6 +49,7 @@ typedef enum {
 } fontlib_newline_options_t;
 
 /**
+ * @warning Flags are currently ignored due to a bug, and treated as FONTLIB_IGNORE_LINE_SPACING
  * Options for controlling how SetFont functions.
  * @see fontlib_SetFont
  */
@@ -384,9 +385,10 @@ void fontlib_Home();
 /**
  * Sets the current font
  * @param[in] font_data Pointer to font data
- * @param[in] flags Information about how to process the font (unused)
+ * @param[in] Unused and treated as FONTLIB_IGNORE_LINE_SPACING
  * @return Returns false if the font seems invalid for any reason
  * @warning If false is returned, no valid font is currently loaded and trying
+ * @note Flags are currently ignored due to a bug, and treated as FONTLIB_IGNORE_LINE_SPACING
  * to print will print garbage!
  */
 bool fontlib_SetFont(const fontlib_font_t *font_data, fontlib_load_options_t flags);
