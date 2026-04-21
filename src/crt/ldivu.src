@@ -10,6 +10,7 @@
 
 .else
 
+; REMEMBER to keep ldivu.src, lremu.src, and ldiv.src in sync with this choice
 .if 1
 
 __ldivu:
@@ -17,7 +18,7 @@ __ldivu:
 ; O: euhl=EUHL/AUBC
 	push	bc
 
-	call	__ldvrmu
+	call	__ldivu_lremu_common
 
 	ld	a, b
 	pop	bc
@@ -25,6 +26,8 @@ __ldivu:
 	ret	z
 	ei
 	ret
+
+	.extern	__ldivu_lremu_common
 
 .else
 
@@ -41,8 +44,9 @@ __ldivu:
 	pop	hl
 
 	ret
-.endif
 
 	.extern	__ldvrmu
+
+.endif
 
 .endif

@@ -10,12 +10,13 @@
 
 .else
 
+; REMEMBER to keep ldivu.src, lremu.src, and ldiv.src in sync with this choice
 .if 1
 
 __lremu:
 ; I: EUHL=dividend, AUBC=divisor
 ; O: euhl=EUHL%AUBC
-	call	__ldvrmu
+	call	__ldivu_lremu_common
 	ld	e, a
 	push	de
 	exx
@@ -25,6 +26,8 @@ __lremu:
 	ret	z
 	ei
 	ret
+
+	.extern	__ldivu_lremu_common
 
 .else
 
@@ -41,8 +44,9 @@ __lremu:
 	pop	iy
 	pop	ix
 	ret
-.endif
 
 	.extern	__ldvrmu
+
+.endif
 
 .endif
