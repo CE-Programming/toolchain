@@ -1,94 +1,13 @@
 	.assume	adl=1
 
 	.section	.text
-;;; struct u32div_t {
-;;;     uint32_t rem;
-;;;     uint32_t quot;
-;;; };
-;;; u32div_t _ldvrmu(uint32_t dividend, uint32_t divisor) {
+
 	.global	__ldvrmu
 	.type	__ldvrmu, @function
 
 .ifdef PREFER_OS_CRT
 
 	.set	__ldvrmu, 0x0001BC
-
-.else
-
-; REMEMBER to also modify ldivu.src, lremu.src, and ldiv.src if you change this
-.if 1
-
-__ldvrmu:
-; I: EUHL=dividend, AUBC=divisor
-; O: a[uhl']=EUHL%AUBC, bcu=0, b=A, c=?, euhl=EUHL/AUBC, eubc'=AUBC, zf=!IEF2
-
-;;;     u32div_t result;
-;;;     result.quot = dividend;
-					; euhl : result.quot
-
-	push	bc
-
-	ld	c, a			; c = A
-	ld	a, i			; a = I
-					; pf = IEF2
-	di
-
-	ld	a, c			; a = A
-	exx
-	pop	bc
-	ld	e, a			; eubc' : divisor
-
-	push	af
-
-;;;     result.rem = 0;
-	xor	a, a
-	sbc	hl, hl			; auhl' : result.rem
-
-;;;     int i = 32;
-	exx
-	ld	b, 32			; b : i
-
-;;;     do {
-.L.c.loop:
-
-;;;         bool dividendBit = result.quot >> 31;
-;;;         result.quot <<= 1;
-	add	hl, hl
-	rl	e
-;;;         result.rem = (result.rem << 1) + dividendBit;
-	exx
-	adc	hl, hl
-	adc	a, a
-
-;;;         bool quotBit = result.rem >= divisor;
-;;;         result.rem -= divisor;
-	sbc	hl, bc
-	sbc	a, e
-
-;;;         if (!quotBit) {
-	jr	nc, .L.c.restore_skip
-;;;             result.rem += divisor;
-	add	hl, bc
-	adc	a, e
-;;;         }
-.L.c.restore_skip:
-
-;;;         if (quotBit) {
-	exx
-	jr	c, .L.c.skip
-;;;             result.quot++;
-	inc	l
-;;;         }
-.L.c.skip:
-
-;;;     } while (--i != 0);
-	djnz	.L.c.loop
-
-;;;     return result;
-	pop	bc
-	bit	2, c
-	ret
-;;; }
 
 .else
 
@@ -126,7 +45,5 @@ __ldvrmu:
 	jr	nz, .L.loop
 
 	ret
-
-.endif
 
 .endif

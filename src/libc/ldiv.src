@@ -4,6 +4,7 @@
 	.global	_ldiv
 	.type	_ldiv, @function
 
+; REMEMBER to keep ldivu.src, lremu.src, and ldiv.src in sync with this choice
 .if 1
 
 _ldiv:
@@ -27,7 +28,7 @@ _ldiv:
 	bit	7, e
 	call	__ldivs_lrems_common
 
-	call	__ldvrmu
+	call	__ldivu_lremu_common
 
 	exx
 	ld	e, a
@@ -52,6 +53,8 @@ _ldiv:
 	ei
 .L.ei_skip:
 	jp	(hl)
+
+	.extern	__ldivu_lremu_common
 
 .else
 
@@ -111,8 +114,9 @@ _ldiv:
 	push	de
 	jp	(hl)
 
+	.extern	__ldvrmu
+
 .endif
 
 	.extern	__ldivs_lrems_common
-	.extern	__ldvrmu
 	.extern	__lneg
