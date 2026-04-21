@@ -71,7 +71,7 @@ include_library '../lcddrvce/lcddrvce.asm'
 	export gfy_TransparentTilemap
 	export gfy_TransparentTilemap_NoClip
 	export gfy_TilePtr
-	export gfy_TilePtrMapped
+	; export gfy_TilePtrMapped
 	export gfy_AllocSprite
 	export gfy_Sprite
 	export gfy_TransparentSprite
@@ -391,13 +391,13 @@ gfy_AllocSprite: ; COPIED_FROM_GRAPHX
 	add	hl, bc
 	ld	d, (hl)			; d = height
 	add	hl, bc
-	ld	hl, (hl)		; hl = malloc
+	ld	iy, (hl)		; iy = malloc
 	push	de
 	mlt	de			; de = width * height
 	inc	de			; +2 to store width and height
 	inc	de			; de = width * height + 2
 	push	de
-	call	_indcallHL		; hl = malloc(width * height + 2)
+	call	ti._indcall		; hl = malloc(width * height + 2)
 	pop	de
 	pop	de			; e = width, d = height, ude = unknown
 	; check if malloc failed (hl == 0)
@@ -637,6 +637,7 @@ FillScreen_FastCode_SrcSize  := FillScreen_FastCode_DestSize-(FillScreen_PushesP
 FillScreen_FastCode_SrcEnd   := $
 
 ;-------------------------------------------------------------------------------
+if 0
 gfy_ZeroScreen: ; COPIED_FROM_GRAPHX
 ; Fills the screen with color index 0
 ; Arguments:
@@ -648,6 +649,7 @@ gfy_ZeroScreen: ; COPIED_FROM_GRAPHX
 	call	gfy_FillScreen
 	pop	hl
 	ret
+end if
 
 ;-------------------------------------------------------------------------------
 gfy_SetPalette: ; COPIED_FROM_GRAPHX
@@ -3346,41 +3348,45 @@ gfy_TilePtr: ; COPIED_FROM_GRAPHX
 ;  uint8_t *gfy_TilePtr(gfy_tilemap_t *tilemap, unsigned x_offset, unsigned y_offset) {
 ;      return &tilemap->map[(x_offset/tilemap->tile_width)+((y_offset/tilemap->tile_height)*tilemap->width)];
 ;  }
-	push	ix
-	ld	ix, 0
-	add	ix, sp
-	ld	iy, (ix + 6)
-	ld	hl, (ix + 9)
-	ld	a, (iy + t_type_width)
-	or	a, a
-	jr	nz, .fastdiv0
-	ld	bc, 0
+	ld	bc, 3
+	push	bc
+	pop	hl
+	add	hl, sp
+	ld	iy, (hl)
+	add	hl, bc
+	ld	hl, (hl)
+	ld	b, (iy + t_type_width)
+	inc	b
+	djnz	.fastdiv0
+	; UBC and B are zero
 	ld	c, (iy + t_tile_width)
 	call	ti._idvrmu
-	ex	de, hl
 	jr	.widthnotpow2
+
 .fastdiv0:
-	ld	b, a
 .div0:
 	srl	h
 	rr	l
 	djnz	.div0
-.widthnotpow2:
 	ex	de, hl
-	ld	hl, (ix + 12)
-	ld	a, (iy + t_type_height)
-	or	a, a
-	jr	nz, .fastdiv1
-	ld	bc, 0
+.widthnotpow2:
+	ld	hl, 9
+	add	hl, sp
+	ld	hl, (hl)
+	ld	b, (iy + t_type_height)
+	inc	b
+	djnz	.fastdiv1
+	; UBC and B are zero
 	ld	c, (iy + t_tile_height)
 	push	de
 	call	ti._idvrmu
 	ex	de, hl
 	pop	de
 	jr	.heightnotpow2
+
 .fastdiv1:
-	ld	b, a
-.div1:	srl	h
+.div1:
+	srl	h
 	rr	l
 	djnz	.div1
 .heightnotpow2:
@@ -3389,10 +3395,10 @@ gfy_TilePtr: ; COPIED_FROM_GRAPHX
 	add	hl, de
 	ld	de, (iy + t_data)
 	add	hl, de
-	pop	ix
 	ret
 
 ;-------------------------------------------------------------------------------
+if 0
 gfy_TilePtrMapped: ; COPIED_FROM_GRAPHX
 ; Returns a direct pointer to the input tile
 ; Arguments:
@@ -3415,6 +3421,7 @@ gfy_TilePtrMapped: ; COPIED_FROM_GRAPHX
 	ld	bc, (iy + 0)		; tilemap data
 	add	hl, bc
 	ret
+end if
 
 ;-------------------------------------------------------------------------------
 gfy_GetTextX: ; COPIED_FROM_GRAPHX
@@ -3451,11 +3458,6 @@ gfy_SetTextXY: ; COPIED_FROM_GRAPHX
 	ld	(_TextYPos), hl
 	push	hl			; xpos=don't care, sp=&xpos
 	ex	de, hl			; hl=return address
-;-------------------------------------------------------------------------------
-_indcallHL: ; COPIED_FROM_GRAPHX
-; Calls HL
-; Inputs:
-;  HL : Address to call
 	jp	(hl)
 
 ;-------------------------------------------------------------------------------
@@ -4082,13 +4084,17 @@ gfy_SetCharData: ; COPIED_FROM_GRAPHX
 ;  arg0 : Pointer to character data; if null returns current data
 ; Returns:
 ;  Pointer to character data if null, otherwise pointer to next character
-	ld	iy, 0
-	add	iy, sp
+	ld	hl, 6
+	add	hl, sp
+	ld	de, (hl)	; de -> custom_character_data
+	dec	hl
+	dec	hl
+	dec	hl
+	ld	a, (hl)
 	sbc	hl, hl		; ld hl, 0
-	ld	de, (iy + 6)	; de -> custom_character_data
 	sbc	hl, de		; sets z flag if NULL
 	add	hl, de
-	ld	l, (iy + 3)	; hl = index
+	ld	l, a		; hl = index
 	add	hl, hl
 	add	hl, hl
 	add	hl, hl
@@ -6935,8 +6941,6 @@ __lshru     := $0001EC
 ; for debugging
 _boot_sprintf := $0000BC
 
-__indcallhl := _indcallHL
-
 ;-------------------------------------------------------------------------------
 ; inlined routines
 ;-------------------------------------------------------------------------------
@@ -6954,6 +6958,9 @@ _memcpy:
 .zero:
 	ld	hl, (iy + 4)  ; Return the destination pointer
 	ret
+
+__indcallhl:
+	jp	(hl)
 
 __set_bc_and_mul_hl_by_240:
 	push	hl
