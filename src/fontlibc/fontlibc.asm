@@ -408,7 +408,7 @@ fontlib_SetFont:
 ; Sets the current font to the data at the pointer given
 ; Arguments:
 ;  arg0: Pointer to font
-;  arg1: Load flags
+;  arg1: Load flags (Ignored, and treated as FONTLIB_IGNORE_LINE_SPACING)
 ; Returns:
 ;  bool:
 ;     - true if font loaded successfully
@@ -458,18 +458,20 @@ fontlib_SetFont:
 	add	hl,de
 	add	hl,bc
 	ld	(iy + strucFont.bitmapsTablePtr),hl
-; Check for the ignore ling spacing flag
-	ld	hl,arg0
-	add	hl,sp
-	ld	a,(hl)
-	or	a,a
-	jr	z,.true
+; Check for the ignore line spacing flag
+; Due to a bug, flags must be ignored, and treated as FONTLIB_IGNORE_LINE_SPACING
+	; ld	hl,arg1
+	; add	hl,sp
+	; ld	a,(hl)
+	; or	a,a
+	; jr	z,.true
 	lea	hl,iy + strucFont.spaceAbove
-	xor	a
+	xor	a,a
 	ld	(hl),a
 	inc	hl
 	ld	(hl),a
-.true:	ld	a,1
+.true:
+	ld	a,1
 	ret
 .false:
 	xor	a,a
