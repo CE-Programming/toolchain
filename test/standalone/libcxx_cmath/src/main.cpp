@@ -20,7 +20,6 @@ int run_tests() {
     const long double pos_pi = bit_cast<long double>(UINT64_C(0x400921FB54442D18));
     const long double neg_pi = bit_cast<long double>(UINT64_C(0xC00921FB54442D18));
     const long double pos_inf = bit_cast<long double>(UINT64_C(0x7FF0000000000000));
-    const long double neg_nan = bit_cast<long double>(UINT64_C(0xFFF8000000001234));
 
     C((bit_cast<std::uint64_t>(std::numbers::pi_v<long double>) == UINT64_C(0x400921FB54442D18)));
     C((bit_cast<std::uint64_t>(std::numbers::e_v<long double>) == UINT64_C(0x4005BF0A8B145769)));
