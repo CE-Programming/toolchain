@@ -1,0 +1,14 @@
+	.assume	adl=1
+	.section	.text
+
+	.global	__ishru_1_fast
+	.type	__ishru_1_fast, @function
+__ishru_1_fast:
+	jp	__ishru_1
+	.extern	__ishru_1
+
+	.global	__ishrs_1_fast
+	.type	__ishrs_1_fast, @function
+__ishrs_1_fast:
+	jp	__ishrs_1
+	.extern	__ishrs_1
