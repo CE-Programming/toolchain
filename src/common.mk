@@ -67,7 +67,7 @@ MKDIR ?= mkdir -p $1
 REMOVE ?= rm -f $1
 RMDIR ?= rm -rf $1
 COPY ?= cp $1 $2
-COPYDIR ?= cp -r $1 $2
+COPYDIR ?= cp -a $1/. $2
 QUOTE_ARG ?= '$(subst ','\'',$1)'#'
 APPEND ?= $(Q)echo $(call QUOTE_ARG,$1) >>$@
 ifeq ($(shell uname -s),Darwin)

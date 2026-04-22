@@ -33,7 +33,7 @@
 // Warn if a compiler version is used that is not supported anymore
 // LLVM RELEASE Update the minimum compiler versions
 #  if defined(_LIBCPP_CLANG_VER)
-#    if _LIBCPP_CLANG_VER < 2001
+#    if !defined(_EZ80) && _LIBCPP_CLANG_VER < 2001
 #      warning "Libc++ only supports Clang 20 and later"
 #    endif
 #  elif defined(_LIBCPP_APPLE_CLANG_VER)

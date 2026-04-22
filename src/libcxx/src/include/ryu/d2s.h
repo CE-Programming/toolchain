@@ -53,7 +53,11 @@ inline constexpr int __DOUBLE_BIAS = 1023;
 inline constexpr int __DOUBLE_POW5_INV_BITCOUNT = 122;
 inline constexpr int __DOUBLE_POW5_BITCOUNT = 121;
 
+#ifndef _EZ80
 [[nodiscard]] to_chars_result __d2s_buffered_n(char* const _First, char* const _Last, const double __f, const chars_format _Fmt);
+#else // _EZ80
+[[nodiscard]] to_chars_result __d2s_buffered_n(char* const _First, char* const _Last, const long double __f, const chars_format _Fmt);
+#endif // _EZ80
 
 _LIBCPP_END_NAMESPACE_STD
 

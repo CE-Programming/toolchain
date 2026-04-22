@@ -1,0 +1,16 @@
+#ifndef ___ASSERTION_HANDLER
+#define ___ASSERTION_HANDLER
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+[[noreturn]] void __abort_message(const char *);
+
+#define _LIBCPP_ASSERTION_HANDLER(msg) __abort_message(msg)
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif // ___ASSERTION_HANDLER
