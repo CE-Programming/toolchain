@@ -1,9 +1,0 @@
-// -*- C++ -*-
-#ifndef _EZCXX_CSTDLIB
-#define _EZCXX_CSTDLIB
-
-#include <stdlib.h>
-
-#pragma clang system_header
-
-#endif // _EZCXX_CSTDLIB

@@ -1,9 +1,0 @@
-// -*- C++ -*-
-#ifndef _EZCXX_CMATH
-#define _EZCXX_CMATH
-
-#include <math.h>
-
-#pragma clang system_header
-
-#endif // _EZCXX_CMATH
