@@ -1,10 +1,6 @@
-#include <fileioc.h>
+#include "__fileioc_stdio.h"
 
-#include <stdbool.h>
 #include <stdint.h>
-#include <stdio.h>
-
-extern FILE _file_streams[FOPEN_MAX];
 
 FILE* __attribute__((weak)) fopen(const char *__restrict filename, const char *__restrict mode)
 {

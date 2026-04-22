@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include <fileioc.h>
+#include "__fileioc_stdio.h"
 
 void __attribute__((weak)) rewind(FILE *stream)
 {
