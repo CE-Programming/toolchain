@@ -1,0 +1,72 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	_swab
+	.type	_swab, @function
+
+.if 1
+
+; void swab(const void *__restrict src, void *__restrict dst, ssize_t count)
+_swab:
+	; swab has unspecified behaviour when count is odd:
+	; - this implementation treats an odd count as if it were count - 1
+	; - does nothing when count <= 1 or count is negative
+	ld	iy, 0
+	add	iy, sp
+	sra	(iy + 11)
+	ret	m		; do nothing when negative
+	ld	bc, (iy + 9)
+	rr	b
+	rr	c
+	; BC = count / 2
+	sbc	hl, hl
+	adc	hl, bc
+	ret	z		; count <= 1
+	ld	de, (iy + 6)	; DE = dst
+	ld	hl, (iy + 3)	; HL = src
+.L.loop:
+	ld	a, (hl)		; A = src.lo
+	inc	hl
+	ldi			; dst.lo = src.hi
+	ld	(de), a		; dst.hi = A
+	inc	de
+	jp	pe, .L.loop
+	ret
+
+.else
+
+; void swab(const void *__restrict src, void *__restrict dst, ssize_t count)
+_swab:
+	; swab has unspecified behaviour when count is odd:
+	; - this implementation will copy dst[count - 1] to src[count - 1] when count is odd
+	; - does nothing when count <= 0 or count is negative
+	ld	iy, 0
+	add	iy, sp
+	sra	(iy + 11)
+	ret	m		; do nothing when negative
+	ld	bc, (iy + 9)
+	rr	b
+	rr	c
+	; BC = count / 2
+	sbc	hl, hl
+	adc	hl, bc
+	; Carry is set when count is odd
+	ld	de, (iy + 6)	; DE = dst
+	ld	hl, (iy + 3)	; HL = src
+	jr	z, .L.finish
+.L.loop:
+	ld	a, (hl)		; A = src.lo
+	inc	hl
+	ldi			; dst.lo = src.hi
+	ld	(de), a		; dst.hi = A
+	inc	de
+	jp	pe, .L.loop
+.L.finish:
+	ret	nc		; even count
+	; copy one more byte
+	ld	a, (hl)
+	ld	(de), a
+	ret
+
+.endif
