@@ -29,6 +29,7 @@ OBJECTS += $(patsubst %.cpp,build/%.cpp.o,$(wildcard *.cpp))
 OBJECTS += $(patsubst %.src,build/%.o,$(wildcard *.src))
 
 SRC_OBJECTS := $(addprefix src/,$(shell $(MAKE) -s -C src print-objects))
+ABI_OBJECTS := $(addprefix abi/,$(shell $(MAKE) -s -C abi print-objects))
 
 CXX_LIB := build/libcxx.a
 
@@ -38,7 +39,7 @@ all: $(CXX_LIB)
 
 $(CXX_LIB): src-build abi-build $(OBJECTS)
 	$(Q)$(call MKDIR,build)
-	$(Q)$(EZAR) rcs $@ $(OBJECTS) $(SRC_OBJECTS)
+	$(Q)$(EZAR) rcs $@ $(OBJECTS) $(SRC_OBJECTS) $(ABI_OBJECTS)
 
 src-build:
 	$(Q)$(MAKE) -C src all
