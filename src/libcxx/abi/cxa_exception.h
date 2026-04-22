@@ -17,6 +17,29 @@
 #include "cxxabi.h"
 #include "unwind.h"
 
+#if defined(__has_feature)
+#  if __has_feature(ptrauth_calls)
+#    include <ptrauth.h>
+#    define __cxa_ptrauth_exception_destructor __ptrauth(ptrauth_key_function_pointer, 1, 0xD1B9)
+#    define __cxa_ptrauth_unexpected_handler __ptrauth(ptrauth_key_function_pointer, 1, 0x12ED)
+#    define __cxa_ptrauth_terminate_handler __ptrauth(ptrauth_key_function_pointer, 1, 0xE4B4)
+#    define __cxa_ptrauth_action_record __ptrauth(ptrauth_key_process_dependent_code, 1, 0x9823)
+#    define __cxa_ptrauth_lsd __ptrauth(ptrauth_key_process_dependent_code, 1, 0xE50D)
+#    define __cxa_ptrauth_catch_temp __ptrauth(ptrauth_key_process_dependent_data, 1, 0x9B67)
+#    define __cxa_ptrauth_adjusted_ptr __ptrauth(ptrauth_key_process_dependent_data, 1, 0x9B68)
+#  endif
+#endif
+
+#ifndef __cxa_ptrauth_exception_destructor
+#  define __cxa_ptrauth_exception_destructor
+#  define __cxa_ptrauth_unexpected_handler
+#  define __cxa_ptrauth_terminate_handler
+#  define __cxa_ptrauth_action_record
+#  define __cxa_ptrauth_lsd
+#  define __cxa_ptrauth_catch_temp
+#  define __cxa_ptrauth_adjusted_ptr
+#endif
+
 namespace __cxxabiv1 {
 
 static const uint64_t kOurExceptionClass          = 0x434C4E47432B2B00; // CLNGC++\0
@@ -47,10 +70,10 @@ struct _LIBCXXABI_HIDDEN __cxa_exception {
     // In Wasm, a destructor returns its argument
     void *(_LIBCXXABI_DTOR_FUNC *exceptionDestructor)(void *);
 #else
-    void (_LIBCXXABI_DTOR_FUNC *__ptrauth_cxxabi_exception_destructor exceptionDestructor)(void *);
+    void (_LIBCXXABI_DTOR_FUNC * __cxa_ptrauth_exception_destructor exceptionDestructor)(void *);
 #endif
-    std::unexpected_handler __ptrauth_cxxabi_unexpected_handler unexpectedHandler;
-    std::terminate_handler __ptrauth_cxxabi_terminate_handler terminateHandler;
+    std::unexpected_handler __cxa_ptrauth_unexpected_handler unexpectedHandler;
+    std::terminate_handler __cxa_ptrauth_terminate_handler terminateHandler;
 
     __cxa_exception *nextException;
 
@@ -61,10 +84,10 @@ struct _LIBCXXABI_HIDDEN __cxa_exception {
     int propagationCount;
 #else
     int handlerSwitchValue;
-    const unsigned char *__ptrauth_cxxabi_action_record actionRecord;
-    const unsigned char *__ptrauth_cxxabi_lsd languageSpecificData;
-    void *__ptrauth_cxxabi_catch_temp catchTemp;
-    void *__ptrauth_cxxabi_adjusted_ptr adjustedPtr;
+    const unsigned char * __cxa_ptrauth_action_record actionRecord;
+    const unsigned char * __cxa_ptrauth_lsd languageSpecificData;
+    void * __cxa_ptrauth_catch_temp catchTemp;
+    void * __cxa_ptrauth_adjusted_ptr adjustedPtr;
 #endif
 
 #if !defined(__LP64__) && !defined(_WIN64) && !defined(_LIBCXXABI_ARM_EHABI)
@@ -88,9 +111,9 @@ struct _LIBCXXABI_HIDDEN __cxa_dependent_exception {
 #endif
 
     std::type_info *exceptionType;
-    void (_LIBCXXABI_DTOR_FUNC *__ptrauth_cxxabi_exception_destructor exceptionDestructor)(void *);
-    std::unexpected_handler __ptrauth_cxxabi_unexpected_handler unexpectedHandler;
-    std::terminate_handler __ptrauth_cxxabi_terminate_handler terminateHandler;
+    void (_LIBCXXABI_DTOR_FUNC * __cxa_ptrauth_exception_destructor exceptionDestructor)(void *);
+    std::unexpected_handler __cxa_ptrauth_unexpected_handler unexpectedHandler;
+    std::terminate_handler __cxa_ptrauth_terminate_handler terminateHandler;
 
     __cxa_exception *nextException;
 
@@ -101,10 +124,10 @@ struct _LIBCXXABI_HIDDEN __cxa_dependent_exception {
     int propagationCount;
 #else
     int handlerSwitchValue;
-    const unsigned char *__ptrauth_cxxabi_action_record actionRecord;
-    const unsigned char *__ptrauth_cxxabi_lsd languageSpecificData;
-    void *__ptrauth_cxxabi_catch_temp catchTemp;
-    void *__ptrauth_cxxabi_adjusted_ptr adjustedPtr;
+    const unsigned char * __cxa_ptrauth_action_record actionRecord;
+    const unsigned char * __cxa_ptrauth_lsd languageSpecificData;
+    void * __cxa_ptrauth_catch_temp catchTemp;
+    void * __cxa_ptrauth_adjusted_ptr adjustedPtr;
 #endif
 
 #if !defined(__LP64__) && !defined(_WIN64) && !defined(_LIBCXXABI_ARM_EHABI)

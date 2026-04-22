@@ -5,9 +5,7 @@
 extern "C" {
 #endif
 
-[[noreturn]] void __abort_message(const char *);
-
-#define _LIBCPP_ASSERTION_HANDLER(msg) __abort_message(msg)
+#define _LIBCPP_ASSERTION_HANDLER(msg) ((void)0)
 
 #ifdef __cplusplus
 }

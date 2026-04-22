@@ -36,12 +36,15 @@ CXX_LIB := build/libcxx.a
 
 all: $(CXX_LIB)
 
-$(CXX_LIB): src-build $(OBJECTS)
+$(CXX_LIB): src-build abi-build $(OBJECTS)
 	$(Q)$(call MKDIR,build)
 	$(Q)$(EZAR) rcs $@ $(OBJECTS) $(SRC_OBJECTS)
 
 src-build:
 	$(Q)$(MAKE) -C src all
+
+abi-build:
+	$(Q)$(MAKE) -C abi all
 
 build/%.c.src: %.c
 	$(Q)$(call MKDIR,build)
@@ -66,6 +69,7 @@ build/%.o: %.src
 clean:
 	$(Q)$(call RMDIR,build)
 	$(MAKE) -C src clean
+	$(MAKE) -C abi clean
 
 install: all
 	$(Q)$(call MKDIR,$(INSTALL_H))
@@ -74,4 +78,4 @@ install: all
 	$(Q)$(call COPY,$(call NATIVEPATH,$(CXX_LIB)),$(INSTALL_LIBCXX))
 	$(Q)$(call COPYDIR,$(call NATIVEPATH,include),$(INSTALL_CXX_H))
 
-.PHONY: all clean install src-build
+.PHONY: all clean install src-build abi-build
