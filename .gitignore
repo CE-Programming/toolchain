@@ -4,6 +4,8 @@
 .vs/
 .vscode/
 *.code-workspace
+.cache
+.codex
 
 # generated documentation
 doxygen/
@@ -43,6 +45,9 @@ linker_script
 
 # macos
 .DS_Store
+
+# windows
+desktop.ini
 
 # executables
 *.hex
