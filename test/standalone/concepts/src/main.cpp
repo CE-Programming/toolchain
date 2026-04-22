@@ -22,6 +22,7 @@ int source_location_test(char *buf) {
 #include <cstring>
 #include <type_traits>
 #include <concepts>
+#include <utility>
 
 // test derived_from
 namespace test_derived_from {
