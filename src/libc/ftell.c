@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include <fileioc.h>
+#include "__fileioc_stdio.h"
 #include <stdint.h>
 
 long int __attribute__((weak)) ftell(FILE *stream)

@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include <fileioc.h>
+#include "__fileioc_stdio.h"
 
 char* __attribute__((weak)) fgets(char *__restrict str, int num, FILE *__restrict stream)
 {

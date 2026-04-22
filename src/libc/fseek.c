@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include <fileioc.h>
+#include "__fileioc_stdio.h"
 
 int __attribute__((weak)) fseek(FILE *stream, long int offset, int origin)
 {

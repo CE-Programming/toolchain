@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include <fileioc.h>
+#include "__fileioc_stdio.h"
 
 size_t __attribute__((weak)) fread(void *ptr, size_t size, size_t count, FILE *__restrict stream)
 {

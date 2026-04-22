@@ -1,7 +1,4 @@
-#include <stdio.h>
-#include <fileioc.h>
-
-extern FILE _file_streams[FOPEN_MAX];
+#include "__fileioc_stdio.h"
 
 void __attribute__((weak)) clearerr(FILE *stream)
 {
