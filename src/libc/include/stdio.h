@@ -81,6 +81,8 @@ int remove(const char *filename);
 
 int rename(const char *old_filename, const char *new_filename);
 
+int fileno(FILE *stream);
+
 /* standard impls */
 
 int getchar(void);
