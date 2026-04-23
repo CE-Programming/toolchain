@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Makefile Options &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/design-tabs.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Debugging Features" href="debugging.html" />
+    <link rel="prev" title="Getting Started" href="getting-started.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v14.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to the CE C/C++ Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hardware.html">Calculator Hardware Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Makefile Options</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#output-configuration">Output Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#compiler-configuration">Compiler Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#miscellaneous-configuration">Miscellaneous Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="asm.html">Assembly Routines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Libraries/Headers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../libraries/index.html">CE Library Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/sys/index.html">CE Hardware Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/ti/index.html">TI Operating System Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/index.html">Miscellaneous Headers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Helpful Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ides.html">Using the Toolchain in an IDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="git.html">Using Git For Revision Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coding-guidelines.html">General Coding Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to the CE Toolchain</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Makefile Options</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="toctree-wrapper compound" id="makefile-options">
+</div>
+<div class="section" id="id1">
+<h1>Makefile Options<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h1>
+<p>The project’s makefile controls different features and settings for the output program.
+Additional rules can be added to build different components as well.</p>
+<p>To edit these options, open the <code class="code docutils literal notranslate"><span class="pre">makefile</span></code> file inside the project’s folder in a text editor.</p>
+<div class="section" id="output-configuration">
+<h2>Output Configuration<a class="headerlink" href="#output-configuration" title="Permalink to this headline"></a></h2>
+<p class="rubric">NAME</p>
+<p>This is the name of the program that will be stored on the calculator.</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">NAME</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>PRGM
+</pre></div>
+</div>
+<p class="rubric">ICON</p>
+<p>Icons make a more polished program that can be displayed in shells such as <a class="reference external" href="https://github.com/mateoconlechuga/cesium/releases/latest">Cesium</a>.</p>
+<p>Icons are a 16x16 pixel image - provide the relative path to the image from the makefile via the <code class="code docutils literal notranslate"><span class="pre">ICON</span></code> option.</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">ICON</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>icon.png
+</pre></div>
+</div>
+<p class="rubric">DESCRIPTION</p>
+<p>Change <code class="code docutils literal notranslate"><span class="pre">DESCRIPTION</span></code> to the program’s description.
+It is recommended to keep this under 25 characters.</p>
+<p>The description will be displayed in shells such as <a class="reference external" href="https://github.com/mateoconlechuga/cesium/releases/latest">Cesium</a>.</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">DESCRIPTION</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;My awesome program&quot;</span>
+</pre></div>
+</div>
+<p class="rubric">COMPRESSED</p>
+<p>Programs can tend to be quite large from a variety of factors such as sprites, bloated code, or other issues.
+The toolchain offers the ability to compress programs into a self-extracting executable.
+This does not change the execution size, but rather the executable’s storage size.</p>
+<p>To enable this feature, open the project’s makefile and edit the line:</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">COMPRESSED</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>YES
+</pre></div>
+</div>
+<p class="rubric">COMPRESSED_MODE</p>
+<p>Specifies the type of program compression to perform.
+The default is <code class="docutils literal notranslate"><span class="pre">zx7</span></code>, however <code class="docutils literal notranslate"><span class="pre">zx0</span></code> can also be used.
+<code class="docutils literal notranslate"><span class="pre">zx0</span></code> takes more time to compress, but usually has better results.</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">COMPRESSED_MODE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>zx7
+</pre></div>
+</div>
+<p class="rubric">ARCHIVED</p>
+<p>Programs can be built to be stored in the archive rather than RAM.
+To enable this feature, open the project’s makefile and change the line:</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">ARCHIVED</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>YES
+</pre></div>
+</div>
+<p class="rubric">OUTPUT_MAP</p>
+<p>Outputs a &lt;name&gt;.map file into the <code class="code docutils literal notranslate"><span class="pre">bin</span></code> directory that includes section, variable, and function addressing/size information of the compiled program.
+To speed up linking this step can be disabled.
+Default: <code class="code docutils literal notranslate"><span class="pre">YES</span></code>.</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">OUTPUT_MAP</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>YES
+</pre></div>
+</div>
+</div>
+<div class="section" id="compiler-configuration">
+<h2>Compiler Configuration<a class="headerlink" href="#compiler-configuration" title="Permalink to this headline"></a></h2>
+<p class="rubric">CFLAGS / CXXFLAGS</p>
+<p>These flags are passed to the compiler.
+<code class="code docutils literal notranslate"><span class="pre">CFLAGS</span></code> is used for C source files, <code class="code docutils literal notranslate"><span class="pre">CXXFLAGS</span></code> is used for C++ source files.</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">CFLAGS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-Oz
+<span class="nv">CXXFLAGS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>-Wall<span class="w"> </span>-Wextra<span class="w"> </span>-Oz
+</pre></div>
+</div>
+<p class="rubric">LTO</p>
+<p>This option enables link-time optimization.
+Depending on the program this can reduce the output size.
+Default: <code class="code docutils literal notranslate"><span class="pre">YES</span></code>.</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">LTO</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>YES
+</pre></div>
+</div>
+<p class="rubric">EXTRA_LDFLAGS</p>
+<p>These flags are passed directly to the fasmg linker.</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">EXTRA_LDFLAGS</span><span class="w"> </span><span class="o">=</span>
+</pre></div>
+</div>
+<p class="rubric">PREFER_OS_CRT</p>
+<p>Prefer the builtin OS CRT (Compiler-Run-Time) functions if they exist.
+This can help to decrease the output size in some circumstances, as a select number of CRT functions will execute from flash.
+Default: <code class="code docutils literal notranslate"><span class="pre">NO</span></code>.</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">PREFER_OS_CRT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>NO
+</pre></div>
+</div>
+<p class="rubric">PREFER_OS_LIBC</p>
+<p>Prefer the builtin OS LIBC functions if they exist.
+This can help to decrease the output size in some circumstances, as a select number of LIBC functions will execute from flash.
+Default: <code class="code docutils literal notranslate"><span class="pre">YES</span></code>.</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">PREFER_OS_LIBC</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>YES
+</pre></div>
+</div>
+<p class="rubric">LIBLOAD_OPTIONAL</p>
+<p>Space separated list of <code class="docutils literal notranslate"><span class="pre">libload</span></code> libraries to mark as optional in the program.
+If an optional library is not present on the device, the program will still execute and not be blocked from running by <code class="docutils literal notranslate"><span class="pre">libload</span></code>, however calls to the library’s functions will crash the program.</p>
+<ul class="simple">
+<li><p>If this option is left blank, libraries supplied to the function <code class="code docutils literal notranslate"><span class="pre">libload_IsLibLoaded</span></code> will be automatically marked as optional.</p></li>
+<li><p>Libraries specified by this option are forced to be optional, regardless of <code class="code docutils literal notranslate"><span class="pre">libload_IsLibLoaded</span></code> usage.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>See the <a class="reference internal" href="../libraries/libload.html#libload-h"><span class="std std-ref">libload library</span></a> documentation for more information.</p>
+</div>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">LIBLOAD_OPTIONAL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>graphx<span class="w"> </span>fileioc
+</pre></div>
+</div>
+</div>
+<div class="section" id="miscellaneous-configuration">
+<h2>Miscellaneous Configuration<a class="headerlink" href="#miscellaneous-configuration" title="Permalink to this headline"></a></h2>
+<p class="rubric">EXTRA_C_SOURCES</p>
+<p>Extra C source files to be compiled in that are not located in the source directory.</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">EXTRA_C_SOURCES</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>&lt;space<span class="w"> </span>separated<span class="w"> </span>list<span class="w"> </span>of<span class="w"> </span>sources&gt;
+</pre></div>
+</div>
+<p class="rubric">EXTRA_CXX_SOURCES</p>
+<p>Extra C++ source files to be compiled in that are not located in the source directory.</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">EXTRA_CXX_SOURCES</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>&lt;space<span class="w"> </span>separated<span class="w"> </span>list<span class="w"> </span>of<span class="w"> </span>sources&gt;
+</pre></div>
+</div>
+<p class="rubric">EXTRA_ASM_SOURCES</p>
+<p>Extra assembly source files to be compiled in that are not located in the source directory.</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">EXTRA_ASM_SOURCES</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>&lt;space<span class="w"> </span>separated<span class="w"> </span>list<span class="w"> </span>of<span class="w"> </span>sources&gt;
+</pre></div>
+</div>
+<p class="rubric">EXTRA_HEADERS</p>
+<p>Extra header files to be used in that are not located in the source directory.</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">EXTRA_HEADERS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>&lt;space<span class="w"> </span>separated<span class="w"> </span>list<span class="w"> </span>of<span class="w"> </span>headers&gt;
+</pre></div>
+</div>
+<p class="rubric">EXTRA_LIBLOAD_LIBS</p>
+<p>Extra libload (<code class="docutils literal notranslate"><span class="pre">.lib</span></code>) libraries to be added at link time.</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">EXTRA_LIBLOAD_LIBS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>&lt;space<span class="w"> </span>separated<span class="w"> </span>list<span class="w"> </span>of<span class="w"> </span>libraries&gt;
+</pre></div>
+</div>
+<p class="rubric">SKIP_LIBRARY_LDFLAGS</p>
+<p>Completely omit the <code class="code docutils literal notranslate"><span class="pre">-library</span></code> flags passed to fasmg when linking.
+Default: <code class="code docutils literal notranslate"><span class="pre">NO</span></code>.</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">SKIP_LIBRARY_LDFLAGS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>YES
+</pre></div>
+</div>
+<p>Extra command(s) to run when <code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">clean</span></code> is executed.</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">EXTRA_CLEAN</span><span class="w"> </span><span class="o">=</span>
+</pre></div>
+</div>
+<p class="rubric">MAKE_GFX</p>
+<p>This is the command that is run when <code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">gfx</span></code> is executed.
+It can be overridden to perform any custom graphics conversions.
+The default command navigates to the graphics directory and runs <code class="docutils literal notranslate"><span class="pre">convimg</span></code>.</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">MAKE_GFX</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span><span class="k">$(</span>GFXDIR<span class="k">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="k">$(</span>CONVIMG<span class="k">)</span>
+</pre></div>
+</div>
+<p class="rubric">DEPS</p>
+<p>Add any files that you want to be built by the toolchain to this variable.
+Define rules for the files after including the main CEdev makefile.</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">DEPS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">$(</span>BINDIR<span class="k">)</span>/levelpack.bin
+
+<span class="cp">include $(shell cedev-config --makefile)</span>
+
+<span class="nf">$(BINDIR)/levelpack.bin</span><span class="o">:</span>
+<span class="w">    </span><span class="k">$(</span>call<span class="w"> </span>MKDIR,<span class="k">$(</span>@D<span class="k">))</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;levelpack&quot;</span><span class="w"> </span>&gt;<span class="w"> </span><span class="k">$(</span>BINDIR<span class="k">)</span>/levelpack.bin
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="getting-started.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="debugging.html" class="btn btn-neutral float-right" title="Debugging Features" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v14.2
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+             <strong> 
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+             </strong> 
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

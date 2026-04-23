@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Frequently Asked Questions &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/design-tabs.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Makefile Options" href="makefile-options.html" />
+    <link rel="prev" title="Getting Started" href="getting-started.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v10.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to the CE C/C++ Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hardware.html">Calculator Hardware Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Frequently Asked Questions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#i-found-a-bug-help">I Found A Bug, Help!?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-versions-of-c-c-are-supported">What versions of C/C++ are supported?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-is-the-c-c-runtime-memory-layout">What is the C/C++ Runtime Memory Layout?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-can-i-use-fasmg-on-a-non-x86-processor">How can I use fasmg on a non-x86 processor?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#linking-assembly-source-files">Linking Assembly Source Files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#arguments">Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#returns">Returns</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="makefile-options.html">Makefile Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Libraries/Headers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../libraries/index.html">CE Libraries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/sys/index.html">CE Hardware Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/ti/index.html">TI Operating System Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/index.html">Miscellaneous Headers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Helpful Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="git.html">Using Git For Revision Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coding-guidelines.html">General Coding Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ides.html">Using the Toolchain in an IDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to the CE Toolchain</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Frequently Asked Questions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="frequently-asked-questions">
+<span id="faq"></span><h1>Frequently Asked Questions<a class="headerlink" href="#frequently-asked-questions" title="Permalink to this headline"></a></h1>
+<div class="section" id="i-found-a-bug-help">
+<h2>I Found A Bug, Help!?<a class="headerlink" href="#i-found-a-bug-help" title="Permalink to this headline"></a></h2>
+<p>Nice work, now create an <a class="reference external" href="https://github.com/CE-Programming/toolchain/issues">issue report here</a> with details on what caused the crash.
+Uploading a zip of your code and/or a minimal reproducible example is very appreciated (and is usually required).</p>
+</div>
+<div class="section" id="what-versions-of-c-c-are-supported">
+<h2>What versions of C/C++ are supported?<a class="headerlink" href="#what-versions-of-c-c-are-supported" title="Permalink to this headline"></a></h2>
+<p>The CE Toolchain supports the latest LLVM/Clang toolchain, and the status of each language can be found at the respective links: <a class="reference external" href="https://clang.llvm.org/c_status.html">C</a>, <a class="reference external" href="https://clang.llvm.org/cxx_status.html">C++</a></p>
+</div>
+<div class="section" id="what-is-the-c-c-runtime-memory-layout">
+<h2>What is the C/C++ Runtime Memory Layout?<a class="headerlink" href="#what-is-the-c-c-runtime-memory-layout" title="Permalink to this headline"></a></h2>
+<p>The CE has a limited amount of memory.</p>
+<ul class="simple">
+<li><p>The stack is roughly 4KiB.</p></li>
+<li><p>The code/data/rodata sections can be up to 64KiB.</p></li>
+<li><p>The bss/heap occupy a shared 60KiB region of memory and grow into each other.</p></li>
+</ul>
+<p>The following graphic breaks down the address space.</p>
+<img alt="../_images/mem_layout.png" class="align-center" src="../_images/mem_layout.png" />
+</div>
+<div class="section" id="how-can-i-use-fasmg-on-a-non-x86-processor">
+<h2>How can I use fasmg on a non-x86 processor?<a class="headerlink" href="#how-can-i-use-fasmg-on-a-non-x86-processor" title="Permalink to this headline"></a></h2>
+<p><a class="reference external" href="https://flatassembler.net/docs.php?article=fasmg">Fasmg</a> is a macro assembler used for assembling and linking project source files.
+The project is written in x86 assembly, which means it cannot be run directly on non-x86 processors (such as ARM).
+To mitigate this, the <a class="reference external" href="https://www.qemu.org">QEMU</a> project can be used to emulate the x86 processor in user-mode so that it can be
+used directly. If you use a Debian-based system such as Ubuntu or Linux Mint, you can install QEMU using the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>qemu-user
+</pre></div>
+</div>
+<p>Next, open the file <code class="code docutils literal notranslate"><span class="pre">CEdev/meta/makefile.mk</span></code> in the toolchain install directory and locate the following line:</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">FASMG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">$(</span>call<span class="w"> </span>NATIVEPATH,<span class="k">$(</span>BIN<span class="k">)</span>/fasmg<span class="k">)</span>
+</pre></div>
+</div>
+<p>Add the text “qemu-x86_64” directly after the equal sign, shown below.
+Now, fasmg will execute in user mode under QEMU, allowing it to successfully complete the assembly and linking steps.</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">FASMG</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>qemu-x86_64<span class="w"> </span><span class="k">$(</span>call<span class="w"> </span>NATIVEPATH,<span class="k">$(</span>BIN<span class="k">)</span>/fasmg<span class="k">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="linking-assembly-source-files">
+<h2>Linking Assembly Source Files<a class="headerlink" href="#linking-assembly-source-files" title="Permalink to this headline"></a></h2>
+<p>Assembly routines can be linked into a C/C++ program provided the following conditions are met:</p>
+<ul class="simple">
+<li><p>The file’s extension is <strong>.asm</strong>. It can be placed at any depth in the sources directory.</p></li>
+<li><p>The appropriate section is declared - either <code class="code docutils literal notranslate"><span class="pre">.text</span></code> for code, <code class="code docutils literal notranslate"><span class="pre">.data</span></code> for initialized data, or <code class="code docutils literal notranslate"><span class="pre">.rodata</span></code> for read-only data.
+This is done using the <cite>section</cite> keyword, whereby everything after the keyword will be added to the defined section.</p></li>
+<li><p>The assembly routine must be prefixed with an underscore, and have a corresponding <cite>public</cite> entry in the assembly file.</p></li>
+<li><p>Any external functions called from the assembly source must be listed as being <cite>extern</cite>.</p></li>
+<li><p>A separate header file should define a C/C++ prototype for the function if it is called from C/C++ code.</p></li>
+</ul>
+<p>Below is an example C prototype followed by the assembly implementation:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">asm_func</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">arg</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">assume</span>  <span class="n">adl</span><span class="o">=</span><span class="mi">1</span>
+
+    <span class="n">section</span> <span class="o">.</span><span class="n">text</span>
+
+    <span class="n">public</span>  <span class="n">_asm_func</span>
+<span class="n">_asm_func</span><span class="p">:</span>
+    <span class="n">pop</span>     <span class="n">hl</span>
+    <span class="n">pop</span>     <span class="n">de</span>
+    <span class="n">push</span>    <span class="n">de</span>      <span class="p">;</span> <span class="n">de</span> <span class="o">=</span> <span class="n">arg</span>
+    <span class="n">push</span>    <span class="n">hl</span>
+    <span class="n">call</span>    <span class="n">_external_func</span>
+    <span class="n">ret</span>
+
+    <span class="n">extern</span>  <span class="n">_external_func</span>
+</pre></div>
+</div>
+<div class="section" id="arguments">
+<h3>Arguments<a class="headerlink" href="#arguments" title="Permalink to this headline"></a></h3>
+<p>Arguments are pushed from last to first corresponding to the C prototype.
+In eZ80, 3 bytes are always pushed to the stack regardless of the actual size.
+However, the assembly function must be careful to only use the valid bytes that are pushed.
+For example, if a <em>short</em> type is used, the upper byte of the value pushed on the stack will contain arbitrary data.
+This table lists the locations relative to <em>sp</em> from within the called funciton.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 26%" />
+<col style="width: 48%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>C Type</p></th>
+<th class="head"><p>Size</p></th>
+<th class="head"><p>Stack Location</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>char</p></td>
+<td><p>1 byte</p></td>
+<td><p>sp + [3]</p></td>
+</tr>
+<tr class="row-odd"><td><p>short</p></td>
+<td><p>2 bytes</p></td>
+<td><p>sp + [3:4]</p></td>
+</tr>
+<tr class="row-even"><td><p>int</p></td>
+<td><p>3 bytes</p></td>
+<td><p>sp + [3:5]</p></td>
+</tr>
+<tr class="row-odd"><td><p>long</p></td>
+<td><p>4 bytes</p></td>
+<td><p>sp + [6]: sp + [3:5]</p></td>
+</tr>
+<tr class="row-even"><td><p>float</p></td>
+<td><p>4 bytes</p></td>
+<td><p>sp + [6]: sp + [3:5]</p></td>
+</tr>
+<tr class="row-odd"><td><p>double</p></td>
+<td><p>4 bytes</p></td>
+<td><p>sp + [6]: sp + [3:5]</p></td>
+</tr>
+<tr class="row-even"><td><p>pointer</p></td>
+<td><p>3 bytes</p></td>
+<td><p>sp + [3:5]</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Permalink to this headline"></a></h3>
+<p>This table lists which registers are used for return values.
+The type’s sign does not affect the registers used, but may affect the value returned.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<div class="line-block">
+<div class="line"><strong>xx</strong>: Byte must contain valid data.</div>
+<div class="line"><strong>??</strong>: Byte contents don’t matter.</div>
+</div>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 28%" />
+<col style="width: 44%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>C Type</p></th>
+<th class="head"><p>Register</p></th>
+<th class="head"><p>Register Contents</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>char</p></td>
+<td><p>A</p></td>
+<td><p>xx</p></td>
+</tr>
+<tr class="row-odd"><td><p>short</p></td>
+<td><p>HL</p></td>
+<td><p>?? xx xx</p></td>
+</tr>
+<tr class="row-even"><td><p>int</p></td>
+<td><p>HL</p></td>
+<td><p>xx xx xx</p></td>
+</tr>
+<tr class="row-odd"><td><p>long</p></td>
+<td><p>E:HL</p></td>
+<td><p>xx: xx xx xx</p></td>
+</tr>
+<tr class="row-even"><td><p>float</p></td>
+<td><p>E:HL</p></td>
+<td><p>xx: xx xx xx</p></td>
+</tr>
+<tr class="row-odd"><td><p>double</p></td>
+<td><p>E:HL</p></td>
+<td><p>xx: xx xx xx</p></td>
+</tr>
+<tr class="row-even"><td><p>pointer</p></td>
+<td><p>HL</p></td>
+<td><p>xx xx xx</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="getting-started.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="makefile-options.html" class="btn btn-neutral float-right" title="Makefile Options" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v10.0
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+             </strong> 
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

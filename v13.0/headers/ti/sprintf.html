@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ti/sprintf.h &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/design-tabs.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="ti/tokens.h" href="tokens.html" />
+    <link rel="prev" title="ti/real.h" href="real.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v13.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Welcome to the CE C/C++ Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/hardware.html">Calculator Hardware Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../static/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/makefile-options.html">Makefile Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/debugging.html">Debugging Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/asm.html">Assembly Routines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Libraries/Headers</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../libraries/index.html">CE Library Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sys/index.html">CE Hardware Headers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">TI Operating System Headers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="error.html">ti/error.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flags.html">ti/flags.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getcsc.html">ti/getcsc.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getkey.html">ti/getkey.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="screen.html">ti/screen.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="info.html">ti/info.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python.html">ti/python.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="real.html">ti/real.h</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">ti/sprintf.h</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#boot-sprintf">boot_sprintf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#replacing-printf-functions">Replacing printf functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#boot-vsprintf">boot_vsprintf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#boot-asprintf">boot_asprintf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#boot-snprintf">boot_snprintf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#printf-and-fprintf">printf and fprintf</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tokens.html">ti/tokens.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ui.html">ti/ui.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vars.html">ti/vars.h</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Miscellaneous Headers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Helpful Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../static/ides.html">Using the Toolchain in an IDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/git.html">Using Git For Revision Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/coding-guidelines.html">General Coding Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../static/contributing.html">Contributing to the CE Toolchain</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">TI Operating System Headers</a> &raquo;</li>
+      <li>ti/sprintf.h</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="ti-sprintf-h">
+<span id="sprintf-h"></span><h1>ti/sprintf.h<a class="headerlink" href="#ti-sprintf-h" title="Permalink to this headline"></a></h1>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;ti/sprintf.h&gt;</span>
+</pre></div>
+</div>
+<p>The OS comes with an implementation of ANSI C89 <cite>sprintf</cite>, which can reduce the size of a program by ~8 KiB. However, it is very limited in functionality. It does not support length modifiers, and it won’t accept <code class="code docutils literal notranslate"><span class="pre">long</span></code> or <code class="code docutils literal notranslate"><span class="pre">float</span></code> arguments.</p>
+<div class="section" id="boot-sprintf">
+<h2>boot_sprintf<a class="headerlink" href="#boot-sprintf" title="Permalink to this headline"></a></h2>
+<p>The following type specifiers are supported <code class="code docutils literal notranslate"><span class="pre">%s</span> <span class="pre">%c</span> <span class="pre">%d</span> <span class="pre">%i</span> <span class="pre">%u</span> <span class="pre">%o</span> <span class="pre">%x</span> <span class="pre">%X</span> <span class="pre">%p</span> <span class="pre">%n</span></code>. The minimum field width <code class="code docutils literal notranslate"><span class="pre">*</span></code>, precision <code class="code docutils literal notranslate"><span class="pre">.*</span></code>, alongside <code class="code docutils literal notranslate"><span class="pre">-+#0</span></code> and the space flag are also supported. However, the precision <code class="code docutils literal notranslate"><span class="pre">.*</span></code> field is ignored for integers.</p>
+<p>All length modifiers <code class="code docutils literal notranslate"><span class="pre">hh</span> <span class="pre">h</span> <span class="pre">l</span> <span class="pre">ll</span> <span class="pre">j</span> <span class="pre">z</span> <span class="pre">t</span> <span class="pre">L</span></code> and floating point specifiers <code class="code docutils literal notranslate"><span class="pre">%f</span> <span class="pre">%g</span> <span class="pre">%e</span> <span class="pre">%a</span></code> are <strong>not</strong> supported.</p>
+<p>Additionally, each individual argument will write no more than 255 characters each. This means that any strings written with <code class="code docutils literal notranslate"><span class="pre">%s</span></code> will be truncated after 255 characters.</p>
+<p><code class="code docutils literal notranslate"><span class="pre">&lt;ti/sprintf.h&gt;</span></code> provides <cite>boot_sprintf</cite>, <cite>boot_snprintf</cite>, and <cite>boot_asprintf</cite>, in addition to <cite>boot_vsprintf</cite>, <cite>boot_vsnprintf</cite>, and <cite>boot_vasprintf</cite> which accept a <cite>va_list</cite>.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="n">boot_sprintf</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="kr">restrict</span><span class="w"> </span><span class="n">buffer</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="kr">restrict</span><span class="w"> </span><span class="n">format</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">boot_vsprintf</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="kr">restrict</span><span class="w"> </span><span class="n">buffer</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="kr">restrict</span><span class="w"> </span><span class="n">format</span><span class="p">,</span><span class="w"> </span><span class="kt">va_list</span><span class="w"> </span><span class="n">args</span><span class="p">)</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="n">boot_snprintf</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="kr">restrict</span><span class="w"> </span><span class="n">buffer</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">count</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="kr">restrict</span><span class="w"> </span><span class="n">format</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">boot_vsnprintf</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="kr">restrict</span><span class="w"> </span><span class="n">buffer</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">count</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="kr">restrict</span><span class="w"> </span><span class="n">format</span><span class="p">,</span><span class="w"> </span><span class="kt">va_list</span><span class="w"> </span><span class="n">args</span><span class="p">)</span>
+
+<span class="kt">int</span><span class="w"> </span><span class="n">boot_asprintf</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">**</span><span class="kr">restrict</span><span class="w"> </span><span class="n">p_buffer</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="kr">restrict</span><span class="w"> </span><span class="n">format</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">boot_vasprintf</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">**</span><span class="kr">restrict</span><span class="w"> </span><span class="n">p_buffer</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="kr">restrict</span><span class="w"> </span><span class="n">format</span><span class="p">,</span><span class="w"> </span><span class="kt">va_list</span><span class="w"> </span><span class="n">args</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><cite>sprintf</cite> is traditionally “unsafe” because a maximum output length cannot be specified, which can cause buffer overflows. By writing to an unmapped memory address <code class="code docutils literal notranslate"><span class="pre">0xE40000</span></code>, <cite>boot_sprintf</cite> can safely write up to ~786000 bytes which can then be used to determine the length of the output.</p>
+</div>
+<div class="section" id="replacing-printf-functions">
+<h2>Replacing printf functions<a class="headerlink" href="#replacing-printf-functions" title="Permalink to this headline"></a></h2>
+<p>To replace all other printf functions with the <cite>boot_sprintf</cite> functions, add the following line to the Makefile. More information <a class="reference internal" href="../../static/printf.html#printf"><span class="std std-ref">here</span></a>.</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">HAS_PRINTF</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>NO
+</pre></div>
+</div>
+</div>
+<div class="section" id="boot-vsprintf">
+<h2>boot_vsprintf<a class="headerlink" href="#boot-vsprintf" title="Permalink to this headline"></a></h2>
+<p>Because the OS does not provide <cite>vsprintf</cite>, <cite>boot_vsprintf</cite> is implemented by counting the number of arguments in the format string, and then copying the arguments from <cite>va_list</cite> onto the stack so they can be passed into <cite>boot_sprintf</cite>.</p>
+</div>
+<div class="section" id="boot-asprintf">
+<h2>boot_asprintf<a class="headerlink" href="#boot-asprintf" title="Permalink to this headline"></a></h2>
+<p><cite>boot_asprintf</cite> functions similarly to <a class="reference external" href="https://www.man7.org/linux/man-pages/man3/asprintf.3.html">asprintf</a>. It will automatically allocate a buffer containing the output from <cite>boot_sprintf</cite>. The buffer shall be deallocated with <code class="code docutils literal notranslate"><span class="pre">free</span></code>. The returned buffer will be <code class="code docutils literal notranslate"><span class="pre">NULL</span></code> if an allocation or formatting error occurs.</p>
+</div>
+<div class="section" id="boot-snprintf">
+<h2>boot_snprintf<a class="headerlink" href="#boot-snprintf" title="Permalink to this headline"></a></h2>
+<p><cite>boot_snprintf</cite> is similar to <cite>snprintf</cite>, except that it returns an empty string if the result of <cite>boot_sprintf</cite> won’t fit inside the buffer. Otherwise passing in <code class="code docutils literal notranslate"><span class="pre">boot_snprintf(NULL,</span> <span class="pre">0,</span> <span class="pre">format,</span> <span class="pre">args)</span></code> can be used to query the length of the output without writing to a buffer.</p>
+<p>The truncating behavior of C99 <cite>snprintf</cite> can be replicated with <cite>boot_asprintf</cite></p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">char</span><span class="w"> </span><span class="n">buf</span><span class="p">[</span><span class="mi">20</span><span class="p">];</span>
+<span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">temp</span><span class="p">;</span>
+<span class="n">boot_asprintf</span><span class="p">(</span><span class="o">&amp;</span><span class="n">temp</span><span class="p">,</span><span class="w"> </span><span class="n">format</span><span class="p">,</span><span class="w"> </span><span class="p">...);</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">temp</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">strncpy</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="n">temp</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">));</span>
+<span class="w">    </span><span class="n">buf</span><span class="p">[</span><span class="k">sizeof</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;\0&#39;</span><span class="p">;</span><span class="w"> </span><span class="c1">// null terminate the end of the buffer</span>
+<span class="w">    </span><span class="n">free</span><span class="p">(</span><span class="n">temp</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="printf-and-fprintf">
+<h2>printf and fprintf<a class="headerlink" href="#printf-and-fprintf" title="Permalink to this headline"></a></h2>
+<p><cite>printf</cite> and <cite>fprintf</cite> can be replicated by using <cite>fputs</cite></p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="kt">char</span><span class="w"> </span><span class="n">output</span><span class="p">[</span><span class="mi">50</span><span class="p">];</span>
+<span class="n">boot_snprintf</span><span class="p">(</span><span class="n">output</span><span class="p">,</span><span class="w"> </span><span class="n">format</span><span class="p">,</span><span class="w"> </span><span class="p">...);</span>
+<span class="c1">// fprintf(stdout, ...) == printf(...)</span>
+<span class="n">fputs</span><span class="p">(</span><span class="n">stdout</span><span class="p">,</span><span class="w"> </span><span class="n">output</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="real.html" class="btn btn-neutral float-left" title="ti/real.h" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tokens.html" class="btn btn-neutral float-right" title="ti/tokens.h" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v13.0
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+             </strong> 
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

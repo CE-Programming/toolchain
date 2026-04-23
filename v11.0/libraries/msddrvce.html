@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>msddrvce.h &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/design-tabs.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="fatdrvce.h" href="fatdrvce.html" />
+    <link rel="prev" title="srldrvce.h" href="srldrvce.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v11.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to the CE C/C++ Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/hardware.html">Calculator Hardware Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../static/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/makefile-options.html">Makefile Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/ides.html">Using the Toolchain in an IDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/debugging.html">Debugging Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/asm.html">Assembly Routines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Libraries/Headers</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">CE Library Headers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="graphx.html">graphx.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fontlibc.html">fontlibc.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fileioc.html">fileioc.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="keypadc.html">keypadc.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="libload.html">libload.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usbdrvce.html">usbdrvce.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="srldrvce.html">srldrvce.h</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">msddrvce.h</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#known-limitations">Known Limitations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#supported-devices">Supported Devices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="fatdrvce.html">fatdrvce.h</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/sys/index.html">CE Hardware Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/ti/index.html">TI Operating System Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/index.html">Miscellaneous Headers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Helpful Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../static/git.html">Using Git For Revision Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/coding-guidelines.html">General Coding Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/contributing.html">Contributing to the CE Toolchain</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">CE Library Headers</a> &raquo;</li>
+      <li>msddrvce.h</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="msddrvce-h">
+<span id="id1"></span><h1>msddrvce.h<a class="headerlink" href="#msddrvce-h" title="Permalink to this headline"></a></h1>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;msddrvce.h&gt;</span>
+</pre></div>
+</div>
+<p>The <strong>msddrvce</strong> library implements routines for writing and reading data to/from Mass Storage Devices (MSD).
+Common MSDs include flash drives, SD cards, hard drives, and similar block-level storage devices.
+Both synchronous and asynchronous block read/write functions are provided by this library.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#known-limitations" id="id2">Known Limitations</a></p></li>
+<li><p><a class="reference internal" href="#supported-devices" id="id3">Supported Devices</a></p></li>
+<li><p><a class="reference internal" href="#api-documentation" id="id4">API Documentation</a></p></li>
+</ul>
+</div>
+<div class="section" id="known-limitations">
+<h2><a class="toc-backref" href="#id2">Known Limitations</a><a class="headerlink" href="#known-limitations" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>The maximum drive size is 2TiB.</p></li>
+<li><p>Only drives utilizing 512 byte logical blocks are supported.</p></li>
+</ul>
+</div>
+<div class="section" id="supported-devices">
+<h2><a class="toc-backref" href="#id3">Supported Devices</a><a class="headerlink" href="#supported-devices" title="Permalink to this headline"></a></h2>
+<p>The following drives have been verified to work when used with a standard OTG adapter connector.
+Other devices may also work but may not have been tested.
+The <strong>msd_bandwidth</strong> program found in the msddrvce examples directory can be used to determine if the device is suitable.
+This program can also be used to test the bandwidth for reading/writing blocks on the device, given in the below table:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 51%" />
+<col style="width: 15%" />
+<col style="width: 17%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>MSD Device</p></th>
+<th class="head"><p>USB Version</p></th>
+<th class="head"><p>Write KiB/sec</p></th>
+<th class="head"><p>Read KiB/sec</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Kingston DataTraveler 32GB</p></td>
+<td><p>3.2 (Gen 1)</p></td>
+<td><p>244.25</p></td>
+<td><p>253.84</p></td>
+</tr>
+<tr class="row-odd"><td><p>PNY Turbo 32GB</p></td>
+<td><p>3.0</p></td>
+<td><p>163.12</p></td>
+<td><p>254.56</p></td>
+</tr>
+<tr class="row-even"><td><p>PNY Attache 16GB</p></td>
+<td><p>2.0</p></td>
+<td><p>85.16</p></td>
+<td><p>244.70</p></td>
+</tr>
+<tr class="row-odd"><td><p>PNY Elite-X Fit 64GB</p></td>
+<td><p>3.1</p></td>
+<td><p>131.71</p></td>
+<td><p>252.86</p></td>
+</tr>
+<tr class="row-even"><td><p>onn. USB 2.0 Flash Drive 16 GB</p></td>
+<td><p>2.0</p></td>
+<td><p>190.16</p></td>
+<td><p>251.98</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sandisk Ultra 32GB</p></td>
+<td><p>3.0</p></td>
+<td><p>222.57</p></td>
+<td><p>253.29</p></td>
+</tr>
+<tr class="row-even"><td><p>Sandisk Cruzer Glide 32GB</p></td>
+<td><p>2.0</p></td>
+<td><p>232.94</p></td>
+<td><p>252.94</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="api-documentation">
+<h2><a class="toc-backref" href="#id4">API Documentation</a><a class="headerlink" href="#api-documentation" title="Permalink to this headline"></a></h2>
+<p>Mass Storage Device (MSD) Driver. </p>
+<p><dl class="simple">
+<dt><strong>Author</strong></dt><dd><p>Matt “MateoConLechuga” Waltz </p>
+</dd>
+<dt><strong>Author</strong></dt><dd><p>Jacob “jacobly” Young </p>
+</dd>
+</dl>
+</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.MSD_BLOCK_SIZE">
+<span class="target" id="msddrvce_8h_1aa6ac430bf06692e6e75cecadc6cdb34e"></span><span class="sig-name descname"><span class="n"><span class="pre">MSD_BLOCK_SIZE</span></span></span><a class="headerlink" href="#c.MSD_BLOCK_SIZE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Block size in bytes. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv414msd_transfer_t">
+<span id="_CPPv314msd_transfer_t"></span><span id="_CPPv214msd_transfer_t"></span><span id="msd_transfer_t"></span><span class="target" id="msddrvce_8h_1a94ba757664a9d618fdfabab64e4a2f42"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv412msd_transfer" title="msd_transfer"><span class="n"><span class="pre">msd_transfer</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">msd_transfer_t</span></span></span><a class="headerlink" href="#_CPPv414msd_transfer_t" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-enums">Enums</p>
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv411msd_error_t">
+<span id="_CPPv311msd_error_t"></span><span id="_CPPv211msd_error_t"></span><span class="target" id="msddrvce_8h_1a43ea5001a52089378666733a353481bb"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">msd_error_t</span></span></span><a class="headerlink" href="#_CPPv411msd_error_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Mass Storage Driver return codes. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11msd_error_t11MSD_SUCCESSE">
+<span id="_CPPv3N11msd_error_t11MSD_SUCCESSE"></span><span id="_CPPv2N11msd_error_t11MSD_SUCCESSE"></span><span class="target" id="msddrvce_8h_1a43ea5001a52089378666733a353481bbae32101a6713c9b21a6d7ae33e0b762ea"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MSD_SUCCESS</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N11msd_error_t11MSD_SUCCESSE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Operation was successful. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11msd_error_t23MSD_ERROR_INVALID_PARAME">
+<span id="_CPPv3N11msd_error_t23MSD_ERROR_INVALID_PARAME"></span><span id="_CPPv2N11msd_error_t23MSD_ERROR_INVALID_PARAME"></span><span class="target" id="msddrvce_8h_1a43ea5001a52089378666733a353481bbaef5b33a1e2b6c2d50265f57e8cb94590"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MSD_ERROR_INVALID_PARAM</span></span></span><a class="headerlink" href="#_CPPv4N11msd_error_t23MSD_ERROR_INVALID_PARAME" title="Permalink to this definition"></a><br /></dt>
+<dd><p>An invalid argument was provided. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11msd_error_t20MSD_ERROR_USB_FAILEDE">
+<span id="_CPPv3N11msd_error_t20MSD_ERROR_USB_FAILEDE"></span><span id="_CPPv2N11msd_error_t20MSD_ERROR_USB_FAILEDE"></span><span class="target" id="msddrvce_8h_1a43ea5001a52089378666733a353481bba9c7e3d61f8ae1013badc81f5b031b4c6"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MSD_ERROR_USB_FAILED</span></span></span><a class="headerlink" href="#_CPPv4N11msd_error_t20MSD_ERROR_USB_FAILEDE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>An error occurred in usbdrvce. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11msd_error_t21MSD_ERROR_SCSI_FAILEDE">
+<span id="_CPPv3N11msd_error_t21MSD_ERROR_SCSI_FAILEDE"></span><span id="_CPPv2N11msd_error_t21MSD_ERROR_SCSI_FAILEDE"></span><span class="target" id="msddrvce_8h_1a43ea5001a52089378666733a353481bba0e113b51cc00446bab32434a99bd10db"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MSD_ERROR_SCSI_FAILED</span></span></span><a class="headerlink" href="#_CPPv4N11msd_error_t21MSD_ERROR_SCSI_FAILEDE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>An error occurred in scsi transfer. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11msd_error_t30MSD_ERROR_SCSI_CHECK_CONDITIONE">
+<span id="_CPPv3N11msd_error_t30MSD_ERROR_SCSI_CHECK_CONDITIONE"></span><span id="_CPPv2N11msd_error_t30MSD_ERROR_SCSI_CHECK_CONDITIONE"></span><span class="target" id="msddrvce_8h_1a43ea5001a52089378666733a353481bba670fa63bb4718a555005bb99a101fda7"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MSD_ERROR_SCSI_CHECK_CONDITION</span></span></span><a class="headerlink" href="#_CPPv4N11msd_error_t30MSD_ERROR_SCSI_CHECK_CONDITIONE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>SCSI command failed. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11msd_error_t23MSD_ERROR_NOT_SUPPORTEDE">
+<span id="_CPPv3N11msd_error_t23MSD_ERROR_NOT_SUPPORTEDE"></span><span id="_CPPv2N11msd_error_t23MSD_ERROR_NOT_SUPPORTEDE"></span><span class="target" id="msddrvce_8h_1a43ea5001a52089378666733a353481bbaa5604a6d85e2d9a48df9e29648c1af36"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MSD_ERROR_NOT_SUPPORTED</span></span></span><a class="headerlink" href="#_CPPv4N11msd_error_t23MSD_ERROR_NOT_SUPPORTEDE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>The operation is not supported. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11msd_error_t24MSD_ERROR_INVALID_DEVICEE">
+<span id="_CPPv3N11msd_error_t24MSD_ERROR_INVALID_DEVICEE"></span><span id="_CPPv2N11msd_error_t24MSD_ERROR_INVALID_DEVICEE"></span><span class="target" id="msddrvce_8h_1a43ea5001a52089378666733a353481bba621bbb67e189bf7eb164d7242aa6e4b6"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MSD_ERROR_INVALID_DEVICE</span></span></span><a class="headerlink" href="#_CPPv4N11msd_error_t24MSD_ERROR_INVALID_DEVICEE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>An invalid usb device was specified. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11msd_error_t17MSD_ERROR_TIMEOUTE">
+<span id="_CPPv3N11msd_error_t17MSD_ERROR_TIMEOUTE"></span><span id="_CPPv2N11msd_error_t17MSD_ERROR_TIMEOUTE"></span><span class="target" id="msddrvce_8h_1a43ea5001a52089378666733a353481bbafbc4f5fd1f8b5de759485e32aa84c88c"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MSD_ERROR_TIMEOUT</span></span></span><a class="headerlink" href="#_CPPv4N11msd_error_t17MSD_ERROR_TIMEOUTE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>The transfer timed out. </p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv48msd_OpenP5msd_t12usb_device_t">
+<span id="_CPPv38msd_OpenP5msd_t12usb_device_t"></span><span id="_CPPv28msd_OpenP5msd_t12usb_device_t"></span><span id="msd_Open__msd_tP.usb_device_t"></span><span class="target" id="msddrvce_8h_1ab12e34440cb5dee746e4f5abb8e86f3e"></span><a class="reference internal" href="#_CPPv411msd_error_t" title="msd_error_t"><span class="n"><span class="pre">msd_error_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">msd_Open</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv45msd_t" title="msd_t"><span class="n"><span class="pre">msd_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">msd</span></span>, <a class="reference internal" href="usbdrvce.html#_CPPv412usb_device_t" title="usb_device_t"><span class="n"><span class="pre">usb_device_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">usb</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48msd_OpenP5msd_t12usb_device_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Initialize a Mass Storage Device. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msd</strong> – Uninitilaized MSD device structure. </p></li>
+<li><p><strong>usb</strong> – Initialized USB device structure. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>MSD_SUCCESS on success, otherwise error. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49msd_CloseP5msd_t">
+<span id="_CPPv39msd_CloseP5msd_t"></span><span id="_CPPv29msd_CloseP5msd_t"></span><span id="msd_Close__msd_tP"></span><span class="target" id="msddrvce_8h_1a474a43ea2aa01cb8fdf8293ae4eb3b7b"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">msd_Close</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv45msd_t" title="msd_t"><span class="n"><span class="pre">msd_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">msd</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49msd_CloseP5msd_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Closes and deinitializes a Mass Storage Device. </p>
+<p>This function should also be called in the <code class="docutils literal notranslate"><span class="pre">USB_DEVICE_DISCONNECTED_EVENT</span></code> in the USB handler callback. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>msd</strong> – Initialized MSD device structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49msd_ResetP5msd_t">
+<span id="_CPPv39msd_ResetP5msd_t"></span><span id="_CPPv29msd_ResetP5msd_t"></span><span id="msd_Reset__msd_tP"></span><span class="target" id="msddrvce_8h_1a1323759a95f8d6453e221526f2b6078d"></span><a class="reference internal" href="#_CPPv411msd_error_t" title="msd_error_t"><span class="n"><span class="pre">msd_error_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">msd_Reset</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv45msd_t" title="msd_t"><span class="n"><span class="pre">msd_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">msd</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49msd_ResetP5msd_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Attempts to reset and restore normal working order of the device. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>msd</strong> – Initialized MSD device structure. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>MSD_SUCCESS on success, otherwise error. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv48msd_InfoP5msd_tP10msd_info_t">
+<span id="_CPPv38msd_InfoP5msd_tP10msd_info_t"></span><span id="_CPPv28msd_InfoP5msd_tP10msd_info_t"></span><span id="msd_Info__msd_tP.msd_info_tP"></span><span class="target" id="msddrvce_8h_1a78e6f70192edaa621e1722f493b0fda0"></span><a class="reference internal" href="#_CPPv411msd_error_t" title="msd_error_t"><span class="n"><span class="pre">msd_error_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">msd_Info</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv45msd_t" title="msd_t"><span class="n"><span class="pre">msd_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">msd</span></span>, <a class="reference internal" href="#_CPPv410msd_info_t" title="msd_info_t"><span class="n"><span class="pre">msd_info_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">info</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48msd_InfoP5msd_tP10msd_info_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets the number of and size of each logical block on the device. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msd</strong> – Initialized MSD device structure. </p></li>
+<li><p><strong>info</strong> – Pointer to store MSD information to. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>MSD_SUCCESS on success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413msd_ReadAsyncP14msd_transfer_t">
+<span id="_CPPv313msd_ReadAsyncP14msd_transfer_t"></span><span id="_CPPv213msd_ReadAsyncP14msd_transfer_t"></span><span id="msd_ReadAsync__msd_transfer_tP"></span><span class="target" id="msddrvce_8h_1a11411141b26580723d35ebe72d216e15"></span><a class="reference internal" href="#_CPPv411msd_error_t" title="msd_error_t"><span class="n"><span class="pre">msd_error_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">msd_ReadAsync</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv414msd_transfer_t" title="msd_transfer_t"><span class="n"><span class="pre">msd_transfer_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">xfer</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413msd_ReadAsyncP14msd_transfer_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Asynchronous block read. </p>
+<p>You must set the following <code class="docutils literal notranslate"><span class="pre">xfer</span></code> elements: <code class="docutils literal notranslate"><span class="pre">msd</span></code>, <code class="docutils literal notranslate"><span class="pre">lba</span></code>, <code class="docutils literal notranslate"><span class="pre">buffer</span></code>, <code class="docutils literal notranslate"><span class="pre">count</span></code>, <code class="docutils literal notranslate"><span class="pre">callback</span></code>. The optional element <code class="docutils literal notranslate"><span class="pre">userptr</span></code> can be used to store user-defined data for access in the callback. The <code class="docutils literal notranslate"><span class="pre">xfer</span></code> argument must remain valid (cannot be free’d or lose scope) until the callback is issued. You can free <code class="docutils literal notranslate"><span class="pre">xfer</span></code> inside the callback as needed. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>xfer</strong> – Initialized transaction structure. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>MSD_SUCCESS if the transfer has been added to the queue. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414msd_WriteAsyncP14msd_transfer_t">
+<span id="_CPPv314msd_WriteAsyncP14msd_transfer_t"></span><span id="_CPPv214msd_WriteAsyncP14msd_transfer_t"></span><span id="msd_WriteAsync__msd_transfer_tP"></span><span class="target" id="msddrvce_8h_1ad718db37e28b5dc88196940ebb089cf7"></span><a class="reference internal" href="#_CPPv411msd_error_t" title="msd_error_t"><span class="n"><span class="pre">msd_error_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">msd_WriteAsync</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv414msd_transfer_t" title="msd_transfer_t"><span class="n"><span class="pre">msd_transfer_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">xfer</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414msd_WriteAsyncP14msd_transfer_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Asynchronous block write. </p>
+<p>You must set the following <code class="docutils literal notranslate"><span class="pre">xfer</span></code> elements: <code class="docutils literal notranslate"><span class="pre">msd</span></code>, <code class="docutils literal notranslate"><span class="pre">lba</span></code>, <code class="docutils literal notranslate"><span class="pre">buffer</span></code>, <code class="docutils literal notranslate"><span class="pre">count</span></code>, <code class="docutils literal notranslate"><span class="pre">callback</span></code>. The optional element <code class="docutils literal notranslate"><span class="pre">userptr</span></code> can be used to store user-defined data for access in the callback. The <code class="docutils literal notranslate"><span class="pre">xfer</span></code> argument must remain valid (cannot be free’d or lose scope) until the callback is issued. You can free <code class="docutils literal notranslate"><span class="pre">xfer</span></code> inside the callback as needed. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>xfer</strong> – Initialized transaction structure. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>MSD_SUCCESS if the transfer has been added to the queue. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv48msd_ReadP5msd_t8uint32_t8uint24_tPv">
+<span id="_CPPv38msd_ReadP5msd_t8uint32_t8uint24_tPv"></span><span id="_CPPv28msd_ReadP5msd_t8uint32_t8uint24_tPv"></span><span id="msd_Read__msd_tP.uint32_t.uint24_t.voidP"></span><span class="target" id="msddrvce_8h_1a779e2ca835a697b4efbdbb6fd93868ff"></span><span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">msd_Read</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv45msd_t" title="msd_t"><span class="n"><span class="pre">msd_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">msd</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">lba</span></span>, <span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">buffer</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48msd_ReadP5msd_t8uint32_t8uint24_tPv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Synchronous block read. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msd</strong> – Initialized MSD structure. </p></li>
+<li><p><strong>lba</strong> – Logical Block Address (LBA) of starting block to read. </p></li>
+<li><p><strong>count</strong> – Number of blocks to read. </p></li>
+<li><p><strong>buffer</strong> – Buffer to read into. Must be at least <code class="docutils literal notranslate"><span class="pre">MSD_BLOCK_SIZE</span></code> * <code class="docutils literal notranslate"><span class="pre">count</span></code> bytes. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Number of blocks read, on success should equal <code class="docutils literal notranslate"><span class="pre">count</span></code>. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49msd_WriteP5msd_t8uint32_t8uint24_tPKv">
+<span id="_CPPv39msd_WriteP5msd_t8uint32_t8uint24_tPKv"></span><span id="_CPPv29msd_WriteP5msd_t8uint32_t8uint24_tPKv"></span><span id="msd_Write__msd_tP.uint32_t.uint24_t.voidCP"></span><span class="target" id="msddrvce_8h_1aa8049cb00a9d78eaab5d000bd5425c46"></span><span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">msd_Write</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv45msd_t" title="msd_t"><span class="n"><span class="pre">msd_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">msd</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">lba</span></span>, <span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">count</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">buffer</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49msd_WriteP5msd_t8uint32_t8uint24_tPKv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Synchronous block write. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msd</strong> – Iniailized MSD structure. </p></li>
+<li><p><strong>lba</strong> – Logical Block Address (LBA) of starting block to read. </p></li>
+<li><p><strong>count</strong> – Number of blocks to write. </p></li>
+<li><p><strong>buffer</strong> – Buffer to write. Must be at least <code class="docutils literal notranslate"><span class="pre">MSD_BLOCK_SIZE</span></code> * <code class="docutils literal notranslate"><span class="pre">count</span></code> bytes. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Number of blocks written, on success should equal <code class="docutils literal notranslate"><span class="pre">count</span></code>. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv418msd_FindPartitionsP5msd_tP15msd_partition_t7uint8_t">
+<span id="_CPPv318msd_FindPartitionsP5msd_tP15msd_partition_t7uint8_t"></span><span id="_CPPv218msd_FindPartitionsP5msd_tP15msd_partition_t7uint8_t"></span><span id="msd_FindPartitions__msd_tP.msd_partition_tP.uint8_t"></span><span class="target" id="msddrvce_8h_1a5bb6fcf973bb1d3d54e75fefac1dffce"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">msd_FindPartitions</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv45msd_t" title="msd_t"><span class="n"><span class="pre">msd_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">msd</span></span>, <a class="reference internal" href="#_CPPv415msd_partition_t" title="msd_partition_t"><span class="n"><span class="pre">msd_partition_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">partitions</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418msd_FindPartitionsP5msd_tP15msd_partition_t7uint8_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns a list of partitions detected on the device. </p>
+<p>You must allocate space for <code class="docutils literal notranslate"><span class="pre">partitions</span></code> before calling this function, as well as passing a valid msd_t returned from msd_Open. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Currently MBR (msdos) and GUID (gpt) partition tables are supported. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msd</strong> – Initialized MSD structure returned from msd_Open. </p></li>
+<li><p><strong>partitions</strong> – Returned array of partitions available. </p></li>
+<li><p><strong>max</strong> – The maximum number of partitions that can be found. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Number of partitions detected; <code class="docutils literal notranslate"><span class="pre">partitions</span></code> will be filled with valid partition information up to the number detected. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv45msd_t">
+<span id="_CPPv35msd_t"></span><span id="_CPPv25msd_t"></span><span id="msd_t"></span><span class="target" id="structmsd__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">msd_t</span></span></span><a class="headerlink" href="#_CPPv45msd_t" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv410msd_info_t">
+<span id="_CPPv310msd_info_t"></span><span id="_CPPv210msd_info_t"></span><span id="msd_info_t"></span><span class="target" id="structmsd__info__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">msd_info_t</span></span></span><a class="headerlink" href="#_CPPv410msd_info_t" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10msd_info_t5bsizeE">
+<span id="_CPPv3N10msd_info_t5bsizeE"></span><span id="_CPPv2N10msd_info_t5bsizeE"></span><span id="msd_info_t::bsize__uint32_t"></span><span class="target" id="structmsd__info__t_1af3e882c7b5f140e47d097c1060086cf6"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bsize</span></span></span><a class="headerlink" href="#_CPPv4N10msd_info_t5bsizeE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Size of each block in bytes. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N10msd_info_t4bnumE">
+<span id="_CPPv3N10msd_info_t4bnumE"></span><span id="_CPPv2N10msd_info_t4bnumE"></span><span id="msd_info_t::bnum__uint32_t"></span><span class="target" id="structmsd__info__t_1a94a10964616e7af76cada05bbd3b06ce"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bnum</span></span></span><a class="headerlink" href="#_CPPv4N10msd_info_t4bnumE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Number of blocks on MSD. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv412msd_transfer">
+<span id="_CPPv312msd_transfer"></span><span id="_CPPv212msd_transfer"></span><span id="msd_transfer"></span><span class="target" id="structmsd__transfer"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">msd_transfer</span></span></span><a class="headerlink" href="#_CPPv412msd_transfer" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12msd_transfer3msdE">
+<span id="_CPPv3N12msd_transfer3msdE"></span><span id="_CPPv2N12msd_transfer3msdE"></span><span id="msd_transfer::msd__msd_tP"></span><span class="target" id="structmsd__transfer_1af60b49e60f599b7f8440c03ab161388c"></span><a class="reference internal" href="#_CPPv45msd_t" title="msd_t"><span class="n"><span class="pre">msd_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">msd</span></span></span><a class="headerlink" href="#_CPPv4N12msd_transfer3msdE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Initialized MSD device. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12msd_transfer3lbaE">
+<span id="_CPPv3N12msd_transfer3lbaE"></span><span id="_CPPv2N12msd_transfer3lbaE"></span><span id="msd_transfer::lba__uint32_t"></span><span class="target" id="structmsd__transfer_1abbca9589a5795071f991fbaf183d757e"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">lba</span></span></span><a class="headerlink" href="#_CPPv4N12msd_transfer3lbaE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Logical block address. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12msd_transfer6bufferE">
+<span id="_CPPv3N12msd_transfer6bufferE"></span><span id="_CPPv2N12msd_transfer6bufferE"></span><span id="msd_transfer::buffer__voidP"></span><span class="target" id="structmsd__transfer_1a3a251925ab8b0ae68932cf76e5d2264a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">buffer</span></span></span><a class="headerlink" href="#_CPPv4N12msd_transfer6bufferE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Pointer to data location to read/write. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12msd_transfer5countE">
+<span id="_CPPv3N12msd_transfer5countE"></span><span id="_CPPv2N12msd_transfer5countE"></span><span id="msd_transfer::count__uint24_t"></span><span class="target" id="structmsd__transfer_1a3ed3b2e1e3f1954e0f346637cc917240"></span><span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">count</span></span></span><a class="headerlink" href="#_CPPv4N12msd_transfer5countE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Number of blocks to transfer. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12msd_transfer8callbackE">
+<span id="_CPPv3N12msd_transfer8callbackE"></span><span id="_CPPv2N12msd_transfer8callbackE"></span><span class="target" id="structmsd__transfer_1a018615c73e3d80f0170547b414ea3788"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">callback</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv411msd_error_t" title="msd_error_t"><span class="n"><span class="pre">msd_error_t</span></span></a><span class="w"> </span><span class="n"><span class="pre">error</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv412msd_transfer" title="msd_transfer"><span class="n"><span class="pre">msd_transfer</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">xfer</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N12msd_transfer8callbackE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Called when transfer completes. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12msd_transfer7userptrE">
+<span id="_CPPv3N12msd_transfer7userptrE"></span><span id="_CPPv2N12msd_transfer7userptrE"></span><span id="msd_transfer::userptr__voidP"></span><span class="target" id="structmsd__transfer_1a3a542d47eeafdc1bb0c721aeeaaccca0"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">userptr</span></span></span><a class="headerlink" href="#_CPPv4N12msd_transfer7userptrE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Custom user data for callback (optional) </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv415msd_partition_t">
+<span id="_CPPv315msd_partition_t"></span><span id="_CPPv215msd_partition_t"></span><span id="msd_partition_t"></span><span class="target" id="structmsd__partition__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">msd_partition_t</span></span></span><a class="headerlink" href="#_CPPv415msd_partition_t" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N15msd_partition_t9first_lbaE">
+<span id="_CPPv3N15msd_partition_t9first_lbaE"></span><span id="_CPPv2N15msd_partition_t9first_lbaE"></span><span id="msd_partition_t::first_lba__uint32_t"></span><span class="target" id="structmsd__partition__t_1a55affcb289706f4caf1c51ea9d7fad81"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">first_lba</span></span></span><a class="headerlink" href="#_CPPv4N15msd_partition_t9first_lbaE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>First Logical Block Address (LBA) of partition. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N15msd_partition_t8last_lbaE">
+<span id="_CPPv3N15msd_partition_t8last_lbaE"></span><span id="_CPPv2N15msd_partition_t8last_lbaE"></span><span id="msd_partition_t::last_lba__uint32_t"></span><span class="target" id="structmsd__partition__t_1a900b1d7d4d2b69177c8fc26c2ce3215b"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">last_lba</span></span></span><a class="headerlink" href="#_CPPv4N15msd_partition_t8last_lbaE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Last Logical Block Address (LBA) of partition. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="srldrvce.html" class="btn btn-neutral float-left" title="srldrvce.h" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="fatdrvce.html" class="btn btn-neutral float-right" title="fatdrvce.h" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v11.0
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+             </strong> 
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

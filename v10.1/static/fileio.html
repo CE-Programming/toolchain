@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Using File I/O Functions &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/design-tabs.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Debugging" href="debugging.html" />
+    <link rel="prev" title="Using printf Functions" href="printf.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v10.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to the CE C/C++ Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hardware.html">Calculator Hardware Overview</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="makefile-options.html">Makefile Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="printf.html">Using printf Functions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Using File I/O Functions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#what-are-file-i-o-functions">What are File I/O Functions?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-custom-file-i-o">Using Custom File I/O</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Libraries/Headers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../libraries/index.html">CE Libraries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/sys/index.html">CE Hardware Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/ti/index.html">TI Operating System Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/index.html">Miscellaneous Headers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Helpful Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="git.html">Using Git For Revision Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coding-guidelines.html">General Coding Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ides.html">Using the Toolchain in an IDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing to the CE Toolchain</a></li>
+<li class="toctree-l1"><a class="reference internal" href="asm.html">Assembly</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Using File I/O Functions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="using-file-i-o-functions">
+<span id="fileio"></span><h1>Using File I/O Functions<a class="headerlink" href="#using-file-i-o-functions" title="Permalink to this headline"></a></h1>
+<div class="section" id="what-are-file-i-o-functions">
+<h2>What are File I/O Functions?<a class="headerlink" href="#what-are-file-i-o-functions" title="Permalink to this headline"></a></h2>
+<p>File I/O functions are any of the standard <cite>fopen</cite>, <cite>fgets</cite>, <cite>fread</cite>, and related file functions.
+These functions are meant to perform OS-level file access for reading and writing.
+However, the CE doesn’t expose any standard UNIX or similar file capabilities.</p>
+<p>To mitigate this, the CE Toolchain includes these functions as wrappers around the <a class="reference internal" href="../libraries/fileioc.html#fileioc-h"><span class="std std-ref">fileioc library</span></a>.
+This allows AppVars to act as file storage for read and write operations.</p>
+<p>For <code class="code docutils literal notranslate"><span class="pre">stdin</span></code>, <code class="code docutils literal notranslate"><span class="pre">stdout</span></code>, and <code class="code docutils literal notranslate"><span class="pre">stderr</span></code> file streams, the default implementation uses the <cite>getchar</cite> and <cite>putchar</cite> functions respectively.</p>
+</div>
+<div class="section" id="using-custom-file-i-o">
+<h2>Using Custom File I/O<a class="headerlink" href="#using-custom-file-i-o" title="Permalink to this headline"></a></h2>
+<p>If you do not wish to have the file I/O functions backed by the <a class="reference internal" href="../libraries/fileioc.html#fileioc-h"><span class="std std-ref">fileioc library</span></a>, you can instead redefine the functions that you need in any source file.
+The new functions will override the default implementation.</p>
+<p>Additionally, the makefile needs to be updated accordingly.
+Add the below lines to the makefile to enable the custom file operations:</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">HAS_CUSTOM_FILE</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span>YES
+<span class="nv">CUSTOM_FILE_FILE</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span>stdio_file.h
+</pre></div>
+</div>
+<p>The option <strong>CUSTOM_FILE_FILE</strong> should be set to the name of the file which redefines the <code class="code docutils literal notranslate"><span class="pre">FILE</span></code> structure used by the standard file I/O functions.
+Additionally, it should redefine <code class="code docutils literal notranslate"><span class="pre">stdin</span></code>, <code class="code docutils literal notranslate"><span class="pre">stdout</span></code>, and <code class="code docutils literal notranslate"><span class="pre">stderr</span></code>, however if your program doesn’t require these this isn’t necessary.</p>
+<p>An example <em>stdio_file.h</em> might look like this:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#ifndef STDIO_FILE_H</span>
+<span class="cp">#define STDIO_FILE_H</span>
+
+<span class="k">typedef</span><span class="w"> </span><span class="k">struct</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">slot</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">eof</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="n">err</span><span class="p">;</span>
+<span class="p">}</span><span class="w"> </span><span class="kt">FILE</span><span class="p">;</span>
+<span class="cp">#define FOPEN_MAX  5</span>
+<span class="cp">#define stdin      ((FILE*)1)</span>
+<span class="cp">#define stdout     ((FILE*)2)</span>
+<span class="cp">#define stderr     ((FILE*)3)</span>
+
+<span class="cp">#endif</span>
+</pre></div>
+</div>
+<p>Be sure to clean the project via <code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">clean</span></code> if the implementation changes from the default and project files need to be rebuilt to use the updates.</p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="printf.html" class="btn btn-neutral float-left" title="Using printf Functions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="debugging.html" class="btn btn-neutral float-right" title="Debugging" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v10.1
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+             </strong> 
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

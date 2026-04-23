@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>srldrvce.h &mdash; CE C/C++ Toolchain  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/design-tabs.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="msddrvce.h" href="msddrvce.html" />
+    <link rel="prev" title="usbdrvce.h" href="usbdrvce.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> CE C/C++ Toolchain
+          </a>
+              <div class="version">
+                v12.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Welcome to the CE C/C++ Toolchain!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/hardware.html">Calculator Hardware Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../static/getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/makefile-options.html">Makefile Options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/debugging.html">Debugging Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/printf.html">Using printf Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/fileio.html">Using File I/O Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/asm.html">Assembly Routines</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Toolchain Libraries/Headers</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">CE Library Headers</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="graphx.html">graphx.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fontlibc.html">fontlibc.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fileioc.html">fileioc.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="keypadc.html">keypadc.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="libload.html">libload.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usbdrvce.html">usbdrvce.h</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">srldrvce.h</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="msddrvce.html">msddrvce.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fatdrvce.html">fatdrvce.h</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/sys/index.html">CE Hardware Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/ti/index.html">TI Operating System Headers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../headers/index.html">Miscellaneous Headers</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Helpful Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../static/ides.html">Using the Toolchain in an IDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/git.html">Using Git For Revision Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/coding-guidelines.html">General Coding Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../static/contributing.html">Contributing to the CE Toolchain</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CE C/C++ Toolchain</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">CE Library Headers</a> &raquo;</li>
+      <li>srldrvce.h</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="srldrvce-h">
+<span id="id1"></span><h1>srldrvce.h<a class="headerlink" href="#srldrvce-h" title="Permalink to this headline"></a></h1>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;srldrvce.h&gt;</span>
+</pre></div>
+</div>
+<p>The <code class="code docutils literal notranslate"><span class="pre">srldrvce</span></code> library adds support for reading and writing serial devices in host mode, as well as emulating a serial device in device mode.
+This library is built on top of the <code class="code docutils literal notranslate"><span class="pre">usbdrvce</span></code> library - data that is not serial in nature such as pictures, video, and audio may be more suited to using the <code class="code docutils literal notranslate"><span class="pre">usbdrvce</span></code> library directly.</p>
+<p>Currently this library is a work-in-progress, so some functionality may not behave as expected.
+This means that future library versions may create backwards-incompatible changes - however the likelihood of this is rather low as long as you use the library in a reasonable manner.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Be sure to look at the provided examples for guidance on how to use this library correctly.
+Hopefully in the future this page will include more documentation as the library becomes more complete.</p>
+</div>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#api-documentation" id="id2">API Documentation</a></p></li>
+</ul>
+</div>
+<div class="section" id="api-documentation">
+<h2><a class="toc-backref" href="#id2">API Documentation</a><a class="headerlink" href="#api-documentation" title="Permalink to this headline"></a></h2>
+<p>
+This library sits on top of usbdrvce to act as a driver for serial devices. In addition to handling USB serial devices while in host mode, srldrvce can also emulate a serial device itself, which is useful for communicating with a computer with minimal setup required on the other end. <dl class="simple">
+<dt><strong>Author</strong></dt><dd><p>John “commandblockguy” Cesarz</p>
+</dd>
+</dl>
+</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.SRL_INTERFACE_ANY">
+<span class="target" id="srldrvce_8h_1a4f1b432f94153c304e2e38f795be9c62"></span><span class="sig-name descname"><span class="n"><span class="pre">SRL_INTERFACE_ANY</span></span></span><a class="headerlink" href="#c.SRL_INTERFACE_ANY" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv417srl_device_type_t">
+<span id="_CPPv317srl_device_type_t"></span><span id="_CPPv217srl_device_type_t"></span><span id="srl_device_type_t"></span><span class="target" id="srldrvce_8h_1a6163e8b535382232156d48eff000c7d2"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">srl_device_type_t</span></span></span><a class="headerlink" href="#_CPPv417srl_device_type_t" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv420srl_device_subtype_t">
+<span id="_CPPv320srl_device_subtype_t"></span><span id="_CPPv220srl_device_subtype_t"></span><span id="srl_device_subtype_t"></span><span class="target" id="srldrvce_8h_1a8512a9b4f1df7893552403f6cac26b8f"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">srl_device_subtype_t</span></span></span><a class="headerlink" href="#_CPPv420srl_device_subtype_t" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-enums">Enums</p>
+<dl class="cpp enum">
+<dt class="sig sig-object cpp">
+<span class="target" id="srldrvce_8h_1adf764cbdea00d65edcd07bb9953ad2b7"></span><span class="sig-name descname"></span></dt>
+<dd><p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N19PhonyNameDueToError16SRL_TYPE_UNKNOWNE">
+<span id="_CPPv3N19PhonyNameDueToError16SRL_TYPE_UNKNOWNE"></span><span id="_CPPv2N19PhonyNameDueToError16SRL_TYPE_UNKNOWNE"></span><span class="target" id="srldrvce_8h_1adf764cbdea00d65edcd07bb9953ad2b7aea772d4eea46c25903e59d8916d48a8d"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SRL_TYPE_UNKNOWN</span></span></span><a class="headerlink" href="#_CPPv4N19PhonyNameDueToError16SRL_TYPE_UNKNOWNE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Incompatible or non-serial device. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N19PhonyNameDueToError13SRL_TYPE_HOSTE">
+<span id="_CPPv3N19PhonyNameDueToError13SRL_TYPE_HOSTE"></span><span id="_CPPv2N19PhonyNameDueToError13SRL_TYPE_HOSTE"></span><span class="target" id="srldrvce_8h_1adf764cbdea00d65edcd07bb9953ad2b7a59116e5631579fd322677c7e9da53152"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SRL_TYPE_HOST</span></span></span><a class="headerlink" href="#_CPPv4N19PhonyNameDueToError13SRL_TYPE_HOSTE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Calc is acting as a device. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N19PhonyNameDueToError12SRL_TYPE_CDCE">
+<span id="_CPPv3N19PhonyNameDueToError12SRL_TYPE_CDCE"></span><span id="_CPPv2N19PhonyNameDueToError12SRL_TYPE_CDCE"></span><span class="target" id="srldrvce_8h_1adf764cbdea00d65edcd07bb9953ad2b7a32f9fd37c7154732df6b7364a6b49b64"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SRL_TYPE_CDC</span></span></span><a class="headerlink" href="#_CPPv4N19PhonyNameDueToError12SRL_TYPE_CDCE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>CDC device. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N19PhonyNameDueToError13SRL_TYPE_FTDIE">
+<span id="_CPPv3N19PhonyNameDueToError13SRL_TYPE_FTDIE"></span><span id="_CPPv2N19PhonyNameDueToError13SRL_TYPE_FTDIE"></span><span class="target" id="srldrvce_8h_1adf764cbdea00d65edcd07bb9953ad2b7a3fc3c683c57d21c302ec3b788af80387"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SRL_TYPE_FTDI</span></span></span><a class="headerlink" href="#_CPPv4N19PhonyNameDueToError13SRL_TYPE_FTDIE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>FTDI device. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N19PhonyNameDueToError15SRL_TYPE_PL2303E">
+<span id="_CPPv3N19PhonyNameDueToError15SRL_TYPE_PL2303E"></span><span id="_CPPv2N19PhonyNameDueToError15SRL_TYPE_PL2303E"></span><span class="target" id="srldrvce_8h_1adf764cbdea00d65edcd07bb9953ad2b7ae5bf15a24b9c43b52ed44f29a034af00"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SRL_TYPE_PL2303</span></span></span><a class="headerlink" href="#_CPPv4N19PhonyNameDueToError15SRL_TYPE_PL2303E" title="Permalink to this definition"></a><br /></dt>
+<dd><p>PL2303 device. </p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp enum">
+<dt class="sig sig-object cpp">
+<span class="target" id="srldrvce_8h_1a99fb83031ce9923c84392b4e92f956b5"></span><span class="sig-name descname"></span></dt>
+<dd><p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N19PhonyNameDueToError24SRL_SUBTYPE_FTDI_UNKNOWNE">
+<span id="_CPPv3N19PhonyNameDueToError24SRL_SUBTYPE_FTDI_UNKNOWNE"></span><span id="_CPPv2N19PhonyNameDueToError24SRL_SUBTYPE_FTDI_UNKNOWNE"></span><span class="target" id="srldrvce_8h_1a99fb83031ce9923c84392b4e92f956b5a23f1732e18f5fe590772170846e97ec0"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SRL_SUBTYPE_FTDI_UNKNOWN</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N19PhonyNameDueToError24SRL_SUBTYPE_FTDI_UNKNOWNE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N19PhonyNameDueToError15SRL_SUBTYPE_SIOE">
+<span id="_CPPv3N19PhonyNameDueToError15SRL_SUBTYPE_SIOE"></span><span id="_CPPv2N19PhonyNameDueToError15SRL_SUBTYPE_SIOE"></span><span class="target" id="srldrvce_8h_1a99fb83031ce9923c84392b4e92f956b5af50218794e2c1fad288bc7205208777d"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SRL_SUBTYPE_SIO</span></span></span><a class="headerlink" href="#_CPPv4N19PhonyNameDueToError15SRL_SUBTYPE_SIOE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N19PhonyNameDueToError21SRL_SUBTYPE_FT8U232AME">
+<span id="_CPPv3N19PhonyNameDueToError21SRL_SUBTYPE_FT8U232AME"></span><span id="_CPPv2N19PhonyNameDueToError21SRL_SUBTYPE_FT8U232AME"></span><span class="target" id="srldrvce_8h_1a99fb83031ce9923c84392b4e92f956b5ac4b092ec5796256125b2da96e2f745f9"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SRL_SUBTYPE_FT8U232AM</span></span></span><a class="headerlink" href="#_CPPv4N19PhonyNameDueToError21SRL_SUBTYPE_FT8U232AME" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N19PhonyNameDueToError19SRL_SUBTYPE_FT232BME">
+<span id="_CPPv3N19PhonyNameDueToError19SRL_SUBTYPE_FT232BME"></span><span id="_CPPv2N19PhonyNameDueToError19SRL_SUBTYPE_FT232BME"></span><span class="target" id="srldrvce_8h_1a99fb83031ce9923c84392b4e92f956b5ad67122999ca2502831a96c460623f433"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SRL_SUBTYPE_FT232BM</span></span></span><a class="headerlink" href="#_CPPv4N19PhonyNameDueToError19SRL_SUBTYPE_FT232BME" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N19PhonyNameDueToError19SRL_SUBTYPE_FT2232CE">
+<span id="_CPPv3N19PhonyNameDueToError19SRL_SUBTYPE_FT2232CE"></span><span id="_CPPv2N19PhonyNameDueToError19SRL_SUBTYPE_FT2232CE"></span><span class="target" id="srldrvce_8h_1a99fb83031ce9923c84392b4e92f956b5a00d7f435c4ca67f4247f4523e98ba782"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SRL_SUBTYPE_FT2232C</span></span></span><a class="headerlink" href="#_CPPv4N19PhonyNameDueToError19SRL_SUBTYPE_FT2232CE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N19PhonyNameDueToError19SRL_SUBTYPE_FT232RLE">
+<span id="_CPPv3N19PhonyNameDueToError19SRL_SUBTYPE_FT232RLE"></span><span id="_CPPv2N19PhonyNameDueToError19SRL_SUBTYPE_FT232RLE"></span><span class="target" id="srldrvce_8h_1a99fb83031ce9923c84392b4e92f956b5a228b9adcda6fba07d22dca9b866048d7"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SRL_SUBTYPE_FT232RL</span></span></span><a class="headerlink" href="#_CPPv4N19PhonyNameDueToError19SRL_SUBTYPE_FT232RLE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N19PhonyNameDueToError15SRL_SUBTYPE_FTXE">
+<span id="_CPPv3N19PhonyNameDueToError15SRL_SUBTYPE_FTXE"></span><span id="_CPPv2N19PhonyNameDueToError15SRL_SUBTYPE_FTXE"></span><span class="target" id="srldrvce_8h_1a99fb83031ce9923c84392b4e92f956b5a19b13024c8ed6c3ee0166de19a118172"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SRL_SUBTYPE_FTX</span></span></span><a class="headerlink" href="#_CPPv4N19PhonyNameDueToError15SRL_SUBTYPE_FTXE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N19PhonyNameDueToError19SRL_SUBTYPE_FT2232HE">
+<span id="_CPPv3N19PhonyNameDueToError19SRL_SUBTYPE_FT2232HE"></span><span id="_CPPv2N19PhonyNameDueToError19SRL_SUBTYPE_FT2232HE"></span><span class="target" id="srldrvce_8h_1a99fb83031ce9923c84392b4e92f956b5a77ac8d54da25f7483bdd2d9c691c73f8"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SRL_SUBTYPE_FT2232H</span></span></span><a class="headerlink" href="#_CPPv4N19PhonyNameDueToError19SRL_SUBTYPE_FT2232HE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N19PhonyNameDueToError19SRL_SUBTYPE_FT4232HE">
+<span id="_CPPv3N19PhonyNameDueToError19SRL_SUBTYPE_FT4232HE"></span><span id="_CPPv2N19PhonyNameDueToError19SRL_SUBTYPE_FT4232HE"></span><span class="target" id="srldrvce_8h_1a99fb83031ce9923c84392b4e92f956b5aca524002c3c58d33b06113e6d69f442c"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SRL_SUBTYPE_FT4232H</span></span></span><a class="headerlink" href="#_CPPv4N19PhonyNameDueToError19SRL_SUBTYPE_FT4232HE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N19PhonyNameDueToError18SRL_SUBTYPE_FT232HE">
+<span id="_CPPv3N19PhonyNameDueToError18SRL_SUBTYPE_FT232HE"></span><span id="_CPPv2N19PhonyNameDueToError18SRL_SUBTYPE_FT232HE"></span><span class="target" id="srldrvce_8h_1a99fb83031ce9923c84392b4e92f956b5afd58bafdaed6c103a1511490e6e040eb"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SRL_SUBTYPE_FT232H</span></span></span><a class="headerlink" href="#_CPPv4N19PhonyNameDueToError18SRL_SUBTYPE_FT232HE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="cpp enum">
+<dt class="sig sig-object cpp">
+<span class="target" id="srldrvce_8h_1abc6126af1d45847bc59afa0aa3216b04"></span><span class="sig-name descname"></span></dt>
+<dd><p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N19PhonyNameDueToError21SRL_SUBTYPE_PL2303_01E">
+<span id="_CPPv3N19PhonyNameDueToError21SRL_SUBTYPE_PL2303_01E"></span><span id="_CPPv2N19PhonyNameDueToError21SRL_SUBTYPE_PL2303_01E"></span><span class="target" id="srldrvce_8h_1abc6126af1d45847bc59afa0aa3216b04afc6ca29cbdeffbe873591ebaecac1faf"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SRL_SUBTYPE_PL2303_01</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N19PhonyNameDueToError21SRL_SUBTYPE_PL2303_01E" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N19PhonyNameDueToError21SRL_SUBTYPE_PL2303_HXE">
+<span id="_CPPv3N19PhonyNameDueToError21SRL_SUBTYPE_PL2303_HXE"></span><span id="_CPPv2N19PhonyNameDueToError21SRL_SUBTYPE_PL2303_HXE"></span><span class="target" id="srldrvce_8h_1abc6126af1d45847bc59afa0aa3216b04a83a952f77e8b77c3f36d6e288b9d21e4"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SRL_SUBTYPE_PL2303_HX</span></span></span><a class="headerlink" href="#_CPPv4N19PhonyNameDueToError21SRL_SUBTYPE_PL2303_HXE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv411srl_error_t">
+<span id="_CPPv311srl_error_t"></span><span id="_CPPv211srl_error_t"></span><span class="target" id="srldrvce_8h_1ae620d62990c78cee4a2d0ee34d36b2ce"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">srl_error_t</span></span></span><a class="headerlink" href="#_CPPv411srl_error_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11srl_error_t11SRL_SUCCESSE">
+<span id="_CPPv3N11srl_error_t11SRL_SUCCESSE"></span><span id="_CPPv2N11srl_error_t11SRL_SUCCESSE"></span><span class="target" id="srldrvce_8h_1ae620d62990c78cee4a2d0ee34d36b2cea253612ab90ff49abd94e95828e444970"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SRL_SUCCESS</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N11srl_error_t11SRL_SUCCESSE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11srl_error_t23SRL_ERROR_INVALID_PARAME">
+<span id="_CPPv3N11srl_error_t23SRL_ERROR_INVALID_PARAME"></span><span id="_CPPv2N11srl_error_t23SRL_ERROR_INVALID_PARAME"></span><span class="target" id="srldrvce_8h_1ae620d62990c78cee4a2d0ee34d36b2cea62f331900000d21e49afa9ee638a7628"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SRL_ERROR_INVALID_PARAM</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N11srl_error_t23SRL_ERROR_INVALID_PARAME" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11srl_error_t20SRL_ERROR_USB_FAILEDE">
+<span id="_CPPv3N11srl_error_t20SRL_ERROR_USB_FAILEDE"></span><span id="_CPPv2N11srl_error_t20SRL_ERROR_USB_FAILEDE"></span><span class="target" id="srldrvce_8h_1ae620d62990c78cee4a2d0ee34d36b2cea91a8d23c1ffc1437fba3e60dfa46e77a"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SRL_ERROR_USB_FAILED</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N11srl_error_t20SRL_ERROR_USB_FAILEDE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11srl_error_t23SRL_ERROR_NOT_SUPPORTEDE">
+<span id="_CPPv3N11srl_error_t23SRL_ERROR_NOT_SUPPORTEDE"></span><span id="_CPPv2N11srl_error_t23SRL_ERROR_NOT_SUPPORTEDE"></span><span class="target" id="srldrvce_8h_1ae620d62990c78cee4a2d0ee34d36b2ceab3edbb5d904a7ef21bd5fee25c7d8586"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SRL_ERROR_NOT_SUPPORTED</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">3</span></span><a class="headerlink" href="#_CPPv4N11srl_error_t23SRL_ERROR_NOT_SUPPORTEDE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11srl_error_t24SRL_ERROR_INVALID_DEVICEE">
+<span id="_CPPv3N11srl_error_t24SRL_ERROR_INVALID_DEVICEE"></span><span id="_CPPv2N11srl_error_t24SRL_ERROR_INVALID_DEVICEE"></span><span class="target" id="srldrvce_8h_1ae620d62990c78cee4a2d0ee34d36b2ceac8aec8b3f8cae5483d93fba54236aaf4"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SRL_ERROR_INVALID_DEVICE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">4</span></span><a class="headerlink" href="#_CPPv4N11srl_error_t24SRL_ERROR_INVALID_DEVICEE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11srl_error_t27SRL_ERROR_INVALID_INTERFACEE">
+<span id="_CPPv3N11srl_error_t27SRL_ERROR_INVALID_INTERFACEE"></span><span id="_CPPv2N11srl_error_t27SRL_ERROR_INVALID_INTERFACEE"></span><span class="target" id="srldrvce_8h_1ae620d62990c78cee4a2d0ee34d36b2cea0321803c5b9966a8a6b86911fc2e6dbb"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SRL_ERROR_INVALID_INTERFACE</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">5</span></span><a class="headerlink" href="#_CPPv4N11srl_error_t27SRL_ERROR_INVALID_INTERFACEE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11srl_error_t19SRL_ERROR_NO_MEMORYE">
+<span id="_CPPv3N11srl_error_t19SRL_ERROR_NO_MEMORYE"></span><span id="_CPPv2N11srl_error_t19SRL_ERROR_NO_MEMORYE"></span><span class="target" id="srldrvce_8h_1ae620d62990c78cee4a2d0ee34d36b2cea3adf6512d3b967f86e58e94015b3a7ce"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SRL_ERROR_NO_MEMORY</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">6</span></span><a class="headerlink" href="#_CPPv4N11srl_error_t19SRL_ERROR_NO_MEMORYE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N11srl_error_t29SRL_ERROR_DEVICE_DISCONNECTEDE">
+<span id="_CPPv3N11srl_error_t29SRL_ERROR_DEVICE_DISCONNECTEDE"></span><span id="_CPPv2N11srl_error_t29SRL_ERROR_DEVICE_DISCONNECTEDE"></span><span class="target" id="srldrvce_8h_1ae620d62990c78cee4a2d0ee34d36b2ceacae6c44ccebf655c1e3774fc46b95ac0"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SRL_ERROR_DEVICE_DISCONNECTED</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">7</span></span><a class="headerlink" href="#_CPPv4N11srl_error_t29SRL_ERROR_DEVICE_DISCONNECTEDE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv48srl_OpenP12srl_device_t12usb_device_tPv6size_t7uint8_t8uint24_t">
+<span id="_CPPv38srl_OpenP12srl_device_t12usb_device_tPv6size_t7uint8_t8uint24_t"></span><span id="_CPPv28srl_OpenP12srl_device_t12usb_device_tPv6size_t7uint8_t8uint24_t"></span><span id="srl_Open__srl_device_tP.usb_device_t.voidP.s.uint8_t.uint24_t"></span><span class="target" id="srldrvce_8h_1a6479ac7c7ee690939a8fd6774c3dff26"></span><a class="reference internal" href="#_CPPv411srl_error_t" title="srl_error_t"><span class="n"><span class="pre">srl_error_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">srl_Open</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv412srl_device_t" title="srl_device_t"><span class="n"><span class="pre">srl_device_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">srl</span></span>, <a class="reference internal" href="usbdrvce.html#_CPPv412usb_device_t" title="usb_device_t"><span class="n"><span class="pre">usb_device_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">dev</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">buffer</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">interface</span></span>, <span class="n"><span class="pre">uint24_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">rate</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48srl_OpenP12srl_device_t12usb_device_tPv6size_t7uint8_t8uint24_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Initialize a USB connected serial device. </p>
+<p>Checks if the device is a valid serial device. Will perform all necessary initialization. A user-supplied buffer is needed for internal library use. This buffer must be at least 128 bytes in size. It should not be the same buffer used by other devices and/or functions. </p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Do not call from a USB event handler. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>srl</strong> – Serial device structure. </p></li>
+<li><p><strong>dev</strong> – USB device to initialize. </p></li>
+<li><p><strong>buffer</strong> – The buffer’s address. (must be at least <code class="docutils literal notranslate"><span class="pre">size</span></code> bytes). </p></li>
+<li><p><strong>size</strong> – The size of the buffer. Must be divisible by 2 and at least 128, but a size of 512 is recommended. </p></li>
+<li><p><strong>interface</strong> – The USB interface number to use, or SRL_INTERFACE_ANY for the first available interface. </p></li>
+<li><p><strong>rate</strong> – The baud rate to set the device to. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>SRL_SUCCESS on success, otherwise error if initialization failed. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49srl_CloseP12srl_device_t">
+<span id="_CPPv39srl_CloseP12srl_device_t"></span><span id="_CPPv29srl_CloseP12srl_device_t"></span><span id="srl_Close__srl_device_tP"></span><span class="target" id="srldrvce_8h_1ad40ad085658c347076e775674e69569c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">srl_Close</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv412srl_device_t" title="srl_device_t"><span class="n"><span class="pre">srl_device_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">srl</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49srl_CloseP12srl_device_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Closes and deinitializes a serial device. </p>
+<p>This function should be called on the <code class="docutils literal notranslate"><span class="pre">USB_DEVICE_DISCONNECTED_EVENT</span></code> in the USB handler callback. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>srl</strong> – SRL device structure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv48srl_ReadP12srl_device_tPv6size_t">
+<span id="_CPPv38srl_ReadP12srl_device_tPv6size_t"></span><span id="_CPPv28srl_ReadP12srl_device_tPv6size_t"></span><span id="srl_Read__srl_device_tP.voidP.s"></span><span class="target" id="srldrvce_8h_1af33b099690087123d07756a118a3c8df"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">srl_Read</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv412srl_device_t" title="srl_device_t"><span class="n"><span class="pre">srl_device_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">srl</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">length</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48srl_ReadP12srl_device_tPv6size_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Reads data from a serial device. </p>
+<p>This is a non-blocking buffered read - if there are less that <code class="docutils literal notranslate"><span class="pre">length</span></code> bytes available in the buffer, all of the bytes in the buffer will be read. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>srl</strong> – SRL device structure. </p></li>
+<li><p><strong>data</strong> – Buffer to read into. Should be at least <code class="docutils literal notranslate"><span class="pre">length</span></code> bytes long. </p></li>
+<li><p><strong>length</strong> – Number of bytes to read. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The number of bytes read, or a negative number upon error. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49srl_WriteP12srl_device_tPKv6size_t">
+<span id="_CPPv39srl_WriteP12srl_device_tPKv6size_t"></span><span id="_CPPv29srl_WriteP12srl_device_tPKv6size_t"></span><span id="srl_Write__srl_device_tP.voidCP.s"></span><span class="target" id="srldrvce_8h_1afe6ccb8e5e202433d7ce526c56ebb9f4"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">srl_Write</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv412srl_device_t" title="srl_device_t"><span class="n"><span class="pre">srl_device_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">srl</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">data</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">length</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49srl_WriteP12srl_device_tPKv6size_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Writes data to a serial device. </p>
+<p>This is a non-blocking buffered write - if there is less than <code class="docutils literal notranslate"><span class="pre">length</span></code> bytes of space in the output buffer, not all of the data may be written. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>srl</strong> – SRL device structure. </p></li>
+<li><p><strong>data</strong> – Data to write to serial. </p></li>
+<li><p><strong>length</strong> – Number of bytes to write. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The number of bytes written, or a negative number upon error. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv429srl_GetCDCStandardDescriptorsv">
+<span id="_CPPv329srl_GetCDCStandardDescriptorsv"></span><span id="_CPPv229srl_GetCDCStandardDescriptorsv"></span><span id="srl_GetCDCStandardDescriptors__void"></span><span class="target" id="srldrvce_8h_1a9ea45b756733f98ecbeed69cf2057a91"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="usbdrvce.html#_CPPv426usb_standard_descriptors_t" title="usb_standard_descriptors_t"><span class="n"><span class="pre">usb_standard_descriptors_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">srl_GetCDCStandardDescriptors</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv429srl_GetCDCStandardDescriptorsv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Returns a pointer to CDC ACM descriptors, to be used with usb_Init. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv420srl_UsbEventCallback11usb_event_tPvP19usb_callback_data_t">
+<span id="_CPPv320srl_UsbEventCallback11usb_event_tPvP19usb_callback_data_t"></span><span id="_CPPv220srl_UsbEventCallback11usb_event_tPvP19usb_callback_data_t"></span><span id="srl_UsbEventCallback__usb_event_t.voidP.usb_callback_data_tP"></span><span class="target" id="srldrvce_8h_1a89c53edefaa8a22aec261305473a4f7b"></span><a class="reference internal" href="usbdrvce.html#_CPPv411usb_error_t" title="usb_error_t"><span class="n"><span class="pre">usb_error_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">srl_UsbEventCallback</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="usbdrvce.html#_CPPv411usb_event_t" title="usb_event_t"><span class="n"><span class="pre">usb_event_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">event</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">event_data</span></span>, <span class="n"><span class="pre">usb_callback_data_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">callback_data</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420srl_UsbEventCallback11usb_event_tPvP19usb_callback_data_t" title="Permalink to this definition"></a><br /></dt>
+<dd><p>USB callback handler. </p>
+<p>Can either be passed as the handler argument to usb_Init, or be delegated to from a custom USB event handler. </p>
+</dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv415ring_buf_ctrl_t">
+<span id="_CPPv315ring_buf_ctrl_t"></span><span id="_CPPv215ring_buf_ctrl_t"></span><span id="ring_buf_ctrl_t"></span><span class="target" id="structring__buf__ctrl__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ring_buf_ctrl_t</span></span></span><a class="headerlink" href="#_CPPv415ring_buf_ctrl_t" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N15ring_buf_ctrl_t9buf_startE">
+<span id="_CPPv3N15ring_buf_ctrl_t9buf_startE"></span><span id="_CPPv2N15ring_buf_ctrl_t9buf_startE"></span><span id="ring_buf_ctrl_t::buf_start__voidP"></span><span class="target" id="structring__buf__ctrl__t_1acfe5923dddb3c3c05e73063c9de91d62"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">buf_start</span></span></span><a class="headerlink" href="#_CPPv4N15ring_buf_ctrl_t9buf_startE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N15ring_buf_ctrl_t7buf_endE">
+<span id="_CPPv3N15ring_buf_ctrl_t7buf_endE"></span><span id="_CPPv2N15ring_buf_ctrl_t7buf_endE"></span><span id="ring_buf_ctrl_t::buf_end__voidP"></span><span class="target" id="structring__buf__ctrl__t_1a569db4e07b3c31cd281698a3a2c6ba79"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">buf_end</span></span></span><a class="headerlink" href="#_CPPv4N15ring_buf_ctrl_t7buf_endE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N15ring_buf_ctrl_t10data_startE">
+<span id="_CPPv3N15ring_buf_ctrl_t10data_startE"></span><span id="_CPPv2N15ring_buf_ctrl_t10data_startE"></span><span id="ring_buf_ctrl_t::data_start__voidP"></span><span class="target" id="structring__buf__ctrl__t_1ada35c64edf7a4d6d0c96e90f7ac6fa61"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">data_start</span></span></span><a class="headerlink" href="#_CPPv4N15ring_buf_ctrl_t10data_startE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N15ring_buf_ctrl_t10data_breakE">
+<span id="_CPPv3N15ring_buf_ctrl_t10data_breakE"></span><span id="_CPPv2N15ring_buf_ctrl_t10data_breakE"></span><span id="ring_buf_ctrl_t::data_break__voidP"></span><span class="target" id="structring__buf__ctrl__t_1aaad941f30b8e3fd1944bbdcf7a2ff702"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">data_break</span></span></span><a class="headerlink" href="#_CPPv4N15ring_buf_ctrl_t10data_breakE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N15ring_buf_ctrl_t8data_endE">
+<span id="_CPPv3N15ring_buf_ctrl_t8data_endE"></span><span id="_CPPv2N15ring_buf_ctrl_t8data_endE"></span><span id="ring_buf_ctrl_t::data_end__voidP"></span><span class="target" id="structring__buf__ctrl__t_1a72c37cf0f85dd1be29eef34cd765d769"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">data_end</span></span></span><a class="headerlink" href="#_CPPv4N15ring_buf_ctrl_t8data_endE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N15ring_buf_ctrl_t10dma_activeE">
+<span id="_CPPv3N15ring_buf_ctrl_t10dma_activeE"></span><span id="_CPPv2N15ring_buf_ctrl_t10dma_activeE"></span><span id="ring_buf_ctrl_t::dma_active__b"></span><span class="target" id="structring__buf__ctrl__t_1a68dbf7173c5127e5646ee9557b92bb7f"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dma_active</span></span></span><a class="headerlink" href="#_CPPv4N15ring_buf_ctrl_t10dma_activeE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv412srl_device_t">
+<span id="_CPPv312srl_device_t"></span><span id="_CPPv212srl_device_t"></span><span id="srl_device_t"></span><span class="target" id="structsrl__device__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">srl_device_t</span></span></span><a class="headerlink" href="#_CPPv412srl_device_t" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12srl_device_t3devE">
+<span id="_CPPv3N12srl_device_t3devE"></span><span id="_CPPv2N12srl_device_t3devE"></span><span id="srl_device_t::dev__usb_device_t"></span><span class="target" id="structsrl__device__t_1acd0ebaa9439f0b103b023542f5292fc8"></span><a class="reference internal" href="usbdrvce.html#_CPPv412usb_device_t" title="usb_device_t"><span class="n"><span class="pre">usb_device_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dev</span></span></span><a class="headerlink" href="#_CPPv4N12srl_device_t3devE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>USB device. </p>
+<p>An OUT endpoint if in device mode, an IN endpoint otherwise </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12srl_device_t7rx_addrE">
+<span id="_CPPv3N12srl_device_t7rx_addrE"></span><span id="_CPPv2N12srl_device_t7rx_addrE"></span><span id="srl_device_t::rx_addr__uint8_t"></span><span class="target" id="structsrl__device__t_1af6f3a83decf9fa6df87f7b2fbf02cff4"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">rx_addr</span></span></span><a class="headerlink" href="#_CPPv4N12srl_device_t7rx_addrE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>An IN endpoint if in device mode, an OUT endpoint otherwise. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12srl_device_t7tx_addrE">
+<span id="_CPPv3N12srl_device_t7tx_addrE"></span><span id="_CPPv2N12srl_device_t7tx_addrE"></span><span id="srl_device_t::tx_addr__uint8_t"></span><span class="target" id="structsrl__device__t_1ac5409eb83df7d2f7629ec0f4c56cbf22"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tx_addr</span></span></span><a class="headerlink" href="#_CPPv4N12srl_device_t7tx_addrE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12srl_device_t4typeE">
+<span id="_CPPv3N12srl_device_t4typeE"></span><span id="_CPPv2N12srl_device_t4typeE"></span><span id="srl_device_t::type__srl_device_type_t"></span><span class="target" id="structsrl__device__t_1a5a39a5c95eb90600c1728d336803f16a"></span><a class="reference internal" href="#_CPPv417srl_device_type_t" title="srl_device_type_t"><span class="n"><span class="pre">srl_device_type_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">type</span></span></span><a class="headerlink" href="#_CPPv4N12srl_device_t4typeE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12srl_device_t7subtypeE">
+<span id="_CPPv3N12srl_device_t7subtypeE"></span><span id="_CPPv2N12srl_device_t7subtypeE"></span><span id="srl_device_t::subtype__srl_device_subtype_t"></span><span class="target" id="structsrl__device__t_1a9048b8f92fdee271251e8fb8dfec726b"></span><a class="reference internal" href="#_CPPv420srl_device_subtype_t" title="srl_device_subtype_t"><span class="n"><span class="pre">srl_device_subtype_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">subtype</span></span></span><a class="headerlink" href="#_CPPv4N12srl_device_t7subtypeE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12srl_device_t6rx_bufE">
+<span id="_CPPv3N12srl_device_t6rx_bufE"></span><span id="_CPPv2N12srl_device_t6rx_bufE"></span><span id="srl_device_t::rx_buf__ring_buf_ctrl_t"></span><span class="target" id="structsrl__device__t_1afc0415c60f73ded9e6080d7fff549eb6"></span><a class="reference internal" href="#_CPPv415ring_buf_ctrl_t" title="ring_buf_ctrl_t"><span class="n"><span class="pre">ring_buf_ctrl_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">rx_buf</span></span></span><a class="headerlink" href="#_CPPv4N12srl_device_t6rx_bufE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12srl_device_t6tx_bufE">
+<span id="_CPPv3N12srl_device_t6tx_bufE"></span><span id="_CPPv2N12srl_device_t6tx_bufE"></span><span id="srl_device_t::tx_buf__ring_buf_ctrl_t"></span><span class="target" id="structsrl__device__t_1a583d2766555c29b2184dad3b432c16b1"></span><a class="reference internal" href="#_CPPv415ring_buf_ctrl_t" title="ring_buf_ctrl_t"><span class="n"><span class="pre">ring_buf_ctrl_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tx_buf</span></span></span><a class="headerlink" href="#_CPPv4N12srl_device_t6tx_bufE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12srl_device_t3errE">
+<span id="_CPPv3N12srl_device_t3errE"></span><span id="_CPPv2N12srl_device_t3errE"></span><span id="srl_device_t::err__srl_error_t"></span><span class="target" id="structsrl__device__t_1a066f3440095a146c76e5cf018c81e851"></span><a class="reference internal" href="#_CPPv411srl_error_t" title="srl_error_t"><span class="n"><span class="pre">srl_error_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">err</span></span></span><a class="headerlink" href="#_CPPv4N12srl_device_t3errE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12srl_device_t8reservedE">
+<span id="_CPPv3N12srl_device_t8reservedE"></span><span id="_CPPv2N12srl_device_t8reservedE"></span><span id="srl_device_t::reserved__uint8_tA"></span><span class="target" id="structsrl__device__t_1ad93f03e749e9fafbb76637696e52a9c1"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">reserved</span></span></span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">16</span></span><span class="p"><span class="pre">]</span></span><a class="headerlink" href="#_CPPv4N12srl_device_t8reservedE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="usbdrvce.html" class="btn btn-neutral float-left" title="usbdrvce.h" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="msddrvce.html" class="btn btn-neutral float-right" title="msddrvce.h" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2015-2026 CE Programming.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Toolchain Version</span>
+      v12.1
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          
+        
+          
+          
+        
+          
+          
+            
+              <dd><a href="/toolchain/index.html">latest (v14.2)</a></dd>
+            
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+            
+            <dd><a href="/toolchain/nightly/index.html">nightly (master)</a></dd>
+            
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+          
+          
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Old Versions</dt>
+        
+          
+            
+            <dd><a href="/toolchain/v14.0/index.html">v14.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v14.1/index.html">v14.1</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v13.0/index.html">v13.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.1/index.html">v11.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.0/index.html">v11.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v11.2/index.html">v11.2</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.0/index.html">v10.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.1/index.html">v10.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v10.2/index.html">v10.2</a></dd>
+            
+          
+        
+          
+        
+          
+            
+            <dd><a href="/toolchain/v12.0/index.html">v12.0</a></dd>
+            
+          
+        
+          
+             <strong> 
+            <dd><a href="/toolchain/v12.1/index.html">v12.1</a></dd>
+             </strong> 
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.0/index.html">v9.0</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.1/index.html">v9.1</a></dd>
+            
+          
+        
+          
+            
+            <dd><a href="/toolchain/v9.2/index.html">v9.2</a></dd>
+            
+          
+        
+      </dl>
+      
+    </div>
+  </div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
