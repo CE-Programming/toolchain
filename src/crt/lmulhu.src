@@ -14,20 +14,22 @@ __lmulhu:
 	ld	iyl, a
 	push	iy
 	push	bc
-	ld	iyl, iyh	; ld iy, 0
-	lea	bc, iy + 0
-	inc	de
-	dec.s	de
-	ld	d, b
+	ld	c, e
+	lea	de, iy + 0	; UDE = 0, D = 0
+	ld	e, c
+	ld	c, d
+	ld	b, d
 	call	__llmulu
 	; E   = B
 	; UHL = C
 	; H   = UDE
 	; L   = D
-	add	iy, sp
+	scf
+	sbc	hl, hl
+	add	hl, sp
 	push	de
-	ld	e, (iy - 1)	; H = UDE
-	ld	(iy - 1), c	; UHL = C
+	ld	e, (hl)		; H = UDE
+	ld	(hl), c		; UHL = C
 	pop	hl		; UHL = C
 	ld	h, e		; H = UDE
 	ld	l, d		; L = D
