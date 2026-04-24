@@ -99,6 +99,10 @@ ___strtoui:
 	ret	z
 
 .if HAVE_WE_FIGURED_OUT_BINUTILS_YET
+; REQUIRE	require	_strtoul.out_of_range
+
+;-------------------------------------------------------------------------------
+
 	.section	.text._strtoul.out_of_range
 
 	.local	_strtoul.out_of_range

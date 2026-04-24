@@ -40,6 +40,9 @@ __sctlz:
 	or	a, a
 	jr	nz, __bctlz
 	ld	a, l
+; REQUIRE	require	__sctlz.hijack
+
+; REQUIRE	.section	.text.__sctlz.hijack
 	.local	__sctlz.hijack
 __sctlz.hijack:
 	call	__bctlz

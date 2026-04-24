@@ -3,15 +3,17 @@
 	.section	.text
 	.global	__lor_fast
 	.type	__lor_fast, @function
-	.global	__ior_fast
-	.type	__ior_fast, @function
-	.global	__sor_fast
-	.type	__sor_fast, @function
 
 __lor_fast:
 ; CC: 24*r(PC)+8*r(SPL)+7*w(SPL)+1
 	or	a, e
 	ld	e, a
+; REQUIRE	require	__ior_fast
+
+; REQUIRE	.section	.text
+	.global	__ior_fast
+	.type	__ior_fast, @function
+
 __ior_fast:
 ; CC: 22*r(PC)+8*r(SPL)+7*w(SPL)+1
 	push	hl
@@ -27,6 +29,12 @@ __ior_fast:
 	or	a, (hl)
 	ld	(hl), a
 	pop	hl
+; REQUIRE	require	__sor_fast
+
+; REQUIRE	.section	.text
+	.global	__sor_fast
+	.type	__sor_fast, @function
+
 __sor_fast:
 ; CC: 8*r(PC)+3*r(SPL)+1
 	ld	a, h

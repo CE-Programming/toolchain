@@ -6,7 +6,9 @@
 
 __bcttz:
 	cp	a, 1
+; REQUIRE	require	__cttz_common
 
+; REQUIRE	.section	.text.__cttz_common
 	.local	__cttz_common
 	; Input: A=byte, CF=(A==0)
 	; Output: A=cttz(A)
@@ -45,6 +47,9 @@ __scttz:
 	jr	nz, __cttz_common
 	sub	a, h
 	ccf
+; REQUIRE	require	__scttz.hijack
+
+; REQUIRE	.section	.text.__scttz.hijack
 	.local	__scttz.hijack
 __scttz.hijack:
 	call	__cttz_common
@@ -56,6 +61,9 @@ __scttz.hijack:
 	.type	__icttz, @function
 __icttz:
 	xor	a, a
+; REQUIRE	require	__icttz.hijack
+
+; REQUIRE	.section	.text.__icttz.hijack
 	.local	__icttz.hijack
 __icttz.hijack:
 	or	a, l
@@ -116,6 +124,9 @@ __i48cttz:
 	sbc	hl, de
 	jr	nz, __icttz.hijack
 	ex	de, hl
+; REQUIRE	require	__i48cttz.hijack
+
+; REQUIRE	.section	.text.__i48cttz.hijack
 	.local	__i48cttz.hijack
 __i48cttz.hijack:
 	call	__icttz.hijack
