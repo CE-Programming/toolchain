@@ -30,6 +30,8 @@ __llmulhu:
 	ld	h, b
 	ld.s	sp, hl
 
+	exx
+
 	lea	hl, iy + 21
 	ld	b, 8
 .L.push_loop:
@@ -39,17 +41,16 @@ __llmulhu:
 	or	a, a		; cf=0
 	djnz	.L.push_loop
 
-	sbc	hl, hl
-	ld	e, l
-	ld	d, h
-
-	exx
+	ld	c, b
 	sbc	hl, hl
 	ex	de, hl
 	sbc	hl, hl
-	ld	c, l
-	ld	b, l
+
 	exx
+
+	sbc	hl, hl
+	ld	e, l
+	ld	d, h
 
 .L.byte_loop:
 	scf
@@ -60,9 +61,8 @@ __llmulhu:
 
 	add	ix, ix
 	adc	hl, hl
-	ex	de, hl
-	adc.s	hl, hl
-	ex	de, hl
+	rl	e
+	rl	d
 
 	exx
 	adc	hl, hl
