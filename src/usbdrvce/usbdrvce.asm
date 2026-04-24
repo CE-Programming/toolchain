@@ -1681,14 +1681,13 @@ usb_GetEndpointAddress:
 usb_GetEndpointTransferType:
 	pop	hl
 	ex	(sp),iy.endpoint
-	ld	a,(iy.endpoint.transferInfo)
-	and	a,endpoint.transferInfo.type
-	ld	c,a
 	xor	a,a
 	cp	a,iyl
-	sbc	a,a
-	cpl
-	or	a,c
+	cpl					; A = -1 = USB_UNKNOWN_TRANSFER
+	jq	z,.unknown_transfer
+	ld	a,(iy.endpoint.transferInfo)
+	and	a,endpoint.transferInfo.type
+.unknown_transfer:
 	jp	(hl)
 
 ;-------------------------------------------------------------------------------
