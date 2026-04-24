@@ -11,8 +11,8 @@ __i48mulhu:
 ;  minimum:  92F +  42R +  42W + 2
 ;  maximum:  94F +  42R +  42W + 4
 ; including __i48mulu:
-;  minimum: 900F + 246R + 182W + 342
-;  maximum: 902F + 246R + 182W + 344
+;  minimum: 896F + 246R + 182W + 342
+;  maximum: 898F + 246R + 182W + 344
 	push	ix
 	push	iy
 	push	bc

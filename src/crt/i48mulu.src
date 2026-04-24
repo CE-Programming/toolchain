@@ -14,8 +14,8 @@
 	.type	__i48mulu, @function
 
 __i48mulu:
-; CC: 202*r(PC)+51*r(SPL)+35*w(SPL)+85
-; CC: 201 bytes | 202F + 51R + 35W + 85
+; CC: 201*r(PC)+51*r(SPL)+35*w(SPL)+85
+; CC: 200 bytes | 201F + 51R + 35W + 85
 	; backup af
 	push	af
 	push	ix
@@ -32,7 +32,7 @@ __i48mulu:
 	ld	a, l		; a = b[0]
 	ld	iy, (ix - 5)	; iy = b[1], b[2]
 
-	or	a, a
+	; or	a, a		; carry is already cleared
 	sbc	hl, hl
 	push	hl		; upper bytes of sum at -15
 	; Stack Use:
