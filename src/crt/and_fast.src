@@ -3,15 +3,17 @@
 	.section	.text
 	.global	__land_fast
 	.type	__land_fast, @function
-	.global	__iand_fast
-	.type	__iand_fast, @function
-	.global	__sand_fast
-	.type	__sand_fast, @function
 
 __land_fast:
 ; CC: 24*r(PC)+8*r(SPL)+7*w(SPL)+1
 	and	a, e
 	ld	e, a
+; REQUIRE	require	__iand_fast
+
+; REQUIRE	.section	.text
+	.global	__iand_fast
+	.type	__iand_fast, @function
+
 __iand_fast:
 ; CC: 22*r(PC)+8*r(SPL)+7*w(SPL)+1
 	push	hl
@@ -27,6 +29,12 @@ __iand_fast:
 	and	a, (hl)
 	ld	(hl), a
 	pop	hl
+; REQUIRE	require	__sand_fast
+
+; REQUIRE	.section	.text
+	.global	__sand_fast
+	.type	__sand_fast, @function
+
 __sand_fast:
 ; CC: 8*r(PC)+3*r(SPL)+1
 	ld	a, h

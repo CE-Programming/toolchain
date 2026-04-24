@@ -3,15 +3,18 @@
 	.section	.text
 	.global	_tolower
 	.type	_tolower, @function
-	.global	_tolower.internal
-	.type	_tolower.internal, @function
 
 _tolower:
 	pop	de
 	ex	(sp), hl
 	push	de
-	; ASM interface: input/output char in L, destroys AF
+; REQUIRE	require	_tolower.internal
+
+; REQUIRE	.section	.text
+	.global	_tolower.internal
+	.type	_tolower.internal, @function
 _tolower.internal:
+	; ASM interface: input/output char in L, destroys AF
 	ld	a, l
 	sub	a, 'A'
 	cp	a, 1+'Z'-'A'

@@ -3,15 +3,17 @@
 	.section	.text
 	.global	__lxor_fast
 	.type	__lxor_fast, @function
-	.global	__ixor_fast
-	.type	__ixor_fast, @function
-	.global	__sxor_fast
-	.type	__sxor_fast, @function
 
 __lxor_fast:
 ; CC: 24*r(PC)+8*r(SPL)+7*w(SPL)+1
 	xor	a, e
 	ld	e, a
+; REQUIRE	require	__ixor_fast
+
+; REQUIRE	.section	.text
+	.global	__ixor_fast
+	.type	__ixor_fast, @function
+
 __ixor_fast:
 ; CC: 22*r(PC)+8*r(SPL)+7*w(SPL)+1
 	push	hl
@@ -27,6 +29,12 @@ __ixor_fast:
 	xor	a, (hl)
 	ld	(hl), a
 	pop	hl
+; REQUIRE	require	__sxor_fast
+
+; REQUIRE	.section	.text
+	.global	__sxor_fast
+	.type	__sxor_fast, @function
+
 __sxor_fast:
 ; CC: 8*r(PC)+3*r(SPL)+1
 	ld	a, h

@@ -3,14 +3,10 @@
 	.section	.text
 	.global	__land
 	.type	__land, @function
-	.section	.text
-	.global	__iand
-	.type	__iand, @function
 
 .ifdef PREFER_OS_CRT
 
 	.set	__land, 0x0001A4
-	.set	__iand, 0x000134
 
 .else
 
@@ -21,6 +17,21 @@ __land:
 	ld	e, a
 	; jr	.L.hijack_land
 	.db	0x3E			; ld a, *
+
+; REQUIRE	require	__iand
+
+.endif
+
+; REQUIRE	.section	.text
+	.global	__iand
+	.type	__iand, @function
+
+.ifdef PREFER_OS_CRT
+
+	.set	__iand, 0x000134
+
+.else
+
 __iand:
 ; CC: 24*r(PC)+11*r(SPL)+10*w(SPL)+1
 	push	af

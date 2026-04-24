@@ -3,13 +3,10 @@
 	.section	.text
 	.global	__lxor
 	.type	__lxor, @function
-	.global	__ixor
-	.type	__ixor, @function
 
 .ifdef PREFER_OS_CRT
 
 	.set	__lxor, 0x0001FC
-	.set	__ixor, 0x000198
 
 .else
 
@@ -20,6 +17,21 @@ __lxor:
 	ld	e, a
 	; jr	.L.hijack_lxor
 	.db	0x3E			; ld a, *
+
+; REQUIRE	require	__ixor
+
+.endif
+
+; REQUIRE	.section	.text
+	.global	__ixor
+	.type	__ixor, @function
+
+.ifdef PREFER_OS_CRT
+
+	.set	__ixor, 0x000198
+
+.else
+
 __ixor:
 ; CC: 24*r(PC)+11*r(SPL)+10*w(SPL)+1
 	push	af

@@ -1,35 +1,46 @@
 	.assume	adl=1
 
+;-------------------------------------------------------------------------------
+
 	.section	.text
 
 	.global	__ulltod
 	.type	__ulltod, @function
-	.global	__lltod
-	.type	__lltod, @function
-	.global	__ultod
-	.type	__ultod, @function
-	.global	__ltod
-	.type	__ltod, @function
-
 __ulltod:
 	; (long double)unsigned long long
 	cp	a, a		; set Z flag
 	push	af
-	jr	.L.lltod_common
+	jr	__lltod_common
+; REQUIRE	jq	__lltod_common
+
+;-------------------------------------------------------------------------------
+
+; REQUIRE	.section	.text
+
+	.global	__lltod
+	.type	__lltod, @function
 __lltod:
 	; (long double)long long
 	bit	7, b
 	push	af
 	call	nz, __llneg	; abs(BC:UDE:UHL)
-.L.lltod_common:
+
+; REQUIRE	require	__lltod_common
+
+;-------------------------------------------------------------------------------
+
+; REQUIRE	.section	.text
+
+	.local	__lltod_common
+__lltod_common:
 	call	__llctlz
 	sub	a, 63		; normalize clz_result
 	; filter out exponent of $000 (zero) and $3FF (one)
-	jr	nc, .L.int_to_f64_zero_or_one
+	jr	nc, __int_to_f64_zero_or_one
 	; A is [-63, -1]
 	add	a, 52
 	; A is [-11, 51]
-	jr	c, .L.int_to_f64_shl
+	jr	c, __int_to_f64_shl
 ; __int_to_f64_shr:
 	; exponent = (1023 or $3FF or f64_bias) + base2_logarithm
 	; Minimum exponent: $434 (2^53)
@@ -89,25 +100,30 @@ __lltod:
 	or	a, a		; NZ = round-up, Z = no-round
 	ld	b, $43
 .if 0
-	jr	z, .L.int_to_f64_shl.no_round
+	jr	z, __int_to_f64_shl.no_round
 	; inlined __lladd_1
 	inc	hl
 	add	hl, de
 	or	a, a
 	sbc	hl, de
-	jr	nz, .L.int_to_f64_shl.finish
+	jr	nz, __int_to_f64_shl.finish
 	inc	de
 	sbc	hl, de
 	add	hl, de
-	jr	nz, .L.int_to_f64_shl.finish
+	jr	nz, __int_to_f64_shl.finish
 	inc	bc
-	jr	.L.int_to_f64_shl.finish
+	jr	__int_to_f64_shl.finish
 .else
 	call	nz, __lladd_1	; round up to even
-	jr	.L.int_to_f64_shl.finish
+	jr	__int_to_f64_shl.finish
 .endif
 
-.L.int_to_f64_zero_or_one:
+;-------------------------------------------------------------------------------
+
+; REQUIRE	.section	.text
+
+	.local	__int_to_f64_zero_or_one
+__int_to_f64_zero_or_one:
 	; carry is cleared here
 	; UHL is either one or zero
 	ld	b, h
@@ -118,29 +134,58 @@ __lltod:
 .L.ret_zero:
 	ex	de, hl
 	sbc	hl, hl
-	jr	.L.int_to_f64_shl.finish
+	jr	__int_to_f64_shl.finish
 
+;-------------------------------------------------------------------------------
+
+; REQUIRE	.section	.text
+
+	.global	__ultod
+	.type	__ultod, @function
 __ultod:
 	; (long double)unsigned long
 	cp	a, a		; set Z flag
 	push	af
-	jr	.L.ltod_common
+	jr	__ltod_common
+; REQUIRE	jq	__ltod_common
+
+;-------------------------------------------------------------------------------
+
+; REQUIRE	.section	.text
+
+	.global	__ltod
+	.type	__ltod, @function
 __ltod:
 	; (long double)long
 	bit	7, e
 	push	af
 	call	nz, __lneg	; abs(E:UHL)
-.L.ltod_common:
+
+; REQUIRE	require	__ltod_common
+
+;-------------------------------------------------------------------------------
+
+; REQUIRE	.section	.text
+
+	.local	__ltod_common
+__ltod_common:
 	call	__lctlz
 	sub	a, 31		; normalize clz_result
 
 	; filter out exponent of $000 (zero) and $3FF (one)
-	jr	nc, .L.int_to_f64_zero_or_one
+	jr	nc, __int_to_f64_zero_or_one
 	; A is [-31, -1]
 	add	a, 52
 	; A is [21, 51]
 
-.L.int_to_f64_shl:
+; REQUIRE	require	__int_to_f64_shl
+
+;-------------------------------------------------------------------------------
+
+; REQUIRE	.section	.text
+
+	.local	__int_to_f64_shl
+__int_to_f64_shl:
 	; exponent = (1023 or $3FF or f64_bias) + base2_logarithm
 	; Minimum exponent: $400 (2^1)
 	; Maximum exponent: $434 (2^52)
@@ -169,8 +214,10 @@ __ltod:
 	ld	c, a
 	ld	b, h
 	pop	hl		; restore shifted HL
-.L.int_to_f64_shl.no_round:
-.L.int_to_f64_shl.finish:
+	.local	__int_to_f64_shl.no_round
+__int_to_f64_shl.no_round:
+	.local	__int_to_f64_shl.finish
+__int_to_f64_shl.finish:
 	pop	af
 	ret	z
 	set	7, b
