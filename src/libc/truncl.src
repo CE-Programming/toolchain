@@ -11,7 +11,7 @@ _truncl:
 	ld	hl, (iy + 9)
 	ld	a, h
 	add.s	hl, hl
-	ld	de, 0xFF8020	; -1023 shl 5
+	ld	de, 0xFF8020		; -1023 shl 5
 	add.s	hl, de
 	jr	nc, .L.ret_zero
 ;	ld	de,	0xFFF980	; -52 shl 5
@@ -23,8 +23,8 @@ _truncl:
 	add	hl, hl
 	add	hl, hl
 	add	hl, hl
-	ld	a, h
-	neg	; carry will be set as A is not zero
+	xor	a, a
+	sub	a, h			; carry will be set as H is not zero
 	ld	b, a
 	; UINT56_MAX
 	sbc	a, a
@@ -40,7 +40,7 @@ _truncl:
 	ex	de, hl
 	rla
 	djnz	.L.loop
-	dec	b	; b = $FF
+	dec	b			; b = $FF
 	ld	c, a
 	; values already on the stack
 	jp	__lland
