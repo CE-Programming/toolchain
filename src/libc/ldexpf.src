@@ -1,5 +1,8 @@
 	.assume	adl=1
 
+	.include	"errno.inc"
+	.include	"fenv.inc"
+
 	.section	.text
 	.global	_ldexpf
 	.type	_ldexpf, @function
@@ -132,12 +135,12 @@ _ldexpf:
 ; .underflow:
 	inc	b	; ld b, 0 ; sets Z
 .L.overflow_to_inf:	; <-- NZ is set when infinite
-	ld	a, $28	; FE_OVERFLOW | FE_INEXACT
+	ld	a, FE_OVERFLOW_MASK | FE_INEXACT_MASK
 .L.underflow_to_zero:	; <-- Z is set when underflowing to zero
 .L.raise_erange:
 	ld	hl, $800000
 	jr	nz, .L.overflow
-	ld	a, $24	; FE_UNDERFLOW | FE_INEXACT
+	ld	a, FE_UNDERFLOW_MASK | FE_INEXACT_MASK
 	add	hl, hl	; ld hl, 0
 .if __ldexpf_avoid_negative_zero
 	; prevents negative zero from being emitted on underflow
@@ -145,7 +148,7 @@ _ldexpf:
 .endif
 .L.overflow:
 	ex	de, hl
-	ld	hl, 5	; ERANGE
+	ld	hl, ERANGE
 	ld	(_errno), hl
 .L.raise_inexact:
 	ld	hl, ___fe_cur_env
@@ -218,7 +221,7 @@ _ldexpf:
 	ld	a, c	; UDE
 	or	a, d
 	or	a, e
-	ld	a, $20	; FE_INEXACT
+	ld	a, FE_INEXACT_MASK
 	jr	nz, .L.raise_inexact
 	; NZ needs to be set here
 	jr	.L.raise_erange

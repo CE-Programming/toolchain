@@ -1,5 +1,7 @@
 	.assume	adl=1
 
+	.include	"fenv.inc"
+
 ;-------------------------------------------------------------------------------
 
 	.section	.text
@@ -70,16 +72,18 @@ __lltod_common:
 .L.round_up:
 	inc	b		; round up after shifting
 .L.no_round:
+
 .if 0	; FE_INEXACT
 	adc	a, a		; test sticky and round bits
 	jr	z, .L.result_is_exact
 .L.no_round_inexact:
 	ld	hl, ___fe_cur_env
-	set	5, (hl)		; FE_INEXACT
+	set	FE_INEXACT_BIT, (hl)
 .L.result_is_exact:
 .else
 .L.no_round_inexact:
 .endif
+
 	ld	h, b
 	ld	a, c
 	ld	l, c

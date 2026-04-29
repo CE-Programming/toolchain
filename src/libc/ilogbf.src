@@ -1,5 +1,18 @@
 	.assume	adl=1
 
+	.include	"errno.inc"
+	.include	"fenv.inc"
+	.include	"math.inc"
+
+.if	!(FP_ILOGBNAN == 0x7FFFFF)
+	.print	"ilogbf/ilogb assumes that FP_ILOGBNAN == 0x7FFFFF (INT_MAX)"
+	.err
+.endif
+.if	!(FP_ILOGB0 - 1 == FP_ILOGBNAN)
+	.print	"ilogbf/ilogb assumes FP_ILOGB0 - 1 == FP_ILOGBNAN"
+	.err
+.endif
+
 	.section	.text
 
 	.global	_ilogbf
@@ -42,10 +55,10 @@ _ilogb:
 .L.inf_nan:
 	scf
 .L.ret_zero:
-	ld	hl, 4	; EDOM
+	ld	hl, EDOM
 	ld	(_errno), hl
 	ld	hl, ___fe_cur_env
-	set	4, (hl)	; FE_INVALID
+	set	FE_INVALID_BIT, (hl)
 	ld	hl, $800000	; FP_ILOGB0
 	ret	nc
 	; FP_ILOGBNAN or INT_MAX when carry is set
