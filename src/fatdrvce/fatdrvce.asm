@@ -818,7 +818,7 @@ fat_SetFileSize:
 	ret
 .writegood:
 	ld	a,hl,(yfat.working_size)
-	call	util_ceil_byte_size_to_blocks_per_cluster
+	call	util_ceil_byte_size_to_cluster_size
 	pop	iy
 	ret
 
@@ -858,7 +858,7 @@ fat_SetFileBlockOffset:
 	add	hl,de
 	jq	nc,.invalid
 	ld	de,(yfatFile.block_index)
-	or	a,a
+	xor	a,a
 	sbc	hl,de
 	ret	z				; if at the same block position, done (return 0)
 	add	hl,de				; hl = new block_index, de = current block_index
@@ -866,9 +866,7 @@ fat_SetFileBlockOffset:
 	; check if block is within current cluster
 	; we can optimize by just changing the block position
 	ld	(yfatFile.block_index),hl
-	ld	a,(yfatFile.blocks_per_cluster)
-	dec	a
-	cpl
+	sub	a,(yfatFile.blocks_per_cluster)
 	ld	c,a				; mask for number of blocks
 	and	a,l
 	ld	l,a
@@ -911,20 +909,21 @@ fat_SetFileBlockOffset:
 	ld	hl,(yfatFile.block_index)
 .followchain:
 	ld	c,(yfatFile.blocks_per_cluster)
-	xor	a,a
-	ld	b,24
+	ld	a,c
+	dec	a
+	and	a,l
+	ld	(.cluster_block),a
+	ld	a,c
 .divloop:
 	add	hl,hl
 	rla
-	cp	a,c
-	jr	c,.divskip
-	sub	a,c
-	inc	l
-.divskip:
-	djnz	.divloop
-	ld	(.cluster_block),a
+	jr	nc,.divloop
+	push	af
+	inc	sp
 	push	hl
+	inc	sp
 	pop	bc
+	inc	sp
 	ld	a,hl,(yfatFile.current_cluster)
 	jr	.entergetpos
 .getclusterpos:
@@ -2199,17 +2198,16 @@ util_block_to_cluster:
 	or	a,a
 	sbc	hl,bc
 	sbc	a,(yfat.data_region + 3)
-	ld	de,(yfat.blocks_per_cluster - 2)
-	ld	d,0
-	ld	e,a
+	; AC:UHL = A:UHL << (8 - log2(blocks_per_cluster))
+	ld	c,a
+	ld	a,(yfat.blocks_per_cluster)
 .loop:
 	add	hl,hl
-	ex	de,hl
-	adc	hl,hl
-	ex	de,hl
+	rl	c
+	rla
 	jr	nc,.loop
-	ld	a,d
-	push	de
+	; A:UHL = (AC:UHL >> 8) + 2
+	push	bc
 	push	hl
 	inc	sp
 	pop	hl
@@ -2297,16 +2295,14 @@ util_fat_read_write:
 	compare_hl_zero				; no more blocks left, exit
 	jq	z,.return
 
-	ld	d,(xfatFile.blocks_per_cluster)
-	ld	a,d
-	dec	a
-	and	a,(xfatFile.block_index)	; mask off the number of blocks remaining in this cluster
-	ld	e,a
-	ld	a,d
-	sub	a,e
-	ld	de,0
-	ld	e,a
-	ex	de,hl				; de = total remaining, hl = remaining in cluster
+	ex	de,hl				; de = total remaining
+	xor	a,a
+	sub	a,(xfatFile.blocks_per_cluster)	; mask for number of blocks
+	or	a,(xfatFile.block_index)	; mask the negative number of blocks remaining in this cluster
+	cpl
+	inc	a
+	sbc	hl,hl
+	ld	l,a				; hl = remaining in cluster
 	compare_hl_de
 	jr	nc,.singleclusterread
 .multicluster:
@@ -2342,11 +2338,9 @@ util_fat_read_write:
 	ld	hl,(xfatFile.block_index)
 	add	hl,de
 	ld	(xfatFile.block_index),hl
-	ld	h,(xfatFile.blocks_per_cluster)
-	ld	a,h
+	ld	a,(xfatFile.blocks_per_cluster)
 	dec	a
-	and	a,l
-	or	a,a				; if at end of cluster, get the next one
+	and	a,l				; if at end of cluster, get the next one
 	call	z,.getnextcluster
 .return:
 	ld	hl,(xfatFile.block_index)
@@ -2495,56 +2489,91 @@ util_get_cluster_offset:
 
 ;-------------------------------------------------------------------------------
 util_cluster_entry_to_block:
-	ld	e,a
-	xor	a,a
-	ld	bc,128
-	call	ti._ldivu
+	; input:
+	; - A:UHL
+	; output:
+	; - A:UHL = floor(A:UHL / 128) + (yfat.fat_pos)
+	; destroys:
+	; - BC, flags
+
+	; shift A:UHL left by 1 and shift the 33-bit result right by 8
+	add	hl,hl
+	rla
+	push	af
+	inc	sp
+	push	hl
+	inc	sp
+	pop	hl
+	inc	sp
+	ccf
+	sbc	a,a
+	; the increment to set A to 0 or 1 is deferred until the adc below
 	ld	bc,(yfat.fat_pos)
 	add	hl,bc
-	adc	a,e
+	adc	a,1
 	ret
 
 ;-------------------------------------------------------------------------------
 util_ceil_byte_size_to_block_size:
-	compare_auhl_zero
-	ret	z
-	ld	e,a
-	push	hl,de
-	xor	a,a
-	ld	bc,512
-	push	bc
-	call	ti._lremu
-	compare_hl_zero
-	pop	bc,de,hl
+	; input:
+	; - A:UHL
+	; output:
+	; - A:UHL = ceil(A:UHL / 512)
+	; - A = 0
+	; destroys:
+	; - C, flags
+
+	; UHL = A:UHL >> 9
+	ld	c,l
+	srl	a
 	push	af
-	xor	a,a
-	call	ti._ldivu
-	pop	af
+	inc	sp
+	push	hl
+	inc	sp
+	pop	hl
+	inc	sp
+	rr	h
+	rr	l
+	; round up if any shifted-out bits were non-zero
+	sbc	a,a
+	or	a,c
 	ret	z
 	inc	hl
+	xor	a,a
 	ret
 
 ;-------------------------------------------------------------------------------
-util_ceil_byte_size_to_blocks_per_cluster:
-	compare_auhl_zero
-	ret	z
-	push	af,hl
-	xor	a,a
-	sbc	hl,hl
-	ld	h,(yfat.blocks_per_cluster)
+util_ceil_byte_size_to_cluster_size:
+	; input:
+	; - A:UHL
+	; - IY = fat struct
+	; output:
+	; - UHL = ceil(A:UHL / (512 * blocks_per_cluster))
+	; destroys:
+	; - A, BC, flags
+
+	; BC:UHL = A:UHL << (7 - log2(blocks_per_cluster))
+	ld	b,(yfat.blocks_per_cluster)
+	or	a,a
+	jr	.enter
+.loop:
 	add	hl,hl
+	rla
+.enter:
+	rl	b
+	jr	nc,.loop
+	ld	c,a
+	; check if HL != 0
+	ld	a,h
+	or	a,l
+	; UHL = BC:UHL >> 16
+	push	bc
 	push	hl
-	pop	bc
-	pop	hl,de
-	ld	e,d
-	push	hl,de,bc
-	call	ti._lremu
-	compare_hl_zero
-	pop	bc,de,hl
-	push	af
-	xor	a,a
-	call	ti._ldivu
-	pop	af
+	inc	sp
+	inc	sp
+	pop	hl
+	inc	sp
+	; round up if any shifted-out bits were non-zero
 	ret	z
 	inc	hl
 	ret
