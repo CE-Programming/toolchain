@@ -1,6 +1,44 @@
 # Change Log
 
-## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v14.2...master)
+## [Unreleased](https://github.com/CE-Programming/toolchain/compare/v15.0...master)
+
+# [v15.0](https://github.com/CE-Programming/toolchain/releases/tag/v15.0) (2026-05-01)
+
+This version is now built around LLVM/Clang v19 (instead of v15) and the move from the fasmg-based assembling+linking to a GNU binutils/GAS one, for user programs, making the toolchain more maintainable, more standard, more portable, and **much faster** than before. On top of that foundation, this release expands the runtime and standard library and brings a large round of fixes, optimizations, and automatic tests.
+
+## New Features
+
+- Upgraded the supported compiler stack to LLVM/Clang v19.
+- Reworked the build flow around GNU binutils/GAS and added the `cedev-obj` helper to inspect ELF outputs and generate CRT/libload metadata.
+- Added LZ4 decompression routines in the runtime and corresponding `lz4` / `lz4hc` compression modes in `convimg`.
+- Added direct 8ek app output support across the toolchain, including `.8ek` output, application linker support, application descriptions, and emitted relocations (see `APPLICATION` makefile flag). Proper installer support for real on-calc app distribution remains outside the toolchain scope for now.
+- Expanded libc/CRT/C++ runtime support with `strtok_r`, `strsep`, `_Complex` floating-point helpers, `cxa_guard` support, improved `<fenv.h>` / `<cfenv>` conformance, and constructor/destructor priority handling.
+- Add overlap support for gfx_CopyRectangle.
+
+## Fixes
+
+- Fixed `atexit`, `on_exit`, and `_Exit`.
+- Fixed long-double softfloat ABI issues and additional floating-point corner cases.
+- Fixed `fgetc` / `fputc` null-stream handling.
+- Fixed `(v)asprintf` behavior for zero-length output.
+- Fixed `atof(f)` return values.
+- Fixed `LIB_ALLOCATOR` and `LIB_PRINTF` linking, and improved circular `LIB_*` dependency handling.
+- Fixed several application-build issues while bringing `.8ek` support online.
+- Fixed assumptions about the target environment, especially around the `__TICE__` define, making the toolchain more usable beyond strictly CE-specific targets.
+- Fixed `convbin` invocation in the top-level `libs` target.
+- Fixed Windows path handling and other tooling issues across `convbin` and `convimg`.
+- Fixed fontlib_SetFont ignore line spacing parameter option to always ignore.
+
+## Improvements
+
+- Made the toolchain's `memcpy` / `memmove` the default implementation.
+- Added assembly include files for <errno.h> <fenv.h> and <math.h> in the toolchain sources
+- Optimized `calloc`, `bss` zeroing, `strerror`, `perror`, `nanoprintf`, libload, random, and many CRT integer helper routines.
+- Added or improved fallback CRT routines that avoid shadow-register or interrupt-sensitive behavior for several multiplication and division paths.
+- Optimized ZX0/ZX7 decompression paths and added LZ4-backed asset workflows.
+- Optimized graphx circle routines and text entry points.
+- Optimized fatdrvce cluster and sector lookup/traversal.
+- Optimized multiply high routines.
 
 # [v14.2](https://github.com/CE-Programming/toolchain/releases/tag/v14.2) (2026-01-13)
 
