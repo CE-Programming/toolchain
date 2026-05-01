@@ -68,7 +68,7 @@ jobs:
 
       - name: Download ez80-clang and ez80-link
         id: ez80-bins
-        uses: carlosperate/download-file-action@v2.0.2
+        uses: carlosperate/download-file-action@v2.0.3
         with:
           file-url: https://github.com/CE-Programming/llvm-project/releases/download/nightly/${{matrix.llvm-project}}
       - name: Extract ez80-clang (Unix)
@@ -81,7 +81,7 @@ jobs:
 
       - name: Download binutils
         id: binutils
-        uses: carlosperate/download-file-action@v2.0.2
+        uses: carlosperate/download-file-action@v2.0.3
         with:
           file-url: https://github.com/CE-Programming/binutils-gdb/releases/download/nightly/${{matrix.binutils-gdb}}
       - name: Extract binutils (Unix)
@@ -98,7 +98,7 @@ jobs:
              sudo echo "208.99.203.253 flatassembler.net" | sudo tee -a /etc/hosts
       - name: Download Fasmg Download Page
         id: fasmg-download
-        uses: carlosperate/download-file-action@v2.0.2
+        uses: carlosperate/download-file-action@v2.0.3
         with:
           file-url: ${{env.FASMG_DOMAIN}}/download.php
       - name: Parse Fasmg Download Page
@@ -111,7 +111,7 @@ jobs:
         run: cmake -E echo >> $${{matrix.env}}GITHUB_ENV ${{steps.fasmg-url.outputs.result}}
       - name: Download Fasmg
         id: fasmg
-        uses: carlosperate/download-file-action@v2.0.2
+        uses: carlosperate/download-file-action@v2.0.3
         with:
           file-url: ${{env.FASMG_DOMAIN}}/${{env.href}}
       - name: Extract Fasmg
@@ -123,7 +123,7 @@ jobs:
         run: cmake -E copy fasmg${{matrix.fasmg}} ${{env.CEDEV_BIN}}/fasmg${{matrix.exe}}
 
       - name: Checkout CEmu
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: CE-Programming/CEmu
           ref: latest-stable
@@ -146,7 +146,7 @@ jobs:
           fasmg ${{matrix.nul}} ${{matrix.nul}}
 
       - name: Checkout Toolchain
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: ${{env.TOOLCHAIN_PATH}}
           submodules: recursive
@@ -231,7 +231,7 @@ jobs:
           cd ${{env.CEDEV}}/.. && 7z a -tzip CEdev-${{runner.os}}.${{matrix.install-output-ext}} CEdev
 
       - name: Upload CEdev
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: CEdev-${{runner.os}}${{matrix.arch-suffix}}
           path: CEdev-${{runner.os}}${{matrix.arch-suffix}}.${{matrix.install-output-ext}}
@@ -242,14 +242,14 @@ jobs:
 
       - name: Upload Libraries
         if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: clibs
           path: ${{env.AUTOTESTER_LIBS_GROUP}}
 
       - name: Upload Libraries Zip
         if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: clibs_separately_in_zip
           path: ${{github.workspace}}/toolchain/clibs_separately_in_zip.zip
@@ -275,7 +275,7 @@ jobs:
         run: cmake -E echo >> $${{matrix.env}}GITHUB_PATH ${{env.CEDEV_BIN}}
 
       - name: Download CEdev
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: CEdev-${{runner.os}}${{matrix.arch-suffix}}
           path: ${{github.workspace}}
@@ -295,7 +295,7 @@ jobs:
 
       # checkout only for test files -- contents should not be used otherwise.
       - name: Checkout Toolchain
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: ${{env.TOOLCHAIN_PATH}}
           persist-credentials: false
@@ -311,14 +311,14 @@ jobs:
         run: make -j4 -C ${{env.CEDEV_EXAMPLES}} COMPRESSED=${{matrix.compressed}} V=1
 
       - name: Download CI test secrets
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: "CE-Programming/ci-test-secrets"
           token: ${{ secrets.GH_PAT_CI_SECRETS }}
           path: "secrets"
 
       - name: Download Libraries
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: clibs
           path: ${{env.TOOLCHAIN_PATH}}
@@ -375,7 +375,7 @@ jobs:
 
       - name: "[Linux] Upload built examples"
         if: runner.os == 'Linux' && matrix.compressed == 'YES'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: built-examples
           path: ${{env.CEDEV}}/built-examples.zip
@@ -389,7 +389,7 @@ jobs:
           cmake -E echo >> $${{matrix.env}}GITHUB_PATH $${{matrix.env}}HOME/.local/bin
 
       - name: Checkout Toolchain
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: ${{env.TOOLCHAIN_PATH}}
           persist-credentials: false
@@ -426,37 +426,37 @@ jobs:
 
     steps:
       - name: Download CEdev Linux
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: CEdev-Linux
           path: ${{github.workspace}}
       - name: Download CEdev Windows
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: CEdev-Windows
           path: ${{github.workspace}}
       - name: Download CEdev macOS-intel
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: CEdev-macOS-intel
           path: ${{github.workspace}}
       - name: Download CEdev macOS-arm
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: CEdev-macOS-arm
           path: ${{github.workspace}}
       - name: Download CE Libraries
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: clibs
           path: ${{github.workspace}}
       - name: Download Libraries Zip
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: clibs_separately_in_zip
           path: ${{github.workspace}}
       - name: Download Built examples
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: built-examples
           path: ${{github.workspace}}
@@ -471,7 +471,7 @@ jobs:
 
       - name: Update nightly release
         if: ${{ github.ref == 'refs/heads/master' && github.event_name != 'pull_request' }}
-        uses: softprops/action-gh-release@5122b4edc95f85501a71628a57dc180a03ec7588 # latest as of 2025-12-22
+        uses: softprops/action-gh-release@2bc819c87a4e63a4ac4e581a02085318bd49975a # latest as of 2026-05-01
         with:
           tag_name: nightly
           prerelease: true
@@ -486,7 +486,7 @@ jobs:
             built-examples-nightly.zip
 
       - name: Dispatch libraries repo
-        uses: peter-evans/repository-dispatch@v3
+        uses: peter-evans/repository-dispatch@575996ea1a010004ee30aaa78ab293b4bfb47e8b # latest as of 2026-05-01
         with:
           token: ${{ secrets.CI_PAT_CLIBS_NIGHTLTY }}
           repository: CE-Programming/libraries
