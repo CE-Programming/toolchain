@@ -22,33 +22,64 @@
     "delay|200",
     "hashWait|3",
     "key|enter",
+    "hashWait|4",
+    "key|2",
     "delay|200",
-    "hashWait|4"
+    "key|1",
+    "delay|200",
+    "hashWait|5",
+    "key|enter",
+    "delay|200",
+    "hashWait|6",
+    "key|enter",
+    "delay|200",
+    "hashWait|7"
   ],
   "hashes":
   {
     "1":
     {
-      "description": "Test wait for input",
+      "description": "Test wait for input 1",
       "start": "vram_start",
       "size": "vram_16_size",
       "expected_CRCs": [ "ED817E7E", "A5642ACC" ]
     },
     "2":
     {
-      "description": "Test show user input",
+      "description": "Test show user input 1",
       "start": "vram_start",
       "size": "vram_16_size",
       "expected_CRCs": [ "0597804D", "C2D3F3D4" ]
     },
     "3":
     {
-      "description": "Test output display",
+      "description": "Test output display 1",
       "start": "vram_start",
       "size": "vram_16_size",
       "expected_CRCs": [ "F90F17BE" ]
     },
     "4":
+    {
+      "description": "Test wait for input 2",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "4DD4EB5A", "5206C3F1" ]
+    },
+    "5":
+    {
+      "description": "Test show user input 2",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "5ABF91FF", "A2F97D43" ]
+    },
+    "6":
+    {
+      "description": "Test output display 2",
+      "start": "vram_start",
+      "size": "vram_16_size",
+      "expected_CRCs": [ "E07B2B32" ]
+    },
+    "7":
     {
       "description": "Test program exit",
       "start": "vram_start",

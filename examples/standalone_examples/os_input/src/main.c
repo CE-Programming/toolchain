@@ -14,13 +14,29 @@ int main(void)
     /* Clear the homescreen */
     os_ClrHome();
 
-    /* Ask the user to type a string, which gets stored in `inputBuf` */
+    /* Ask the user to type a string, which gets stored in `inputBuffer` */
     os_GetStringInput("What is N? ", inputBuffer, INPUT_SIZE);
 
     /* Build the user response */
     sprintf(response, "N is %s.", inputBuffer);
 
-    /* Clear the homescreen and display the built response */
+    /* Clear the homescreen and display the response */
+    os_ClrHome();
+    os_PutStrFull(response);
+
+    /* Waits for a key */
+    while (!os_GetCSC());
+
+    /* Clear the homescreen */
+    os_ClrHome();
+
+    /* Ask the user to type a tokenized string, which gets stored in `inputBuffer` */
+    os_GetTokenInput("What is N (tokens)? ", inputBuffer, INPUT_SIZE);
+
+    /* Build the user response */
+    sprintf(response, "N is %s.", inputBuffer);
+
+    /* Clear the homescreen and display the response */
     os_ClrHome();
     os_PutStrFull(response);
 

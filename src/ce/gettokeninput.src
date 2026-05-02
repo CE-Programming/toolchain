@@ -31,7 +31,7 @@
 
 _os_GetTokenInput:
 	call	__frameset0
-	ld	iy, flags
+	ld	iy, ti.flags
 	ld	l, (iy + $0D)
 	ld	h, (iy + $4C)
 	push	hl			; save text flags
