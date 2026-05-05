@@ -1,0 +1,22 @@
+	.assume	adl=1
+
+	.section	.text
+	.global	__frameset_b
+	.type	__frameset_b, @function
+
+	; TODO: merge into __frameset.src once compiler starts emitting __frameset_b
+__frameset_b:
+	; framesets -A bytes (1 to 256 bytes)
+	; framesets 256 bytes if A is zero
+	scf
+	sbc	hl, hl
+	ld	l, a
+; __frameset:
+	pop	de
+	push	ix
+	ld	ix, 0
+	add	ix, sp
+	add	hl, sp
+	ld	sp, hl
+	ex	de, hl
+	jp	(hl)
