@@ -30,8 +30,7 @@ __BEGIN_DECLS
 
 clock_t clock(void);
 
-double difftime(time_t time1, time_t time0)
-    __attribute__((__const__));
+double difftime(time_t time1, time_t time0);
 
 time_t mktime(struct tm *tmp);
 
