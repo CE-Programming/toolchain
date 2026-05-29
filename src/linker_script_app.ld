@@ -123,6 +123,5 @@ SECTIONS
     {
         *(.runprgm.reloc)
         *(.comment)
-        *(.note*)
     }
 }
