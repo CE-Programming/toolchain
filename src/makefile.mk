@@ -124,9 +124,6 @@ UPDIR_RM = $(subst _../,../,$(subst \,/,$1))
 CC_DEBUG = -DNDEBUG=1
 LD_DEBUG = --defsym NDEBUG=1
 
-# linker script
-LINKER_SCRIPT ?= $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/meta/linker_script.ld)
-
 # allocator (malloc/realloc/free)
 ifeq ($(ALLOCATOR),STANDARD)
 LIB_ALLOCATOR = $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/lib/libc/allocator_standard.a)
@@ -241,12 +238,13 @@ LD_EMIT_RELOCS = --emit-relocs
 LOAD_ADDR = 0x000000
 TARGET = $(NAME).8ek
 CRT0_APPLICATION = -DHAS_APPLICATION=1
-LINKER_SCRIPT = $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/meta/linker_script_app.ld)
+LINKER_SCRIPT ?= $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/meta/linker_script_app.ld)
 CONVBINFLAGS += -k 8ek
 ifneq ($(APPLICATION_DESCRIPTION),)
 CONVBINFLAGS += -d $(APPLICATION_DESCRIPTION)
 endif
 else
+LINKER_SCRIPT ?= $(call FORWARD_PATH,$(CEDEV_TOOLCHAIN)/meta/linker_script.ld)
 LD_EMIT_RELOCS =
 ifeq ($(ARCHIVED),YES)
 CONVBINFLAGS += -r
