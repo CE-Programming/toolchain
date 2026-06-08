@@ -536,19 +536,20 @@ int memccpy_tests(void) {
     for (size_t i = 0; i != sizeof terminal; ++i) {
         void* to = T_memccpy(dest, src, terminal[i], sizeof dest);
 
-        fprintf(file, "Terminal '%c' (%s):\t\"", terminal[i], to ? "found" : "absent");
+        C(fprintf(file, "Terminal '%c' (%s):\t\"", terminal[i], to ? "found" : "absent") > 0);
 
         // if `terminal` character was not found - print the whole `dest`
         to = to ? to : dest + sizeof dest;
 
         for (char* from = dest; from != to; ++from) {
-            fputc(isprint(*from) ? *from : alt, file);
+            unsigned char ch = (unsigned char)(isprint(*from) ? *from : alt);
+            C(fputc((int)ch, file) == (int)ch);
         }
 
-        fputs("\"\n", file);
+        C(fputs("\"\n", file) >= 0);
     }
 
-    fprintf(file, "%c%s", '\n', "Separate star names from distances (ly):\n");
+    C(fprintf(file, "%c%s", '\n', "Separate star names from distances (ly):\n") > 0);
     const char *star_distance[] = {
         "Arcturus : 37", "Vega : 25", "Capella : 43", "Rigel : 860", "Procyon : 11"
     };
@@ -566,14 +567,14 @@ int memccpy_tests(void) {
 
     if (first) {
         *first = '\0';
-        fprintf(file, "%s%c", names_only, '\n');
+        C(fprintf(file, "%s%c", names_only, '\n') > 0);
     } else {
         printf("Error Buffer is too small.\n");
     }
 
-    fseek(file, 0, SEEK_END);
+    C(fseek(file, 0, SEEK_END) == 0);
     int file_size = ftell(file);
-    fseek(file, 0, SEEK_SET);
+    C(fseek(file, 0, SEEK_SET) == 0);
 
     if (file_size <= 0) {
         perror("file_size <= 0");
@@ -1687,9 +1688,11 @@ int run_tests(void) {
     /* nano_fprintf memccpy */
         ret = memccpy_tests();
         free(buf); buf = NULL;
-        fclose(file);
+        if (fclose(file) != 0) {
+            perror("Could not close file");
+        }
         if (remove(file_name) != 0) {
-            perror("Couldn't delete file");
+            perror("Could not delete file");
         }
         if (ret != 0) { return ret; }
 

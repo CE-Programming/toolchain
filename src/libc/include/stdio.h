@@ -61,9 +61,9 @@ size_t fread(void *__restrict ptr, size_t size, size_t count, FILE *__restrict s
 
 size_t fwrite(const void *__restrict ptr, size_t size, size_t count, FILE *__restrict stream);
 
-long int ftell(FILE *stream) __attribute__((__warn_unused_result__));
+long ftell(FILE *stream) __attribute__((__warn_unused_result__));
 
-int fseek(FILE *stream, long int offset, int origin);
+int fseek(FILE *stream, long offset, int origin);
 
 void rewind(FILE *stream);
 

@@ -2,32 +2,21 @@
 
 int __attribute__((weak)) fputc(int c, FILE *stream)
 {
-    int ret;
-
-    if (stream == NULL)
+    if (stream == NULL || stream == stdin)
     {
         return EOF;
     }
-
-    if (stream == stdin)
+    if (stream == stdout || stream == stderr)
     {
-        ret = EOF;
-    }
-    else if (stream == stdout || stream == stderr)
-    {
-        ret = putchar(c);
-    }
-    else
-    {
-        ret = ti_PutC((char)c, stream->slot);
+        return putchar(c);
     }
 
+    int ret = ti_PutC((char)c, stream->slot);
+    /*
+     * `ti_PutC` returns `(unsigned char)c` or `EOF` so we can skip testing for
+     * the case of `ret != (unsigned char)c`
+     */
     if (ret == EOF)
-    {
-        stream->eof = 1;
-    }
-
-    if (ret != c)
     {
         stream->err = 1;
     }

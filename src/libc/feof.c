@@ -2,5 +2,9 @@
 
 int __attribute__((weak)) feof(FILE *stream)
 {
+    if (stream == NULL || stream == stdin || stream == stdout || stream == stderr)
+    {
+        return 0;
+    }
     return stream->eof;
 }
