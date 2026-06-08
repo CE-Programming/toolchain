@@ -2,11 +2,12 @@
 
 size_t __attribute__((weak)) fread(void *ptr, size_t size, size_t count, FILE *__restrict stream)
 {
-    size_t ncount;
-
-    if (stream == NULL ||
-        stream == stdout ||
-        stream == stderr)
+    if (stream == NULL || stream == stdout || stream == stderr)
+    {
+        return 0;
+    }
+    // If size or count is zero, fread returns zero and performs no other action.
+    if (size == 0 || count == 0)
     {
         return 0;
     }
@@ -16,6 +17,7 @@ size_t __attribute__((weak)) fread(void *ptr, size_t size, size_t count, FILE *_
         int c;
         char *p = ptr;
         size_t len = size * count;
+        size_t bytes_read = 0;
 
         for (; len > 0; len--)
         {
@@ -24,12 +26,13 @@ size_t __attribute__((weak)) fread(void *ptr, size_t size, size_t count, FILE *_
                 break;
             }
             *p++ = (char)c;
+            bytes_read++;
         }
 
-        return count;
+        return bytes_read / size;
     }
 
-    ncount = ti_Read(ptr, size, count, stream->slot);
+    size_t ncount = ti_Read(ptr, size, count, stream->slot);
     if (ncount != count)
     {
         stream->err = 1;

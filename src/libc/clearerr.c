@@ -1,5 +1,7 @@
 #include "__fileioc_stdio.h"
 
+#include <stdint.h>
+
 void __attribute__((weak)) clearerr(FILE *stream)
 {
     if (stream == NULL ||
@@ -9,7 +11,7 @@ void __attribute__((weak)) clearerr(FILE *stream)
     {
         return;
     }
-
-    _file_streams[stream->slot].eof = 0;
-    _file_streams[stream->slot].err = 0;
+    uint8_t index = stream->slot - 1;
+    _file_streams[index].eof = 0;
+    _file_streams[index].err = 0;
 }
