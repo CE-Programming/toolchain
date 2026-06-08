@@ -1,20 +1,23 @@
 #include <stddef.h>
 #include <stdarg.h>
-#include <string.h>
 #include <stdio.h>
-#include <stdbool.h>
 #include <stdlib.h>
 #include <ti/sprintf.h>
 
 #define SINK (char *__restrict)0xE40000
 
 int boot_vsnprintf(char *__restrict buffer, size_t count, const char *__restrict format, va_list args) {
-    int str_len = boot_vsprintf(SINK, format, args);
+    va_list args_copy;
+    va_copy(args_copy, args);
+    int str_len = boot_vsprintf(SINK, format, args_copy);
+    va_end(args_copy);
+
     if (buffer == NULL || count == 0) {
         return str_len;
     }
-    if ((size_t)str_len >= count || str_len <= 0) {
-        // won't fit or invalid formatting
+    // str_len == 0 can take this fast path
+    if ((size_t)str_len >= count || str_len < 0 || str_len == 0) {
+        // won't fit, invalid formatting, or empty string
         *buffer = '\0';
         return str_len;
     }
@@ -32,18 +35,30 @@ int boot_snprintf(char *__restrict buffer, size_t count, const char *__restrict 
 __attribute__((weak, alias("boot_snprintf"))) int snprintf(char *__restrict buffer, size_t count, const char *__restrict format, ...);
 
 int boot_vasprintf(char **__restrict p_buffer, const char *__restrict format, va_list args) {
-    int ret = -1;
     *p_buffer = NULL;
-    int str_len = boot_vsprintf(SINK, format, args);
+    va_list args_copy;
+    va_copy(args_copy, args);
+    int str_len = boot_vsprintf(SINK, format, args_copy);
+    va_end(args_copy);
+
     if (str_len < 0) {
         // formatting error
         return str_len;
     }
     size_t buffer_size = (size_t)str_len + 1;
-    *p_buffer = malloc(buffer_size);
-    if (*p_buffer != NULL) {
-        ret = boot_vsprintf(*p_buffer, format, args);
+    char* buffer = malloc(buffer_size);
+    if (buffer == NULL) {
+        // malloc failure
+        return -1;
     }
+    va_copy(args_copy, args);
+    int ret = boot_vsprintf(buffer, format, args_copy);
+    va_end(args_copy);
+    if (ret < 0) {
+        free(buffer);
+        return ret;
+    }
+    *p_buffer = buffer;
     return ret;
 }
 __attribute__((weak, alias("boot_vasprintf"))) int vasprintf(char **__restrict p_buffer, const char *__restrict format, va_list args);
