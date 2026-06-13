@@ -93,8 +93,13 @@ int sprintf(char *__restrict buffer, const char *__restrict format, ...)
 
 int vasprintf(char **__restrict p_str, const char *__restrict format, va_list vlist) {
   *p_str = NULL;
-  int str_len = vsnprintf(NULL, 0, format, vlist);
+  va_list vlist_copy;
+  va_copy(vlist_copy, vlist);
+  int str_len = vsnprintf(NULL, 0, format, vlist_copy);
+  va_end(vlist_copy);
+
   if (str_len < 0) {
+    // formatting error
     return str_len;
   }
   size_t buf_len = (size_t)str_len + 1;
@@ -103,7 +108,9 @@ int vasprintf(char **__restrict p_str, const char *__restrict format, va_list vl
     // malloc failure
     return -1;
   }
-  int ret = vsnprintf(buf, buf_len, format, vlist);
+  va_copy(vlist_copy, vlist);
+  int ret = vsnprintf(buf, buf_len, format, vlist_copy);
+  va_end(vlist_copy);
   if (ret < 0) {
     free(buf);
     return ret;
