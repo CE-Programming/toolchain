@@ -1,6 +1,6 @@
 #include "__fileioc_stdio.h"
 
-int __attribute__((weak)) fseek(FILE *stream, long int offset, int origin)
+int __attribute__((weak)) fseek(FILE *stream, long offset, int origin)
 {
     if (stream == NULL ||
         stream == stdin ||
@@ -9,6 +9,5 @@ int __attribute__((weak)) fseek(FILE *stream, long int offset, int origin)
     {
         return -1;
     }
-
-    return ti_Seek((int)offset, origin, stream->slot);
+    return (ti_Seek((int)offset, origin, stream->slot) == EOF) ? -1 : 0;
 }
