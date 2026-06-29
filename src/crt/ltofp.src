@@ -1,0 +1,57 @@
+	.assume	adl=1
+
+;-------------------------------------------------------------------------------
+
+	.section	.text
+
+	.global	__ultofp
+	.type	__ultofp, @function
+
+; IEEE single precision from 32-bit integers
+; aubc = float(aubc)
+__ultofp: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)bitcast(uint32_t, pair8_24_t, { in.BC, in.A })) && out.DE == in.DE && out.HL == in.HL && out.IX == in.IX && out.IY == in.IY
+	push	af
+	xor	a, a
+;	jq	__ltofp.enter
+	db	$38	; jr c, *
+
+	; require	__ltofp
+
+;-------------------------------------------------------------------------------
+
+	.section	.text
+
+	.global	__ltofp
+	.type	__ltofp, @function
+
+__ltofp: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)bitcast(int32_t, pair8_24_t, { in.BC, in.A })) && out.DE == in.DE && out.HL == in.HL && out.IX == in.IX && out.IY == in.IY
+	push	af
+	.local	__ltofp.enter
+__ltofp.enter:
+	rlca
+	inc	sp
+	push	bc
+	inc	sp
+	ex	(sp), hl
+	ld	b, c
+	ld	c, a
+	ld	a, b
+	push	de
+	jr	nc, .L.positive
+	add	hl, de
+	ex	de, hl
+	neg
+	sbc	hl, de
+.L.positive:
+	ld	de, 0800000h
+	ld	b, 07Fh + 31
+	call	__fppack
+	pop	de
+	ex	(sp), hl
+	pop	bc
+	inc	sp
+	ret
+
+;-------------------------------------------------------------------------------
+
+	.extern	__fppack

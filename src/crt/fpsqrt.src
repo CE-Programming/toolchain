@@ -1,0 +1,119 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__fpsqrt
+	.type	__fpsqrt, @function
+
+; IEEE single precision square root
+; aubc = sqrt(aubc)
+__fpsqrt: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), (float)sqrt(bitcast(float, pair8_24_t, { in.BC, in.A }))) && out.DE == in.DE && out.HL == in.HL && out.IX == in.IX && out.IY == in.IY
+	push	de
+	push	bc
+	ex	(sp), hl
+	ld	e, a
+	call	__fppop1
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	jr	z, .L.zero
+	rlca
+	jr	c, .L.return_nan
+	inc	e
+	jr	z, .L.nonfinite
+	push	hl
+	ex	(sp), ix
+	sbc	hl, hl
+	srl	e
+	jr	nc, .L.normalize.skip
+.L.normalize.loop:
+	add	ix, ix
+	adc	hl, hl
+.L.normalize.skip:
+	dec	e
+	add	ix, ix
+	adc	hl, hl
+	jr	z, .L.normalize.loop
+	push	de
+	xor	a, a
+	ex	de, hl
+	sbc	hl, hl
+	ld	c, a
+	ld	b, 25
+	; x in AUDEUIX, r in CUHL
+.L.root.loop:
+	ex	de, hl
+	; r += 1
+	inc	de	; sets bit 0 so never overflows
+	; x -= r << 24
+	sbc	hl, de
+	sbc	a, c
+	jr	nc, .L.root.onebit
+	; x += r << 24
+	add	hl, de
+	adc	a, c
+	; r -= 2
+	dec	de
+	dec	de
+.L.root.onebit:
+	; r += 1
+	inc	de
+	; x <<= 2
+	.rept	2
+	add	ix, ix
+	adc	hl, hl
+	rla
+	.endr
+	ex	de, hl
+	; r <<= 1
+	add	hl, hl
+	rl	c	; clears carry
+	djnz	.L.root.loop
+	; Shift left by 5
+	ld	a, c
+	.rept	5
+	add	hl, hl
+	rla
+	.endr
+	; Set the low exponent bit of the result
+	pop	de
+	pop	ix
+	sra	e
+	rla
+	rrca
+	; Shift right by 8
+	push	af
+	inc	sp
+	push	hl
+	inc	sp
+	pop	bc
+	inc	sp
+	; Calculate the high exponent bits and unset sign bit
+	ld	a, e
+	add	a, 07Fh / 4 + 1
+	; Check whether to round up (never round-to-even because a root with the lowest mantissa bit set must be irrational)
+	inc	l
+	pop	hl
+	pop	de
+	ret	p
+	inc	bc	; This never overflows into the exponent field
+	ret
+
+.L.nonfinite:
+	rrca
+.L.zero:
+	ex	(sp), hl
+	pop	bc
+	pop	de
+	ret
+
+.L.return_nan:
+	; input was negative and not -0.0
+	; return negative NaN
+	sbc	a, a
+	set	7, b
+	pop	hl
+	pop	de
+	ret
+
+	.extern	__fppop1

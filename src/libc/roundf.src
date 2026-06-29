@@ -1,0 +1,22 @@
+	.assume	adl=1
+
+	.section	.text
+	.global	_roundf
+	.type	_roundf, @function
+	.global	_round
+	.type	_round, @function
+
+_round:
+_roundf:
+	pop	de
+	pop	bc
+	ex	(sp), hl
+	ld	a, l
+	call	__fpround
+	push	bc
+	ex	(sp), hl
+	push	de
+	ld	e, a
+	ret
+
+	.extern	__fpround

@@ -1,0 +1,129 @@
+	.assume	adl=1
+
+;-------------------------------------------------------------------------------
+
+	.section	.text
+
+	.global	__fppop1
+	.type	__fppop1, @function
+	.global	__fppop2
+	.type	__fppop2, @function
+
+__fppop1:
+	ld	bc, 0800000h
+__fppop2:
+	sla	e
+	jr	z, .L.denormal
+	add	hl, bc
+	ret	nc
+	add	hl, bc
+.L.denormal:
+	inc	e
+	ret
+
+;-------------------------------------------------------------------------------
+
+	.section	.text
+
+	.global	__fppack
+	.type	__fppack, @function
+	.global	__fppack.normalize
+	.type	__fppack.normalize, @function
+	.global	__fppack.normalized
+	.type	__fppack.normalized, @function
+
+__fppack.normalize:
+	dec	b
+	call	nz, __fppack.normalize.entry
+__fppack:
+	add	hl, de
+	jr	nc, __fppack.normalize
+__fppack.normalized:
+	rrc	l
+	rlc	l
+	adc	a, 07Fh
+	adc	hl, de
+	ld	a, b
+	adc	a, e
+	srl	c
+	rra
+	srl	b
+	ret	c
+	add	hl, de
+	ret
+
+	.local	__fppack.normalize.entry
+__fppack.normalize.entry:
+	add	a, a
+	adc	hl, hl
+	ret	m
+	jr	nz, .L.normalize.continue
+	or	a, a
+	jr	nz, .L.normalize.continue
+	ld	b, 1
+.L.normalize.loop:
+	add	a, a
+	adc	hl, hl
+	ret	m
+.L.normalize.continue:
+	djnz	.L.normalize.loop
+	add	hl, de
+	ret
+
+;-------------------------------------------------------------------------------
+
+	.section	.text
+
+	.global	__fppack2
+	.type	__fppack2, @function
+	.global	__fppack2.normalize
+	.type	__fppack2.normalize, @function
+	.global	__fppack2.normalized
+	.type	__fppack2.normalized, @function
+
+__fppack2.normalize:
+	dec	b
+	call	nz, __fppack2.normalize.loop
+__fppack2:
+	add	hl, de
+	jr	nc, __fppack2.normalize
+__fppack2.normalized:
+	ld	a, b
+	add	ix, de
+	jr	nc, .L.rounded
+	dec	ix
+	add	ix, de
+	jr	nc, .L.round
+	bit	0, l
+	jr	z, .L.rounded
+.L.round:
+	scf
+	adc	hl, de
+	adc	a, e
+.L.clear:
+	add	hl, de
+	jr	nc, .L.clear
+.L.rounded:
+	cp	a, 0FFh
+	jr	z, .L.infinite
+	sla	c
+	rra
+	ret	nc
+	add	hl, de
+	ret
+.L.infinite:
+	sla	c
+	rra
+	ex	de, hl
+	ret
+
+	.local	__fppack2.normalize.loop
+__fppack2.normalize.loop:
+	add	ix, ix
+	adc	hl, hl
+	ret	m
+	djnz	__fppack2.normalize.loop
+	add	hl, de
+	ret
+
+;-------------------------------------------------------------------------------
