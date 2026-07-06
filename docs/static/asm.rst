@@ -61,7 +61,7 @@ Below is an example C prototype followed by the assembly implementation:
 
     void asm_func(int argument);
 
-:code:`asm_func.asm`
+:code:`asm_func.s`
 
 .. code-block::
 
