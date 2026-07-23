@@ -1,0 +1,14 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__sabs
+	.type	__sabs, @function
+
+__sabs:
+	; HL = abs(HL)
+	bit	7, h
+	ret	z
+	jp	__sneg
+
+	.extern	__sneg
