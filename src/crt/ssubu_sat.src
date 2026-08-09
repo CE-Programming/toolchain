@@ -1,0 +1,16 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__ssubu_sat
+	.type	__ssubu_sat, @function
+
+__ssubu_sat:
+	; unsigned saturated subtraction
+	; HL = HL - BC
+	or	a, a
+	sbc.s	hl, bc
+	ret	nc
+	or	a, a
+	sbc	hl, hl
+	ret

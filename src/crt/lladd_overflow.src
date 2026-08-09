@@ -1,0 +1,34 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__lladdu_overflow
+	.type	__lladdu_overflow, @function
+
+	.global	__lladds_overflow
+	.type	__lladds_overflow, @function
+
+__lladdu_overflow:
+	; NC : no unsigned overflow
+	; C  : unsigned overflow occured
+__lladds_overflow:
+	; PO : no signed overflow
+	; PE : signed overflow
+	push	iy
+	ld	iy, 0
+	add	iy, sp
+	push	bc
+	ld	bc, (iy + 6)
+	add	hl, bc
+	ex	de, hl
+	ld	bc, (iy + 9)
+	adc	hl, bc
+	ex	de, hl
+	ex	(sp), hl
+	ld	bc, (iy + 12)
+	adc.s	hl, bc
+	ld	c, l
+	ld	b, h
+	pop	hl
+	pop	iy
+	ret

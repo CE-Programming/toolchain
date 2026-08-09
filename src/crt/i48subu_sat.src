@@ -1,0 +1,19 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__i48subu_sat
+	.type	__i48subu_sat, @function
+
+__i48subu_sat:
+	; unsigned saturated subtraction
+	; UDE:UHL = UDE:UHL - UIY:UBC
+	call	__i48subu_overflow
+	ret	nc
+	or	a, a
+	sbc	hl, hl
+	ex	de, hl
+	sbc	hl, hl
+	ret
+
+	.extern	__i48subu_overflow

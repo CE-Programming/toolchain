@@ -6,9 +6,24 @@
 	.assume	adl=1
 
 	.section	.text
+
 	.global	__i48sub
 	.type	__i48sub, @function
 
+	.global	__i48subu_overflow
+	.type	__i48subu_overflow, @function
+
+	.global	__i48subs_overflow
+	.type	__i48subs_overflow, @function
+
+__i48subu_overflow:
+	; returned flags:
+	; NC : no unsigned overflow
+	; C  : unsigned overflow occured
+__i48subs_overflow:
+	; returned flags:
+	; PO : no signed overflow
+	; PE : signed overflow occured
 __i48sub:
 ; CC: 13 bytes | 14F + 6R + 3W + 1
 	or	a, a
