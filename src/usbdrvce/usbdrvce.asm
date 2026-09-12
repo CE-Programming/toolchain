@@ -812,6 +812,8 @@ end if
 ;	set	7,(hl)
 	call	_Init
 	res	5,(hl);ti.flags+$1B
+	ld	hl,ti.mpTmrCtrl+1
+	res	ti.bTmr2CountUp-8,(hl)
 	ret
 
 ;-------------------------------------------------------------------------------

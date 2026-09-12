@@ -6,9 +6,19 @@
 	.equ	ti.mpTmrCtrl, 0x0F20030
 
 	.equ	ti.bTmr1Enable, 0
+	.equ	ti.tmr1Enable, 1 << ti.bTmr1Enable
 	.equ	ti.bTmr1Crystal, 1
+	.equ    ti.tmr1Crystal, 1 << ti.bTmr1Crystal
 	.equ	ti.bTmr1Overflow, 2
+	.equ    ti.tmr1Overflow, 1 << ti.bTmr1Overflow
+	.equ	ti.bTmr3Overflow, 8
+	.equ    ti.tmr3Overflow, 1 << ti.bTmr3Overflow
 	.equ	ti.bTmr1CountUp, 9
+	.equ    ti.tmr1CountUp, 1 << ti.bTmr1CountUp
+	.equ	ti.bTmr2CountUp, 10
+	.equ    ti.tmr2CountUp, 1 << ti.bTmr2CountUp
+	.equ	ti.bTmr3CountUp, 11
+	.equ    ti.tmr3CountUp, 1 << ti.bTmr3CountUp
 
 	.equ	ti.Arc_Unarc, 0x021448
 	.equ	ti.usb_ResetTimer, 0x00004F0
@@ -285,9 +295,9 @@ ___libload_libs_ret:
 	ld	hl, ti.mpTmrCtrl + 1
 	set	ti.bTmr1CountUp - 8, (hl)
 	dec	hl
-	res	ti.bTmr1Enable, (hl)
-	set	ti.bTmr1Crystal, (hl)
-	res	ti.bTmr1Overflow, (hl)
+	ld	a, (hl)
+	and	a, ~(ti.tmr1Enable | ti.tmr1Crystal | ti.tmr1Overflow)
+	ld	(hl), a
 
 	; Set the counter to zero
 	.errif	(ti.mpTmr1Counter & 0xFFFF) != 0
@@ -298,7 +308,8 @@ ___libload_libs_ret:
 	jr	nz, .L.zeroize_counter
 
 	ld	l, ti.mpTmrCtrl & 0xFF
-	set	ti.bTmr1Enable, (hl)		; Enable the timer
+	or	a, ti.tmr1Enable | ti.tmr1Crystal
+	ld	(hl), a				; Enable the timer
 #endif
 
 #if HAS_INIT_ARRAY
@@ -455,6 +466,11 @@ _abort:
 	.equ	_exit.flash_wait_states, $ - 1
 #endif
 	ld	(0xE00305), a
+	ld	hl, ti.mpTmrCtrl + 1
+	ld	a, (hl)
+	.errif  (((ti.mpTmrCtrl + 1) << 8) & (ti.tmr3CountUp | ti.tmr2CountUp | ti.tmr1CountUp | ti.tmr3Overflow)) != ti.tmr3Overflow
+	and	a, l				; clear timer count-up bits
+	ld	(hl), a
 	call	ti.usb_ResetTimer
 	ld	a, 1
 	ld	(0xF00008), a			; clear on interrupt
