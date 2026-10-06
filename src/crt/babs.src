@@ -1,0 +1,13 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__babs
+	.type	__babs, @function
+
+__babs:
+	; A = abs(A)
+	or	a, a
+	ret	p
+	neg
+	ret

@@ -1,0 +1,16 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__iabs
+	.type	__iabs, @function
+
+__iabs:
+	; UHL = abs(UHL)
+	add	hl, bc
+	or	a, a
+	sbc	hl, bc
+	ret	p
+	jp	__ineg
+
+	.extern	__ineg

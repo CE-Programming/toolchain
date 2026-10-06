@@ -1,0 +1,14 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__llabs
+	.type	__llabs, @function
+
+__llabs:
+	; BC:UDE:UHL = abs(BC:UDE:UHL)
+	bit	7, b
+	ret	z
+	jp	__llneg
+
+	.extern	__llneg
