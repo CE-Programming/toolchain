@@ -1,0 +1,11 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__dabs
+	.type	__dabs, @function
+
+; assumes BC:UDE:UHL
+__dabs:
+	res	7, b
+	ret

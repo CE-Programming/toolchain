@@ -1,0 +1,68 @@
+	.assume	adl=1
+
+	.section	.text.__dcmpo
+
+	.global	__dcmpo
+	.type	__dcmpo, @function
+
+__dcmpo:
+	push	bc
+	push	de
+	push	hl
+	or	a, a
+	sbc	hl, hl
+	add	hl, sp
+	push	iy
+	push	af
+	push	hl	; f64_cmp_arg*
+	call	__dcmpo_c
+	ld	l, a
+	pop	af
+	pop	af
+	pop	iy
+
+	; Set the comparison flags
+	ld	h, a
+	ex	(sp), hl
+	pop	af
+
+	pop	de
+	pop	bc
+	ret
+
+	.section	.text.__dcmpu
+
+	.global	__dcmpu
+	.type	__dcmpu, @function
+
+__dcmpu:
+	push	bc
+	push	de
+	push	hl
+	or	a, a
+	sbc	hl, hl
+	add	hl, sp
+	push	iy
+	push	af
+	push	hl	; f64_cmp_arg*
+	call	__dcmpo_c
+	ld	l, a
+	pop	af
+	pop	af
+	pop	iy
+
+	; Set the comparison flags
+	ld	h, a
+	ex	(sp), hl
+	pop	af
+
+	pop	de
+	pop	bc
+	ret	c	; If BC:UDE:UHL < (SP64): C = 1, Z = 0
+	scf
+	ret	p	; If BC:UDE:UHL >= (SP64): C = 1, Z = (BC:UDE:UHL == (SP64))
+	cp	a, a	; If unordered: C = 0, Z = 1
+	ret
+
+; uint8_t _dcmpo_c(f64_cmp_arg const *__restrict const arg)
+	.extern	__dcmpo_c

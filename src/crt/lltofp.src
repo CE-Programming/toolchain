@@ -1,0 +1,80 @@
+	.assume	adl=1
+
+;-------------------------------------------------------------------------------
+
+	.section	.text
+
+	.global	__lltof
+	.type	__lltof, @function
+	.global	__lltofp
+	.type	__lltofp, @function
+
+; IEEE single precision from 64-bit integers
+; euhl = float(bcudeuhl)
+__lltof:
+__lltofp: ; CHECK: same(bitcast(float, pair8_24_t, { out.HL, out.E }), (float)bitcast(int64_t, tuple16_24_24_t, { in.HL, in.DE, in.BCS })) && out.A == in.A && out.BC == in.BC && out.IX == in.IX && out.IY == in.IY
+	push	af
+	push	bc
+	ld	a, b
+	or	a, a
+	call	m, __llneg
+	jr	__ulltofp.enter
+
+;-------------------------------------------------------------------------------
+
+	.section	.text
+
+	.global	__ulltof
+	.type	__ulltof, @function
+	.global	__ulltofp
+	.type	__ulltofp, @function
+
+__ulltof:
+__ulltofp: ; CHECK: same(bitcast(float, pair8_24_t, { out.HL, out.E }), (float)bitcast(uint64_t, tuple16_24_24_t, { in.HL, in.DE, in.BCS })) && out.A == in.A && out.BC == in.BC && out.IX == in.IX && out.IY == in.IY
+	push	af
+	push	bc
+	xor	a, a
+	.local	__ulltofp.enter
+__ulltofp.enter:
+	inc	b
+	djnz	.L.upper
+	inc	c
+	dec	c
+	jr	z, .L.lower
+.L.upper:
+	push	bc
+	push	de
+	push	hl
+	ld	c, a
+	ld	a, l
+	or	a, h
+	inc	sp
+	inc	sp
+	pop	hl
+	pop	de
+	inc	sp
+	or	a, l
+	ld	l, a
+	ld	b, 07Fh + 63
+;	jq	.L.pack
+	db	$DA	; jp c, *
+.L.lower:
+	ld	c, a
+	ld	b, 07Fh + 47
+.L.pack:
+	ex	de, hl
+	push	de
+	ex	(sp), ix
+	ld	de, 0800000h
+	call	__fppack2
+	ld	e, a
+	pop	ix
+	pop	bc
+	pop	af
+	ret
+
+;-------------------------------------------------------------------------------
+
+	.extern	__llneg
+
+	.extern	__fppack2

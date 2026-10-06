@@ -1,0 +1,230 @@
+	.assume	adl=1
+
+;-------------------------------------------------------------------------------
+
+	.section	.text
+
+	.global	__fpsub
+	.type	__fpsub, @function
+
+; IEEE single precision subtraction
+; aubc = aubc - euhl
+__fpsub: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(float, pair8_24_t, { in.BC, in.A }) - bitcast(float, pair8_24_t, { in.HL, in.E })) && out.DE == in.DE && out.HL == in.HL && out.IX == in.IX && out.IY == in.IY
+	push	de
+	rl	e
+	ccf
+	rr	e
+;	jq	__fpadd.enter
+	db	$16	; ld d, *
+
+	; require	__fpadd
+
+;-------------------------------------------------------------------------------
+
+	; .section	.text
+
+	.global	__fpadd
+	.type	__fpadd, @function
+
+; IEEE single precision addition
+; aubc = aubc + euhl
+__fpadd: ; CHECK: same(bitcast(float, pair8_24_t, { out.BC, out.A }), bitcast(float, pair8_24_t, { in.BC, in.A }) + bitcast(float, pair8_24_t, { in.HL, in.E })) && out.DE == in.DE && out.HL == in.HL && out.IX == in.IX && out.IY == in.IY
+	push	de
+	.local	__fpadd.enter
+__fpadd.enter:
+	push	hl
+	push	bc
+	xor	a, e
+	ld	d, a
+	push	de
+	push	bc
+	xor	a, e
+	call	__fppop1
+	ex	(sp), hl
+	ld	d, e
+	ld	e, a
+	call	__fppop2
+	inc	e
+	jr	z, .L.nonfinite1
+	inc	d
+	jr	z, .L.return2
+	ld	a, d
+	sub	a, e
+	jr	z, .L.rounded
+	jr	nc, .L.sorted
+	inc	c
+	ex	(sp), hl
+	ld	a, e
+	sub	a, d
+	ld	d, e
+.L.sorted:
+	cp	a, 26
+	jr	nc, .L.largest
+	; Extend to 32 bits and shift left by ~(amount - 1) & 7
+	dec	a
+	ld	b, a
+	xor	a, a
+	srl	b
+	jr	c, .L.noshift1
+	add	hl, hl
+	rla
+.L.noshift1:
+	srl	b
+	jr	c, .L.noshift2
+	.rept	2
+	add	hl, hl
+	rla
+	.endr
+.L.noshift2:
+	srl	b
+	jr	c, .L.noshift4
+	.rept	4
+	add	hl, hl
+	rla
+	.endr
+.L.noshift4:
+	; Shift right by (amount + 7) / 8 * 8, truncating to 24 bits
+	; The last 2 bits shifted out are in A, while any remaining non-zero
+	; bits are aggregated into the lower bits of A
+	push	af
+	inc	sp
+	push	hl
+	inc	sp
+	ld	a, l
+	jr	nz, .L.shift16
+	; Shift by 8 for amounts between 1 and 8
+	pop	hl
+	inc	sp
+	jr	.L.rounded
+
+.L.shift16:
+	; Shift by 16 for amounts between 9 and 16
+	ld	e, h
+	inc	sp
+	pop	hl
+	dec	b
+	jr	z, .L.flush
+.L.shift8more:
+	; Shift by 24 for amounts between 17 and 24
+	or	a, e
+	ld	e, l
+	ld	l, h
+	ld	h, 0
+	; Shift by 32 for amount of 25
+	djnz	.L.shift8more
+.L.flush:
+	sub	a, 1
+	sbc	a, a
+	inc	a
+	or	a, e
+.L.rounded:
+	ld	b, d
+	pop	de
+	ex	(sp), hl
+	add.s	hl, hl
+	jr	nc, .L.add
+	ld	l, h
+	add	hl, bc
+	ld	c, l
+	pop	hl
+	djnz	.L.subtract	;always taken
+
+.L.nonfinite1:
+	inc	d
+	jr	z, .L.nonfinite
+.L.return1:
+	pop	bc
+.L.return1.pop1:
+	pop	de
+	ld	a, d
+.L.return1.pop2:
+	xor	a, e
+	pop	bc
+.L.return:
+	pop	hl
+	pop	de
+	ret
+
+.L.largest:
+	ld	a, d
+	cp	a, e
+	jr	z, .L.return1
+.L.return2:
+	pop	bc
+.L.return2.pop1:
+	pop	de
+.L.return2.pop2:
+	ld	a, e
+	pop	bc
+	pop	bc
+	push	bc
+	jr	.L.return
+
+.L.add:
+	ld	c, h
+	pop	hl
+	add	hl, de
+	dec	b
+	jr	nc, .L.done
+	ex	de, hl
+	sbc	hl, hl
+	add	hl, sp
+	push	de
+	rr	(hl)
+	pop	hl
+	rr	h
+	rr	l
+	rra
+	jr	nc, .L.flushed2
+	or	a, 1
+.L.flushed2:
+	inc	b
+	inc	b
+	jr	z, .L.infinite
+	djnz	.L.done	;always taken
+
+.L.borrow:
+	inc	c
+	add	hl, de
+.L.subtract:
+	ex	de, hl
+	neg
+	sbc	hl, de
+	jr	c, .L.borrow
+	jr	nz, .L.done
+	or	a, a
+.L.done:
+	ld	de, 0800000h
+	call	nz, __fppack
+	pop	bc
+	ex	(sp), hl
+	pop	bc
+	pop	de
+	ret
+
+.L.nonfinite:
+	xor	a, a
+	sbc	hl, bc
+	jr	nz, .L.return1
+	pop	hl
+	sbc	hl, bc
+	jr	nz, .L.return2.pop1
+	pop	de
+	bit	7, d
+	jr	z, .L.return1.pop2
+	ld	bc, 0C00000h
+.L.infinite:
+	ld	a, c
+	ld	c, b ;0, also note BCU=080h from __fppop1 or 0C0h from .L.nonfinite
+	rrca
+	or	a, 07Fh
+	pop	hl
+	pop	hl
+	pop	de
+	ret
+
+;-------------------------------------------------------------------------------
+
+	.extern	__fppop1
+	.extern	__fppop2
+	.extern	__fppack
