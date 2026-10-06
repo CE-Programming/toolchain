@@ -1,0 +1,14 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__iaddu_sat
+	.type	__iaddu_sat, @function
+
+__iaddu_sat:
+	; unsigned saturated addition
+	; UHL = UHL + UBC
+	add	hl, bc
+	ret	nc
+	sbc	hl, hl
+	ret

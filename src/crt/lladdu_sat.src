@@ -1,0 +1,20 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__lladdu_sat
+	.type	__lladdu_sat, @function
+
+__lladdu_sat:
+	; unsigned saturated addition
+	; BC:UDE:UHL = BC:UDE:UHL + (SP)
+	call	__lladdu_overflow
+	ret	nc
+	sbc	hl, hl
+	ex	de, hl
+	sbc	hl, hl
+	ld	b, l
+	ld	c, l
+	ret
+
+	.extern	__lladdu_overflow
