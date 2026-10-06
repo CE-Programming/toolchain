@@ -23,7 +23,8 @@ void __assert_fail_loc(const struct __assert_loc *__loc)
 
 __END_DECLS
 
-/* Avoid putting extra parens around expr because it can hide warnings. */
+/* Avoid putting extra parens around expr because it can hide warnings.
+ * End with a void expression to support C++ constexpr evaluation. */
 # define assert(expr) __extension__ ({                                  \
         if (expr) {} else {                                             \
             static const struct __assert_loc __loc = {                  \
