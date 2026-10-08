@@ -2,6 +2,14 @@
 #ifndef _EZCXX_MEMORY
 #define _EZCXX_MEMORY
 
+#include <__config>
+#include <cstddef>
+#include <cstdlib>
+#include <exception>
+#include <new>
+#include <type_traits>
+#include <utility>
+
 #pragma clang system_header
 
 namespace std {
@@ -13,6 +21,1267 @@ constexpr inline _Tp* addressof(_Tp& __x) noexcept {
 
 template <class _Tp>
 _Tp* addressof(const _Tp&&) noexcept = delete;
+
+//------------------------------------------------------------------------------
+// construct_at destroy_at
+//------------------------------------------------------------------------------
+
+#if __cplusplus >= 202002L
+template <class _Tp, class... _Args>
+    requires requires { ::new (std::declval<void*>()) _Tp(std::declval<_Args>()...); }
+_EZCXX_INLINE constexpr _Tp* construct_at(_Tp* __location, _Args&&... __args) {
+    return ::new (static_cast<void*>(__location)) _Tp(std::forward<_Args>(__args)...);
+}
+#endif // __cplusplus >= 202002L
+
+#if __cplusplus >= 201703L
+template <class _Tp, class... _Args>
+_EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX20 _Tp* __construct_at(_Tp* __location, _Args&&... __args) {
+#if __cplusplus >= 202002L
+    return std::construct_at(__location, std::forward<_Args>(__args)...);
+#else
+    return ::new (static_cast<void*>(__location)) _Tp(std::forward<_Args>(__args)...);
+#endif
+}
+
+template <class _Tp>
+_EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX20 void destroy_at(_Tp* __location) {
+    if constexpr (is_array_v<_Tp>) {
+        for (auto& __element : *__location) {
+            std::destroy_at(std::addressof(__element));
+        }
+    } else {
+        __location->~_Tp();
+    }
+}
+#endif // __cplusplus >= 201703L
+
+//------------------------------------------------------------------------------
+// default_delete
+//------------------------------------------------------------------------------
+
+template <class _Up, class _Elem, class = void>
+inline constexpr bool __array_convertible_v = false;
+
+template <class _Up, class _Elem>
+inline constexpr bool __array_convertible_v<_Up, _Elem, void_t<_Up(*)[]>> = is_convertible_v<_Up(*)[], _Elem(*)[]>;
+
+template <class _Tp>
+struct default_delete {
+    static_assert(!is_function_v<_Tp>, "default_delete cannot be instantiated for function types");
+
+    constexpr default_delete() noexcept = default;
+
+    template <class _Up, enable_if_t<is_convertible_v<_Up*, _Tp*>, int> = 0>
+    _EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 default_delete(const default_delete<_Up>&) noexcept {}
+
+    _EZCXX_CONSTEXPR_SINCE_CXX23 void operator()(_Tp* __ptr) const noexcept {
+        static_assert(sizeof(_Tp) >= 0, "cannot delete an incomplete type");
+        static_assert(!is_void_v<_Tp>, "cannot delete an incomplete type");
+        delete __ptr;
+    }
+};
+
+template <class _Tp>
+struct default_delete<_Tp[]> {
+    constexpr default_delete() noexcept = default;
+
+    template <class _Up, enable_if_t<__array_convertible_v<_Up, _Tp>, int> = 0>
+    _EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 default_delete(const default_delete<_Up[]>&) noexcept {}
+
+    template <class _Up, enable_if_t<__array_convertible_v<_Up, _Tp>, int> = 0>
+    _EZCXX_CONSTEXPR_SINCE_CXX23 void operator()(_Up* __ptr) const noexcept {
+        static_assert(sizeof(_Up) >= 0, "cannot delete an incomplete type");
+        delete[] __ptr;
+    }
+};
+
+//------------------------------------------------------------------------------
+// unique_ptr
+//------------------------------------------------------------------------------
+
+template <class _Tp, class _Dp, class = void>
+struct __unique_ptr_pointer {
+    using type _EZCXX_NODEBUG = _Tp*;
+};
+
+template <class _Tp, class _Dp>
+struct __unique_ptr_pointer<_Tp, _Dp, void_t<typename remove_reference_t<_Dp>::pointer>> {
+    using type _EZCXX_NODEBUG = typename remove_reference_t<_Dp>::pointer;
+};
+
+template <class _Dp>
+inline constexpr bool __unique_ptr_default_deleter_v = is_default_constructible_v<_Dp> && !is_pointer_v<_Dp>;
+
+template <class _Dp>
+using __unique_ptr_deleter_lvalue_t _EZCXX_NODEBUG = conditional_t<is_reference_v<_Dp>, _Dp, const _Dp&>;
+
+template <class _Dp, class _Ep>
+inline constexpr bool __unique_ptr_deleter_convertible_v =
+    is_reference_v<_Dp> ? is_same_v<_Ep, _Dp> : is_convertible_v<_Ep, _Dp>;
+
+template <class _Tp, class _Dp = default_delete<_Tp>>
+class unique_ptr {
+public:
+    using pointer = typename __unique_ptr_pointer<_Tp, _Dp>::type;
+    using element_type = _Tp;
+    using deleter_type = _Dp;
+
+private:
+    pointer __ptr_;
+    _EZCXX_NO_UNIQUE_ADDRESS deleter_type __deleter_;
+
+    template <class _Up, class _Ep>
+    static constexpr bool __convertible_from_v =
+        !is_array_v<_Up> &&
+        is_convertible_v<typename unique_ptr<_Up, _Ep>::pointer, pointer> &&
+        __unique_ptr_deleter_convertible_v<_Dp, _Ep>;
+
+    template <class _Up, class _Ep>
+    static constexpr bool __assignable_from_v =
+        !is_array_v<_Up> &&
+        is_convertible_v<typename unique_ptr<_Up, _Ep>::pointer, pointer> &&
+        is_assignable_v<_Dp&, _Ep&&>;
+
+public:
+    template <class _Dx = _Dp, enable_if_t<__unique_ptr_default_deleter_v<_Dx>, int> = 0>
+    _EZCXX_INLINE constexpr unique_ptr() noexcept : __ptr_(), __deleter_() {}
+
+    template <class _Dx = _Dp, enable_if_t<__unique_ptr_default_deleter_v<_Dx>, int> = 0>
+    _EZCXX_INLINE constexpr unique_ptr(nullptr_t) noexcept : __ptr_(), __deleter_() {}
+
+    template <class _Dx = _Dp, enable_if_t<__unique_ptr_default_deleter_v<_Dx>, int> = 0>
+    _EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 explicit unique_ptr(pointer __p) noexcept : __ptr_(__p), __deleter_() {}
+
+    template <class _Dx = _Dp, enable_if_t<is_constructible_v<_Dx, __unique_ptr_deleter_lvalue_t<_Dx>>, int> = 0>
+    _EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 unique_ptr(pointer __p, __unique_ptr_deleter_lvalue_t<_Dx> __d) noexcept
+        : __ptr_(__p), __deleter_(__d) {}
+
+    template <class _Dx = _Dp, enable_if_t<!is_reference_v<_Dx> && is_move_constructible_v<_Dx>, int> = 0>
+    _EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 unique_ptr(pointer __p, remove_reference_t<_Dx>&& __d) noexcept
+        : __ptr_(__p), __deleter_(std::move(__d)) {}
+
+    template <class _Dx = _Dp, enable_if_t<is_reference_v<_Dx>, int> = 0>
+    unique_ptr(pointer, remove_reference_t<_Dx>&&) = delete;
+
+    _EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 unique_ptr(unique_ptr&& __u) noexcept
+        : __ptr_(__u.release()), __deleter_(std::forward<_Dp>(__u.get_deleter())) {}
+
+    template <class _Up, class _Ep, enable_if_t<__convertible_from_v<_Up, _Ep>, int> = 0>
+    _EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 unique_ptr(unique_ptr<_Up, _Ep>&& __u) noexcept
+        : __ptr_(__u.release()), __deleter_(std::forward<_Ep>(__u.get_deleter())) {}
+
+    unique_ptr(const unique_ptr&) = delete;
+    unique_ptr& operator=(const unique_ptr&) = delete;
+
+    _EZCXX_CONSTEXPR_SINCE_CXX23 ~unique_ptr() {
+        if (__ptr_) {
+            __deleter_(__ptr_);
+        }
+    }
+
+    _EZCXX_CONSTEXPR_SINCE_CXX23 unique_ptr& operator=(unique_ptr&& __u) noexcept {
+        reset(__u.release());
+        __deleter_ = std::forward<_Dp>(__u.get_deleter());
+        return *this;
+    }
+
+    template <class _Up, class _Ep, enable_if_t<__assignable_from_v<_Up, _Ep>, int> = 0>
+    _EZCXX_CONSTEXPR_SINCE_CXX23 unique_ptr& operator=(unique_ptr<_Up, _Ep>&& __u) noexcept {
+        reset(__u.release());
+        __deleter_ = std::forward<_Ep>(__u.get_deleter());
+        return *this;
+    }
+
+    _EZCXX_CONSTEXPR_SINCE_CXX23 unique_ptr& operator=(nullptr_t) noexcept {
+        reset();
+        return *this;
+    }
+
+    _EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 add_lvalue_reference_t<_Tp> operator*() const
+    noexcept(noexcept(*std::declval<pointer>())) {
+        return *__ptr_;
+    }
+
+    _EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 pointer operator->() const noexcept { return __ptr_; }
+
+    _EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 pointer get() const noexcept { return __ptr_; }
+
+    _EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 deleter_type& get_deleter() noexcept { return __deleter_; }
+
+    _EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 const deleter_type& get_deleter() const noexcept { return __deleter_; }
+
+    _EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 explicit operator bool() const noexcept { return __ptr_ != nullptr; }
+
+    _EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 pointer release() noexcept {
+        pointer __t = __ptr_;
+        __ptr_ = pointer();
+        return __t;
+    }
+
+    _EZCXX_CONSTEXPR_SINCE_CXX23 void reset(pointer __p = pointer()) noexcept {
+        pointer __old = __ptr_;
+        __ptr_ = __p;
+        if (__old) {
+            __deleter_(__old);
+        }
+    }
+
+    _EZCXX_CONSTEXPR_SINCE_CXX23 void swap(unique_ptr& __u) noexcept {
+        using std::swap;
+        swap(__ptr_, __u.__ptr_);
+        swap(__deleter_, __u.__deleter_);
+    }
+};
+
+template <class _Tp, class _Dp>
+class unique_ptr<_Tp[], _Dp> {
+public:
+    using pointer = typename __unique_ptr_pointer<_Tp, _Dp>::type;
+    using element_type = _Tp;
+    using deleter_type = _Dp;
+
+private:
+    pointer __ptr_;
+    _EZCXX_NO_UNIQUE_ADDRESS deleter_type __deleter_;
+
+    template <class _Up>
+    static constexpr bool __acceptable_pointer_v =
+        is_same_v<_Up, pointer> ||
+        (is_same_v<pointer, element_type*> && is_pointer_v<_Up> &&
+         __array_convertible_v<remove_pointer_t<_Up>, element_type>);
+
+    template <class _Up>
+    static constexpr bool __acceptable_pointer_or_null_v = __acceptable_pointer_v<_Up> || is_same_v<_Up, nullptr_t>;
+
+    template <class _Up, class _Ep>
+    static constexpr bool __array_from_v =
+        is_array_v<_Up> &&
+        is_same_v<pointer, element_type*> &&
+        is_same_v<typename unique_ptr<_Up, _Ep>::pointer, typename unique_ptr<_Up, _Ep>::element_type*> &&
+        __array_convertible_v<typename unique_ptr<_Up, _Ep>::element_type, element_type>;
+
+public:
+    template <class _Dx = _Dp, enable_if_t<__unique_ptr_default_deleter_v<_Dx>, int> = 0>
+    _EZCXX_INLINE constexpr unique_ptr() noexcept : __ptr_(), __deleter_() {}
+
+    template <class _Dx = _Dp, enable_if_t<__unique_ptr_default_deleter_v<_Dx>, int> = 0>
+    _EZCXX_INLINE constexpr unique_ptr(nullptr_t) noexcept : __ptr_(), __deleter_() {}
+
+    template <class _Up, class _Dx = _Dp,
+              enable_if_t<__unique_ptr_default_deleter_v<_Dx> && __acceptable_pointer_v<_Up>, int> = 0>
+    _EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 explicit unique_ptr(_Up __p) noexcept : __ptr_(__p), __deleter_() {}
+
+    template <class _Up, class _Dx = _Dp,
+              enable_if_t<is_constructible_v<_Dx, __unique_ptr_deleter_lvalue_t<_Dx>> &&
+                          __acceptable_pointer_or_null_v<_Up>, int> = 0>
+    _EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 unique_ptr(_Up __p, __unique_ptr_deleter_lvalue_t<_Dx> __d) noexcept
+        : __ptr_(__p), __deleter_(__d) {}
+
+    template <class _Up, class _Dx = _Dp,
+              enable_if_t<!is_reference_v<_Dx> && is_move_constructible_v<_Dx> &&
+                          __acceptable_pointer_or_null_v<_Up>, int> = 0>
+    _EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 unique_ptr(_Up __p, remove_reference_t<_Dx>&& __d) noexcept
+        : __ptr_(__p), __deleter_(std::move(__d)) {}
+
+    template <class _Up, class _Dx = _Dp,
+              enable_if_t<is_reference_v<_Dx> && __acceptable_pointer_or_null_v<_Up>, int> = 0>
+    unique_ptr(_Up, remove_reference_t<_Dx>&&) = delete;
+
+    _EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 unique_ptr(unique_ptr&& __u) noexcept
+        : __ptr_(__u.release()), __deleter_(std::forward<_Dp>(__u.get_deleter())) {}
+
+    template <class _Up, class _Ep,
+              enable_if_t<__array_from_v<_Up, _Ep> && __unique_ptr_deleter_convertible_v<_Dp, _Ep>, int> = 0>
+    _EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 unique_ptr(unique_ptr<_Up, _Ep>&& __u) noexcept
+        : __ptr_(__u.release()), __deleter_(std::forward<_Ep>(__u.get_deleter())) {}
+
+    unique_ptr(const unique_ptr&) = delete;
+    unique_ptr& operator=(const unique_ptr&) = delete;
+
+    _EZCXX_CONSTEXPR_SINCE_CXX23 ~unique_ptr() {
+        if (__ptr_) {
+            __deleter_(__ptr_);
+        }
+    }
+
+    _EZCXX_CONSTEXPR_SINCE_CXX23 unique_ptr& operator=(unique_ptr&& __u) noexcept {
+        reset(__u.release());
+        __deleter_ = std::forward<_Dp>(__u.get_deleter());
+        return *this;
+    }
+
+    template <class _Up, class _Ep,
+              enable_if_t<__array_from_v<_Up, _Ep> && is_assignable_v<_Dp&, _Ep&&>, int> = 0>
+    _EZCXX_CONSTEXPR_SINCE_CXX23 unique_ptr& operator=(unique_ptr<_Up, _Ep>&& __u) noexcept {
+        reset(__u.release());
+        __deleter_ = std::forward<_Ep>(__u.get_deleter());
+        return *this;
+    }
+
+    _EZCXX_CONSTEXPR_SINCE_CXX23 unique_ptr& operator=(nullptr_t) noexcept {
+        reset();
+        return *this;
+    }
+
+    _EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 _Tp& operator[](size_t __i) const { return __ptr_[__i]; }
+
+    _EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 pointer get() const noexcept { return __ptr_; }
+
+    _EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 deleter_type& get_deleter() noexcept { return __deleter_; }
+
+    _EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 const deleter_type& get_deleter() const noexcept { return __deleter_; }
+
+    _EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 explicit operator bool() const noexcept { return __ptr_ != nullptr; }
+
+    _EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 pointer release() noexcept {
+        pointer __t = __ptr_;
+        __ptr_ = pointer();
+        return __t;
+    }
+
+    template <class _Up, enable_if_t<__acceptable_pointer_v<_Up>, int> = 0>
+    _EZCXX_CONSTEXPR_SINCE_CXX23 void reset(_Up __p) noexcept {
+        pointer __old = __ptr_;
+        __ptr_ = __p;
+        if (__old) {
+            __deleter_(__old);
+        }
+    }
+
+    _EZCXX_CONSTEXPR_SINCE_CXX23 void reset(nullptr_t = nullptr) noexcept {
+        reset(pointer());
+    }
+
+    _EZCXX_CONSTEXPR_SINCE_CXX23 void swap(unique_ptr& __u) noexcept {
+        using std::swap;
+        swap(__ptr_, __u.__ptr_);
+        swap(__deleter_, __u.__deleter_);
+    }
+};
+
+template <class _Tp, class _Dp, enable_if_t<is_swappable_v<_Dp>, int> = 0>
+_EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 void swap(unique_ptr<_Tp, _Dp>& __x, unique_ptr<_Tp, _Dp>& __y) noexcept {
+    __x.swap(__y);
+}
+
+template <class _T1, class _D1, class _T2, class _D2>
+_EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 bool
+operator==(const unique_ptr<_T1, _D1>& __x, const unique_ptr<_T2, _D2>& __y) {
+    return __x.get() == __y.get();
+}
+
+#if __cplusplus < 202002L
+template <class _T1, class _D1, class _T2, class _D2>
+_EZCXX_INLINE bool operator!=(const unique_ptr<_T1, _D1>& __x, const unique_ptr<_T2, _D2>& __y) {
+    return !(__x == __y);
+}
+#endif // __cplusplus < 202002L
+
+template <class _T1, class _D1, class _T2, class _D2>
+_EZCXX_INLINE bool operator<(const unique_ptr<_T1, _D1>& __x, const unique_ptr<_T2, _D2>& __y) {
+    using _Cp = common_type_t<typename unique_ptr<_T1, _D1>::pointer, typename unique_ptr<_T2, _D2>::pointer>;
+    return static_cast<_Cp>(__x.get()) < static_cast<_Cp>(__y.get());
+}
+
+template <class _T1, class _D1, class _T2, class _D2>
+_EZCXX_INLINE bool operator>(const unique_ptr<_T1, _D1>& __x, const unique_ptr<_T2, _D2>& __y) {
+    return __y < __x;
+}
+
+template <class _T1, class _D1, class _T2, class _D2>
+_EZCXX_INLINE bool operator<=(const unique_ptr<_T1, _D1>& __x, const unique_ptr<_T2, _D2>& __y) {
+    return !(__y < __x);
+}
+
+template <class _T1, class _D1, class _T2, class _D2>
+_EZCXX_INLINE bool operator>=(const unique_ptr<_T1, _D1>& __x, const unique_ptr<_T2, _D2>& __y) {
+    return !(__x < __y);
+}
+
+template <class _Tp, class _Dp>
+_EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 bool operator==(const unique_ptr<_Tp, _Dp>& __x, nullptr_t) noexcept {
+    return !__x;
+}
+
+#if __cplusplus < 202002L
+template <class _Tp, class _Dp>
+_EZCXX_INLINE bool operator==(nullptr_t, const unique_ptr<_Tp, _Dp>& __x) noexcept {
+    return !__x;
+}
+
+template <class _Tp, class _Dp>
+_EZCXX_INLINE bool operator!=(const unique_ptr<_Tp, _Dp>& __x, nullptr_t) noexcept {
+    return static_cast<bool>(__x);
+}
+
+template <class _Tp, class _Dp>
+_EZCXX_INLINE bool operator!=(nullptr_t, const unique_ptr<_Tp, _Dp>& __x) noexcept {
+    return static_cast<bool>(__x);
+}
+#endif // __cplusplus < 202002L
+
+template <class _Tp, class _Dp>
+_EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 bool operator<(const unique_ptr<_Tp, _Dp>& __x, nullptr_t) {
+    return __x.get() < static_cast<typename unique_ptr<_Tp, _Dp>::pointer>(nullptr);
+}
+
+template <class _Tp, class _Dp>
+_EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 bool operator<(nullptr_t, const unique_ptr<_Tp, _Dp>& __x) {
+    return static_cast<typename unique_ptr<_Tp, _Dp>::pointer>(nullptr) < __x.get();
+}
+
+template <class _Tp, class _Dp>
+_EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 bool operator>(const unique_ptr<_Tp, _Dp>& __x, nullptr_t) {
+    return nullptr < __x;
+}
+
+template <class _Tp, class _Dp>
+_EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 bool operator>(nullptr_t, const unique_ptr<_Tp, _Dp>& __x) {
+    return __x < nullptr;
+}
+
+template <class _Tp, class _Dp>
+_EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 bool operator<=(const unique_ptr<_Tp, _Dp>& __x, nullptr_t) {
+    return !(nullptr < __x);
+}
+
+template <class _Tp, class _Dp>
+_EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 bool operator<=(nullptr_t, const unique_ptr<_Tp, _Dp>& __x) {
+    return !(__x < nullptr);
+}
+
+template <class _Tp, class _Dp>
+_EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 bool operator>=(const unique_ptr<_Tp, _Dp>& __x, nullptr_t) {
+    return !(__x < nullptr);
+}
+
+template <class _Tp, class _Dp>
+_EZCXX_INLINE _EZCXX_CONSTEXPR_SINCE_CXX23 bool operator>=(nullptr_t, const unique_ptr<_Tp, _Dp>& __x) {
+    return !(nullptr < __x);
+}
+
+#if __cplusplus >= 201402L
+template <class _Tp, class... _Args, enable_if_t<!is_array_v<_Tp>, int> = 0>
+_EZCXX_CONSTEXPR_SINCE_CXX23 unique_ptr<_Tp> make_unique(_Args&&... __args) {
+    return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...));
+}
+
+template <class _Tp, enable_if_t<is_unbounded_array_v<_Tp>, int> = 0>
+_EZCXX_CONSTEXPR_SINCE_CXX23 unique_ptr<_Tp> make_unique(size_t __n) {
+    return unique_ptr<_Tp>(new remove_extent_t<_Tp>[__n]());
+}
+
+template <class _Tp, class... _Args, enable_if_t<is_bounded_array_v<_Tp>, int> = 0>
+void make_unique(_Args&&...) = delete;
+#endif // __cplusplus >= 201402L
+
+#if __cplusplus >= 202002L
+template <class _Tp, enable_if_t<!is_array_v<_Tp>, int> = 0>
+_EZCXX_CONSTEXPR_SINCE_CXX23 unique_ptr<_Tp> make_unique_for_overwrite() {
+    return unique_ptr<_Tp>(new _Tp);
+}
+
+template <class _Tp, enable_if_t<is_unbounded_array_v<_Tp>, int> = 0>
+_EZCXX_CONSTEXPR_SINCE_CXX23 unique_ptr<_Tp> make_unique_for_overwrite(size_t __n) {
+    return unique_ptr<_Tp>(new remove_extent_t<_Tp>[__n]);
+}
+
+template <class _Tp, class... _Args, enable_if_t<is_bounded_array_v<_Tp>, int> = 0>
+void make_unique_for_overwrite(_Args&&...) = delete;
+#endif // __cplusplus >= 202002L
+
+//------------------------------------------------------------------------------
+// shared_ptr control blocks
+//------------------------------------------------------------------------------
+
+_EZCXX_DECLARE_EXCEPTION(bad_weak_ptr);
+
+[[noreturn]] inline void __throw_bad_weak_ptr() {
+#if __has_feature(cxx_exceptions)
+    throw bad_weak_ptr();
+#else
+    std::abort();
+#endif
+}
+
+template <class _Tp>
+class shared_ptr;
+
+template <class _Tp>
+class weak_ptr;
+
+template <class _Tp>
+class enable_shared_from_this;
+
+template <class _Tp>
+struct __type_tag {
+    static const char __id;
+};
+
+template <class _Tp>
+const char __type_tag<_Tp>::__id = 0;
+
+struct __shared_weak_count {
+    // Destroys the owned object when __tag is null, otherwise returns the deleter matching __tag.
+    using __manager_t = const void* (*)(__shared_weak_count*, const void* __tag);
+
+    unsigned int __shared_owners_;
+    unsigned int __weak_owners_;
+    __manager_t __manager_;
+
+    _EZCXX_INLINE explicit __shared_weak_count(__manager_t __manager) noexcept
+        : __shared_owners_(1), __weak_owners_(1), __manager_(__manager) {}
+
+    _EZCXX_INLINE static void __add_shared(__shared_weak_count* __cntrl) noexcept {
+        if (__cntrl) {
+            ++__cntrl->__shared_owners_;
+        }
+    }
+
+    _EZCXX_INLINE static void __add_weak(__shared_weak_count* __cntrl) noexcept {
+        if (__cntrl) {
+            ++__cntrl->__weak_owners_;
+        }
+    }
+
+    static void __release_shared(__shared_weak_count* __cntrl) noexcept;
+    static void __release_weak(__shared_weak_count* __cntrl) noexcept;
+    static __shared_weak_count* __lock(__shared_weak_count* __cntrl) noexcept;
+    static const void* __noop_manager(__shared_weak_count*, const void*) noexcept;
+};
+
+template <class _Ptr, class _Dp>
+struct __shared_ptr_pointer : __shared_weak_count {
+    _Ptr __ptr_;
+    _EZCXX_NO_UNIQUE_ADDRESS _Dp __deleter_;
+
+    _EZCXX_INLINE __shared_ptr_pointer(_Ptr __p, _Dp&& __d) noexcept
+        : __shared_weak_count(&__manage), __ptr_(__p), __deleter_(std::move(__d)) {}
+
+    static const void* __manage(__shared_weak_count* __cntrl, const void* __tag) noexcept {
+        __shared_ptr_pointer* __self = static_cast<__shared_ptr_pointer*>(__cntrl);
+        if (__tag) {
+            return __tag == &__type_tag<_Dp>::__id ? std::addressof(__self->__deleter_) : nullptr;
+        }
+        __self->__deleter_(__self->__ptr_);
+        __self->__deleter_.~_Dp();
+        return nullptr;
+    }
+};
+
+struct __shared_default_init_tag {};
+
+template <class _Tp>
+struct __shared_ptr_emplace : __shared_weak_count {
+    union {
+        _Tp __value_;
+    };
+
+    template <class... _Args>
+    _EZCXX_INLINE explicit __shared_ptr_emplace(_Args&&... __args)
+        : __shared_weak_count(__manager()), __value_(std::forward<_Args>(__args)...) {}
+
+    _EZCXX_INLINE explicit __shared_ptr_emplace(__shared_default_init_tag)
+        : __shared_weak_count(__manager()) {
+        ::new (static_cast<void*>(std::addressof(__value_))) _Tp;
+    }
+
+    _EZCXX_INLINE ~__shared_ptr_emplace() {}
+
+    static const void* __manage(__shared_weak_count* __cntrl, const void* __tag) noexcept {
+        if (!__tag) {
+            static_cast<__shared_ptr_emplace*>(__cntrl)->__value_.~_Tp();
+        }
+        return nullptr;
+    }
+
+    _EZCXX_INLINE static constexpr __manager_t __manager() noexcept {
+        return is_trivially_destructible_v<_Tp> ? &__shared_weak_count::__noop_manager : &__manage;
+    }
+};
+
+inline void* __shared_allocate(size_t __size) {
+#if __has_feature(cxx_exceptions)
+    return ::operator new(__size);
+#else
+    void* __mem = ::operator new(__size, nothrow);
+    if (__mem == nullptr) {
+        __throw_bad_alloc();
+    }
+    return __mem;
+#endif
+}
+
+template <class _Block, class... _Args>
+_Block* __shared_new_block(_Args&&... __args) {
+    void* __mem = std::__shared_allocate(sizeof(_Block));
+    _EZCXX_TRY {
+        return ::new (__mem) _Block(std::forward<_Args>(__args)...);
+    } _EZCXX_CATCH_ALL {
+        ::operator delete(__mem);
+        _EZCXX_RETHROW;
+    }
+}
+
+// Takes ownership of __p, calling __d(__p) if the control block cannot be created.
+template <class _Ptr, class _Dp>
+__shared_weak_count* __shared_pointer_block(_Ptr __p, _Dp& __d) {
+    _EZCXX_TRY {
+        return std::__shared_new_block<__shared_ptr_pointer<_Ptr, _Dp>>(__p, std::move(__d));
+    } _EZCXX_CATCH_ALL {
+        __d(__p);
+        _EZCXX_RETHROW;
+    }
+}
+
+template <class _Dp>
+struct __shared_ref_deleter {
+    _Dp* __deleter_;
+
+    template <class _Ptr>
+    _EZCXX_INLINE void operator()(_Ptr __p) const {
+        (*__deleter_)(__p);
+    }
+};
+
+template <class _Yp, class _Tp>
+inline constexpr bool __sp_compatible_v = is_convertible_v<_Yp*, _Tp*>;
+
+template <class _Up, size_t _Np, class _Tp>
+inline constexpr bool __sp_compatible_v<_Up[_Np], _Tp[]> =
+    is_same_v<remove_cv_t<_Up>, remove_cv_t<_Tp>> && is_convertible_v<_Up*, _Tp*>;
+
+template <class _Yp, class _Tp>
+inline constexpr bool __sp_pointer_compatible_v = is_convertible_v<_Yp*, _Tp*>;
+
+template <class _Yp, class _Up>
+inline constexpr bool __sp_pointer_compatible_v<_Yp, _Up[]> = __array_convertible_v<_Yp, _Up>;
+
+template <class _Yp, class _Up, size_t _Np>
+inline constexpr bool __sp_pointer_compatible_v<_Yp, _Up[_Np]> = __array_convertible_v<_Yp, _Up>;
+
+template <class _Ptr, class _Dp, class = void>
+inline constexpr bool __sp_deleter_callable_v = false;
+
+template <class _Ptr, class _Dp>
+inline constexpr bool __sp_deleter_callable_v<_Ptr, _Dp, void_t<decltype(std::declval<_Dp&>()(std::declval<_Ptr&>()))>> =
+    is_move_constructible_v<_Dp>;
+
+//------------------------------------------------------------------------------
+// shared_ptr
+//------------------------------------------------------------------------------
+
+template <class _Tp>
+class shared_ptr {
+public:
+    using element_type = remove_extent_t<_Tp>;
+#if __cplusplus >= 201703L
+    using weak_type = weak_ptr<_Tp>;
+#endif // __cplusplus >= 201703L
+
+private:
+    element_type* __ptr_;
+    __shared_weak_count* __cntrl_;
+
+    template <class _Up>
+    friend class shared_ptr;
+
+    template <class _Up>
+    friend class weak_ptr;
+
+    template <class _Dp, class _Up>
+    friend _Dp* get_deleter(const shared_ptr<_Up>&) noexcept;
+
+    template <class _Yp>
+    void __enable_weak_this(_Yp* __p) noexcept {
+        if constexpr (!is_array_v<_Tp>) {
+            __enable_weak_this_impl(__p, __p);
+        }
+    }
+
+    template <class _Up, class _Yp,
+              enable_if_t<is_convertible_v<_Yp*, const enable_shared_from_this<_Up>*>, int> = 0>
+    void __enable_weak_this_impl(const enable_shared_from_this<_Up>* __e, _Yp* __p) noexcept {
+        if (__e && __e->__weak_this_.expired()) {
+            __e->__weak_this_ = shared_ptr<_Up>(*this, const_cast<_Up*>(static_cast<const _Up*>(__p)));
+        }
+    }
+
+    _EZCXX_INLINE void __enable_weak_this_impl(...) noexcept {}
+
+public:
+    // Adopts a control block that already counts one shared owner.
+    template <class _Yp>
+    static shared_ptr __adopt(_Yp* __p, __shared_weak_count* __cntrl) noexcept {
+        shared_ptr __r;
+        __r.__ptr_ = __p;
+        __r.__cntrl_ = __cntrl;
+        __r.__enable_weak_this(__p);
+        return __r;
+    }
+
+    _EZCXX_INLINE constexpr shared_ptr() noexcept : __ptr_(nullptr), __cntrl_(nullptr) {}
+
+    _EZCXX_INLINE constexpr shared_ptr(nullptr_t) noexcept : __ptr_(nullptr), __cntrl_(nullptr) {}
+
+    template <class _Yp, enable_if_t<__sp_pointer_compatible_v<_Yp, _Tp>, int> = 0>
+    explicit shared_ptr(_Yp* __p) : __ptr_(__p) {
+        conditional_t<is_array_v<_Tp>, default_delete<element_type[]>, default_delete<_Yp>> __d;
+        __cntrl_ = std::__shared_pointer_block(__p, __d);
+        __enable_weak_this(__p);
+    }
+
+    template <class _Yp, class _Dp,
+              enable_if_t<__sp_pointer_compatible_v<_Yp, _Tp> && __sp_deleter_callable_v<_Yp*, _Dp>, int> = 0>
+    shared_ptr(_Yp* __p, _Dp __d) : __ptr_(__p) {
+        __cntrl_ = std::__shared_pointer_block(__p, __d);
+        __enable_weak_this(__p);
+    }
+
+    template <class _Dp, enable_if_t<__sp_deleter_callable_v<nullptr_t, _Dp>, int> = 0>
+    shared_ptr(nullptr_t __p, _Dp __d) : __ptr_(nullptr) {
+        __cntrl_ = std::__shared_pointer_block(__p, __d);
+    }
+
+    template <class _Yp>
+    _EZCXX_INLINE shared_ptr(const shared_ptr<_Yp>& __r, element_type* __p) noexcept
+        : __ptr_(__p), __cntrl_(__r.__cntrl_) {
+        __shared_weak_count::__add_shared(__cntrl_);
+    }
+
+    template <class _Yp>
+    _EZCXX_INLINE shared_ptr(shared_ptr<_Yp>&& __r, element_type* __p) noexcept
+        : __ptr_(__p), __cntrl_(__r.__cntrl_) {
+        __r.__ptr_ = nullptr;
+        __r.__cntrl_ = nullptr;
+    }
+
+    _EZCXX_INLINE shared_ptr(const shared_ptr& __r) noexcept : __ptr_(__r.__ptr_), __cntrl_(__r.__cntrl_) {
+        __shared_weak_count::__add_shared(__cntrl_);
+    }
+
+    template <class _Yp, enable_if_t<__sp_compatible_v<_Yp, _Tp>, int> = 0>
+    _EZCXX_INLINE shared_ptr(const shared_ptr<_Yp>& __r) noexcept : __ptr_(__r.__ptr_), __cntrl_(__r.__cntrl_) {
+        __shared_weak_count::__add_shared(__cntrl_);
+    }
+
+    _EZCXX_INLINE shared_ptr(shared_ptr&& __r) noexcept : __ptr_(__r.__ptr_), __cntrl_(__r.__cntrl_) {
+        __r.__ptr_ = nullptr;
+        __r.__cntrl_ = nullptr;
+    }
+
+    template <class _Yp, enable_if_t<__sp_compatible_v<_Yp, _Tp>, int> = 0>
+    _EZCXX_INLINE shared_ptr(shared_ptr<_Yp>&& __r) noexcept : __ptr_(__r.__ptr_), __cntrl_(__r.__cntrl_) {
+        __r.__ptr_ = nullptr;
+        __r.__cntrl_ = nullptr;
+    }
+
+    template <class _Yp, enable_if_t<__sp_compatible_v<_Yp, _Tp>, int> = 0>
+    explicit shared_ptr(const weak_ptr<_Yp>& __r)
+        : __ptr_(__r.__ptr_), __cntrl_(__shared_weak_count::__lock(__r.__cntrl_)) {
+        if (__cntrl_ == nullptr) {
+            __throw_bad_weak_ptr();
+        }
+    }
+
+    template <class _Yp, class _Dp,
+              enable_if_t<__sp_compatible_v<_Yp, _Tp> &&
+                          is_convertible_v<typename unique_ptr<_Yp, _Dp>::pointer, element_type*>, int> = 0>
+    shared_ptr(unique_ptr<_Yp, _Dp>&& __r) : __ptr_(nullptr), __cntrl_(nullptr) {
+        using _Ptr = typename unique_ptr<_Yp, _Dp>::pointer;
+        if (__r.get() == nullptr) {
+            return;
+        }
+        if constexpr (is_reference_v<_Dp>) {
+            __cntrl_ = std::__shared_new_block<__shared_ptr_pointer<_Ptr, __shared_ref_deleter<remove_reference_t<_Dp>>>>(
+                __r.get(), __shared_ref_deleter<remove_reference_t<_Dp>>{std::addressof(__r.get_deleter())});
+        } else {
+            __cntrl_ = std::__shared_new_block<__shared_ptr_pointer<_Ptr, _Dp>>(__r.get(), std::move(__r.get_deleter()));
+        }
+        __ptr_ = __r.get();
+        if constexpr (is_same_v<_Ptr, _Yp*>) {
+            __enable_weak_this(__r.get());
+        }
+        __r.release();
+    }
+
+    _EZCXX_INLINE ~shared_ptr() {
+        __shared_weak_count::__release_shared(__cntrl_);
+    }
+
+    shared_ptr& operator=(const shared_ptr& __r) noexcept {
+        shared_ptr(__r).swap(*this);
+        return *this;
+    }
+
+    template <class _Yp, enable_if_t<__sp_compatible_v<_Yp, _Tp>, int> = 0>
+    shared_ptr& operator=(const shared_ptr<_Yp>& __r) noexcept {
+        shared_ptr(__r).swap(*this);
+        return *this;
+    }
+
+    shared_ptr& operator=(shared_ptr&& __r) noexcept {
+        shared_ptr(std::move(__r)).swap(*this);
+        return *this;
+    }
+
+    template <class _Yp, enable_if_t<__sp_compatible_v<_Yp, _Tp>, int> = 0>
+    shared_ptr& operator=(shared_ptr<_Yp>&& __r) noexcept {
+        shared_ptr(std::move(__r)).swap(*this);
+        return *this;
+    }
+
+    template <class _Yp, class _Dp,
+              enable_if_t<__sp_compatible_v<_Yp, _Tp> &&
+                          is_convertible_v<typename unique_ptr<_Yp, _Dp>::pointer, element_type*>, int> = 0>
+    shared_ptr& operator=(unique_ptr<_Yp, _Dp>&& __r) {
+        shared_ptr(std::move(__r)).swap(*this);
+        return *this;
+    }
+
+    _EZCXX_INLINE void swap(shared_ptr& __r) noexcept {
+        std::swap(__ptr_, __r.__ptr_);
+        std::swap(__cntrl_, __r.__cntrl_);
+    }
+
+    void reset() noexcept {
+        shared_ptr().swap(*this);
+    }
+
+    template <class _Yp, enable_if_t<__sp_pointer_compatible_v<_Yp, _Tp>, int> = 0>
+    void reset(_Yp* __p) {
+        shared_ptr(__p).swap(*this);
+    }
+
+    template <class _Yp, class _Dp,
+              enable_if_t<__sp_pointer_compatible_v<_Yp, _Tp> && __sp_deleter_callable_v<_Yp*, _Dp>, int> = 0>
+    void reset(_Yp* __p, _Dp __d) {
+        shared_ptr(__p, std::move(__d)).swap(*this);
+    }
+
+    _EZCXX_INLINE element_type* get() const noexcept { return __ptr_; }
+
+    _EZCXX_INLINE add_lvalue_reference_t<element_type> operator*() const noexcept { return *__ptr_; }
+
+    _EZCXX_INLINE element_type* operator->() const noexcept { return __ptr_; }
+
+    template <class _Up = _Tp, enable_if_t<is_array_v<_Up>, int> = 0>
+    _EZCXX_INLINE remove_extent_t<_Up>& operator[](ptrdiff_t __i) const { return __ptr_[__i]; }
+
+    _EZCXX_INLINE long use_count() const noexcept {
+        return __cntrl_ ? static_cast<long>(__cntrl_->__shared_owners_) : 0;
+    }
+
+    _EZCXX_INLINE explicit operator bool() const noexcept { return __ptr_ != nullptr; }
+
+    template <class _Up>
+    _EZCXX_INLINE bool owner_before(const shared_ptr<_Up>& __r) const noexcept { return __cntrl_ < __r.__cntrl_; }
+
+    template <class _Up>
+    _EZCXX_INLINE bool owner_before(const weak_ptr<_Up>& __r) const noexcept { return __cntrl_ < __r.__cntrl_; }
+};
+
+#if __cplusplus >= 201703L
+template <class _Tp>
+shared_ptr(weak_ptr<_Tp>) -> shared_ptr<_Tp>;
+
+template <class _Tp, class _Dp>
+shared_ptr(unique_ptr<_Tp, _Dp>) -> shared_ptr<_Tp>;
+#endif // __cplusplus >= 201703L
+
+template <class _Tp, class... _Args, enable_if_t<!is_array_v<_Tp>, int> = 0>
+shared_ptr<_Tp> make_shared(_Args&&... __args) {
+    using _Block = __shared_ptr_emplace<remove_cv_t<_Tp>>;
+    _Block* __block = std::__shared_new_block<_Block>(std::forward<_Args>(__args)...);
+    return shared_ptr<_Tp>::__adopt(std::addressof(__block->__value_), __block);
+}
+
+#if __cplusplus >= 202002L
+template <class _Tp, enable_if_t<!is_array_v<_Tp>, int> = 0>
+shared_ptr<_Tp> make_shared_for_overwrite() {
+    using _Block = __shared_ptr_emplace<remove_cv_t<_Tp>>;
+    _Block* __block = std::__shared_new_block<_Block>(__shared_default_init_tag());
+    return shared_ptr<_Tp>::__adopt(std::addressof(__block->__value_), __block);
+}
+#endif // __cplusplus >= 202002L
+
+template <class _Tp>
+_EZCXX_INLINE void swap(shared_ptr<_Tp>& __x, shared_ptr<_Tp>& __y) noexcept {
+    __x.swap(__y);
+}
+
+template <class _Dp, class _Tp>
+_Dp* get_deleter(const shared_ptr<_Tp>& __p) noexcept {
+    if (__p.__cntrl_ == nullptr) {
+        return nullptr;
+    }
+    const void* __d = __p.__cntrl_->__manager_(__p.__cntrl_, &__type_tag<remove_cv_t<_Dp>>::__id);
+    return static_cast<_Dp*>(const_cast<void*>(__d));
+}
+
+template <class _Tp, class _Up>
+_EZCXX_INLINE shared_ptr<_Tp> static_pointer_cast(const shared_ptr<_Up>& __r) noexcept {
+    return shared_ptr<_Tp>(__r, static_cast<typename shared_ptr<_Tp>::element_type*>(__r.get()));
+}
+
+template <class _Tp, class _Up>
+_EZCXX_INLINE shared_ptr<_Tp> const_pointer_cast(const shared_ptr<_Up>& __r) noexcept {
+    return shared_ptr<_Tp>(__r, const_cast<typename shared_ptr<_Tp>::element_type*>(__r.get()));
+}
+
+template <class _Tp, class _Up>
+_EZCXX_INLINE shared_ptr<_Tp> reinterpret_pointer_cast(const shared_ptr<_Up>& __r) noexcept {
+    return shared_ptr<_Tp>(__r, reinterpret_cast<typename shared_ptr<_Tp>::element_type*>(__r.get()));
+}
+
+#if __cplusplus >= 202002L
+template <class _Tp, class _Up>
+_EZCXX_INLINE shared_ptr<_Tp> static_pointer_cast(shared_ptr<_Up>&& __r) noexcept {
+    auto* __p = static_cast<typename shared_ptr<_Tp>::element_type*>(__r.get());
+    return shared_ptr<_Tp>(std::move(__r), __p);
+}
+
+template <class _Tp, class _Up>
+_EZCXX_INLINE shared_ptr<_Tp> const_pointer_cast(shared_ptr<_Up>&& __r) noexcept {
+    auto* __p = const_cast<typename shared_ptr<_Tp>::element_type*>(__r.get());
+    return shared_ptr<_Tp>(std::move(__r), __p);
+}
+
+template <class _Tp, class _Up>
+_EZCXX_INLINE shared_ptr<_Tp> reinterpret_pointer_cast(shared_ptr<_Up>&& __r) noexcept {
+    auto* __p = reinterpret_cast<typename shared_ptr<_Tp>::element_type*>(__r.get());
+    return shared_ptr<_Tp>(std::move(__r), __p);
+}
+#endif // __cplusplus >= 202002L
+
+#if __has_feature(cxx_rtti)
+template <class _Tp, class _Up>
+shared_ptr<_Tp> dynamic_pointer_cast(const shared_ptr<_Up>& __r) noexcept {
+    auto* __p = dynamic_cast<typename shared_ptr<_Tp>::element_type*>(__r.get());
+    return __p ? shared_ptr<_Tp>(__r, __p) : shared_ptr<_Tp>();
+}
+
+#if __cplusplus >= 202002L
+template <class _Tp, class _Up>
+shared_ptr<_Tp> dynamic_pointer_cast(shared_ptr<_Up>&& __r) noexcept {
+    auto* __p = dynamic_cast<typename shared_ptr<_Tp>::element_type*>(__r.get());
+    return __p ? shared_ptr<_Tp>(std::move(__r), __p) : shared_ptr<_Tp>();
+}
+#endif // __cplusplus >= 202002L
+#endif // __has_feature(cxx_rtti)
+
+template <class _Tp, class _Up>
+_EZCXX_INLINE bool operator==(const shared_ptr<_Tp>& __x, const shared_ptr<_Up>& __y) noexcept {
+    return __x.get() == __y.get();
+}
+
+#if __cplusplus < 202002L
+template <class _Tp, class _Up>
+_EZCXX_INLINE bool operator!=(const shared_ptr<_Tp>& __x, const shared_ptr<_Up>& __y) noexcept {
+    return !(__x == __y);
+}
+#endif // __cplusplus < 202002L
+
+template <class _Tp, class _Up>
+_EZCXX_INLINE bool operator<(const shared_ptr<_Tp>& __x, const shared_ptr<_Up>& __y) noexcept {
+    using _Cp = common_type_t<typename shared_ptr<_Tp>::element_type*, typename shared_ptr<_Up>::element_type*>;
+    return static_cast<_Cp>(__x.get()) < static_cast<_Cp>(__y.get());
+}
+
+template <class _Tp, class _Up>
+_EZCXX_INLINE bool operator>(const shared_ptr<_Tp>& __x, const shared_ptr<_Up>& __y) noexcept {
+    return __y < __x;
+}
+
+template <class _Tp, class _Up>
+_EZCXX_INLINE bool operator<=(const shared_ptr<_Tp>& __x, const shared_ptr<_Up>& __y) noexcept {
+    return !(__y < __x);
+}
+
+template <class _Tp, class _Up>
+_EZCXX_INLINE bool operator>=(const shared_ptr<_Tp>& __x, const shared_ptr<_Up>& __y) noexcept {
+    return !(__x < __y);
+}
+
+template <class _Tp>
+_EZCXX_INLINE bool operator==(const shared_ptr<_Tp>& __x, nullptr_t) noexcept {
+    return !__x;
+}
+
+#if __cplusplus < 202002L
+template <class _Tp>
+_EZCXX_INLINE bool operator==(nullptr_t, const shared_ptr<_Tp>& __x) noexcept {
+    return !__x;
+}
+
+template <class _Tp>
+_EZCXX_INLINE bool operator!=(const shared_ptr<_Tp>& __x, nullptr_t) noexcept {
+    return static_cast<bool>(__x);
+}
+
+template <class _Tp>
+_EZCXX_INLINE bool operator!=(nullptr_t, const shared_ptr<_Tp>& __x) noexcept {
+    return static_cast<bool>(__x);
+}
+#endif // __cplusplus < 202002L
+
+template <class _Tp>
+_EZCXX_INLINE bool operator<(const shared_ptr<_Tp>& __x, nullptr_t) noexcept {
+    return __x.get() < static_cast<typename shared_ptr<_Tp>::element_type*>(nullptr);
+}
+
+template <class _Tp>
+_EZCXX_INLINE bool operator<(nullptr_t, const shared_ptr<_Tp>& __x) noexcept {
+    return static_cast<typename shared_ptr<_Tp>::element_type*>(nullptr) < __x.get();
+}
+
+template <class _Tp>
+_EZCXX_INLINE bool operator>(const shared_ptr<_Tp>& __x, nullptr_t) noexcept {
+    return nullptr < __x;
+}
+
+template <class _Tp>
+_EZCXX_INLINE bool operator>(nullptr_t, const shared_ptr<_Tp>& __x) noexcept {
+    return __x < nullptr;
+}
+
+template <class _Tp>
+_EZCXX_INLINE bool operator<=(const shared_ptr<_Tp>& __x, nullptr_t) noexcept {
+    return !(nullptr < __x);
+}
+
+template <class _Tp>
+_EZCXX_INLINE bool operator<=(nullptr_t, const shared_ptr<_Tp>& __x) noexcept {
+    return !(__x < nullptr);
+}
+
+template <class _Tp>
+_EZCXX_INLINE bool operator>=(const shared_ptr<_Tp>& __x, nullptr_t) noexcept {
+    return !(__x < nullptr);
+}
+
+template <class _Tp>
+_EZCXX_INLINE bool operator>=(nullptr_t, const shared_ptr<_Tp>& __x) noexcept {
+    return !(nullptr < __x);
+}
+
+//------------------------------------------------------------------------------
+// weak_ptr
+//------------------------------------------------------------------------------
+
+template <class _Tp>
+class weak_ptr {
+public:
+    using element_type = remove_extent_t<_Tp>;
+
+private:
+    element_type* __ptr_;
+    __shared_weak_count* __cntrl_;
+
+    template <class _Up>
+    friend class weak_ptr;
+
+    template <class _Up>
+    friend class shared_ptr;
+
+    template <class _Yp>
+    static element_type* __convert(const weak_ptr<_Yp>& __r) noexcept {
+        if constexpr (is_same_v<remove_cv_t<typename weak_ptr<_Yp>::element_type>, remove_cv_t<element_type>>) {
+            return __r.__ptr_;
+        } else {
+            return __r.lock().get();
+        }
+    }
+
+public:
+    _EZCXX_INLINE constexpr weak_ptr() noexcept : __ptr_(nullptr), __cntrl_(nullptr) {}
+
+    _EZCXX_INLINE weak_ptr(const weak_ptr& __r) noexcept : __ptr_(__r.__ptr_), __cntrl_(__r.__cntrl_) {
+        __shared_weak_count::__add_weak(__cntrl_);
+    }
+
+    template <class _Yp, enable_if_t<__sp_compatible_v<_Yp, _Tp>, int> = 0>
+    _EZCXX_INLINE weak_ptr(const shared_ptr<_Yp>& __r) noexcept : __ptr_(__r.__ptr_), __cntrl_(__r.__cntrl_) {
+        __shared_weak_count::__add_weak(__cntrl_);
+    }
+
+    template <class _Yp, enable_if_t<__sp_compatible_v<_Yp, _Tp>, int> = 0>
+    weak_ptr(const weak_ptr<_Yp>& __r) noexcept : __ptr_(__convert(__r)), __cntrl_(__r.__cntrl_) {
+        __shared_weak_count::__add_weak(__cntrl_);
+    }
+
+    _EZCXX_INLINE weak_ptr(weak_ptr&& __r) noexcept : __ptr_(__r.__ptr_), __cntrl_(__r.__cntrl_) {
+        __r.__ptr_ = nullptr;
+        __r.__cntrl_ = nullptr;
+    }
+
+    template <class _Yp, enable_if_t<__sp_compatible_v<_Yp, _Tp>, int> = 0>
+    weak_ptr(weak_ptr<_Yp>&& __r) noexcept : __ptr_(__convert(__r)), __cntrl_(__r.__cntrl_) {
+        __r.__ptr_ = nullptr;
+        __r.__cntrl_ = nullptr;
+    }
+
+    _EZCXX_INLINE ~weak_ptr() {
+        __shared_weak_count::__release_weak(__cntrl_);
+    }
+
+    weak_ptr& operator=(const weak_ptr& __r) noexcept {
+        weak_ptr(__r).swap(*this);
+        return *this;
+    }
+
+    template <class _Yp, enable_if_t<__sp_compatible_v<_Yp, _Tp>, int> = 0>
+    weak_ptr& operator=(const weak_ptr<_Yp>& __r) noexcept {
+        weak_ptr(__r).swap(*this);
+        return *this;
+    }
+
+    template <class _Yp, enable_if_t<__sp_compatible_v<_Yp, _Tp>, int> = 0>
+    weak_ptr& operator=(const shared_ptr<_Yp>& __r) noexcept {
+        weak_ptr(__r).swap(*this);
+        return *this;
+    }
+
+    weak_ptr& operator=(weak_ptr&& __r) noexcept {
+        weak_ptr(std::move(__r)).swap(*this);
+        return *this;
+    }
+
+    template <class _Yp, enable_if_t<__sp_compatible_v<_Yp, _Tp>, int> = 0>
+    weak_ptr& operator=(weak_ptr<_Yp>&& __r) noexcept {
+        weak_ptr(std::move(__r)).swap(*this);
+        return *this;
+    }
+
+    _EZCXX_INLINE void swap(weak_ptr& __r) noexcept {
+        std::swap(__ptr_, __r.__ptr_);
+        std::swap(__cntrl_, __r.__cntrl_);
+    }
+
+    void reset() noexcept {
+        weak_ptr().swap(*this);
+    }
+
+    _EZCXX_INLINE long use_count() const noexcept {
+        return __cntrl_ ? static_cast<long>(__cntrl_->__shared_owners_) : 0;
+    }
+
+    _EZCXX_INLINE bool expired() const noexcept {
+        return __cntrl_ == nullptr || __cntrl_->__shared_owners_ == 0;
+    }
+
+    shared_ptr<_Tp> lock() const noexcept {
+        shared_ptr<_Tp> __r;
+        __r.__cntrl_ = __shared_weak_count::__lock(__cntrl_);
+        if (__r.__cntrl_) {
+            __r.__ptr_ = __ptr_;
+        }
+        return __r;
+    }
+
+    template <class _Up>
+    _EZCXX_INLINE bool owner_before(const shared_ptr<_Up>& __r) const noexcept { return __cntrl_ < __r.__cntrl_; }
+
+    template <class _Up>
+    _EZCXX_INLINE bool owner_before(const weak_ptr<_Up>& __r) const noexcept { return __cntrl_ < __r.__cntrl_; }
+};
+
+#if __cplusplus >= 201703L
+template <class _Tp>
+weak_ptr(shared_ptr<_Tp>) -> weak_ptr<_Tp>;
+#endif // __cplusplus >= 201703L
+
+template <class _Tp>
+_EZCXX_INLINE void swap(weak_ptr<_Tp>& __x, weak_ptr<_Tp>& __y) noexcept {
+    __x.swap(__y);
+}
+
+//------------------------------------------------------------------------------
+// owner_less
+//------------------------------------------------------------------------------
+
+template <class _Tp = void>
+struct owner_less;
+
+template <class _Tp>
+struct owner_less<shared_ptr<_Tp>> {
+    _EZCXX_INLINE bool operator()(const shared_ptr<_Tp>& __x, const shared_ptr<_Tp>& __y) const noexcept {
+        return __x.owner_before(__y);
+    }
+    _EZCXX_INLINE bool operator()(const shared_ptr<_Tp>& __x, const weak_ptr<_Tp>& __y) const noexcept {
+        return __x.owner_before(__y);
+    }
+    _EZCXX_INLINE bool operator()(const weak_ptr<_Tp>& __x, const shared_ptr<_Tp>& __y) const noexcept {
+        return __x.owner_before(__y);
+    }
+};
+
+template <class _Tp>
+struct owner_less<weak_ptr<_Tp>> {
+    _EZCXX_INLINE bool operator()(const weak_ptr<_Tp>& __x, const weak_ptr<_Tp>& __y) const noexcept {
+        return __x.owner_before(__y);
+    }
+    _EZCXX_INLINE bool operator()(const shared_ptr<_Tp>& __x, const weak_ptr<_Tp>& __y) const noexcept {
+        return __x.owner_before(__y);
+    }
+    _EZCXX_INLINE bool operator()(const weak_ptr<_Tp>& __x, const shared_ptr<_Tp>& __y) const noexcept {
+        return __x.owner_before(__y);
+    }
+};
+
+template <>
+struct owner_less<void> {
+    template <class _Tp, class _Up>
+    _EZCXX_INLINE bool operator()(const shared_ptr<_Tp>& __x, const shared_ptr<_Up>& __y) const noexcept {
+        return __x.owner_before(__y);
+    }
+    template <class _Tp, class _Up>
+    _EZCXX_INLINE bool operator()(const shared_ptr<_Tp>& __x, const weak_ptr<_Up>& __y) const noexcept {
+        return __x.owner_before(__y);
+    }
+    template <class _Tp, class _Up>
+    _EZCXX_INLINE bool operator()(const weak_ptr<_Tp>& __x, const shared_ptr<_Up>& __y) const noexcept {
+        return __x.owner_before(__y);
+    }
+    template <class _Tp, class _Up>
+    _EZCXX_INLINE bool operator()(const weak_ptr<_Tp>& __x, const weak_ptr<_Up>& __y) const noexcept {
+        return __x.owner_before(__y);
+    }
+    using is_transparent = void;
+};
+
+//------------------------------------------------------------------------------
+// enable_shared_from_this
+//------------------------------------------------------------------------------
+
+template <class _Tp>
+class enable_shared_from_this {
+    mutable weak_ptr<_Tp> __weak_this_;
+
+    template <class _Up>
+    friend class shared_ptr;
+
+protected:
+    _EZCXX_INLINE constexpr enable_shared_from_this() noexcept {}
+
+    _EZCXX_INLINE enable_shared_from_this(const enable_shared_from_this&) noexcept {}
+
+    _EZCXX_INLINE enable_shared_from_this& operator=(const enable_shared_from_this&) noexcept { return *this; }
+
+    ~enable_shared_from_this() = default;
+
+public:
+    shared_ptr<_Tp> shared_from_this() { return shared_ptr<_Tp>(__weak_this_); }
+
+    shared_ptr<const _Tp> shared_from_this() const { return shared_ptr<const _Tp>(__weak_this_); }
+
+#if __cplusplus >= 201703L
+    weak_ptr<_Tp> weak_from_this() noexcept { return __weak_this_; }
+
+    weak_ptr<const _Tp> weak_from_this() const noexcept { return __weak_this_; }
+#endif // __cplusplus >= 201703L
+};
 
 } // namespace std
 

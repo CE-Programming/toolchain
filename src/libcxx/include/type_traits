@@ -1081,6 +1081,89 @@ template <class _Tp>
 struct _EZCXX_TEMPLATE_VIS is_nothrow_swappable
     : bool_constant<is_nothrow_swappable_v<_Tp>> {};
 
+//------------------------------------------------------------------------------
+// invoke
+//------------------------------------------------------------------------------
+
+template <class _Mp>
+struct __member_pointer_class {};
+
+template <class _Mp, class _Cp>
+struct __member_pointer_class<_Mp _Cp::*> {
+    using type _EZCXX_NODEBUG = _Cp;
+};
+
+template <class _Fp, class _Ap, class = void>
+inline constexpr bool __invoke_on_object_v = false;
+
+template <class _Fp, class _Ap>
+inline constexpr bool __invoke_on_object_v<
+    _Fp, _Ap, void_t<typename __member_pointer_class<remove_cvref_t<_Fp>>::type>
+> = is_same_v<typename __member_pointer_class<remove_cvref_t<_Fp>>::type, remove_cvref_t<_Ap>> ||
+    is_base_of_v<typename __member_pointer_class<remove_cvref_t<_Fp>>::type, remove_cvref_t<_Ap>>;
+
+template <class _Fp, class... _Args, enable_if_t<!is_member_pointer_v<remove_cvref_t<_Fp>>, int> = 0>
+_EZCXX_INLINE constexpr auto __invoke(_Fp&& __f, _Args&&... __args)
+noexcept(noexcept(static_cast<_Fp&&>(__f)(static_cast<_Args&&>(__args)...)))
+-> decltype(static_cast<_Fp&&>(__f)(static_cast<_Args&&>(__args)...)) {
+    return static_cast<_Fp&&>(__f)(static_cast<_Args&&>(__args)...);
+}
+
+template <class _Fp, class _Ap, class... _Args,
+          enable_if_t<is_member_function_pointer_v<remove_cvref_t<_Fp>> && __invoke_on_object_v<_Fp, _Ap>, int> = 0>
+_EZCXX_INLINE constexpr auto __invoke(_Fp&& __f, _Ap&& __a, _Args&&... __args)
+noexcept(noexcept((static_cast<_Ap&&>(__a).*__f)(static_cast<_Args&&>(__args)...)))
+-> decltype((static_cast<_Ap&&>(__a).*__f)(static_cast<_Args&&>(__args)...)) {
+    return (static_cast<_Ap&&>(__a).*__f)(static_cast<_Args&&>(__args)...);
+}
+
+template <class _Fp, class _Ap, class... _Args,
+          enable_if_t<is_member_function_pointer_v<remove_cvref_t<_Fp>> && !__invoke_on_object_v<_Fp, _Ap>, int> = 0>
+_EZCXX_INLINE constexpr auto __invoke(_Fp&& __f, _Ap&& __a, _Args&&... __args)
+noexcept(noexcept(((*static_cast<_Ap&&>(__a)).*__f)(static_cast<_Args&&>(__args)...)))
+-> decltype(((*static_cast<_Ap&&>(__a)).*__f)(static_cast<_Args&&>(__args)...)) {
+    return ((*static_cast<_Ap&&>(__a)).*__f)(static_cast<_Args&&>(__args)...);
+}
+
+template <class _Fp, class _Ap,
+          enable_if_t<is_member_object_pointer_v<remove_cvref_t<_Fp>> && __invoke_on_object_v<_Fp, _Ap>, int> = 0>
+_EZCXX_INLINE constexpr auto __invoke(_Fp&& __f, _Ap&& __a) noexcept
+-> decltype(static_cast<_Ap&&>(__a).*__f) {
+    return static_cast<_Ap&&>(__a).*__f;
+}
+
+template <class _Fp, class _Ap,
+          enable_if_t<is_member_object_pointer_v<remove_cvref_t<_Fp>> && !__invoke_on_object_v<_Fp, _Ap>, int> = 0>
+_EZCXX_INLINE constexpr auto __invoke(_Fp&& __f, _Ap&& __a)
+noexcept(noexcept((*static_cast<_Ap&&>(__a)).*__f))
+-> decltype((*static_cast<_Ap&&>(__a)).*__f) {
+    return (*static_cast<_Ap&&>(__a)).*__f;
+}
+
+template <class _Fp, class... _Args>
+using __invoke_result_t _EZCXX_NODEBUG = decltype(std::__invoke(std::declval<_Fp>(), std::declval<_Args>()...));
+
+template <class _Void, class _Fp, class... _Args>
+inline constexpr bool __is_invocable_impl_v = false;
+
+template <class _Fp, class... _Args>
+inline constexpr bool __is_invocable_impl_v<void_t<__invoke_result_t<_Fp, _Args...>>, _Fp, _Args...> = true;
+
+template <class _Fp, class... _Args>
+inline constexpr bool __is_invocable_v = __is_invocable_impl_v<void, _Fp, _Args...>;
+
+template <class _Tp, class _Wp>
+inline constexpr bool __converts_from_any_cvref_v =
+    is_constructible_v<_Tp, _Wp&> || is_convertible_v<_Wp&, _Tp> ||
+    is_constructible_v<_Tp, _Wp> || is_convertible_v<_Wp, _Tp> ||
+    is_constructible_v<_Tp, const _Wp&> || is_convertible_v<const _Wp&, _Tp> ||
+    is_constructible_v<_Tp, const _Wp> || is_convertible_v<const _Wp, _Tp>;
+
+template <class _Tp, class _Wp>
+inline constexpr bool __assignable_from_any_cvref_v =
+    is_assignable_v<_Tp&, _Wp&> || is_assignable_v<_Tp&, const _Wp&> ||
+    is_assignable_v<_Tp&, _Wp> || is_assignable_v<_Tp&, const _Wp>;
+
 } // namespace std
 
 #endif // _EZCXX_TYPE_TRAITS
