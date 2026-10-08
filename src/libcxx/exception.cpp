@@ -2,7 +2,9 @@
 
 #include "abort_message.h"
 
+#include <memory>
 #include <new>
+#include <optional>
 #include <utility>
 
 namespace std {
@@ -13,6 +15,8 @@ namespace std {
 DEFINE_EXCEPTION(exception)
 DEFINE_EXCEPTION(bad_exception)
 DEFINE_EXCEPTION(bad_alloc)
+DEFINE_EXCEPTION(bad_weak_ptr)
+DEFINE_EXCEPTION(bad_optional_access)
 #undef DEFINE_EXCEPTION
 
 namespace {

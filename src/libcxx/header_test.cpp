@@ -30,11 +30,13 @@
 #include <cwctype>
 #include <cxxabi.h>
 #include <exception>
+#include <expected>
 #include <initializer_list>
 #include <limits>
 #include <memory>
 #include <new>
 #include <numbers>
+#include <optional>
 #if __cplusplus >= 201907L
 #include <source_location>
 #endif // __cplusplus >= 201907L
