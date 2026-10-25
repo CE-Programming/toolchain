@@ -59,6 +59,9 @@ jobs:
 
     runs-on: ${{matrix.runs-on}}
     steps:
+      - name: ls
+        run: |
+          ls ${{github.workspace}}
       - name: Prepare Build Environment
         run: |
           cmake -E echo >> $${{matrix.env}}GITHUB_PATH ${{env.CEDEV_BIN}}
