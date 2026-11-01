@@ -15,5 +15,28 @@
 #define _EZCXX_TEMPLATE_VIS __attribute__ ((__type_visibility__("default")))
 #define _EZCXX_LIFETIMEBOUND [[_Clang::__lifetimebound__]]
 #define _EZCXX_INLINE_VISIBILITY _EZCXX_HIDE_FROM_ABI
+#define _EZCXX_NO_UNIQUE_ADDRESS [[__no_unique_address__]]
+
+#if __cplusplus >= 202002L
+#define _EZCXX_CONSTEXPR_SINCE_CXX20 constexpr
+#else
+#define _EZCXX_CONSTEXPR_SINCE_CXX20
+#endif
+
+#if __cplusplus >= 202302L
+#define _EZCXX_CONSTEXPR_SINCE_CXX23 constexpr
+#else
+#define _EZCXX_CONSTEXPR_SINCE_CXX23
+#endif
+
+#if __has_feature(cxx_exceptions)
+#define _EZCXX_TRY try
+#define _EZCXX_CATCH_ALL catch (...)
+#define _EZCXX_RETHROW throw
+#else
+#define _EZCXX_TRY if (true)
+#define _EZCXX_CATCH_ALL else
+#define _EZCXX_RETHROW static_cast<void>(0)
+#endif
 
 #endif // _EZCXX_CONFIG
