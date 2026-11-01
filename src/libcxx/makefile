@@ -28,8 +28,9 @@ OBJECTS += $(patsubst %.c,build/%.c.o,$(wildcard *.c))
 OBJECTS += $(patsubst %.cpp,build/%.cpp.o,$(wildcard *.cpp))
 OBJECTS += $(patsubst %.src,build/%.o,$(wildcard *.src))
 
-SRC_OBJECTS := $(addprefix src/,$(shell $(MAKE) -s -C src print-objects))
-ABI_OBJECTS := $(addprefix abi/,$(shell $(MAKE) -s -C abi print-objects))
+# Keep directory banners emitted by recursive make versions out of the archive.
+SRC_OBJECTS := $(addprefix src/,$(filter build/%.o,$(shell $(MAKE) --no-print-directory -s -C src print-objects)))
+ABI_OBJECTS := $(addprefix abi/,$(filter build/%.o,$(shell $(MAKE) --no-print-directory -s -C abi print-objects)))
 
 CXX_LIB := build/libcxx.a
 
@@ -77,6 +78,6 @@ install: all
 	$(Q)$(call MKDIR,$(INSTALL_CXX_H))
 	$(Q)$(call MKDIR,$(INSTALL_LIBCXX))
 	$(Q)$(call COPY,$(call NATIVEPATH,$(CXX_LIB)),$(INSTALL_LIBCXX))
-	$(Q)$(call COPYDIR,$(call NATIVEPATH,include),$(INSTALL_CXX_H))
+	$(Q)$(call COPYDIR,$(call NATIVEPATH,include/.),$(INSTALL_CXX_H))
 
 .PHONY: all clean install src-build abi-build

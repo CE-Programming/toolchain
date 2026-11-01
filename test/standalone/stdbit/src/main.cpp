@@ -349,12 +349,7 @@ int test_bit_ceil(void) {
     C((std::bit_ceil( one_u32) ==  one_u32));
     // C((std::bit_ceil( one_u48) ==  one_u48));
     C((std::bit_ceil( one_u64) ==  one_u64));
-    C((std::bit_ceil(umax_u8 ) == zero_u8 ));
-    C((std::bit_ceil(umax_u16) == zero_u16));
-    C((std::bit_ceil(umax_u24) == zero_u24));
-    C((std::bit_ceil(umax_u32) == zero_u32));
-    // C((std::bit_ceil(umax_u48) == zero_u48));
-    C((std::bit_ceil(umax_u64) == zero_u64));
+    // std::bit_ceil is undefined when its result cannot be represented.
     C((std::bit_ceil(smax_u8 ) == smin_u8 ));
     C((std::bit_ceil(smax_u16) == smin_u16));
     C((std::bit_ceil(smax_u24) == smin_u24));
@@ -442,10 +437,11 @@ template<typename T>
 static inline bool verify_bit_ceil(void) {
     __attribute__((__unused__)) constexpr int width = std::numeric_limits<T>::digits / 4;
     for (int i = 0; i < Random_Test_Count; i++) {
-        T input = rand_gen<T>();
+        // Keep the next power of two representable, as required by bit_ceil.
+        T input = rand_gen<T>() >> 1;
         T output = std::bit_ceil(input);
         if (
-            (!std::has_single_bit(output) || output < input) && output != 0
+            !std::has_single_bit(output) || output < input
         ) {
             test_printf(
                 "bit_ceil:\nI: %0*llX\nO: %0*llX\n",
