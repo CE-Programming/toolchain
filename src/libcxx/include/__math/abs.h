@@ -67,7 +67,7 @@ template <class = int>
 [[__nodiscard__]] _LIBCPP_HIDE_FROM_ABI inline __int128_t abs(__int128_t __x) _NOEXCEPT { return __x < 0 ? -__x : __x; }
 #endif
 
-#if defined(__BITINT_MAXWIDTH__)
+#if defined(__BITINT_MAXWIDTH__) && !defined(_EZ80)
 // _BitInt does not integer-promote, so without a same-type overload a narrow
 // signed _BitInt would be an ambiguous call against abs(int/long/long long).
 template <int _Np>

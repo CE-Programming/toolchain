@@ -50,8 +50,13 @@ _LIBCPP_BEGIN_NAMESPACE_STD
 void __append_n_digits(const uint32_t __olength, uint32_t __digits, char* const __result);
 void __append_nine_digits(uint32_t __digits, char* const __result);
 
+#ifndef _EZ80
 [[nodiscard]] to_chars_result __d2fixed_buffered_n(char* _First, char* const _Last, const double __d, const uint32_t __precision);
 [[nodiscard]] to_chars_result __d2exp_buffered_n(char* _First, char* const _Last, const double __d, uint32_t __precision);
+#else // _EZ80
+[[nodiscard]] to_chars_result __d2fixed_buffered_n(char* _First, char* const _Last, const long double __d, const uint32_t __precision);
+[[nodiscard]] to_chars_result __d2exp_buffered_n(char* _First, char* const _Last, const long double __d, uint32_t __precision);
+#endif // _EZ80
 
 _LIBCPP_END_NAMESPACE_STD
 

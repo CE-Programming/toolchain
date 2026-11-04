@@ -348,6 +348,11 @@ string to_string(long long val) { return i_to_string< string>(val); }
 string to_string(unsigned val) { return i_to_string< string>(val); }
 string to_string(unsigned long val) { return i_to_string< string>(val); }
 string to_string(unsigned long long val) { return i_to_string< string>(val); }
+#  if defined(_EZ80)
+// Widen before formatting: the upstream charconv helpers do not support 48-bit storage.
+string to_string(signed __int48 val) { return i_to_string<string>(static_cast<long long>(val)); }
+string to_string(unsigned __int48 val) { return i_to_string<string>(static_cast<unsigned long long>(val)); }
+#  endif
 
 #if _LIBCPP_HAS_WIDE_CHARACTERS
 wstring to_wstring(int val) { return i_to_string<wstring>(val); }
@@ -356,6 +361,11 @@ wstring to_wstring(long long val) { return i_to_string<wstring>(val); }
 wstring to_wstring(unsigned val) { return i_to_string<wstring>(val); }
 wstring to_wstring(unsigned long val) { return i_to_string<wstring>(val); }
 wstring to_wstring(unsigned long long val) { return i_to_string<wstring>(val); }
+#  if defined(_EZ80)
+// Widen before formatting: the upstream charconv helpers do not support 48-bit storage.
+wstring to_wstring(signed __int48 val) { return i_to_string<wstring>(static_cast<long long>(val)); }
+wstring to_wstring(unsigned __int48 val) { return i_to_string<wstring>(static_cast<unsigned long long>(val)); }
+#  endif
 #endif
 
 string to_string(float val) { return as_string(snprintf, initial_string< string>()(), "%f", val); }

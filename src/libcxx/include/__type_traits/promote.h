@@ -25,6 +25,10 @@ double __promote_impl(int);
 double __promote_impl(unsigned);
 double __promote_impl(long);
 double __promote_impl(unsigned long);
+#if defined(_EZ80)
+double __promote_impl(signed __int48);
+double __promote_impl(unsigned __int48);
+#endif
 double __promote_impl(long long);
 double __promote_impl(unsigned long long);
 #if _LIBCPP_HAS_INT128
