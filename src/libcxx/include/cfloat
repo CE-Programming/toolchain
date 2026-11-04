@@ -1,9 +1,0 @@
-// -*- C++ -*-
-#ifndef _EZCXX_CFLOAT
-#define _EZCXX_CFLOAT
-
-#include <float.h>
-
-#pragma clang system_header
-
-#endif // _EZCXX_CFLOAT
