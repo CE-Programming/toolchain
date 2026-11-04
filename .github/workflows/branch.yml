@@ -251,6 +251,12 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
+      # The pinned Sphinx 4 stack imports imghdr, removed in Python 3.13.
+      - name: Set Up Documentation Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
       - name: Install Documentation Dependencies
         run: |
           sudo apt-get install -y doxygen

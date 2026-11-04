@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # Default toolchain docs (should be latest release!)
 export default_version=v15.0
 
@@ -60,6 +62,7 @@ for target_dir in "${!versions_map[@]}"
 do
 	branch_name="${versions_map[$target_dir]}"
 	git checkout "${branch_name}"
+	build_pids=()
 	for format in html
 	do
 		if [ "${target_dir}" = "." ]; then
@@ -68,8 +71,11 @@ do
 			current_version="${target_dir}"
 		fi
 		build_documentation "build/${format}/${target_dir}" "${format}" &
+		build_pids+=("$!")
 	done
 	# Each format is run in parallel, but we need to wait for completion before
 	# checking out the next branch.
-	wait
+	for build_pid in "${build_pids[@]}"; do
+		wait "$build_pid"
+	done
 done
