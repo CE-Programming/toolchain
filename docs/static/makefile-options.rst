@@ -97,6 +97,14 @@ These flags are additionally passed to the compiler.
     CFLAGS = -Wall -Wextra -Oz
     CXXFLAGS = -Wall -Wextra -Oz
 
+C++ source files default to GNU C++23, including when a project supplies its own
+:code:`CXXFLAGS`. To select a different standard, add :code:`-std=` to the
+project's :code:`CXXFLAGS` before including the toolchain makefile. For example:
+
+.. code-block:: makefile
+
+    CXXFLAGS = -Wall -Wextra -Oz -std=c++20
+
 .. rubric:: ASFLAGS
 
 These flags are additionally passed to the assembler:
