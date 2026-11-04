@@ -1,9 +1,0 @@
-// -*- C++ -*-
-#ifndef _EZCXX_CSTDIO
-#define _EZCXX_CSTDIO
-
-#include <stdio.h>
-
-#pragma clang system_header
-
-#endif // _EZCXX_CSTDIO
