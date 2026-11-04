@@ -113,6 +113,7 @@ EZCFLAGS := $(EZCOMMONFLAGS) $(EZLIBCINCLUDE)
 # The C++ standard requires libcxx headers to be searched before libc headers
 # this means include/c++/math.h must be included before include/math.h
 EZCXXFLAGS := $(EZCOMMONFLAGS) $(EZLIBCXXINCLUDE) $(EZLIBCINCLUDE)
+EZCXXFLAGS += -std=gnu++23
 EZCXXFLAGS += -fno-exceptions
 EZCXXFLAGS += -fno-rtti
 

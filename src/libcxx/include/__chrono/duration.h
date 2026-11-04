@@ -298,8 +298,8 @@ typedef duration<long, ratio<60 * 60> > hours;
 #if _LIBCPP_STD_VER >= 20
 typedef duration<int, ratio<60 * 60 * 24>> days;
 typedef duration<int, ratio<60 * 60 * 24 * 7>> weeks;
-typedef duration<int, ratio<static_cast<int>(365.2425 * 60 * 60 * 24)>> years;
-typedef duration<int, ratio<static_cast<int>(365.2425 * 60 * 60 * 24) / 12>> months;
+typedef duration<int, ratio<31556952L>> years;
+typedef duration<int, ratio<2629746L>> months;
 #endif
 // Duration ==
 

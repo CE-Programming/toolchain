@@ -41,6 +41,8 @@
 #  define _LIBCPP_ELAST 1160
 #elif defined(_LIBCPP_MSVCRT_LIKE)
 #  define _LIBCPP_ELAST (_sys_nerr - 1)
+#elif defined(_EZ80)
+// No _LIBCPP_ELAST needed on _EZ80
 #elif defined(_AIX)
 #  define _LIBCPP_ELAST 127
 #else

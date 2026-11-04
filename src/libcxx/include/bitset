@@ -877,7 +877,7 @@ bitset<_Size>::to_string(char __zero, char __one) const {
 
 template <size_t _Size>
 inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX23 size_t bitset<_Size>::count() const _NOEXCEPT {
-#  if defined(_LIBCPP_COMPILER_CLANG_BASED) && !defined(_LIBCPP_CXX03_LANG)
+#  if !defined(_EZ80) && defined(_LIBCPP_COMPILER_CLANG_BASED) && !defined(_LIBCPP_CXX03_LANG)
   if constexpr (_Size == 0) {
     return 0;
   } else if constexpr (_Size <= __base::__bits_per_word) {
