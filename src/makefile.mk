@@ -351,6 +351,8 @@ EZCFLAGS += $(CFLAGS) $(CC_DEBUG)
 # The C++ standard requires libcxx headers to be searched before libc headers
 # this means include/c++/math.h must be included before include/math.h
 EZCXXFLAGS = $(EZCOMMONFLAGS) $(EZLIBCXXINCLUDE) $(EZLIBCINCLUDE)
+# Project CXXFLAGS follow this default so an explicit -std= takes precedence.
+EZCXXFLAGS += -std=gnu++23
 EZCXXFLAGS += -fno-exceptions
 EZCXXFLAGS += -fno-use-cxa-atexit
 EZCXXFLAGS += $(CXXFLAGS) $(CC_DEBUG)

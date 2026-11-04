@@ -494,8 +494,26 @@ protected:
       if (__offset >= __base)
         break;
       // __val = (__val * __base) + __offset
+    #ifndef _EZ80
+    // DEBUG //
       __overflowed |= __builtin_mul_overflow(__val, __base, std::addressof(__val)) ||
                       __builtin_add_overflow(__val, __offset, std::addressof(__val));
+    // DEBUG //
+    #else // _EZ80
+    // DEBUG //
+      using _Limits = std::numeric_limits<_Unsigned>;
+
+      if (!__overflowed) {
+          // Check: __val * __base + __offset would overflow
+
+          if (__val > (_Limits::max() - __offset) / __base) {
+              __overflowed = true;
+          } else {
+              __val = __val * __base + __offset;
+          }
+      }
+    // DEBUG //
+    #endif // _EZ80
       __parsed_num = true;
       ++__dc;
     }

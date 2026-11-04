@@ -3810,6 +3810,10 @@ stoull(const string& __str, size_t* __idx = nullptr, int __base = 10);
 [[__nodiscard__]] _LIBCPP_EXPORTED_FROM_ABI string to_string(unsigned long __val);
 [[__nodiscard__]] _LIBCPP_EXPORTED_FROM_ABI string to_string(long long __val);
 [[__nodiscard__]] _LIBCPP_EXPORTED_FROM_ABI string to_string(unsigned long long __val);
+#  if defined(_EZ80)
+[[__nodiscard__]] _LIBCPP_EXPORTED_FROM_ABI string to_string(signed __int48 __val);
+[[__nodiscard__]] _LIBCPP_EXPORTED_FROM_ABI string to_string(unsigned __int48 __val);
+#  endif
 [[__nodiscard__]] _LIBCPP_EXPORTED_FROM_ABI string to_string(float __val);
 [[__nodiscard__]] _LIBCPP_EXPORTED_FROM_ABI string to_string(double __val);
 [[__nodiscard__]] _LIBCPP_EXPORTED_FROM_ABI string to_string(long double __val);
@@ -3834,6 +3838,10 @@ stoull(const wstring& __str, size_t* __idx = nullptr, int __base = 10);
 [[__nodiscard__]] _LIBCPP_EXPORTED_FROM_ABI wstring to_wstring(unsigned long __val);
 [[__nodiscard__]] _LIBCPP_EXPORTED_FROM_ABI wstring to_wstring(long long __val);
 [[__nodiscard__]] _LIBCPP_EXPORTED_FROM_ABI wstring to_wstring(unsigned long long __val);
+#    if defined(_EZ80)
+[[__nodiscard__]] _LIBCPP_EXPORTED_FROM_ABI wstring to_wstring(signed __int48 __val);
+[[__nodiscard__]] _LIBCPP_EXPORTED_FROM_ABI wstring to_wstring(unsigned __int48 __val);
+#    endif
 [[__nodiscard__]] _LIBCPP_EXPORTED_FROM_ABI wstring to_wstring(float __val);
 [[__nodiscard__]] _LIBCPP_EXPORTED_FROM_ABI wstring to_wstring(double __val);
 [[__nodiscard__]] _LIBCPP_EXPORTED_FROM_ABI wstring to_wstring(long double __val);

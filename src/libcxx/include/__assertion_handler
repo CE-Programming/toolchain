@@ -1,0 +1,14 @@
+#ifndef ___ASSERTION_HANDLER
+#define ___ASSERTION_HANDLER
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define _LIBCPP_ASSERTION_HANDLER(msg) ((void)0)
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif // ___ASSERTION_HANDLER
