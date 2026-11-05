@@ -10,7 +10,6 @@
 #define _LIBCPP___MATH_TRAITS_H
 
 #include <__config>
-#include <__math_def.h>
 #include <__type_traits/enable_if.h>
 #include <__type_traits/is_arithmetic.h>
 #include <__type_traits/is_integral.h>
@@ -24,8 +23,6 @@ _LIBCPP_BEGIN_NAMESPACE_STD
 
 namespace __math {
 
-// Use the CE classification routines at runtime and retain builtin constant folding.
-
 // signbit
 
 // The universal C runtime (UCRT) in the WinSDK provides floating point overloads
@@ -33,22 +30,16 @@ namespace __math {
 // this issue as templates are less preferred than non-template functions.
 template <class = void>
 [[__nodiscard__]] inline _LIBCPP_CONSTEXPR_SINCE_CXX23 _LIBCPP_HIDE_FROM_ABI bool signbit(float __x) _NOEXCEPT {
-  if (!__builtin_constant_p(__x))
-    return ::_signbitf(__x);
   return __builtin_signbit(__x);
 }
 
 template <class = void>
 [[__nodiscard__]] inline _LIBCPP_CONSTEXPR_SINCE_CXX23 _LIBCPP_HIDE_FROM_ABI bool signbit(double __x) _NOEXCEPT {
-  if (!__builtin_constant_p(__x))
-    return ::_signbitf(__x);
   return __builtin_signbit(__x);
 }
 
 template <class = void>
 [[__nodiscard__]] inline _LIBCPP_CONSTEXPR_SINCE_CXX23 _LIBCPP_HIDE_FROM_ABI bool signbit(long double __x) _NOEXCEPT {
-  if (!__builtin_constant_p(__x))
-    return ::_signbitl(__x);
   return __builtin_signbit(__x);
 }
 
@@ -65,20 +56,14 @@ template <class _A1, __enable_if_t<is_integral<_A1>::value, int> = 0>
 }
 
 [[__nodiscard__]] inline _LIBCPP_CONSTEXPR_SINCE_CXX23 _LIBCPP_HIDE_FROM_ABI bool isfinite(float __x) _NOEXCEPT {
-  if (!__builtin_constant_p(__x))
-    return ::_isfinitef(__x);
   return __builtin_isfinite(__x);
 }
 
 [[__nodiscard__]] inline _LIBCPP_CONSTEXPR_SINCE_CXX23 _LIBCPP_HIDE_FROM_ABI bool isfinite(double __x) _NOEXCEPT {
-  if (!__builtin_constant_p(__x))
-    return ::_isfinitef(__x);
   return __builtin_isfinite(__x);
 }
 
 [[__nodiscard__]] inline _LIBCPP_CONSTEXPR_SINCE_CXX23 _LIBCPP_HIDE_FROM_ABI bool isfinite(long double __x) _NOEXCEPT {
-  if (!__builtin_constant_p(__x))
-    return ::_isfinitel(__x);
   return __builtin_isfinite(__x);
 }
 
@@ -90,8 +75,6 @@ template <class _A1, __enable_if_t<is_integral<_A1>::value, int> = 0>
 }
 
 [[__nodiscard__]] inline _LIBCPP_CONSTEXPR_SINCE_CXX23 _LIBCPP_HIDE_FROM_ABI bool isinf(float __x) _NOEXCEPT {
-  if (!__builtin_constant_p(__x))
-    return ::_isinff(__x);
   return __builtin_isinf(__x);
 }
 
@@ -101,14 +84,10 @@ _LIBCPP_PREFERRED_OVERLOAD
 #endif
     bool
     isinf(double __x) _NOEXCEPT {
-  if (!__builtin_constant_p(__x))
-    return ::_isinff(__x);
   return __builtin_isinf(__x);
 }
 
 [[__nodiscard__]] inline _LIBCPP_CONSTEXPR_SINCE_CXX23 _LIBCPP_HIDE_FROM_ABI bool isinf(long double __x) _NOEXCEPT {
-  if (!__builtin_constant_p(__x))
-    return ::_isinfl(__x);
   return __builtin_isinf(__x);
 }
 
@@ -120,8 +99,6 @@ template <class _A1, __enable_if_t<is_integral<_A1>::value, int> = 0>
 }
 
 [[__nodiscard__]] inline _LIBCPP_CONSTEXPR_SINCE_CXX23 _LIBCPP_HIDE_FROM_ABI bool isnan(float __x) _NOEXCEPT {
-  if (!__builtin_constant_p(__x))
-    return ::_isnanf(__x);
   return __builtin_isnan(__x);
 }
 
@@ -131,14 +108,10 @@ _LIBCPP_PREFERRED_OVERLOAD
 #endif
     bool
     isnan(double __x) _NOEXCEPT {
-  if (!__builtin_constant_p(__x))
-    return ::_isnanf(__x);
   return __builtin_isnan(__x);
 }
 
 [[__nodiscard__]] inline _LIBCPP_CONSTEXPR_SINCE_CXX23 _LIBCPP_HIDE_FROM_ABI bool isnan(long double __x) _NOEXCEPT {
-  if (!__builtin_constant_p(__x))
-    return ::_isnanl(__x);
   return __builtin_isnan(__x);
 }
 
@@ -150,20 +123,14 @@ template <class _A1, __enable_if_t<is_integral<_A1>::value, int> = 0>
 }
 
 [[__nodiscard__]] inline _LIBCPP_CONSTEXPR_SINCE_CXX23 _LIBCPP_HIDE_FROM_ABI bool isnormal(float __x) _NOEXCEPT {
-  if (!__builtin_constant_p(__x))
-    return ::_isnormalf(__x);
   return __builtin_isnormal(__x);
 }
 
 [[__nodiscard__]] inline _LIBCPP_CONSTEXPR_SINCE_CXX23 _LIBCPP_HIDE_FROM_ABI bool isnormal(double __x) _NOEXCEPT {
-  if (!__builtin_constant_p(__x))
-    return ::_isnormalf(__x);
   return __builtin_isnormal(__x);
 }
 
 [[__nodiscard__]] inline _LIBCPP_CONSTEXPR_SINCE_CXX23 _LIBCPP_HIDE_FROM_ABI bool isnormal(long double __x) _NOEXCEPT {
-  if (!__builtin_constant_p(__x))
-    return ::_isnormall(__x);
   return __builtin_isnormal(__x);
 }
 

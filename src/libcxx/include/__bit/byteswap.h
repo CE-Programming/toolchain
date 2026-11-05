@@ -39,11 +39,6 @@ template <integral _Tp>
 
   if constexpr (sizeof(_Tp) == 1) {
     return __val;
-#  if defined(_EZ80)
-  } else if constexpr (sizeof(_Tp) == 3) {
-    // LLVM 22 rejects llvm.bswap.i24: use a supported width and discard padding.
-    return static_cast<_Tp>(__builtin_bswap32(static_cast<uint32_t>(__val)) >> 8);
-#  endif
 #  if __has_builtin(__builtin_bswapg)
   } else {
     return __builtin_bswapg(__val);

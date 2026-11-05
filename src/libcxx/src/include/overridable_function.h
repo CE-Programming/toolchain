@@ -59,9 +59,7 @@
 // want to be defining special sections inside user's executables which use our headers.
 //
 
-// The eZ80 backend cannot lower the inline-assembly constraints used by this detector.
-#if !defined(_EZ80) && \
-    (defined(_LIBCPP_OBJECT_FORMAT_MACHO) || (defined(_LIBCPP_OBJECT_FORMAT_ELF) && !defined(__NVPTX__)))
+#if defined(_LIBCPP_OBJECT_FORMAT_MACHO) || (defined(_LIBCPP_OBJECT_FORMAT_ELF) && !defined(__NVPTX__))
 
 #  define _LIBCPP_CAN_DETECT_OVERRIDDEN_FUNCTION 1
 
