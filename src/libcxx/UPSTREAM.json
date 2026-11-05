@@ -59,18 +59,20 @@
     "version": "22.1.8",
     "target": "ez80",
     "repository": "https://github.com/CE-Programming/llvm-project",
-    "revision": "c1c359f0f2ea33df6fe0a8a0e11676db1ff7507a",
-    "distribution": "published nightly"
+    "revision": "8dd8b5a90f8cbb0c77611b654dca4bb912b8472b",
+    "distribution": "local audit build; unpublished compiler fixes",
+    "optimization_branch_revision": "dc51f004de33",
+    "build_note": "Isolated frontend and Z80 target archives linked with the existing Clang 22.1.8 build. The embedded version still reports ff0702aaaa7a; the audited source snapshots match the listed commits."
   },
   "v23_target_adaptations": [
     "Exclude _BitInt abs overloads: the eZ80 target does not implement _BitInt despite advertising __BITINT_MAXWIDTH__.",
     "Use exact integer year/month periods: int is 24 bits and double is 32 bits.",
-    "Use the weak-function fallback: the eZ80 backend cannot lower the inline-assembly constraints in the v23 override detector.",
-    "Use bswap32 followed by an 8-bit shift for 24-bit byteswap: LLVM 22 rejects llvm.bswap.i24 during LTO."
+    "Keep algorithm SIMD utilities disabled: packed vector-boolean bitcasts fail in locale digit lookup and in O2 algorithm stress tests.",
+    "Use a native storage-word mask for small-bitset popcount instead of _BitInt."
   ],
   "local_validation": {
-    "test_projects_built": 83,
-    "autotest_suites_passed_per_mode": 129,
+    "test_projects_built": 85,
+    "autotest_suites_passed_per_mode": 131,
     "compressed_modes": [
       "NO",
       "YES"
@@ -81,13 +83,20 @@
       "c++23"
     ],
     "rom": "83pceep_cemu_536_540.rom",
-    "hardware_tested": false
+    "hardware_tested": false,
+    "compression_exceptions": [
+      {
+        "project": "floating_point/float64_arithmetic",
+        "compressed": "YES",
+        "reason": "The raw program with all 108 direct comparison expressions exceeds one variable."
+      }
+    ]
   },
   "followup_notes": [
     "The obsolete __ishru_1_fast/__ishrs_1_fast aliases are removed; supported compiler builds use the original entry points.",
-    "The 24/48-bit byteswap and 48-bit bit-operation tests are restored, with constexpr coverage.",
-    "Math runtime fallbacks remain until Z80 FCMP_UNO/FCMP_ORD lowering respects NaNs independently of fast-math flags.",
-    "The published compiler nightly includes the 48-bit signedness and bidirectional floating-point conversion fixes; regression coverage uses those fixes directly."
+    "Generic 24/48-bit byteswap, runtime math classification, integer parser overflow builtins, and the weak-function override detector now use upstream implementations.",
+    "The new compiler fixes are not yet published. The c1c359f0f2ea nightly alone is insufficient for this branch.",
+    "The published compiler nightly already includes the 48-bit signedness and bidirectional floating-point conversion fixes."
   ],
   "additional_ce_patches": [
     {
@@ -138,6 +147,119 @@
     {
       "commit": "c1c359f0f2ea33df6fe0a8a0e11676db1ff7507a",
       "description": "Legalize integer/floating-point conversions in both directions for 48-bit integers."
+    },
+    {
+      "commit": "fb00cf55b372",
+      "description": "Model comparison pseudo inputs correctly for machine verification."
+    },
+    {
+      "commit": "aa5970b3506d71ee826107782611542325c9ca68",
+      "description": "Clang: lower odd-byte native byteswap through an even-width intrinsic"
+    },
+    {
+      "commit": "9c29ca244660f526c580393d28ab69fa4d76d6bd",
+      "description": "Z80: accept immediate symbol operands with the inline asm X constraint"
+    },
+    {
+      "commit": "9505fc974525910cdb55c85f74c409f7f7028b34",
+      "description": "Z80: preserve live inputs and kill flags during copy expansion"
+    },
+    {
+      "commit": "3d436603ee6e89855c55b441bef314d1b6db10bb",
+      "description": "Z80: respect NaNs and signed zeros in floating-point comparisons"
+    },
+    {
+      "commit": "8dd8b5a90f8cbb0c77611b654dca4bb912b8472b",
+      "description": "Z80: legalize partial-width comparison and overflow operands"
     }
-  ]
+  ],
+  "compiler_audit_validation": {
+    "date": "2026-11-05",
+    "compiler_fix_tip": "8dd8b5a90f8cbb0c77611b654dca4bb912b8472b",
+    "with_optimizations_tip": "dc51f004de33",
+    "compiler_published": false,
+    "llvm_backend_tests_before_optimizations": 51,
+    "llvm_backend_tests_with_optimizations": 88,
+    "clang_byteswap_checks": "CodeGen in Z80/eZ80 modes and both constant evaluators; existing builtin-bswapg Sema tests also pass",
+    "runtime_compiler": "local build with the optimization series",
+    "test_projects_built": 85,
+    "autotest_suites_passed_per_mode": 131,
+    "compressed_modes": [
+      "NO",
+      "YES"
+    ],
+    "before_optimizations_runtime_suites": [
+      "libcxx_cmath",
+      "libcxx_builtins",
+      "libcxx_overrides",
+      "libcxx_stl",
+      "stdbit"
+    ],
+    "before_optimizations_runtime_mode": "NO",
+    "floating_point_comparisons": {
+      "operand_patterns": 14,
+      "type_instantiations": [
+        "float",
+        "double",
+        "long double"
+      ],
+      "operand_pairs": 588,
+      "predicate_results_per_pair": 16,
+      "reference": "integer ranks and explicit NaN indices"
+    },
+    "overflow_operand_widths": [
+      8,
+      16,
+      24,
+      32,
+      48,
+      64
+    ],
+    "overflow_bases": [
+      2,
+      8,
+      10,
+      16
+    ],
+    "bitset_sizes": [
+      0,
+      1,
+      7,
+      8,
+      9,
+      16,
+      23,
+      24,
+      25,
+      47,
+      48,
+      49,
+      64
+    ],
+    "bitset_checks": "constexpr set/flip/count and runtime per-bit reference",
+    "algorithm_checks": "find/count/equal/mismatch with every mismatch offset, at Oz and O2; SIMD exclusion retained",
+    "override_detection": "separately compiled weak definitions, strong replacement of one hook, default hook unchanged",
+    "public_header_standard_modes": [
+      "c++17",
+      "c++20",
+      "c++23"
+    ],
+    "rom": "83pceep_cemu_536_540.rom",
+    "hardware_tested": false,
+    "compression_exceptions": [
+      {
+        "project": "floating_point/float64_arithmetic",
+        "compressed": "YES",
+        "reason": "The raw program with all 108 direct comparison expressions exceeds one variable."
+      }
+    ],
+    "float64_arithmetic_packaging": {
+      "comparison_expressions": 108,
+      "shared_comparison_helper": false,
+      "always_compressed": true,
+      "before_optimizations_compressed_bytes": 17369,
+      "with_optimizations_compressed_bytes": 16968,
+      "cemu_checks_passed_per_compiler": 2
+    }
+  }
 }

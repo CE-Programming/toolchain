@@ -877,11 +877,20 @@ bitset<_Size>::to_string(char __zero, char __one) const {
 
 template <size_t _Size>
 inline _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX23 size_t bitset<_Size>::count() const _NOEXCEPT {
-#  if !defined(_EZ80) && defined(_LIBCPP_COMPILER_CLANG_BASED) && !defined(_LIBCPP_CXX03_LANG)
+#  if defined(_LIBCPP_COMPILER_CLANG_BASED) && !defined(_LIBCPP_CXX03_LANG)
   if constexpr (_Size == 0) {
     return 0;
   } else if constexpr (_Size <= __base::__bits_per_word) {
+#    if defined(_EZ80)
+    // _BitInt is unavailable on this target. Mask unused bits in the native
+    // storage word instead, including the full-word case without a wide shift.
+    using __storage_type = typename __base::__storage_type;
+    constexpr __storage_type __mask =
+        __storage_type(~__storage_type(0)) >> (__base::__bits_per_word - _Size);
+    return __builtin_popcountg(__storage_type(__base::__first_ & __mask));
+#    else
     return __builtin_popcountg(static_cast<unsigned _BitInt(_Size)>(__base::__first_));
+#    endif
   } else
 #  endif
   {

@@ -6,8 +6,9 @@ licenses are mapped in [UPSTREAM.json](UPSTREAM.json).
 
 The branch starts from toolchain master at `283292dd` and carries forward
 the CE adaptations from `libcxx_22` at `1f960e0d`, originally based on
-ZERICO2005's port at `63b8cce1`. Its four commits separate removal of the
+ZERICO2005's port at `63b8cce1`. Its first four commits separate removal of the
 old STL, the pristine upstream import, CE customization, and metadata/tests.
+Follow-up commits remove workarounds covered by the compiler audit below.
 All 1,851 files in the raw import commit match the upstream Git blobs exactly;
 the following commit contains the target changes.
 
@@ -28,13 +29,12 @@ random-device support, Unicode, and the time-zone database are disabled.
 Localization and wide-character support retain the incomplete CE runtime
 interfaces from the previous port. Integer-width conversion warnings also
 remain. The 24/48-bit byteswap and 48-bit `<bit>` checks are enabled.
-The full regression suite requires the eZ80 Clang 22.1.8 nightly from compiler
-revision [`c1c359f0f2ea`](https://github.com/CE-Programming/llvm-project/commit/c1c359f0f2ea33df6fe0a8a0e11676db1ff7507a)
-or a descendant. It includes the 48-bit signedness fix from
-[`b3f9795fb32c`](https://github.com/CE-Programming/llvm-project/commit/b3f9795fb32c)
-and conversion legalization in both directions between 48-bit integers and
-floating point. Older 22.1.8 binaries can build the library but fail these new
-regressions.
+The full regression suite now requires the **unpublished compiler fixes** listed
+in `UPSTREAM.json`, on top of the Clang 22.1.8 nightly at `c1c359f0f2ea`.
+They fix generic 24-bit byteswap, NaN and signed-zero comparisons, partial-width
+overflow arithmetic, and inline-assembly symbol operands. The published nightly
+already contains the 48-bit signedness and bidirectional floating-point
+conversion fixes, but does not yet contain these new audit fixes.
 
 ## Target adaptations
 
@@ -46,40 +46,49 @@ and [`libcxx_22_locale` port](https://github.com/ZERICO2005/toolchain/commit/5c3
 `to_string` and `to_wstring` include runtime definitions and widen to 64 bits
 before formatting, since upstream charconv helpers do not handle six-byte
 integer storage. The v23 upstream traits and bit algorithms remain in use.
-Floating-point classification uses
-the CE routines at runtime and compiler builtins for constant folding;
-`<numbers>` retains long-double precision.
+Floating-point classification now uses upstream compiler builtins at runtime
+and during constant evaluation. The compiler audit covers quiet/signaling NaNs,
+infinities, subnormals, and both zero signs. No global fast-math or finite-only
+default is introduced. `<numbers>` retains long-double precision.
 
-The runtime classification fallbacks remain necessary: the Z80 backend maps
-`FCMP_UNO` to constant false and `FCMP_ORD` to true, even with fast-math
-disabled. Remove those fallbacks when compiler-side NaN handling is fixed
-and the existing classification tests pass with direct builtins. No global
-fast-math or finite-only default is introduced here.
+The upstream generic byteswap and function-override detector are restored.
+Locale integer parsing uses the upstream overflow builtins again, including its
+mixed signed/unsigned operands. The override detector is tested with separate
+compilation, matching the libc++ archive build: a strong definition overrides
+one weak function while a second remains unchanged.
+
+The algorithm SIMD exclusion remains: an O2 runtime stress test exposes
+unsupported packed-boolean bitcasts even in the ordinary algorithm path.
+Locale parsing also uses a fixed 32-lane search when these utilities are enabled.
+The native vector-width value of one is not enough to make those paths safe.
+`bitset::count()` restores the small-bitset fast path
+using a native storage-word mask instead of `_BitInt`.
 
 The obsolete `__ishru_1_fast`/`__ishrs_1_fast` compatibility aliases are removed;
 the compiler uses the existing `__ishru_1`/`__ishrs_1` entry points.
 
-LLVM 23 needs these additional target adjustments:
+The compiler limitations still requiring libc++ customizations are:
 
-- 24-bit byteswap uses a 32-bit builtin followed by an eight-bit shift.
-  Clang 22's generic builtin emits `llvm.bswap.i24`, which its LLVM verifier
-  rejects during LTO. The generic 48-bit builtin works directly.
-- `_BitInt` overloads are excluded because eZ80 Clang advertises
-  `__BITINT_MAXWIDTH__` while rejecting `_BitInt` for this target.
-- `chrono::years` and `chrono::months` use exact integer periods. The upstream
-  floating-point expression both exceeds 24-bit `int` and loses precision
-  with the CE's 32-bit `double`.
-- The function-override diagnostic uses libc++'s portable fallback because
-  the eZ80 backend cannot lower the new inline-assembly constraints. Weak
-  `operator new`/`delete` definitions remain overridable.
+- `_BitInt` overloads remain excluded: eZ80 Clang advertises
+  `__BITINT_MAXWIDTH__` while rejecting `_BitInt` for this target. Small-bitset
+  popcount uses the native-word equivalent instead.
+- Algorithm SIMD utilities remain disabled because packed vector-boolean
+  bitcasts are not supported, including the locale parser's fixed 32-lane search.
+
+Other retained adaptations describe the CE data model or runtime interfaces.
+For example, `chrono::years` and `chrono::months` need exact integer periods:
+the upstream floating-point expression exceeds 24-bit `int` and loses precision
+with the CE's 32-bit `double`. Those are separate from compiler limitations.
 
 ## Validation
 
-The archive builds with eZ80 Clang 22.1.8. All 83 toolchain test projects
+The archive builds with eZ80 Clang 22.1.8. All 85 toolchain test projects
 and the installed examples build against a fresh SDK in compressed and
-uncompressed modes. All 129 CEmu autotest suites pass in each mode on the
-TI-83 Premium CE Edition Python 5.3.6 ROM. Public-header syntax checks pass
-in C++17, C++20, and C++23, and project standard overrides are verified.
+uncompressed matrix modes. The float64 arithmetic test always uses compression
+because its raw program exceeds one variable. All 131 CEmu autotest suites pass
+in each matrix mode on the TI-83 Premium CE Edition Python 5.3.6 ROM.
+Public-header syntax checks pass in C++17, C++20, and C++23, and project standard
+overrides are verified.
 
 The autotests cover the CE math predicates, STL allocations and
 containers, optional/expected values, integer character conversion, exact
@@ -94,11 +103,28 @@ type transformations (including cv-qualified types and enums), and the exact
 year/month periods. Runtime checks exercise integer/floating-point casts in both
 directions, fractional truncation, signed/unsigned boundaries, mixed 48-bit
 `hypot`, duration conversion, and leap-year dates.
-Validation uses the published Clang 22.1.8 nightly at `c1c359f0f2ea` in both
-compression modes. Physical-calculator validation has not been performed.
+Validation uses local Clang 22.1.8 builds with fixes through `8dd8b5a90f8c`,
+with the optimization series through `dc51f004de33` for the complete suite.
+All 51 backend tests pass before the optimization series and all 88 pass with
+it. The five focused libc++/bit suites also pass with a library rebuilt by the
+compiler before the optimization series. Physical-calculator validation has
+not been performed.
 
 The `stdbit` suite also exercises signed/unsigned 24- and 48-bit byteswap,
 48-bit leading/trailing counts, bit width, floor/ceil, popcount, and randomized
 rotations. Its constexpr checks cover 48-bit traits and both byteswap widths.
 Target-specific compatibility blocks use compiler/width guards; the raw
 upstream import commit provides the baseline for auditing every CE change.
+
+The compiler-audit regressions add a 588-pair floating-point comparison matrix
+covering all 16 predicate results, with an independent integer-rank reference.
+`libcxx_builtins` covers mixed signed/unsigned overflow at 8/16/24/32/48/64 bits,
+bitset counts at zero, full-word and partial-word boundaries, and algorithm
+results at every mismatch offset. The same suite passes at O2 with SIMD
+utilities disabled. `libcxx_overrides` tests assembler aliases and weak-symbol
+interposition without LTO, matching the library build. The existing float64
+arithmetic test retains all 108 direct volatile-operand comparison expressions.
+Its raw program exceeds one variable, so this test explicitly stays compressed
+even in the uncompressed CI matrix. The compressed original passes both CEmu
+checks with the compiler before and after the optimization series (17,369 and
+16,968 bytes respectively).

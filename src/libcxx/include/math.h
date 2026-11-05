@@ -390,22 +390,16 @@ namespace __math {
 // template on non-double overloads to make them weaker than same overloads from MSVC runtime
 template <class = int>
 [[__nodiscard__]] inline _LIBCPP_HIDE_FROM_ABI int fpclassify(float __x) _NOEXCEPT {
-  if (!__builtin_constant_p(__x))
-    return ::_fpclassifyf(__x);
   return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, __x);
 }
 
 template <class = int>
 [[__nodiscard__]] inline _LIBCPP_HIDE_FROM_ABI int fpclassify(double __x) _NOEXCEPT {
-  if (!__builtin_constant_p(__x))
-    return ::_fpclassifyf(__x);
   return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, __x);
 }
 
 template <class = int>
 [[__nodiscard__]] inline _LIBCPP_HIDE_FROM_ABI int fpclassify(long double __x) _NOEXCEPT {
-  if (!__builtin_constant_p(__x))
-    return ::_fpclassifyl(__x);
   return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, __x);
 }
 
