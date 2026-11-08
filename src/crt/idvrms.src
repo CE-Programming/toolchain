@@ -32,7 +32,14 @@ __idvrms:
 	ex	de, hl
 .L.pos_dividend_skip:
 
+; Keep the sign state used below: the OS unsigned divider clobbers AF.
+.ifdef PREFER_OS_CRT
+	push	af
+.endif
 	call	__idvrmu
+.ifdef PREFER_OS_CRT
+	pop	af
+.endif
 
 	call	p, __ineg
 
