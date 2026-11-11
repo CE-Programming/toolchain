@@ -31,6 +31,23 @@ template<class _Tp> _EZCXX_INLINE constexpr auto as_const(_Tp const&& __value) n
 
 [[noreturn]] inline void unreachable() { __builtin_unreachable(); }
 
+#if __cplusplus >= 201703L
+struct in_place_t {
+    explicit in_place_t() = default;
+};
+inline constexpr in_place_t in_place{};
+
+template<class _Tp> struct in_place_type_t {
+    explicit in_place_type_t() = default;
+};
+template<class _Tp> inline constexpr in_place_type_t<_Tp> in_place_type{};
+
+template<size_t _Ip> struct in_place_index_t {
+    explicit in_place_index_t() = default;
+};
+template<size_t _Ip> inline constexpr in_place_index_t<_Ip> in_place_index{};
+#endif // __cplusplus >= 201703L
+
 } // namespace std
 
 #endif // _EZCXX_UTILITY
