@@ -1,0 +1,17 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__laddu_sat
+	.type	__laddu_sat, @function
+
+__laddu_sat:
+	; unsigned saturated addition
+	; E:UHL = E:UHL + A:UBC
+	call	__laddu_overflow
+	ret	nc
+	sbc	hl, hl
+	ld	e, l
+	ret
+
+	.extern	__laddu_overflow

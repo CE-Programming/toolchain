@@ -1,0 +1,22 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__i48adds_sat
+	.type	__i48adds_sat, @function
+
+__i48adds_sat:
+	; signed saturated addition
+	; UDE:UHL = UDE:UHL + UIY:UBC
+	call	__i48adds_overflow
+	ret	po
+	ex	de, hl
+	add	hl, hl
+	sbc	hl, hl
+	ld	de, $800000
+	ret	nc		; negative underflow
+	; positive overflow
+	dec	de
+	ret
+
+	.extern	__i48adds_overflow

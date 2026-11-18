@@ -1,0 +1,22 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__i48subs_sat
+	.type	__i48subs_sat, @function
+
+__i48subs_sat:
+	; signed saturated subtraction
+	; UDE:UHL = UDE:UHL - UIY:UBC
+	call	__i48subs_overflow
+	ret	po
+	ex	de, hl
+	add	hl, hl
+	sbc	hl, hl
+	ld	de, $800000
+	ret	nc		; negative underflow
+	; positive overflow
+	dec	de
+	ret
+
+	.extern	__i48subs_overflow

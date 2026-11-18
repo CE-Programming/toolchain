@@ -1,0 +1,18 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__ssubs_sat
+	.type	__ssubs_sat, @function
+
+__ssubs_sat:
+	; signed saturated subtraction
+	; HL = HL - BC
+	or	a, a
+	sbc.s	hl, bc
+	ret	po
+	ld.sis	hl, $8000
+	ret	p		; negative underflow
+	; positive overflow
+	dec	hl
+	ret
