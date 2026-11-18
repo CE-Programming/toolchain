@@ -1,0 +1,18 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__i48abs
+	.type	__i48abs, @function
+
+__i48abs:
+	; UDE:UHL = abs(UDE:UHL)
+	ex	de, hl
+	add	hl, de
+	or	a, a
+	sbc	hl, de
+	ex	de, hl
+	ret	p
+	jp	__i48neg
+
+	.extern	__i48neg

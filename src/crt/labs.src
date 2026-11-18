@@ -1,0 +1,14 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__labs
+	.type	__labs, @function
+
+__labs:
+	; E:UHL = abs(E:UHL)
+	bit	7, e
+	ret	z
+	jp	__lneg
+
+	.extern	__lneg
