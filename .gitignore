@@ -19,6 +19,7 @@ doxygen/
 *.inc
 !src/include/*.inc
 !src/*/*-exports.inc
+!src/graphx/graphics-smc.inc
 obj/
 release/
 build/

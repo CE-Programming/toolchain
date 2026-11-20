@@ -15,6 +15,6 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 LIB_NAME := usbdrvce
-LIB_ASM_DEPS := usbdrvce-exports.inc
+LIB_ASM_DEPS := usbdrvce-exports.inc ../include/usb-descriptors.inc
 
 include ../library.mk

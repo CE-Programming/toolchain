@@ -15,6 +15,6 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 LIB_NAME := graphx
-LIB_ASM_DEPS := graphx-exports.inc ../include/graphics-smc.inc
+LIB_ASM_DEPS := graphx-exports.inc graphics-smc.inc
 
 include ../library.mk

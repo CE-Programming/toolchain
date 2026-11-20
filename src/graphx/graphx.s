@@ -180,22 +180,22 @@ gfx_SetClipRegion:
 	ld	de, ti.lcdWidth
 	ld	a, ti.lcdHeight
 gfx_SetClipRegion.apply:
-	setSmcWordsInline _XMin, _XMin_2, _XMin_3, _XMin_4, _XMin_5, _XMin_6, _XMin_7, _XMin_8, _XMin_9, _XMin_10, _XMin_11
+	setSmcWordsInline _XMin, 11
 	ex	de, hl
-	setSmcWordsInline _XMax, _XMax_2, _XMax_3
+	setSmcWordsInline _XMax, 3
 	dec	hl
-	setSmcWordsInline _XMaxMinus1, _XMaxMinus1_2, _XMaxMinus1_3, _XMaxMinus1_4
+	setSmcWordsInline _XMaxMinus1, 4
 	inc	hl
 	sbc	hl, de
-	setSmcWordsInline _XSpan, _XSpan_2, _XSpan_3, _XSpan_4, _XSpan_5, _XSpan_6
-	setSmcBytesInline _YMax, _YMax_2, _YMax_3
+	setSmcWordsInline _XSpan, 6
+	setSmcBytesInline _YMax, 3
 	dec	a
-	setSmcBytesInline _YMaxMinus1, _YMaxMinus1_2, _YMaxMinus1_3
+	setSmcBytesInline _YMaxMinus1, 3
 	inc	a
 	sub	a, c
-	setSmcBytesInline _YSpan, _YSpan_2, _YSpan_3, _YSpan_4, _YSpan_5, _YSpan_6, _YSpan_7, _YSpan_8
+	setSmcBytesInline _YSpan, 8
 	ld	a, c
-	setSmcBytesInline _YMin, _YMin_2, _YMin_3, _YMin_4, _YMin_5, _YMin_6, _YMin_7, _YMin_8, _YMin_9, _YMin_10, _YMin_11, _YMin_12, _YMin_13
+	setSmcBytesInline _YMin, 13
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -299,7 +299,7 @@ gfx_SetColor:
 ;  arg0 : Global color index
 ; Returns:
 ;  Previous global color index
-	setSmcBytesFast _Color, _Color_2, _Color_3, _Color_4, _Color_5
+	setSmcBytesFast _Color, 5
 
 ;-------------------------------------------------------------------------------
 gfx_SetTransparentColor:
@@ -308,7 +308,7 @@ gfx_SetTransparentColor:
 ;  arg0 : Transparent color index
 ; Returns:
 ;  Previous transparent color index
-	setSmcBytes _TransparentColor, _TransparentColor_2, _TransparentColor_3, _TransparentColor_4, _TransparentColor_5, _TransparentColor_6, _TransparentColor_7, _TransparentColor_8
+	setSmcBytes _TransparentColor, 8
 
 ;-------------------------------------------------------------------------------
 gfx_FillScreen:
@@ -474,7 +474,7 @@ _SetPixel_NoClip_NoWait:
 	add	hl, de
 	add	hl, de
 	ld	(hl), 0			; get the actual pixel
-.equ _Color, .-1
+smcByte _Color
 	ret
 
 ;-------------------------------------------------------------------------------
@@ -670,17 +670,17 @@ gfx_HorizLine:
 	add	iy, sp
 	ld	hl, (iy + 6)
 	ld	de, ti.lcdHeight
-.equ _YMax, .-3
+smcWord _YMax
 	sbc	hl, de			; subtract maximum y
 	ld	de, ti.lcdHeight
-.equ _YSpan, .-3
+smcWord _YSpan
 	add	hl, de			; add y bounds span
 	ret	nc			; return if not within y bounds
 	ld	de, (iy + 3)
 	ld	hl, 0
-.equ _XMin, .-3
+smcWord _XMin
 	ld	bc, ti.lcdWidth
-.equ _XSpan, .-3
+smcWord _XSpan
 	call	_ClipInterval
 	ex	de, hl
 	; Check for empty interval
@@ -720,7 +720,7 @@ _HorizLine_NoClip_NotDegen_NoWait:
 	add	hl, de			; hl -> place to draw
 _HorizLine_NoClip_Draw:
 	ld	(hl), 0
-.equ _Color_2, .-1
+smcByte _Color
 	cpi
 	ex	de, hl
 	ld	hl, -1
@@ -743,17 +743,17 @@ gfx_VertLine:
 	add	iy, sp
 	ld	hl, (iy + 3)
 	ld	de, ti.lcdWidth
-.equ _XMax, .-3
+smcWord _XMax
 	sbc	hl, de			; subtract maximum x
 	ld	de, ti.lcdWidth
-.equ _XSpan_2, .-3
+smcWord _XSpan
 	add	hl, de			; add x bounds span
 	ret	nc			; return if not within x bounds
 	ld	de, (iy + 6)
 	ld	hl, 0
-.equ _YMin, .-3
+smcWord _YMin
 	ld	bc, ti.lcdHeight
-.equ _YSpan_2, .-3
+smcWord _YSpan
 	call	_ClipInterval
 	ld	b, c
 	jr	_VertLine_NoClip_StackX	; jump to unclipped version
@@ -786,7 +786,7 @@ _VertLine_NoClip_NotDegen_StackX:
 _VertLine_NoClip_Draw:
 	ld	de, ti.lcdWidth
 	ld	a, 0
-.equ _Color_3, .-1
+smcByte _Color
 	wait_quick
 _VertLine_NoClip_Draw.loop:
 	ld	(hl), a			; loop for height
@@ -1726,13 +1726,13 @@ GetOutOutcode:				; select correct outcode
 	rra
 	jr	nc, GetOutOutcode.notop		; if (outcodeOut & TOP)
 	ld	hl, ti.lcdHeight-1
-.equ _YMaxMinus1, .-3
+smcWord _YMaxMinus1
 	jr	ComputeNewX
 GetOutOutcode.notop:
 	rra
 	jr	nc, NotBottom		; if (outcodeOut & BOTTOM)
 	ld	hl, 0
-.equ _YMin_2, .-3
+smcWord _YMin
 ComputeNewX:
 	push	hl
 	ld	bc, (iy + 6)
@@ -1761,7 +1761,7 @@ NotBottom:
 	rra
 	jr	nc, NotRight		; if (outcodeOut & RIGHT)
 	ld	hl, ti.lcdWidth-1
-.equ _XMaxMinus1, .-3
+smcWord _XMaxMinus1
 	jr	ComputeNewY
 
 TrivialReject:
@@ -1775,7 +1775,7 @@ NotRight:
 	rra
 	jr	nc, FinishComputations	; if (outcodeOut & LEFT)
 	ld	hl, 0
-.equ _XMin_2, .-3
+smcWord _XMin
 ComputeNewY:
 	push	hl
 	ld	bc, (iy + 3)
@@ -1896,7 +1896,7 @@ dl_horizontal.dl_nz:
 	pop	bc
 	inc	bc
 	ld	a, 0
-.equ _Color_4, .-1
+smcByte _Color
 	wait_quick
 dl_hloop:
 	ld	(hl), a			; write pixel
@@ -1928,7 +1928,7 @@ dl_vertical:
 	wait_quick
 dl_vloop:
 	ld	(hl), 0			; write pixel
-.equ _Color_5, .-1
+smcByte _Color
 	dec	c
 	ret	z
 	add	hl, de			; y inc
@@ -2133,7 +2133,7 @@ gfx_ShiftUp:
 	call	_ShiftCalculate
 	ld	(ShiftAmountOffset), hl
 	ld	de, ti.lcdWidth
-.equ _XSpan_3, .-3
+smcWord _XSpan
 	jr	nz, gfx_ShiftUp.next
 	ex	de, hl
 	sbc	hl, de
@@ -2143,9 +2143,9 @@ gfx_ShiftUp.next:
 	ld	hl, ti.lcdWidth
 	sbc	hl, de
 	ld	e, 0
-.equ _YMin_3, .-1
+smcByte _YMin
 	ld	bc, 0
-.equ _XMin_3, .-3
+smcWord _XMin
 	jr	_Shift
 
 ;-------------------------------------------------------------------------------
@@ -2172,7 +2172,7 @@ gfx_ShiftDown:
 	sbc	hl, de
 	ld	(ShiftAmountOffset), hl
 	ld	hl, ti.lcdWidth
-.equ _XSpan_4, .-3
+smcWord _XSpan
 	or	a, a
 	jr	nz, gfx_ShiftDown.next
 	sbc	hl, de
@@ -2181,16 +2181,16 @@ gfx_ShiftDown.next:
 	ld	de, 0 - ti.lcdWidth
 	add	hl, de
 	ld	e, ti.lcdHeight-1
-.equ _YMaxMinus1_2, .-1
+smcByte _YMaxMinus1
 	ld	bc, ti.lcdWidth-1
-.equ _XMaxMinus1_2, .-3
+smcWord _XMaxMinus1
 
 _Shift:
 	ex	(sp), ix	; shift copy amount
 	push	hl
 	pop	iy	; shift line offset
 	sub	a, ti.lcdHeight
-.equ _YSpan_3, .-1
+smcByte _YSpan
 	ld	d, ti.lcdWidth / 2
 	mlt	de
 	ld	hl, (CurrentBuffer)
@@ -2380,7 +2380,7 @@ gfx_ScaledTransparentSprite_NoClip.loopwidth:
 .equ gfx_ScaledTransparentSprite_NoClip.widthscale, .-1
 	ld	a, (hl)			; get sprite pixel
 	cp	a, TRASPARENT_COLOR
-.equ _TransparentColor, .-1
+smcByte _TransparentColor
 	jr	nz, gfx_ScaledTransparentSprite_NoClip.next		; is transparent?
 gfx_ScaledTransparentSprite_NoClip.skip:
 	inc	de
@@ -2427,7 +2427,7 @@ gfx_TransparentSprite:
 	ld	(gfx_TransparentSprite.amount), a
 .equ gfx_TransparentSprite.transparent_color, .+1
 	ld	a, TRASPARENT_COLOR
-.equ _TransparentColor_2, .-1
+smcByte _TransparentColor
 	wait_quick
 gfx_TransparentSprite.loop:
 	ld	c, iyl	; next
@@ -2651,7 +2651,7 @@ gfx_TransparentSprite_NoClip:
 	ld	iyh, a			; ixh = height of sprite
 	ld	b, 0			; zero mid byte
 	ld	a, TRASPARENT_COLOR
-.equ _TransparentColor_3, .-1
+smcByte _TransparentColor
 	wait_quick
 gfx_TransparentSprite_NoClip.loop:
 	ld	c, iyl			; (.next)
@@ -2691,12 +2691,12 @@ _ClipCoordinates:
 	ld	iy, (hl)		; iyl = width, iyh = height
 
 	ld	bc, 0
-.equ _YMin_4, .-3
+smcWord _YMin
 	ld	hl, (ix + 9)		; hl = y coordinate
 	sbc	hl, bc
 	ex	de, hl			; de = y coordinate relative to min y
 	ld	a, ti.lcdHeight		; a = clip_height
-.equ _YSpan_4, .-1
+smcByte _YSpan
 	ld	c, iyh			; bc = height
 	sub	a, c			; get difference between clip_height and height
 	sbc	hl, hl
@@ -2729,7 +2729,7 @@ _ClipCoordinates.cliptop:
 	add	hl, bc
 	ld	(ix + 3), hl		; store new ptr
 	ld	(ix + 9), 0		; save min y coordinate
-.equ _YMin_5, .-1
+smcByte _YMin
 _ClipCoordinates.clipbottom:
 	inc	e
 	ld	iyh, e			; save new height
@@ -2737,12 +2737,12 @@ _ClipCoordinates.clipbottom:
 _ClipCoordinates.yclipped:	; <-- carry already cleared on this path
 
 	ld	bc, 0
-.equ _XMin_4, .-3
+smcWord _XMin
 	ld	hl, (ix + 6)		; hl = x coordinate
 	sbc	hl, bc
 	ex	de, hl			; de = x coordinate relative to min x
 	ld	hl, ti.lcdWidth		; hl = clip_width
-.equ _XSpan_5, .-3
+smcWord _XSpan
 	xor	a, a
 	ld	b, a			; UBC and B are zero from this point onwards
 	ld	c, iyl			; bc = width
@@ -2772,7 +2772,7 @@ _ClipCoordinates.clipleft:
 	add	hl, bc
 	ld	(ix + 3), hl
 	ld	hl, 0
-.equ _XMin_5, .-3
+smcWord _XMin
 	ld	(ix + 6), hl		; save min x coordinate
 _ClipCoordinates.clipright:
 	inc	e
@@ -3132,7 +3132,7 @@ gfx_SetTextBGColor:
 ;  arg0 : Color index to set BG to
 ; Returns:
 ;  Previous text color palette index
-	setSmcBytes _TextBGColor, _TextBGColor_2, _TextBGColor_3
+	setSmcBytes _TextBGColor, 3
 
 ;-------------------------------------------------------------------------------
 gfx_SetTextFGColor:
@@ -3141,7 +3141,7 @@ gfx_SetTextFGColor:
 ;  arg0 : Color index to set FG to
 ; Returns:
 ;  Previous text color palette index
-	setSmcBytes _TextFGColor, _TextFGColor_2, _TextFGColor_3
+	setSmcBytes _TextFGColor, 3
 
 ;-------------------------------------------------------------------------------
 gfx_SetTextTransparentColor:
@@ -3150,7 +3150,7 @@ gfx_SetTextTransparentColor:
 ;  arg0 : Color index to set transparent text to
 ; Returns:
 ;  Previous text color palette index
-	setSmcBytes _TextTPColor, _TextTPColor_2, _TextTPColor_3, _TextTPColor_4
+	setSmcBytes _TextTPColor, 4
 
 ;-------------------------------------------------------------------------------
 gfx_SetFontHeight:
@@ -3159,7 +3159,7 @@ gfx_SetFontHeight:
 ;  arg0 : New font height
 ; Returns:
 ;  Previous font height
-	setSmcBytes _TextHeight, _TextHeight_2, _TextHeight_3
+	setSmcBytes _TextHeight, 3
 
 ;-------------------------------------------------------------------------------
 gfx_PrintStringXY:
@@ -3316,7 +3316,7 @@ _PrintChar.fixed:
 	add	hl, bc
 	ld	iy, 0
 	ld	ixl, 8
-.equ _TextHeight, .-1
+smcByte _TextHeight
 	wait_quick
 	jr	_PrintLargeFont		; SMC the jump
 .equ _TextScaleJump, . - 1
@@ -3328,15 +3328,15 @@ _PrintNormalFont.loop:
 	ld	b, ixh
 _PrintNormalFont.nextpixel:
 	ld	a, TEXT_BG_COLOR
-.equ _TextBGColor, .-1
+smcByte _TextBGColor
 	rlc	c
 	jr	nc, _PrintNormalFont.bgcolor
 	ld	a, TEXT_FG_COLOR
-.equ _TextFGColor, .-1
+smcByte _TextFGColor
 _PrintNormalFont.bgcolor:
 	cp	a, TEXT_TP_COLOR	; check if transparent
 .equ gfx_PrintChar.transparent_color, .-1
-.equ _TextTPColor, .-1
+smcByte _TextTPColor
 	jr	z, _PrintNormalFont.transparent
 	ld	(de), a
 _PrintNormalFont.transparent:
@@ -3368,16 +3368,16 @@ _PrintLargeFont.hscale:
 	ld	b, ixh
 _PrintLargeFont.inner:
 	ld	a, TEXT_BG_COLOR
-.equ _TextBGColor_2, .-1
+smcByte _TextBGColor
 	ld	l, 1
 .equ _TextWidthScale, .-1
 	rlc	c
 	jr	nc, _PrintLargeFont.bgcolor
 	ld	a, TEXT_FG_COLOR
-.equ _TextFGColor_2, .-1
+smcByte _TextFGColor
 _PrintLargeFont.bgcolor:
 	cp	a, TEXT_TP_COLOR	; check if transparent
-.equ _TextTPColor_2, .-1
+smcByte _TextTPColor
 	jr	z, _PrintLargeFont.fgcolor
 
 _PrintLargeFont.wscale0:
@@ -3438,7 +3438,7 @@ _PrintChar_Clip.fixedwidth:
 	add	hl, bc			; de = draw location
 	ld	de, _TmpCharData	; store pixel data into temporary sprite
 	ld	iyl, 8
-.equ _TextHeight_2, .-1
+smcByte _TextHeight
 	ld	iyh, a			; ixh = char width
 	ld	(_TmpCharSprite), a	; store width of character we are drawing
 	call	_GetChar		; store the character data
@@ -3642,7 +3642,7 @@ gfx_GetSpriteChar.fixed:
 	ex	de, hl
 	push	hl			; save pointer to sprite
 	ld	a, 8
-.equ _TextHeight_3, .-1
+smcByte _TextHeight
 	ld	iyh, a			; ixh = char width
 	ld	(hl), a			; store width of character we are drawing
 	inc	hl
@@ -3667,14 +3667,14 @@ _GetChar.loop:
 	ld	b, iyh
 _GetChar.nextpixel:
 	ld	a, TEXT_BG_COLOR
-.equ _TextBGColor_3, .-1
+smcByte _TextBGColor
 	rlc	c
 	jr	nc, _GetChar.bgcolor
 	ld	a, TEXT_FG_COLOR
-.equ _TextFGColor_3, .-1
+smcByte _TextFGColor
 _GetChar.bgcolor:
 	cp	a, TEXT_TP_COLOR	; check if transparent
-.equ _TextTPColor_3, .-1
+smcByte _TextTPColor
 	jr	z, _GetChar.transparent
 	ld	(de), a
 	inc	de
@@ -3685,7 +3685,7 @@ _GetChar.bgcolor:
 	ret
 _GetChar.transparent:
 	ld	a, 0
-.equ _TextTPColor_4, .-1
+smcByte _TextTPColor
 	ld	(de), a
 	inc	de			; move to next pixel
 	djnz	_GetChar.nextpixel
@@ -4855,7 +4855,7 @@ _RSS_NC.inner_transparent:
 	ld	b, a	; preserve A
 	ld	a, (hl)
 	cp	a, TRASPARENT_COLOR
-.equ _TransparentColor_4, .-1
+smcByte _TransparentColor
 	jr	z, _RSS_NC.transparent_pixel
 	ld	(de), a
 _RSS_NC.transparent_pixel:
@@ -4907,12 +4907,12 @@ _RotatedScaled_ClipAdjust:
 ;  IYL: New sprite width
 ;  NC : If offscreen
 	ld	bc, 0
-.equ _YMin_6, .-3
+smcWord _YMin
 	ld	hl, (ix + 12)		; hl = y coordinate
 	sbc	hl, bc
 	ex	de, hl			; de = y coordinate relative to min y
 	ld	a, ti.lcdHeight		; a = clip_height
-.equ _YSpan_5, .-1
+smcByte _YSpan
 	ld	c, iyh			; bc = height
 	sub	a, c			; get difference between clip_height and height
 	sbc	hl, hl
@@ -4940,19 +4940,19 @@ _RotatedScaled_ClipAdjust.cliptop:
 	ex	de, hl			; e = new height - 1
 	ld	(ix + 17), a		; store height that was clipped
 	ld	(ix + 12), 0		; save min y coordinate
-.equ _YMin_7, .-1
+smcByte _YMin
 _RotatedScaled_ClipAdjust.clipbottom:
 	inc	e
 	ld	iyh, e			; save new height
 	or	a, a
 _RotatedScaled_ClipAdjust.yclipped:	; <-- carry already cleared on this path
 	ld	bc, 0
-.equ _XMin_6, .-3
+smcWord _XMin
 	ld	hl, (ix + 9)		; hl = x coordinate
 	sbc	hl, bc
 	ex	de, hl			; de = x coordinate relative to min x
 	ld	hl, ti.lcdWidth		; hl = clip_width
-.equ _XSpan_6, .-3
+smcWord _XSpan
 	xor	a, a
 	ld	b, a
 	ld	c, iyl			; bc = width
@@ -4979,7 +4979,7 @@ _RotatedScaled_ClipAdjust.clipleft:
 	ld	(ix + 16), a		; store width that was clipped
 	ex	de, hl			; e = new width - 1
 	ld	hl, 0
-.equ _XMin_7, .-3
+smcWord _XMin
 	ld	(ix + 9), hl		; save min x coordinate
 _RotatedScaled_ClipAdjust.clipright:
 	inc	e
@@ -5198,7 +5198,7 @@ gfx_RotateScaleSprite.hax:
 drawSpriteRotateScale_SkipPixel:
 	ex	de, hl
 	ld	(hl), TRASPARENT_COLOR	; write pixel
-.equ _TransparentColor_5, .-1
+smcByte _TransparentColor
 	ex	de, hl
 	inc	de			; x++s
 
@@ -5447,7 +5447,7 @@ gfx_FloodFill.dowhileloop:				; do {
 	add	hl, de
 	add	hl, de
 	ld	de, 0
-.equ _XMin_8, .-3
+smcWord _XMin
 	ex	de, hl
 	add	hl, de
 	ex	de, hl			; de -> draw location at xmin, y
@@ -5491,9 +5491,9 @@ gfx_FloodFill.check:
 	jr	nc, gfx_FloodFill.badpush0		; check stack limit
 	sub	a, (ix - 4)
 	sub	a, 0			; check if y coordinate is in bounds
-.equ _YMin_8, .-1
+smcByte _YMin
 	cp	a, ti.lcdHeight
-.equ _YSpan_6, .-1
+smcByte _YSpan
 	jr	nc, gfx_FloodFill.badpush0
 	ld	(iy + 6), e
 	ld	hl, (ix - 11)
@@ -5518,7 +5518,7 @@ gfx_FloodFill.badpush0:
 					; do {
 gfx_FloodFill.forloop1start:
 	ld	hl, ti.lcdWidth-1
-.equ _XMaxMinus1_3, .-3
+smcWord _XMaxMinus1
 	jr	gfx_FloodFill.atov			; for (; (unsigned)x<=xmax && p(x, y) == ov; x++) { s(x, y); }
 gfx_FloodFill.forloop1:
 	ld	a, 0
@@ -5547,9 +5547,9 @@ gfx_FloodFill.ovat:
 	ld	a, (ix - 4)
 	add	a, (ix + 9)
 	sub	a, 0			; check if y coordinate is in bounds
-.equ _YMin_9, .-1
+smcByte _YMin
 	cp	a, ti.lcdHeight
-.equ _YSpan_7, .-1
+smcByte _YSpan
 	jr	nc, gfx_FloodFill.badpush1
 	dec	bc
 	ld	(iy + 3), bc
@@ -5575,9 +5575,9 @@ gfx_FloodFill.badpush1:
 	ld	a, (ix + 9)
 	sub	a, (ix - 4)
 	sub	a, 0			; check if y coordinate is in bounds
-.equ _YMin_10, .-1
+smcByte _YMin
 	cp	a, ti.lcdHeight
-.equ _YSpan_8, .-1
+smcByte _YSpan
 	jr	nc, gfx_FloodFill.badpush2
 	dec	bc
 	ld	(iy + 3), bc
@@ -5654,7 +5654,7 @@ gfx_RLETSprite:
 	inc	hl
 	ld	c, (hl)			; bc = height
 	ld	hl, ti.lcdHeight	; hl = ymax
-.equ _YMax_2, .-3
+smcWord _YMax
 	ld	de, (iy + 9)		; de = y
 	sbc	hl, de			; hl = ymax-y
 	ret	m			; m ==> ymax < y || y ~ int_min ==> fully off-screen
@@ -5669,7 +5669,7 @@ _RLETSprite_SkipClipBottom:
 ; ymax-y did not overflow ==> y-ymin will not overflow
 ; Clip top
 	ld	hl, 0			; hl = ymin
-.equ _YMin_11, .-3
+smcWord _YMin
 	ex	de, hl			; de = ymin
 					; hl = y
 	sbc	hl, de			; hl = y-ymin
@@ -5693,7 +5693,7 @@ _RLETSprite_SkipClipTop:
 	ld	e, (hl)			; de = width
 	ld	hl, (iy + 6)		; hl = x
 	ld	bc, 0			; bc = xmin
-.equ _XMin_9, .-3
+smcWord _XMin
 	sbc	hl, bc			; hl = x-xmin
 	ret	pe			; v ==> x ~ int_min ==> fully off-screen
 	jp	p, _RLETSprite_SkipClipLeft ; p ==> x >= xmin ==> fully on-screen
@@ -5714,7 +5714,7 @@ _RLETSprite_SkipClipLeft:
 	add	hl, bc			; hl = x (clipped)
 	ld	(iy + 6), hl		; write back clipped x
 	ld	bc, ti.lcdWidth		; bc = xmax
-.equ _XMax_2, .-3
+smcWord _XMax
 	sbc	hl, bc			; hl = x-xmax
 	ret	nc			; nc ==> x >= xmax ==> fully off-screen
 	ld	a, d			; a[0] = clip left?
@@ -6035,7 +6035,7 @@ _ConvertFromRLETSprite_Trans:
 ;;; Write <transparent run length> zeros to the output.
 	sub	a, b			; a = width remaining after trans run
 	ld	c, 0			; c = trans color
-.equ _TransparentColor_6, .-1
+smcByte _TransparentColor
 	ex	de, hl			; de = input data, hl = output data
 _ConvertFromRLETSprite_TransLoop:
 	ld	(hl), c			; write trans color to output
@@ -6087,7 +6087,7 @@ gfx_ConvertToNewRLETSprite:
 ; Initialize values for looping.
 	ld	de, 2			; de = 2 = output size
 	ld	a, 0			; a = trans color
-.equ _TransparentColor_7, .-1
+smcByte _TransparentColor
 ; Row loop {
 _ConvertToNewRLETSprite_Row:
 	ld	b, iyl			; b = width
@@ -6155,7 +6155,7 @@ _ConvertToRLETSprite_ASM:
 ; Initialize values for looping.
 	inc.s	bc			; bcu = 0
 	ld	a, 0			; a = trans color
-.equ _TransparentColor_8, .-1
+smcByte _TransparentColor
 ; Row loop {
 _ConvertToRLETSprite_Row:
 	ld	b, iyl			; b = width
@@ -6389,13 +6389,13 @@ _ClipRegion:
 ;  Modifies data registers
 ;  Sets C flag if offscreen
 	ld	hl, 0
-.equ _XMin_10, .-3
+smcWord _XMin
 .equ _ClipRegion.XMin, .-3
 	ld	de, (iy + 3)
 	call	_Maximum
 	ld	(iy + 3), hl
 	ld	hl, ti.lcdWidth
-.equ _XMax_3, .-3
+smcWord _XMax
 .equ _ClipRegion.XMax, .-3
 	ld	de, (iy + 9)
 	call	_Minimum
@@ -6404,13 +6404,13 @@ _ClipRegion:
 	call	_ClipRegion.compare
 	ret	c
 	ld	hl, 0
-.equ _YMin_12, .-3
+smcWord _YMin
 .equ _ClipRegion.YMin, .-3
 	ld	de, (iy + 6)
 	call	_Maximum.no_carry
 	ld	(iy + 6), hl
 	ld	hl, ti.lcdHeight
-.equ _YMax_3, .-3
+smcWord _YMax
 .equ _ClipRegion.YMax, .-3
 	ld	de, (iy + 12)
 	call	_Minimum
@@ -6566,7 +6566,7 @@ _ComputeOutcode:
 ; Outputs:
 ;   A : Bitcode
 	ld	bc, 0
-.equ _XMin_11, .-3
+smcWord _XMin
 	push	hl
 	xor	a, a
 	sbc	hl, bc
@@ -6577,7 +6577,7 @@ _ComputeOutcode:
 _ComputeOutcode.skip1:
 	rla
 	ld	hl, ti.lcdWidth-1
-.equ _XMaxMinus1_4, .-3
+smcWord _XMaxMinus1
 	sbc	hl, bc
 	add	hl, hl
 	jp	po, _ComputeOutcode.skip2
@@ -6585,7 +6585,7 @@ _ComputeOutcode.skip1:
 _ComputeOutcode.skip2:
 	rla
 	ld	hl, 0
-.equ _YMin_13, .-3
+smcWord _YMin
 	scf
 	sbc	hl, de
 	add	hl, hl
@@ -6594,7 +6594,7 @@ _ComputeOutcode.skip2:
 _ComputeOutcode.skip3:
 	rla
 	ld	hl, ti.lcdHeight-1
-.equ _YMaxMinus1_3, .-3
+smcWord _YMaxMinus1
 	sbc	hl, de
 	add	hl, hl
 	rla

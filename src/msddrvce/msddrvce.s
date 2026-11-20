@@ -996,7 +996,7 @@ msd_FindPartitions.skip_entry:
 	ret	z
 	jp	msd_FindPartitions.gpt_loop
 msd_FindPartitions.gpt_signature:
-	.db	0x45, 0x46, 0x49, 0x20, 0x50, 0x41, 0x52, 0x54
+	.ascii	"EFI PART"
 msd_FindPartitions.gpt_lba:
 	.db	1, 0, 0, 0
 msd_FindPartitions.gpt_entry_lba:

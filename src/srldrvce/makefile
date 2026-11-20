@@ -16,6 +16,6 @@
 
 LIB_NAME := srldrvce
 LIB_DEPENDENCY_DIR := ../usbdrvce
-LIB_ASM_DEPS := ../usbdrvce/usbdrvce-exports.inc
+LIB_ASM_DEPS := ../usbdrvce/usbdrvce-exports.inc ../include/usb-descriptors.inc
 
 include ../library.mk
