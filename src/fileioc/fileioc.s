@@ -1,5 +1,5 @@
 ;-------------------------------------------------------------------------------
-include '../include/library.inc'
+.include "library.inc"
 ;-------------------------------------------------------------------------------
 
 library FILEIOC, 8
@@ -11,57 +11,57 @@ library FILEIOC, 8
 ;-------------------------------------------------------------------------------
 ; v1 functions
 ;-------------------------------------------------------------------------------
-	export ti_CloseAll
-	export ti_Open
-	export ti_OpenVar
-	export ti_Close
-	export ti_Write
-	export ti_Read
-	export ti_GetC
-	export ti_PutC
-	export ti_Delete
-	export ti_DeleteVar
-	export ti_Seek
-	export ti_Resize
-	export ti_IsArchived
-	export ti_SetArchiveStatus
-	export ti_Tell
-	export ti_Rewind
-	export ti_GetSize
+	lib_export ti_CloseAll
+	lib_export ti_Open
+	lib_export ti_OpenVar
+	lib_export ti_Close
+	lib_export ti_Write
+	lib_export ti_Read
+	lib_export ti_GetC
+	lib_export ti_PutC
+	lib_export ti_Delete
+	lib_export ti_DeleteVar
+	lib_export ti_Seek
+	lib_export ti_Resize
+	lib_export ti_IsArchived
+	lib_export ti_SetArchiveStatus
+	lib_export ti_Tell
+	lib_export ti_Rewind
+	lib_export ti_GetSize
 ;-------------------------------------------------------------------------------
 ; v2 functions
 ;-------------------------------------------------------------------------------
-	export ti_GetTokenString
-	export ti_GetDataPtr
-	export ti_Detect
-	export ti_DetectVar
+	lib_export ti_GetTokenString
+	lib_export ti_GetDataPtr
+	lib_export ti_Detect
+	lib_export ti_DetectVar
 ;-------------------------------------------------------------------------------
 ; v3 functions
 ;-------------------------------------------------------------------------------
-	export ti_SetVar
-	export ti_StoVar
-	export ti_RclVar
-	export ti_AllocString
-	export ti_AllocList
-	export ti_AllocMatrix
-	export ti_AllocCplxList
-	export ti_AllocEqu
+	lib_export ti_SetVar
+	lib_export ti_StoVar
+	lib_export ti_RclVar
+	lib_export ti_AllocString
+	lib_export ti_AllocList
+	lib_export ti_AllocMatrix
+	lib_export ti_AllocCplxList
+	lib_export ti_AllocEqu
 ;-------------------------------------------------------------------------------
 ; v4 functions
 ;-------------------------------------------------------------------------------
-	export ti_DetectAny
-	export ti_GetVATPtr
-	export ti_GetName
-	export ti_Rename
-	export ti_RenameVar
+	lib_export ti_DetectAny
+	lib_export ti_GetVATPtr
+	lib_export ti_GetName
+	lib_export ti_Rename
+	lib_export ti_RenameVar
 ;-------------------------------------------------------------------------------
 ; v5 functions
 ;-------------------------------------------------------------------------------
-	export ti_ArchiveHasRoom
+	lib_export ti_ArchiveHasRoom
 ;-------------------------------------------------------------------------------
 ; v6 functions
 ;-------------------------------------------------------------------------------
-	export ti_SetGCBehavior
+	lib_export ti_SetGCBehavior
 ;-------------------------------------------------------------------------------
 ; v7 functions
 ;-------------------------------------------------------------------------------
@@ -71,22 +71,22 @@ library FILEIOC, 8
 ;-------------------------------------------------------------------------------
 ; v8 functions
 ;-------------------------------------------------------------------------------
-	export ti_ArchiveHasRoomVar
+	lib_export ti_ArchiveHasRoomVar
 
 ;-------------------------------------------------------------------------------
-vat_ptr0 := $d0244e
-vat_ptr1 := $d0257b
-vat_ptr2 := $d0257e
-vat_ptr3 := $d02581
-vat_ptr4 := $d02584
-data_ptr0 := $d0067e
-data_ptr1 := $d00681
-data_ptr2 := $d01fed
-data_ptr3 := $d01ff3
-data_ptr4 := $d01ff9
-resize_amount := $e30c0c
-curr_slot := $e30c11
-TI_MAX_SIZE := 65505
+.equ vat_ptr0, 0xd0244e
+.equ vat_ptr1, 0xd0257b
+.equ vat_ptr2, 0xd0257e
+.equ vat_ptr3, 0xd02581
+.equ vat_ptr4, 0xd02584
+.equ data_ptr0, 0xd0067e
+.equ data_ptr1, 0xd00681
+.equ data_ptr2, 0xd01fed
+.equ data_ptr3, 0xd01ff3
+.equ data_ptr4, 0xd01ff9
+.equ resize_amount, 0xe30c0c
+.equ curr_slot, 0xe30c11
+.equ TI_MAX_SIZE, 65505
 ;-------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------
@@ -221,15 +221,15 @@ ti_Resize:
 	or	a, a
 	sbc	hl, bc
 	ld	(resize_amount), hl
-	jr	z, .no_resize
-	jr	c, .decrease
-.increase:
+	jr	z, ti_Resize.no_resize
+	jr	c, ti_Resize.decrease
+ti_Resize.increase:
 	call	ti.EnoughMem
 	jp	c, util_ret_null
 	ex	de, hl
 	call	util_insert_mem
-	jr	.no_resize
-.decrease:
+	jr	ti_Resize.no_resize
+ti_Resize.decrease:
 	push	hl
 	pop	bc
 	or	a, a
@@ -237,7 +237,7 @@ ti_Resize:
 	sbc	hl, bc
 	ld	(resize_amount), hl
 	call	util_delete_mem
-.no_resize:
+ti_Resize.no_resize:
 	ld	hl, (resize_amount)
 	ret
 
@@ -267,7 +267,7 @@ util_is_in_ram:
 	ld	a, (hl)
 	or	a, a
 	sbc	hl, hl
-	cp	a, $d0
+	cp	a, 0xd0
 	ret	nc
 	inc	hl
 	ret
@@ -285,8 +285,8 @@ ti_OpenVar:
 	add	hl, sp
 	ld	a, (hl)			; (sp + 9)
 ;	jr	ti_Open.start		; emulated by dummifying next instruction
-	db	$fe			; ld a, ti.AppVarObj -> cp a, $3e \ dec d
-assert ti.AppVarObj = $15
+	.db	0xfe			; ld a, ti.AppVarObj -> cp a, $3e \ dec d
+assert (ti.AppVarObj == 0x15)
 
 ;-------------------------------------------------------------------------------
 ti_Open:
@@ -297,26 +297,26 @@ ti_Open:
 ; return:
 ;  a = slot index if no error
 	ld	a, ti.AppVarObj
-.start:
-	ld	(.smc_type), a
+ti_Open.start:
+	ld	(ti_Open.smc_type), a
 	ld	(ti.OP1), a
 	ld	iy, ti.flags
 
 	ld	hl, variable_offsets + (5 * 3) - 1
 	ld	a, 5
-.find_slot:
+ti_Open.find_slot:
 ; slot open (in use): upper byte of offset == 0
 ; slot closed (free): upper byte of offset > slot
 	cp	a, (hl)
-	jr	c, .slot
+	jr	c, ti_Open.slot
 	dec	hl
 	dec	hl
 	dec	hl
 	dec	a
-	jr	nz, .find_slot
+	jr	nz, ti_Open.find_slot
 	ret
 
-.slot:
+ti_Open.slot:
 	ld	(curr_slot), a
 	push	ix
 	ld	ix, 0
@@ -328,32 +328,32 @@ ti_Open:
 	ld	(de), a
 	ld	hl, (ix + 9)
 	ld	a, (hl)
-	cp	a, 'w'
+	cp	a, 0x77
 	ld	iy, ti.flags
-	jr	nz, .no_overwite
+	jr	nz, ti_Open.no_overwite
 	call	ti.PushOP1
 	call	ti.ChkFindSym
 	call	nc, ti.DelVarArc
 	call	ti.PopOP1
-.no_overwite:
+ti_Open.no_overwite:
 	ld	hl, (ix + 9)
 	ld	a, (hl)
-	cp	a, 'r'
-	jr	z, .mode
-	cp	a, 'a'
-	jr	z, .mode
-	cp	a, 'w'
-	jr	nz, .ret_null_pop_ix
-.mode:
+	cp	a, 0x72
+	jr	z, ti_Open.mode
+	cp	a, 0x61
+	jr	z, ti_Open.mode
+	cp	a, 0x77
+	jr	nz, ti_Open.ret_null_pop_ix
+ti_Open.mode:
 	inc	hl
 	ld	a, (hl)
-	cp	a, '+'
-	jr	nz, .no_append
-.unarchive_var:
+	cp	a, 0x2b
+	jr	nz, ti_Open.no_append
+ti_Open.unarchive_var:
 	call	ti.ChkFindSym
-	jr	c, .not_found
+	jr	c, ti_Open.not_found
 	call	ti.ChkInRam
-	jr	z, .save_ptrs
+	jr	z, ti_Open.save_ptrs
 	ex	de, hl
 	inc.s	de			; clear UDE
 	ld	e, (hl)
@@ -361,41 +361,41 @@ ti_Open:
 	ld	d, (hl)
 	ex	de, hl
 	call	ti.EnoughMem
-	jr	c, .ret_null_pop_ix
+	jr	c, ti_Open.ret_null_pop_ix
 	call	util_unarchive
-	jr	.unarchive_var
+	jr	ti_Open.unarchive_var
 
-.ret_null_pop_ix:
+ti_Open.ret_null_pop_ix:
 	pop	ix
 	xor	a, a
 	sbc	hl, hl
 	ret
 
-.no_append:
+ti_Open.no_append:
 	call	ti.ChkFindSym
-	jr	c, .not_found
+	jr	c, ti_Open.not_found
 	call	ti.ChkInRam
-	jr	z, .save_ptrs
+	jr	z, ti_Open.save_ptrs
 	push	hl
 	ld	hl, (ix + 9)
 	ld	a, (hl)
-	cp	a, 'r'
+	cp	a, 0x72
 	pop	hl
-	jr	nz, .ret_null_pop_ix
+	jr	nz, ti_Open.ret_null_pop_ix
 	call	util_skip_archive_header
-	jr	.save_ptrs
-.not_found:
+	jr	ti_Open.save_ptrs
+ti_Open.not_found:
 	ld	hl, (ix + 9)
 	ld	a, (hl)
-	cp	a, 'r'
-	jr	z, .ret_null_pop_ix
+	cp	a, 0x72
+	jr	z, ti_Open.ret_null_pop_ix
 	or	a, a
 	sbc	hl, hl
 	ld	a, 0
-.smc_type := $-1
+.equ ti_Open.smc_type, .-1
 	ld	iy, ti.flags
 	call	ti.CreateVar
-.save_ptrs:
+ti_Open.save_ptrs:
 	push	hl
 	call	util_get_vat_ptr
 	pop	bc
@@ -404,7 +404,7 @@ ti_Open:
 	ld	(hl), de
 	ld	bc, 0
 	ld	hl, (ix + 9)
-	ld	a, 'a'
+	ld	a, 0x61
 	cp	a, (hl)
 	call	z, util_get_slot_size
 	call	util_set_offset
@@ -442,29 +442,29 @@ ti_SetArchiveStatus:
 	ld	b, (hl)
 	ld	de, ti.OP1 + 1
 	dec	hl
-.copy_name:
+ti_SetArchiveStatus.copy_name:
 	ld	a, (hl)
 	ld	(de), a
 	inc	de
 	dec	hl
-	djnz	.copy_name
+	djnz	ti_SetArchiveStatus.copy_name
 	xor	a, a
 	ld	(de), a
 	pop	af
 	or	a, a
-	jr	z, .set_unarchived
-.set_archived:
+	jr	z, ti_SetArchiveStatus.set_unarchived
+ti_SetArchiveStatus.set_archived:
 	call	util_archive
-	jr	.relocate_var
-.set_unarchived:
+	jr	ti_SetArchiveStatus.relocate_var
+ti_SetArchiveStatus.set_unarchived:
 	call	util_unarchive
-.relocate_var:
+ti_SetArchiveStatus.relocate_var:
 	call	ti.ChkFindSym
 	jp	c, util_ret_neg_one
 	call	ti.ChkInRam
 	; jr	z, .save_ptrs
 	call	nz, util_skip_archive_header
-.save_ptrs:
+ti_SetArchiveStatus.save_ptrs:
 	push	hl
 	call	util_get_vat_ptr
 	pop	bc
@@ -487,9 +487,9 @@ ti_Write:
 	add	iy, sp
 	ld	c, (iy + 12)
 	call	util_is_slot_open
-	jr	nz, .ret0
+	jr	nz, ti_Write.ret0
 	call	util_is_in_ram
-	jr	z, .ret0
+	jr	z, ti_Write.ret0
 	ld	bc, (iy + 6)
 	ld	hl, (iy + 9)
 	call	ti._smulu
@@ -497,7 +497,7 @@ ti_Write:
 	xor	a, a
 	sbc	hl, de
 	ret	z
-	ld	(.smc_copy_size), hl
+	ld	(ti_Write.smc_copy_size), hl
 	push	hl
 	call	util_get_offset
 	pop	hl
@@ -508,18 +508,18 @@ ti_Write:
 	or	a, a
 	inc	bc
 	sbc	hl, bc
-	jr	c, .no_core_needed
+	jr	c, ti_Write.no_core_needed
 	inc	hl
 	ld	(resize_amount), hl
 	call	util_insert_mem
 	or	a, a
-	jr	z, .ret0
-.no_core_needed:
+	jr	z, ti_Write.ret0
+ti_Write.no_core_needed:
 	call	util_get_data_offset
 	ex	de, hl
 	ld	hl, (iy + 3)
 	ld	bc, 0
-.smc_copy_size := $-3
+.equ ti_Write.smc_copy_size, .-3
 	push	bc
 	ldir
 	call	util_get_offset
@@ -530,7 +530,7 @@ ti_Write:
 	ld	(hl), de
 	ld	hl, (iy + 9)
 	ret
-.ret0:
+ti_Write.ret0:
 util_ret_null:
 	xor	a, a
 	sbc	hl, hl
@@ -566,7 +566,7 @@ ti_Read:
 	add	iy, sp
 	ld	c, (iy + 12)
 	call	util_is_slot_open
-	jr	nz, .ret0
+	jr	nz, ti_Read.ret0
 	call	util_get_slot_size
 	push	bc
 	call	util_get_offset
@@ -574,23 +574,23 @@ ti_Read:
 	xor	a, a
 	sbc	hl, bc			; size - offset = bytes left to read
 	ret	z			; jr z, .ret0
-	jr	c, .ret0
+	jr	c, ti_Read.ret0
 	ld	bc, (iy + 6)
 	call	ti._sdivu			; (size - offset) / chunk_size
 	ld	de, (iy + 9)		; number of chunks to read, hl = number of chunks left
 	or	a, a
 	sbc	hl, de
 	add	hl, de			; check if left <= read
-	jr	c, .no_copy
+	jr	c, ti_Read.no_copy
 	ex	de, hl
-.no_copy:
+ti_Read.no_copy:
 	ld	bc, (iy + 6)
 	push	hl
 	call	ti._smulu
 	add	hl, de
 	or	a, a
 	sbc	hl, de
-	jr	z, .ret0.pop
+	jr	z, ti_Read.ret0.pop
 	push	hl
 	call	util_get_data_offset
 	ld	de, (iy + 3)
@@ -605,9 +605,9 @@ ti_Read:
 	ld	(hl), de
 	pop	hl
 	ret				; return actual chunks read
-.ret0.pop:
+ti_Read.ret0.pop:
 	pop	hl
-.ret0:
+ti_Read.ret0:
 	xor	a, a
 	sbc	hl, hl
 	ret
@@ -624,14 +624,14 @@ ti_GetC:
 	push	bc
 	push	de
 	call	util_is_slot_open
-	jr	nz, .ret_neg_one
+	jr	nz, ti_GetC.ret_neg_one
 	call	util_get_slot_size
 	push	bc
 	call	util_get_offset
 	pop	hl
 	scf
 	sbc	hl, bc			; size-offset
-	jr	c, .ret_neg_one
+	jr	c, ti_GetC.ret_neg_one
 	push	bc
 	call	util_get_data_ptr
 	ld	hl, (hl)
@@ -646,7 +646,7 @@ ti_GetC:
 	sbc	hl, hl
 	ld	l, a
 	ret
-.ret_neg_one:
+ti_GetC.ret_neg_one:
 	scf
 	sbc	hl, hl
 	ld	a, l
@@ -669,38 +669,38 @@ ti_PutC:
 	ld	a, e
 	ld	(char_in), a
 	call	util_is_slot_open
-	jr	nz, .ret_neg_one
+	jr	nz, ti_PutC.ret_neg_one
 	call	util_is_in_ram
-	jr	c, .ret_neg_one
+	jr	c, ti_PutC.ret_neg_one
 	call	util_get_slot_size
 	push	bc
 	call	util_get_offset
 	pop	hl
 	or	a, a
 	sbc	hl, bc
-	jr	c, .ret_neg_one
-	jr	nz, .no_increment
-.increment:
+	jr	c, ti_PutC.ret_neg_one
+	jr	nz, ti_PutC.no_increment
+ti_PutC.increment:
 	push	bc
 	inc	hl
 	ld	(resize_amount), hl
 	call	ti.EnoughMem
 	pop	bc
-	jr	c, .ret_neg_one
+	jr	c, ti_PutC.ret_neg_one
 	push	bc
 	ex	de, hl
 	call	util_insert_mem
 	pop	bc
 	or	a, a
-	jr	z, .ret_neg_one
-.no_increment:
+	jr	z, ti_PutC.ret_neg_one
+ti_PutC.no_increment:
 	call	util_get_data_ptr
 	ld	hl, (hl)
 	add	hl, bc
 	inc	hl
 	inc	hl
 	ld	a, 0
-char_in := $-1
+.equ char_in, .-1
 	ld	(hl), a
 	inc	bc
 	push	af
@@ -710,7 +710,7 @@ char_in := $-1
 	sbc	hl, hl
 	ld	l, a
 	ret
-.ret_neg_one:
+ti_PutC.ret_neg_one:
 	scf
 	sbc	hl, hl
 	ld	a, l
@@ -730,22 +730,22 @@ ti_Seek:
 	ld	de, (iy + 3)
 	ld	c, (iy + 9)
 	call	util_is_slot_open
-	jr	nz, .ret_neg_one
+	jr	nz, ti_Seek.ret_neg_one
 	ld	a, (iy + 6)		; origin location
 	or	a, a
-	jr	z, .seek_set
+	jr	z, ti_Seek.seek_set
 	dec	a
-	jr	z, .seek_curr
+	jr	z, ti_Seek.seek_curr
 	dec	a
-	jr	nz, .ret_neg_one
-.seek_end:
+	jr	nz, ti_Seek.ret_neg_one
+ti_Seek.seek_end:
 	push	de
 	call	util_get_slot_size
-.seek_set_asm:
+ti_Seek.seek_set_asm:
 	pop	hl
 	add	hl, bc
 	ex	de, hl
-.seek_set:
+ti_Seek.seek_set:
 	call	util_get_slot_size
 	push	bc
 	pop	hl
@@ -753,9 +753,9 @@ ti_Seek:
 	sbc	hl, de
 	push	de
 	pop	bc
-	jr	c, .ret_neg_one
+	jr	c, ti_Seek.ret_neg_one
 	; jp	util_set_offset
-.util_set_offset:
+ti_Seek.util_set_offset:
 ; input:
 ;  BC = offset
 ; output:
@@ -764,16 +764,16 @@ ti_Seek:
 	ld	(hl), bc
 	ret
 
-.seek_curr:
+ti_Seek.seek_curr:
 	push	de
 	call	util_get_offset
-	jr	.seek_set_asm
-.ret_neg_one:
+	jr	ti_Seek.seek_set_asm
+ti_Seek.ret_neg_one:
 	scf
 	sbc	hl, hl
 	ret
 
-util_set_offset := ti_Seek.util_set_offset
+.equ util_set_offset, ti_Seek.util_set_offset
 
 ;-------------------------------------------------------------------------------
 ti_DeleteVar:
@@ -787,8 +787,8 @@ ti_DeleteVar:
 	add	hl, sp
 	ld	a, (hl)
 ;	jr	ti_Delete.start		; emulated by dummifying next instruction:
-	db	$fe			; ld a, ti.AppVarObj -> cp a, $3E \ dec d
-assert ti.AppVarObj = $15
+	.db	0xfe			; ld a, ti.AppVarObj -> cp a, $3E \ dec d
+assert (ti.AppVarObj == 0x15)
 
 ;-------------------------------------------------------------------------------
 ti_Delete:
@@ -798,7 +798,7 @@ ti_Delete:
 ; return:
 ;  hl = 0 if failure
 	ld	a, ti.AppVarObj
-.start:
+ti_Delete.start:
 	pop	de
 	pop	hl
 	push	hl
@@ -829,14 +829,14 @@ ti_Rewind:
 	push	bc
 	push	hl
 	call	util_is_slot_open
-	jr	nz, .ret_neg_one
-.rewind:
+	jr	nz, ti_Rewind.ret_neg_one
+ti_Rewind.rewind:
 	ld	bc, 0
 	call	util_set_offset
 	or	a, a
 	sbc	hl, hl
 	ret
-.ret_neg_one:
+ti_Rewind.ret_neg_one:
 	scf
 	sbc	hl, hl
 	ret
@@ -853,12 +853,12 @@ ti_Tell:
 	push	bc
 	push	hl
 	call	util_is_slot_open
-	jr	nz, .ret_neg_one
+	jr	nz, ti_Tell.ret_neg_one
 	call	util_get_offset
 	push	bc
 	pop	hl
 	ret
-.ret_neg_one:
+ti_Tell.ret_neg_one:
 	scf
 	sbc	hl, hl
 	ret
@@ -875,12 +875,12 @@ ti_GetSize:
 	push	bc
 	push	hl
 	call	util_is_slot_open
-	jr	nz, .ret_neg_one
+	jr	nz, ti_GetSize.ret_neg_one
 	call	util_get_slot_size
 	push	bc
 	pop	hl
 	ret
-.ret_neg_one:
+ti_GetSize.ret_neg_one:
 	scf
 	sbc	hl, hl
 	ret
@@ -897,7 +897,7 @@ ti_Close:
 	push	bc
 	push	de
 	call	util_is_slot_open
-	jq	nz, util_ret_null
+	jp	nz, util_ret_null
 	ld	(hl), 255
 	ret
 
@@ -910,7 +910,7 @@ ti_DetectAny:
 ;  sp + 9 : pointer storage of type of variable found
 ; return:
 ;  hl -> name of variable
-	ld	a, $ff
+	ld	a, 0xff
 	jr	ti_Detect.start_flag
 
 ;-------------------------------------------------------------------------------
@@ -926,8 +926,8 @@ ti_DetectVar:
 	add	hl, sp
 	ld	a, (hl)			; (sp + 9)
 ;	jr	ti_Detect.start		; emulated by dummifying next instruction:
-	db	$fe			; ld a, ti.AppVarObj -> cp a, $3E \ dec d
-assert ti.AppVarObj = $15
+	.db	0xfe			; ld a, ti.AppVarObj -> cp a, $3E \ dec d
+assert (ti.AppVarObj == 0x15)
 
 ;-------------------------------------------------------------------------------
 ti_Detect:
@@ -937,58 +937,58 @@ ti_Detect:
 ; return:
 ;  hl -> name of variable
 	ld	a, ti.AppVarObj
-.start:
-	ld	(.smc_type), a
+ti_Detect.start:
+	ld	(ti_Detect.smc_type), a
 	xor	a, a
-.start_flag:
-	ld	(.smc_flag), a
+ti_Detect.start_flag:
+	ld	(ti_Detect.smc_flag), a
 	push	ix
 	ld	ix, 0
 	lea	bc, ix + 0
 	add	ix, sp
 	ld	hl, (ix + 9)
 	adc	hl, bc
-	jr	nz, .detectall		; if null, then detect everything
-	ld	hl, .fdetectall
+	jr	nz, ti_Detect.detectall		; if null, then detect everything
+	ld	hl, ti_Detect.fdetectall
 	ld	(ix + 9), hl
-.detectall:
+ti_Detect.detectall:
 	ld	hl, (ix + 6)
 	adc	hl, bc
-	jr	z, .fstart
+	jr	z, ti_Detect.fstart
 	ld	hl, (hl)
 	adc	hl, bc
-	jr	nz, .fdetect
-.fstart:
+	jr	nz, ti_Detect.fdetect
+ti_Detect.fstart:
 	ld	hl, (ti.progPtr)
-.fdetect:
+ti_Detect.fdetect:
 	ld	de, (ti.pTemp)
 	or	a, a
 	sbc	hl, de
-	jr	c, .finish
-	jr	z, .finish
+	jr	c, ti_Detect.finish
+	jr	z, ti_Detect.finish
 	add	hl, de
-.fcontinue:
+ti_Detect.fcontinue:
 	push	hl
 	ld	a, 0
-.smc_flag := $-1
+.equ ti_Detect.smc_flag, .-1
 	or	a, a
 	ld	a, (hl)
-	jr	z, .fdetectnormal
+	jr	z, ti_Detect.fdetectnormal
 	ld	de, (ix + 12)
 	ld	(de), a
-	jr	.fgoodtype
+	jr	ti_Detect.fgoodtype
 
-.finish:
+ti_Detect.finish:
 	xor	a, a
 	sbc	hl, hl
 	pop	ix
 	ret
 
-.fdetectnormal:
+ti_Detect.fdetectnormal:
 	cp	a, ti.AppVarObj
-.smc_type := $-1
-	jr	nz, .fskip
-.fgoodtype:
+.equ ti_Detect.smc_type, .-1
+	jr	nz, ti_Detect.fskip
+ti_Detect.fgoodtype:
 	dec	hl
 	dec	hl
 	dec	hl
@@ -999,64 +999,64 @@ ti_Detect:
 	ld	a, (hl)
 	call	ti.SetDEUToA
 	ex	de, hl
-	cp	a, $d0
-	jr	nc, .finram
+	cp	a, 0xd0
+	jr	nc, ti_Detect.finram
 	ld	de, 9
 	add	hl, de			; skip archive vat stuff
 	ld	e, (hl)
 	add	hl, de
 	inc	hl
-.finram:
+ti_Detect.finram:
 	inc	hl
 	inc	hl			; hl -> data
 	ld	bc, (ix + 9)
-.fcmp:
+ti_Detect.fcmp:
 	ld	a, (bc)
 	or	a, a
-	jr	z, .ffound
+	jr	z, ti_Detect.ffound
 	cp	a, (hl)
 	inc	bc
 	inc	de
 	inc	hl
-	jr	z, .fcmp		; check the string in memory
-.fskip:
+	jr	z, ti_Detect.fcmp		; check the string in memory
+ti_Detect.fskip:
 	pop	hl
-	call	.fbypassname
-	jr	.fdetect
+	call	ti_Detect.fbypassname
+	jr	ti_Detect.fdetect
 
-.ffound:
+ti_Detect.ffound:
 	pop	hl
-	call	.fbypassname
+	call	ti_Detect.fbypassname
 	ex	de, hl
 	ld	hl, (ix + 6)
 	add	hl, de
 	or	a, a
 	sbc	hl, de
-	jr	z, .isnull
+	jr	z, ti_Detect.isnull
 	ld	(hl), de
-.isnull:
+ti_Detect.isnull:
 	ld	hl, ti.OP6
 	pop	ix
 	ret
 
-.fbypassname:				; bypass the name in the vat
+ti_Detect.fbypassname:				; bypass the name in the vat
 	ld	de, ti.OP6
 	ld	bc, -6
 	add	hl, bc
 	ld	b, (hl)
 	dec	hl
-.loop:
+ti_Detect.loop:
 	ld	a, (hl)
 	ld	(de), a
 	dec	hl
 	inc	de
-	djnz	.loop
+	djnz	ti_Detect.loop
 	xor	a, a
 	ld	(de), a
 	ret
 
-.fdetectall:
-	dl	0
+ti_Detect.fdetectall:
+	.d24	0
 
 ;-------------------------------------------------------------------------------
 ti_GetTokenString:
@@ -1070,18 +1070,18 @@ ti_GetTokenString:
 	ld	iy, 0
 	add	iy, sp
 	ld	a, 1
-	ld	(.smc_length), a
+	ld	(ti_GetTokenString.smc_length), a
 	ld	hl, (iy + 3)
 	ld	hl, (hl)
 	push	hl
 	ld	a, (hl)
 	call	ti.Isa2ByteTok
 	ex	de, hl
-	jr	nz, .not2byte
+	jr	nz, ti_GetTokenString.not2byte
 	inc	de
-	ld	hl, .smc_length
+	ld	hl, ti_GetTokenString.smc_length
 	inc	(hl)
-.not2byte:
+ti_GetTokenString.not2byte:
 	inc	de
 	ld	hl, (iy + 3)
 	ld	(hl), de
@@ -1094,17 +1094,17 @@ ti_GetTokenString:
 	add	hl, bc
 	or	a, a
 	sbc	hl, bc
-	jr	z, .skip
+	jr	z, ti_GetTokenString.skip
 	ld	(hl), bc
-.skip:
+ti_GetTokenString.skip:
 	ld	hl, (iy + 6)
 	add	hl, bc
 	or	a, a
 	sbc	hl, bc
-	jr	z, .skipstore
+	jr	z, ti_GetTokenString.skipstore
 	ld	(hl), 1
-.smc_length := $-1
-.skipstore:
+.equ ti_GetTokenString.smc_length, .-1
+ti_GetTokenString.skipstore:
 	ld	hl, ti.OP3
 	ret
 
@@ -1120,7 +1120,7 @@ ti_GetDataPtr:
 	push	bc
 	push	de
 	call	util_is_slot_open
-	jr	nz, .ret_null
+	jr	nz, ti_GetDataPtr.ret_null
 	call	util_get_slot_size
 	inc	hl
 	push	hl
@@ -1128,7 +1128,7 @@ ti_GetDataPtr:
 	pop	hl
 	add	hl, bc
 	ret
-.ret_null:
+ti_GetDataPtr.ret_null:
 	xor	a, a
 	sbc	hl, hl
 	ret
@@ -1145,11 +1145,11 @@ ti_GetVATPtr:
 	push	bc
 	push	de
 	call	util_is_slot_open
-	jr	nz, .ret_null
+	jr	nz, ti_GetVATPtr.ret_null
 	call	util_get_vat_ptr
 	ld	hl, (hl)
 	ret
-.ret_null:
+ti_GetVATPtr.ret_null:
 	xor	a, a
 	sbc	hl, hl
 	ret
@@ -1176,12 +1176,12 @@ ti_GetName:
 	add	hl, bc
 	ld	b, (hl)			; length of name
 	dec	hl
-.copy:
+ti_GetName.copy:
 	ld	a, (hl)
 	ld	(de), a
 	inc	de
 	dec	hl
-	djnz	.copy
+	djnz	ti_GetName.copy
 	xor	a, a
 	ld	(de), a			; terminate the string
 	ret
@@ -1203,7 +1203,7 @@ ti_RenameVar:
 	ld	a, (hl)			; (sp + 9)
 	ld	iy, ti.flags		; probably not needed
 ;	jr	ti_Rename.start		; emulated by dummifying next instruction
-	db	$fe			; ld a, appVarObj -> cp a, $3E \ dec d
+	.db	0xfe			; ld a, appVarObj -> cp a, $3E \ dec d
 
 ;-------------------------------------------------------------------------------
 ti_Rename:
@@ -1217,7 +1217,7 @@ ti_Rename:
 ;  a = 2 if old file does not exist
 ;  a = 3 if other error
 	ld	a, ti.AppVarObj		; file type
-.start:
+ti_Rename.start:
 	pop	bc
 	pop	hl
 	pop	de
@@ -1232,7 +1232,7 @@ ti_Rename:
 	call	ti.Mov8b
 	call	ti.PushOP1		; save old name
 	ld	hl, util_archive
-	ld	(.smc_archive), hl
+	ld	(ti_Rename.smc_archive), hl
 	pop	hl			; new name
 	ld	de, ti.OP1 + 1
 	call	ti.Mov8b
@@ -1240,19 +1240,19 @@ ti_Rename:
 	push	af
 	call	ti.PopOP1
 	pop	af
-	jr	nc, .return_1		; check if name already exists
-.locate_program:
+	jr	nc, ti_Rename.return_1		; check if name already exists
+ti_Rename.locate_program:
 	call	ti.ChkFindSym		; find old name
-	jr	c, .return_2
+	jr	c, ti_Rename.return_2
 	call	ti.ChkInRam
-	jr	nz, .in_archive
+	jr	nz, ti_Rename.in_archive
 	ld	hl, util_no_op		; no-op routine
-	ld	(.smc_archive), hl
+	ld	(ti_Rename.smc_archive), hl
 	call	ti.PushOP1
 	call	util_archive
 	call	ti.PopOP1
-	jr	.locate_program
-.in_archive:
+	jr	ti_Rename.locate_program
+ti_Rename.in_archive:
 	ex	de, hl
 	ld	de, 9
 	add	hl, de			; skip vat stuff
@@ -1278,22 +1278,22 @@ ti_Rename:
 	pop	bc
 	pop	hl
 	call	ti.ChkBCIs0
-	jr	z, .is_zero
+	jr	z, ti_Rename.is_zero
 	ldir
-.is_zero:
+ti_Rename.is_zero:
 	call	ti.PopOP1
 	call	0
-.smc_archive := $-3
+.equ ti_Rename.smc_archive, .-3
 	call	ti.PopOP1
 	call	ti.ChkFindSym
 	call	ti.DelVarArc
 	xor	a, a
 	ret
-.return_1:
+ti_Rename.return_1:
 	pop	de			; new name
 	ld	a, 1
 	ret
-.return_2:
+ti_Rename.return_2:
 	pop	de			; new name
 	ld	a, 2
 	ret
@@ -1317,7 +1317,7 @@ ti_SetVar:
 	call	nc, ti.DelVarArc
 	ld	a, (ix + 6)
 	ld	hl, (ix + 12)
-	and	a, $3f
+	and	a, 0x3f
 	call	ti.DataSize
 	pop	ix
 	push	hl
@@ -1348,16 +1348,16 @@ ti_StoVar:
 	call	util_set_var_str
 	ld	a, (iy + 9)
 	or	a, a			; if real look up the variable
-	jr	z, .iscr
-	cp	a, $0c			; if cplx look up the variable
-	jr	nz, .notcr
-.iscr:
+	jr	z, ti_StoVar.iscr
+	cp	a, 0x0c			; if cplx look up the variable
+	jr	nz, ti_StoVar.notcr
+ti_StoVar.iscr:
 	call	ti.FindSym
-	jr	c, .notcr		; fill it with zeros
-	and	a, $3f
+	jr	c, ti_StoVar.notcr		; fill it with zeros
+	and	a, 0x3f
 	ex	de, hl
 	call	ti.Mov9OP1OP2
-.notcr:
+ti_StoVar.notcr:
 	call	ti.PushOP1
 	ld	hl, (iy + 6)		; pointer to var string
 	ld	a, (iy + 3)
@@ -1389,21 +1389,21 @@ ti_RclVar:
 	ld	iy, ti.flags
 	call	util_set_var_str
 	call	ti.FindSym
-	jr	c, .ret_neg_one
+	jr	c, ti_RclVar.ret_neg_one
 	push	af
 	call	ti.ChkInRam
 	pop	bc
 	ld	a, b
-	jr	nz, .ret_neg_one
+	jr	nz, ti_RclVar.ret_neg_one
 	ld	iy, 0
 	add	iy, sp
-	and	a, $3f
+	and	a, 0x3f
 	sub	a, (iy + 3)		; var type
-	jr	nz, .ret_neg_one
+	jr	nz, ti_RclVar.ret_neg_one
 	ld	hl, (iy + 9)
 	ld	(hl), de
 	ret
-.ret_neg_one:
+ti_RclVar.ret_neg_one:
 	ld	a, -1
 	ret
 
@@ -1419,7 +1419,7 @@ ti_ArchiveHasRoom:
 	push	bc
 	push	de
 	cp	a, a			; set z flag
-	ld	hl, $FF0000
+	ld	hl, 0xFF0000
 	add	hl, bc
 	call	nc, ti.FindFreeArcSpot
 	ld	a, 1
@@ -1439,7 +1439,7 @@ ti_ArchiveHasRoomVar:
 	push	bc
 	push	de
 	call	util_is_slot_open
-	jr	nz, .fail
+	jr	nz, ti_ArchiveHasRoomVar.fail
 	call	util_get_vat_ptr
 	ld	hl, (hl)
 	ld	bc, -6
@@ -1447,7 +1447,7 @@ ti_ArchiveHasRoomVar:
 	ld	c, (hl)			; get var name length
 	call	util_get_data_ptr
 	ld	de, (hl)
-.entry_sym:
+ti_ArchiveHasRoomVar.entry_sym:
 	ld	a, c
 	ex	de, hl
 	ld	hl, (hl)
@@ -1455,13 +1455,13 @@ ti_ArchiveHasRoomVar:
 	add	a, c
 	ld	c, a
 	add.s	hl, bc
-	jr	c, .fail
+	jr	c, ti_ArchiveHasRoomVar.fail
 	ld	c, l
 	ld	b, h
 	call	ti.FindFreeArcSpot
 	ld	a, 1
 	ret	nz
-.fail:
+ti_ArchiveHasRoomVar.fail:
 	xor	a, a
 	ret
 
@@ -1481,19 +1481,19 @@ ti_SetGCBehavior:
 	add	hl, de
 	or	a, a
 	sbc	hl, de
-	jr	nz, .notdefault1
+	jr	nz, ti_SetGCBehavior.notdefault1
 	ld	hl, util_post_gc_default_handler
-.notdefault1:
+ti_SetGCBehavior.notdefault1:
 	ld	(util_post_gc_handler), hl
 	sbc	hl, hl
 	adc	hl, bc
-	jr	nz, .notdefault2
+	jr	nz, ti_SetGCBehavior.notdefault2
 	ld	hl, util_pre_gc_default_handler
-.notdefault2:
+ti_SetGCBehavior.notdefault2:
 	ld	(util_pre_gc_handler), hl
 	ret
-util_post_gc_default_handler := util_no_op
-util_pre_gc_default_handler := util_no_op
+.equ util_post_gc_default_handler, util_no_op
+.equ util_pre_gc_default_handler, util_no_op
 
 ;-------------------------------------------------------------------------------
 ; internal library routines
@@ -1523,7 +1523,7 @@ util_set_var_str:
 ; out:
 ;  OP1 = variable combo
 	ld	de, ti.OP1
-	and	a, $3f
+	and	a, 0x3f
 	ld	(de), a
 	inc	de
 	jp	ti.Mov8b
@@ -1546,11 +1546,11 @@ util_insert_mem:
 	call	ti.EnoughMem
 	pop	de
 	pop	hl
-	jr	nc, .enough_mem
+	jr	nc, util_insert_mem.enough_mem
 	pop	hl
 	xor	a, a
 	ret
-.enough_mem:
+util_insert_mem.enough_mem:
 	call	ti.InsertMem
 	pop	hl
 	ld	hl, (hl)
@@ -1607,7 +1607,7 @@ util_is_slot_open:
 ;  (curr_slot) = slot
 	ld	a, c
 	cp	a, 6
-	jr	nc, .not_open
+	jr	nc, util_is_slot_open.not_open
 	ld	(curr_slot), a
 	ld	b, 3
 	mlt	bc
@@ -1616,7 +1616,7 @@ util_is_slot_open:
 	ld	a, b
 	cp	a, (hl)
 	ret
-.not_open:
+util_is_slot_open.not_open:
 	xor	a, a
 	inc	a
 	ret
@@ -1631,16 +1631,16 @@ util_get_vat_ptr:
 	dec	a
 	ret	z
 	inc	h
-	ld	l, $7b			; vat_ptr1 = $d0257b
+	ld	l, 0x7b			; vat_ptr1 = $d0257b
 	dec	a
 	ret	z
-	ld	l, $7e			; vat_ptr2 = $d0257e
+	ld	l, 0x7e			; vat_ptr2 = $d0257e
 	dec	a
 	ret	z
-	ld	l, $81			; vat_ptr3 = $d02581
+	ld	l, 0x81			; vat_ptr3 = $d02581
 	dec	a
 	ret	z
-	ld	l, $84			; vat_ptr4 = $d02584
+	ld	l, 0x84			; vat_ptr4 = $d02584
 	ret
 
 util_get_data_ptr:
@@ -1652,16 +1652,16 @@ util_get_data_ptr:
 	ld	hl, data_ptr0		; data_ptr0 = $d0067e
 	dec	a
 	ret	z
-	ld	l, $81			; data_ptr1 = $d00681
+	ld	l, 0x81			; data_ptr1 = $d00681
 	dec	a
 	ret	z
 	ld	hl, data_ptr2		; data_ptr2 = $d01fed
 	dec	a
 	ret	z
-	ld	l, $f3			; data_ptr3 = $d01ff3
+	ld	l, 0xf3			; data_ptr3 = $d01ff3
 	dec	a
 	ret	z
-	ld	l, $f9			; data_ptr4 = $d01ff9
+	ld	l, 0xf9			; data_ptr4 = $d01ff9
 	ret
 
 util_get_offset_ptr:
@@ -1706,18 +1706,18 @@ util_archive:				; properly handle garbage collects
 	ret	nz
 	call	ti.PushOP1
 	call	ti_ArchiveHasRoomVar.entry_sym
-	jr	z, .handle_gc
+	jr	z, util_archive.handle_gc
 	call	ti.Arc_Unarc
 	jp	ti.PopOP1
-.handle_gc:
+util_archive.handle_gc:
 	call	util_pre_gc_default_handler
-util_pre_gc_handler := $-3
+.equ util_pre_gc_handler, .-3
 	ld	iy, ti.flags
 	call	ti.PopOP1
 	call	ti.PushOP1
 	call	ti.Arc_Unarc
 	call	util_post_gc_default_handler
-util_post_gc_handler := $-3
+.equ util_post_gc_handler, .-3
 	ld	iy, ti.flags
 	jp	ti.PopOP1
 
@@ -1733,6 +1733,6 @@ util_unarchive:
 ; Internal library data
 ;-------------------------------------------------------------------------------
 
-	db	255			; handle edge case of 0 for slot
+	.db	255			; handle edge case of 0 for slot
 variable_offsets:
-	dl	-1, -1, -1, -1, -1
+	.d24	-1, -1, -1, -1, -1

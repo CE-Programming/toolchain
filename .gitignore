@@ -17,13 +17,13 @@ doxygen/
 *.elf
 *.bin
 *.inc
+!src/include/*.inc
+!src/*/*-exports.inc
 obj/
 release/
 build/
 CEdev/
 cmake-build-debug/
-tools/fasmg/fasmg
-tools/fasmg/fasmg.exe
 tools/cedev-config/bin/cedev-config
 tools/cedev-config/bin/cedev-config.exe
 linker_script
@@ -62,9 +62,3 @@ desktop.ini
 
 # log files
 *.log
-
-# fasmg files
-src/include/*.alm
-src/include/ez80.inc
-src/include/ti84pceg.inc
-src/include/tiformat.inc

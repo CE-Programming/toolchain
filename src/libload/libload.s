@@ -20,53 +20,53 @@
 ;=========================================================================
 
 ; includes
-include '../include/library.inc'
+.include "library.inc"
 
-define VERSION_MAJOR       4
-define VERSION_MINOR       1
+.equ VERSION_MAJOR, 4
+.equ VERSION_MINOR, 1
 
-buf := ti.cursorImage
+.equ buf, ti.cursorImage
 
-arc_lib_locs      := buf + 000	; place to store locations of archived libraries
-dep_queue_ptr     := buf + 450	; queue for keeping track of which libraries still need to be resolved
-error_sp          := buf + 850	; save sp for errors
-total_lib_size    := buf + 853	; total size of the library appvar (not used)
-loaded_size       := buf + 856	; holds extracted size of the library
-arclocation       := buf + 859	; pointer to place to begin extraction from the archive
-ramlocation       := buf + 862	; pointer to place to extract in usermem
-end_arc_lib_locs  := buf + 865	; pointer to end of archived library locations in arc_lib_locs
-end_dep_queue     := buf + 868	; pointer to end of dependency stack
-next_lib_ptr      := buf + 871	; pointer to save location of next lib place that needs to be relocated
-jump_tbl_ptr      := buf + 874	; pointer to start of function table for each library in the program
-vector_tbl_ptr    := buf + 877	; pointer to start of archived function vector table
-reloc_tbl_ptr     := buf + 880	; pointer to start of relocation table
-end_reloc_tbl     := buf + 883	; pointer to end of relocation table
-prgm_start        := buf + 886	; pointer to start of actual program when dealing with dependencies
-appvar_ptr        := buf + 889	; pointer to start of library appvar in archive
-lib_name_ptr      := buf + 892	; pointer to name of library to extract
-show_msgs         := buf + 895  ; show error messages or just exit with error
-flag_save         := buf + 896  ; save/restore modified iy flag
-ix_save           := buf + 897  ; save/restore modified ix register
+.equ arc_lib_locs, buf + 0	; place to store locations of archived libraries
+.equ dep_queue_ptr, buf + 450	; queue for keeping track of which libraries still need to be resolved
+.equ error_sp, buf + 850	; save sp for errors
+.equ total_lib_size, buf + 853	; total size of the library appvar (not used)
+.equ loaded_size, buf + 856	; holds extracted size of the library
+.equ arclocation, buf + 859	; pointer to place to begin extraction from the archive
+.equ ramlocation, buf + 862	; pointer to place to extract in usermem
+.equ end_arc_lib_locs, buf + 865	; pointer to end of archived library locations in arc_lib_locs
+.equ end_dep_queue, buf + 868	; pointer to end of dependency stack
+.equ next_lib_ptr, buf + 871	; pointer to save location of next lib place that needs to be relocated
+.equ jump_tbl_ptr, buf + 874	; pointer to start of function table for each library in the program
+.equ vector_tbl_ptr, buf + 877	; pointer to start of archived function vector table
+.equ reloc_tbl_ptr, buf + 880	; pointer to start of relocation table
+.equ end_reloc_tbl, buf + 883	; pointer to end of relocation table
+.equ prgm_start, buf + 886	; pointer to start of actual program when dealing with dependencies
+.equ appvar_ptr, buf + 889	; pointer to start of library appvar in archive
+.equ lib_name_ptr, buf + 892	; pointer to name of library to extract
+.equ show_msgs, buf + 895  ; show error messages or just exit with error
+.equ flag_save, buf + 896  ; save/restore modified iy flag
+.equ ix_save, buf + 897  ; save/restore modified ix register
 
-REQ_LIB_MARKER    := $C0	; required library signifier byte
-OPT_LIB_MARKER    := $C1	; optional library signifier byte
-JP_OPCODE         := $C3	; byte for 'jp' opcode
-LIB_MAGIC_1       := $C0	; library magic byte 1
-LIB_MAGIC_2       := $C1	; library magic byte 2
-LIB_MAGIC_1_ALT   := $BF	; alternate library magic byte 1
-LIB_MAGIC_2_ALT   := $FE	; alternate library magic byte 2
+.equ REQ_LIB_MARKER, 0xC0	; required library signifier byte
+.equ OPT_LIB_MARKER, 0xC1	; optional library signifier byte
+.equ JP_OPCODE, 0xC3	; byte for 'jp' opcode
+.equ LIB_MAGIC_1, 0xC0	; library magic byte 1
+.equ LIB_MAGIC_2, 0xC1	; library magic byte 2
+.equ LIB_MAGIC_1_ALT, 0xBF	; alternate library magic byte 1
+.equ LIB_MAGIC_2_ALT, 0xFE	; alternate library magic byte 2
 
-LIB_FLAGS         := $22	; flag storage
-loaded            := 0
-keep_in_arc       := 1
-optional          := 2
-is_dep            := 3
+.equ LIB_FLAGS, 0x22	; flag storage
+.equ loaded, 0
+.equ keep_in_arc, 1
+.equ optional, 2
+.equ is_dep, 3
 
-macro move_string_to_end
+.macro move_string_to_end
 	ld	bc, 0
 	ld	a, c
 	cpir
-end macro
+.endm
 
 ; The alternate magic bytes were added to allow LibLoad to present itself as a
 ; library (initially just for the version check, but LibLoad could expose
@@ -76,9 +76,7 @@ end macro
 ;	cp	a, a
 ;	cp	a, VERSION_MAJOR*10+VERSION_MINOR
 
-library LibLoad, VERSION_MAJOR*10+VERSION_MINOR, <LIB_MAGIC_1_ALT, LIB_MAGIC_2_ALT>
-
-disable_relocations
+library LibLoad, VERSION_MAJOR*10+VERSION_MINOR, LIB_MAGIC_1_ALT, LIB_MAGIC_2_ALT
 
 	ld	iy, ti.flags
 	push	de			; de->start of library jump table
@@ -94,7 +92,7 @@ disable_relocations
 	ld	(flag_save), a
 	ld	(ix_save), ix		; save IX since older ICE programs don't
 
-	ld	hl, $AA55AA
+	ld	hl, 0xAA55AA
 	xor	a, a
 	sbc	hl, bc
 	jr	z, .no_show_msgs
@@ -132,19 +130,11 @@ disable_relocations
 	ld	ix, (ix_save)		; restore IX register
 	jp	(hl)			; return to execution if there are no libs
 
-macro relocate? name, address*
-	name.source? := $
-	name.destination? := address
-	org name.destination?
-	macro end?.relocate?
-		name.length? := $ - name.destination?
-		org name.source? + name.length?
-		purge end?.relocate?
-	end macro
-end macro
-
-relocate helpers, buf + 900
-if 0
+; The helpers are copied from the AppVar to cursor-image RAM.
+.equ helpers.source, helpers_code - .Llibrary_base + LIBRARY_HEADER_SIZE
+.equ helpers.destination, buf + 900
+helpers_code:
+.if 0
 call_relative:
 	pop	ix
 	pea	ix + 3
@@ -153,8 +143,8 @@ call_relative:
 	add	ix, de
 	pop	de
 	jp	(ix)
-end if
-jump_relative:
+.endif
+jump_relative_code:
 	ex	(sp), hl
 	push	de
 	ld	de, (hl)
@@ -162,7 +152,7 @@ jump_relative:
 	pop	de
 	ex	(sp), hl
 	ret
-ld_relative:
+ld_relative_code:
 	pop	hl
 	ld	de, 0
 	ld	e, (hl)
@@ -170,22 +160,20 @@ ld_relative:
 	push	hl
 	add	hl, de			; add hl, relative - 1
 	ret
-end relocate
+helpers_end:
+.equ helpers.length, helpers_end - helpers_code
+.equ jump_relative, helpers.destination + (jump_relative_code - helpers_code)
+.equ ld_relative, helpers.destination + (ld_relative_code - helpers_code)
 
-macro rcall? name
-	call	call_relative
-	dl	name - $
-end macro
-
-macro rjump? name
+.macro rjump name
 	call	jump_relative
-	dl	name - $
-end macro
+	.d24	\name - .
+.endm
 
-macro rload? name
+.macro rload name
 	call	ld_relative
-	db	name - $ - 1
-end macro
+	.db	\name - . - 1
+.endm
 
 start:
 	push	hl
@@ -202,25 +190,25 @@ load_lib:				; hl->NULL terminated libray name string ($CX, 'LIBNAME', 0)
 
 check_already_loaded:
 	ld	de, arc_lib_locs
-.loop:					; de->place to start search,  hl->name to search for
+check_already_loaded.loop:					; de->place to start search,  hl->name to search for
 	push	hl
 	push	de
-.seach_tbl:
+check_already_loaded.seach_tbl:
 	ld	a, (de)			; compare characters
 	cp	a, (hl)
-	jr	nz, .no_match		; do they match?
+	jr	nz, check_already_loaded.no_match		; do they match?
 	inc	hl
 	inc	de
 	or	a, a			; means we've reached the end of the string
-	jr	nz, .seach_tbl
+	jr	nz, check_already_loaded.seach_tbl
 
-.match:					; mark as previously loaded (don't resolve absolutes again)
+check_already_loaded.match:					; mark as previously loaded (don't resolve absolutes again)
 	set	loaded, (iy + LIB_FLAGS)
 	pop	hl
 	ld	de, 9
 	add	hl, de
 	pop	de
-.done:					; hl->location of library in ram, hl+3->location of library vector table in archive
+check_already_loaded.done:					; hl->location of library in ram, hl+3->location of library vector table in archive
 	ld	de, (hl)		; de=location of library vector table in archive
 	ld	(vector_tbl_ptr), de
 	inc	hl
@@ -234,7 +222,7 @@ check_already_loaded:
 	ld	(jump_tbl_ptr), hl
 	rjump	resolve_entry_points	; need to resolve the entry points & enqueue dependencies
 
-.no_match:
+check_already_loaded.no_match:
 	pop	de
 	ld	hl, (end_arc_lib_locs)
 	or	a, a
@@ -244,30 +232,30 @@ check_already_loaded:
 	add	hl, de
 	ex	de, hl			; end of the extraction table?
 	pop	hl
-	jr	nz, .loop
+	jr	nz, check_already_loaded.loop
 
-.not_loaded:
+check_already_loaded.not_loaded:
 	ld	hl, (lib_name_ptr)
 	move_string_to_end
 	push	hl			; save the location in the program we are on
 findlib:
 	call	ti.ChkFindSym
-	jr	nc, .foundlib		; throw an error if the library doesn't exist
+	jr	nc, findlib.foundlib		; throw an error if the library doesn't exist
 	bit	optional, (iy + LIB_FLAGS)
 	; if optional, zeroize marker and move on
 	jr	nz, optional_lib_clear_pop_hl
-.missing:
+findlib.missing:
 	rjump	error_missing		; jump to the lib missing handler
 
-.foundlib:
+findlib.foundlib:
 	call	ti.ChkInRam
-	jr	nz, .archived		; if the library is found in ram, archive the library and search again
+	jr	nz, findlib.archived		; if the library is found in ram, archive the library and search again
 	call	ti.PushOP1
 	call	ti.Arc_Unarc
 	call	ti.PopOP1
 	jr	findlib
 
-.archived:
+findlib.archived:
 	ex	de, hl
 	ld	de, 9
 	add	hl, de
@@ -280,17 +268,17 @@ findlib:
 ;	ld	(total_lib_size), bc
 	ld	(appvar_ptr), hl	; hl->start of appvar in archived memory
 
-assert LIB_MAGIC_1 = LIB_MAGIC_1_ALT+1
+assert (LIB_MAGIC_1 == LIB_MAGIC_1_ALT+1)
 	ld	a, (hl)			; magic byte check 1
 	sub	a, LIB_MAGIC_1_ALT+2
 	add	a, 2
-	jr	nc, .magic_error
+	jr	nc, findlib.magic_error
 	inc	hl
 	ld	a, (hl)			; magic byte check 2
 	cp	a, LIB_MAGIC_2
 	jr	z, lib_exists
 	cp	a, LIB_MAGIC_2_ALT
-.magic_error:
+findlib.magic_error:
 	jr	z, lib_exists
 	bit	optional, (iy + LIB_FLAGS)
 	jr	z, invalid_error
@@ -305,17 +293,17 @@ optional_lib_clear:
 	pop	hl
 	ld	a, JP_OPCODE
 	; inc	hl			; skip version byte
-.loop:
+optional_lib_clear.loop:
 	inc	hl
 	cp	a, (hl)			; jp byte ($C3)
-	jr	nz, .done
+	jr	nz, optional_lib_clear.done
 	inc	hl
 	ld	(hl), de		; make the vector zero
 	inc	hl
 	inc	hl			; move to next jump
-	jr	.loop
+	jr	optional_lib_clear.loop
 
-.done:
+optional_lib_clear.done:
 	rjump	check_for_lib_marker
 
 invalid_error:
@@ -344,7 +332,7 @@ lib_exists:
 	jr	nc, good_version
 	bit	optional, (iy + LIB_FLAGS)
 	jr	nz, optional_lib_clear
-.version_error:
+lib_exists.version_error:
 	rjump	error_version		; c flag set if on-calc lib version is less than the one used in the program
 
 good_version:
@@ -400,7 +388,7 @@ need_to_load_lib:
 
 	bit	keep_in_arc, (iy + LIB_FLAGS)
 	jr	nz, resolve_entry_points
-.not_in_arc:
+need_to_load_lib.not_in_arc:
 	ld	hl, (loaded_size)
 	push	hl
 	push	de
@@ -409,11 +397,11 @@ need_to_load_lib:
 	pop	bc
 	pop	de
 	pop	hl
-	jr	nc, .enough_mem
+	jr	nc, need_to_load_lib.enough_mem
 	call	ti.PopOP1		; pop program name
 	jp	ti.ErrMemory		; throw a memory error -- need more ram!
 
-.enough_mem:
+need_to_load_lib.enough_mem:
 	call	ti.InsertMem		; insert memory for the relocated library (de)
 
 	ld	bc, (loaded_size)	; loaded size = dependency jumps + library code
@@ -431,12 +419,12 @@ resolve_entry_points:
 	; get all the dependency pointers that reside in the ram lib
 enqueue_all_deps:			; we don't need to store anything if we are here
 	bit	keep_in_arc, (iy + LIB_FLAGS)
-	jr	nz, .finish		; really, this is just a precautionary check -- should work fine without
-.loop:
+	jr	nz, enqueue_all_deps.finish		; really, this is just a precautionary check -- should work fine without
+enqueue_all_deps.loop:
 	res	optional, (iy + LIB_FLAGS)
 	ld	a, (hl)
 	cp	a, REQ_LIB_MARKER	; is there a dependency?
-	jr	nz, .check
+	jr	nz, enqueue_all_deps.check
 	ex	de, hl
 	ld	hl, (end_dep_queue)
 	ld	(hl), de		; save pointer to start of this dependency -- one at a time
@@ -445,32 +433,32 @@ enqueue_all_deps:			; we don't need to store anything if we are here
 	inc	hl			; move to next pointer
 	ld	(end_dep_queue), hl	; save next pointer
 	ex	de, hl
-.skip:
+enqueue_all_deps.skip:
 	move_string_to_end
 	ld	a, JP_OPCODE
 	; inc	hl			; move to start of dependency jump table
-.next:
+enqueue_all_deps.next:
 	inc	hl
 	cp	a, (hl)			; jp byte ($C3)
-	jr	nz, .loop
+	jr	nz, enqueue_all_deps.loop
 	inc	hl
 	inc	hl
 	inc	hl			; jp address
-	jr	.next
+	jr	enqueue_all_deps.next
 
-.check:
+enqueue_all_deps.check:
 	cp	a, ti.AppVarObj
-	jr	z, .skip		; keep going
-.finish:
+	jr	z, enqueue_all_deps.skip		; keep going
+enqueue_all_deps.finish:
 
 resolve_entry_points_enqueued:
 
 	ld	hl, (jump_tbl_ptr)	; hl->start of function jump table
 	ld	bc, 3
 	ld	a, JP_OPCODE
-.loop:
+resolve_entry_points_enqueued.loop:
 	cp	a, (hl)			; jp byte ($C3)
-	jr	nz, .done
+	jr	nz, resolve_entry_points_enqueued.done
 	inc	hl			; bypass jp byte ($C3)
 	push	hl
 	ld	hl, (hl)		; offset in vector table (0, 3, 6, etc.)
@@ -492,22 +480,22 @@ resolve_entry_points_enqueued:
 	pop	hl			; restore jump offset
 	ld	(hl), de		; de=resolved address
 	add	hl, bc			; move to next jump
-	jr	.loop
+	jr	resolve_entry_points_enqueued.loop
 
-.done:					; finished resolving entry points
+resolve_entry_points_enqueued.done:					; finished resolving entry points
 					; now relocate absolutes in library
 relocate_absolutes:
 	ld	(next_lib_ptr), hl	; hl->next library in program (if there is one)
 	bit	loaded, (iy + LIB_FLAGS)
-	jr	nz, .done
+	jr	nz, relocate_absolutes.done
 	bit	keep_in_arc, (iy + LIB_FLAGS)
-	jr	nz, .done
+	jr	nz, relocate_absolutes.done
 	ld	hl, (reloc_tbl_ptr)	; restore this
-.loop:
+relocate_absolutes.loop:
 	ld	de, (end_reloc_tbl)
 	or	a, a
 	sbc	hl, de			; have we reached the end of the relocation table
-	jr	z, .done
+	jr	z, relocate_absolutes.done
 	add	hl, de			; restore hl
 	ld	e, (hl)
 	inc	hl
@@ -526,9 +514,9 @@ relocate_absolutes:
 	ld	(hl), de		; resolved absolute address
 	pop	hl
 	inc	hl			; move to next relocation vector
-	jr	.loop
+	jr	relocate_absolutes.loop
 
-.done:					; have we found the start of the program?
+relocate_absolutes.done:					; have we found the start of the program?
 	bit	is_dep, (iy + LIB_FLAGS)
 	jr	nz, load_next_dep	; if loading dependencies, don't check markers
 	ld	hl, (next_lib_ptr)
@@ -572,21 +560,21 @@ start_execution:
 	jp	(hl)			; passed all the checks; let's start execution! :)
 
 error_invalid:
-	rload	str_error_invalid
+	rload str_error_invalid
 	jr	throw_error
 
 error_version:
-	rload	str_error_version
+	rload str_error_version
 	jr	throw_error
 
 error_missing:
-	rload	str_error_missing
+	rload str_error_missing
 throw_error:				; draw the error message onscreen
 	ld	sp, (error_sp)
 	ld	a, (show_msgs)
 	or	a, a
-	jr	z, .return
-.show_msgs:
+	jr	z, throw_error.return
+throw_error.show_msgs:
 	ld	a, ti.lcdBpp16
 	ld	(ti.mpLcdCtrl), a
 	push	hl
@@ -596,14 +584,14 @@ throw_error:				; draw the error message onscreen
 	set	ti.textInverse, (iy + ti.textFlags)
 	ld	a, 2
 	ld	(ti.curCol), a
-	rload	str_error_prefix
+	rload str_error_prefix
 	call	ti.PutS
 	pop	hl
 	call	ti.PutS
 	res	ti.textInverse, (iy + ti.textFlags)
 	call	ti.NewLine
 	call	ti.NewLine		; make it look pretty
-	rload	str_lib_name
+	rload str_lib_name
 	call	ti.PutS
 	ld	hl, ti.OP1+1+8
 	ld	(hl), 0
@@ -611,22 +599,22 @@ throw_error:				; draw the error message onscreen
 	call	ti.PutS
 	call	ti.NewLine
 	call	ti.NewLine
-	rload	str_download
+	rload str_download
 	call	ti.PutS
 	push	hl
 	call	ti.NewLine
 	pop	hl
 	call	ti.PutS
-.wait_key:
+throw_error.wait_key:
 	call	ti.GetCSC
 	cp	a, ti.skEnter
-	jr	z, .exit
+	jr	z, throw_error.exit
 	cp	a, ti.skClear
-	jr	nz, .wait_key
-.exit:
+	jr	nz, throw_error.wait_key
+throw_error.exit:
 	call	ti.ClrScrn
 	call	ti.HomeUp
-.return:
+throw_error.return:
 	call	ti.PopOP1
 	ld	a, (flag_save)
 	ld	(iy + LIB_FLAGS), a	; restore flag bits
@@ -635,15 +623,15 @@ throw_error:				; draw the error message onscreen
 	ret
 
 str_error_prefix:
-	db	"ERROR: Library ", 0
+	.db	"ERROR: Library ", 0
 str_error_version:
-	db	"Version", 0
+	.db	"Version", 0
 str_error_missing:
-	db	"Missing", 0
+	.db	"Missing", 0
 str_error_invalid:
-	db	"Invalid", 0
+	.db	"Invalid", 0
 str_lib_name:
-	db	"Library Name: ", 0
+	.db	"Library Name: ", 0
 str_download:
-	db	"Download here:", 0
-	db	"https://tiny.cc/clibs", 0
+	.db	"Download here:", 0
+	.db	"https://tiny.cc/clibs", 0

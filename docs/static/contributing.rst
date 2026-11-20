@@ -30,18 +30,13 @@ Make sure that ``ez80-clang`` and ``ez80-link`` are reachable by the system's PA
 Download the prebuilt `ez80 GNU binutils <https://github.com/CE-Programming/binutils-gdb/releases/tag/nightly>`_.
 Make sure that the ``bin`` directory is reachable by the system's PATH environment variable.
 
-Download the `fasmg assembler <https://flatassembler.net/download.php>`_.
-The download is located near the bottom of the page.
-Extract the ``fasmg.x64`` executable to the same location as the compiler.
-Rename it to just ``fasmg``.
-
-Clone the repo:
+Clone the repo. Convbin builds from its checked-in helper bytes, so skip the submodule used to regenerate them:
 
 .. code-block:: bash
 
     git clone https://github.com/CE-Programming/toolchain.git
     cd toolchain
-    git submodule update --init --recursive
+    git -c submodule.src/deps/fasmg-ez80.update=none submodule update --init --recursive
 
 Build and install the toolchain:
 
@@ -71,17 +66,13 @@ Make sure that ``ez80-clang.exe`` and ``ez80-link.exe`` are reachable by the sys
 Download the prebuilt `ez80 GNU binutils <https://github.com/CE-Programming/binutils-gdb/releases/tag/nightly>`_.
 Make sure that the ``bin`` directory is reachable by the system's PATH environment variable.
 
-Download the `fasmg assembler <https://flatassembler.net/download.php>`_.
-The download is located near the bottom of the page.
-Extract the ``fasmg.exe`` executable to the same location as the compiler.
-
-Clone the repo:
+Clone the repo. Convbin builds from its checked-in helper bytes, so skip the submodule used to regenerate them:
 
 .. code-block:: bash
 
     git clone https://github.com/CE-Programming/toolchain.git
     cd toolchain
-    git submodule update --init --recursive
+    git -c submodule.src/deps/fasmg-ez80.update=none submodule update --init --recursive
 
 Build and install the toolchain:
 

@@ -14,25 +14,8 @@
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-include $(CURDIR)/../common.mk
+LIB_NAME := srldrvce
+LIB_DEPENDENCY_DIR := ../usbdrvce
+LIB_ASM_DEPS := ../usbdrvce/usbdrvce-exports.inc
 
-LIB_SRC := srldrvce.asm
-LIB_LIB := srldrvce.lib
-LIB_8XV := srldrvce.8xv
-LIB_H := srldrvce.h
-
-all: $(LIB_8XV)
-
-$(LIB_8XV): $(LIB_SRC)
-	$(Q)$(FASMG) $< $@
-
-clean:
-	$(Q)$(call REMOVE,$(LIB_LIB) $(LIB_8XV))
-
-install: all
-	$(Q)$(call MKDIR,$(INSTALL_LIB))
-	$(Q)$(call MKDIR,$(INSTALL_H))
-	$(Q)$(call COPY,$(LIB_LIB),$(INSTALL_LIB))
-	$(Q)$(call COPY,$(LIB_H),$(INSTALL_H))
-
-.PHONY: all clean install
+include ../library.mk

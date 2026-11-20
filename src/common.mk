@@ -40,11 +40,9 @@ endif
 ifeq ($(OS),Windows_NT)
 WINDOWS := 1
 SHELL := cmd.exe
-FASMG ?= fasmg.exe
 EZCC ?= ez80-clang.exe
 EZAS ?= z80-none-elf-as.exe
 EZAR ?= z80-none-elf-ar.exe
-NULL ?= nul
 NATIVEPATH ?= $(subst /,\,$1)
 NATIVEEXE ?= $(NATIVEPATH).exe
 MKDIR ?= ( mkdir $1 2>nul || call )
@@ -56,11 +54,9 @@ QUOTE_ARG  ?= "$(subst ",',$1)"#'
 APPEND ?= $(Q)echo.$(subst ",^",$(subst \,^\,$(subst &,^&,$(subst |,^|,$(subst >,^>,$(subst <,^<,$(subst ^,^^,$1))))))) >>$@
 RELEASE_NAME = windows
 else
-FASMG ?= fasmg
 EZCC ?= ez80-clang
 EZAS ?= z80-none-elf-as
 EZAR ?= z80-none-elf-ar
-NULL ?= /dev/null
 NATIVEPATH ?= $(subst \,/,$1)
 NATIVEEXE ?= $(NATIVEPATH)
 MKDIR ?= mkdir -p $1

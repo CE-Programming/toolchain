@@ -1,80 +1,41 @@
-include 'ez80.inc'
-include 'ti84pceg.inc'
-include 'tiformat.inc'
+.include "ti84pce.inc"
 
-macro library? name*, version*, magic: <192,193>
-	local lib
-	element lib.base
-	virtual
-		lib.exports.area::
-	end virtual
-	virtual as 'lib'
-		lib.exports.file::
-		repeat 1, string: version
-			db 9, 'library', 9, `name, ', ', `string, 10, 10
-		end repeat
-	end virtual
-	virtual
-		lib.relocations.area::
-	end virtual
+.assume adl=1
 
-	format ti archived appvar `name
-	org 0
-	db magic,version
-	dw lib.exports
-	lib.dependencies:
-	lib.base_offset := $%
+.equ LIBRARY_HEADER_SIZE, 3
 
-	macro disable_relocations?
-		org $% - lib.base_offset + lib.dependencies
-	end macro
-	macro enable_relocations?
-		org $% - lib.base_offset + lib.base
-	end macro
-	enable_relocations?
+; The host packer combines these sections with .text and its ELF relocations.
+.macro library name, version, magic1=0xc0, magic2=0xc1
+	.pushsection .libload.header
+	.db \magic1, \magic2, \version, "\name", 0
+	.popsection
+	.text
+.Llibrary_base:
+.endm
 
-	iterate each, export, export_pointer
-		macro each? function*
-			local offset
-			virtual lib.exports.area
-				dw function-lib.base
-				offset = $-$$
-			end virtual
-			virtual lib.exports.file
-				repeat 1, string: ((offset - 2) / 2) * 3
-					db 9, `each, 9, `function, 10
-				end repeat
-			end virtual
-		end macro
-	end iterate
+.macro lib_export target
+	.pushsection .libload.exports
+	.dw \target - .Llibrary_base
+	.asciz "\target"
+	.popsection
+.endm
 
-	macro @ez80.word @size*, @value*
-		local value, address
-		value = @value
-		address = $
-		if value relativeto lib.base
-			virtual lib.relocations.area
-				dw address-lib.base
-			end virtual
-			@ez80.word @size, value-lib.base
-		else
-			@ez80.word @size, value
-		end if
-	end macro
+; Walk the dependency's export list in ABI order and emit the requested slots.
+.macro lib_dependency name, version
+	.set .Lexport_index, 0
+	.db 0xc0, "\name", 0, \version
+.endm
 
-	postpone
-		virtual lib.exports.area
-			load lib.exports: $-$$ from $$
-		end virtual
-		virtual lib.relocations.area
-			load lib.relocations: $-$$ from $$
-		end virtual
+.macro lib_import target
+	.ifdef import_\target
+\target:
+		jp .Lexport_index * 3
+	.endif
+	.set .Lexport_index, .Lexport_index + 1
+.endm
 
-		lib.end_offset := $%
-		dw lib.relocations
-		dl lib.dependencies
-		dl lib.end_offset - lib.base_offset
-	end postpone
-
-	purge library?
-end macro
+.macro assert test:vararg
+	.if !(\test)
+		.error "Assertion failed: \test"
+	.endif
+.endm

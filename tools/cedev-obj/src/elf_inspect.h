@@ -19,6 +19,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,6 +45,14 @@ bool elf_has_section(struct elf_file *elf, const char *section_name);
 
 /* Check if any section with a given prefix exists and is non-empty */
 bool elf_has_section_prefix(struct elf_file *elf, const char *section_prefix);
+
+/* Read a section into a caller-owned buffer. An absent section has size zero. */
+bool elf_read_section(struct elf_file *elf, const char *name,
+                      uint8_t **data, size_t *size);
+
+/* Resolve .text to a base of zero and return its LibLoad relocation offsets. */
+bool elf_relocate_library(struct elf_file *elf, uint8_t *text, size_t text_size,
+                          uint16_t **offsets, size_t *count);
 
 /* Get last error message (valid until next call or elf_close) */
 const char *elf_get_error(struct elf_file *elf);

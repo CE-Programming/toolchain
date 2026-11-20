@@ -17,8 +17,6 @@ env:
   CEDEV_EXAMPLES: ${{github.workspace}}/CEdev/examples
   CEDEV_TEST: ${{github.workspace}}/toolchain/test
   CEMU_PATH: ${{github.workspace}}/CEmu
-  FASMG_DOMAIN: https://flatassembler.net
-  FASMG_PATH: ${{github.workspace}}/fasmg
   SECRETS_PATH: ${{github.workspace}}/secrets
   TOOLCHAIN_PATH: ${{github.workspace}}/toolchain
 
@@ -29,32 +27,26 @@ jobs:
       matrix:
         runs-on: [ubuntu-22.04, macos-15-intel, macos-15, windows-latest]
         include:
-          - nul: /dev/null
           - runs-on: macos-15-intel
-            fasmg: /source/macos/x64/fasmg
             arch-suffix: "-intel"
             llvm-project: ez80-clang-link_macOS_intel_nightly.zip
             binutils-gdb: binutils_macos_intel_nightly.tar.gz
             install-output-ext: "dmg"
           - runs-on: macos-15
-            fasmg: /source/macos/x64/fasmg
             arch-suffix: "-arm"
             llvm-project: ez80-clang-link_macOS_arm_nightly.zip
             binutils-gdb: binutils_macos_arm_nightly.tar.gz
             install-output-ext: "dmg"
           - runs-on: windows-latest
-            fasmg: /fasmg.exe
             llvm-project: ez80-clang-link_windows_nightly.zip
             binutils-gdb: binutils_windows_nightly.zip
             env: "env:"
             exe: .exe
-            nul: nul
             ldflags: LDFLAGS="-static-libgcc -static-libstdc++ -static"
             install-output-ext: "zip"
           - runs-on: ubuntu-22.04
             llvm-project: ez80-clang-link_ubuntu_nightly.zip
             binutils-gdb: binutils_ubuntu_nightly.tar.gz
-            fasmg: /fasmg.x64
             install-output-ext: "tar.gz"
 
     runs-on: ${{matrix.runs-on}}
@@ -92,36 +84,6 @@ jobs:
         run: Expand-Archive -Path "${{steps.binutils.outputs.file-path}}" -DestinationPath "${{env.CEDEV}}"
         shell: pwsh
 
-      - name: Add fasmg website to /etc/hosts since DNS seems to be broken
-        if: runner.os == 'macOS'
-        run: |
-             sudo echo "208.99.203.253 flatassembler.net" | sudo tee -a /etc/hosts
-      - name: Download Fasmg Download Page
-        id: fasmg-download
-        uses: carlosperate/download-file-action@v2.0.3
-        with:
-          file-url: ${{env.FASMG_DOMAIN}}/download.php
-      - name: Parse Fasmg Download Page
-        id: fasmg-url
-        uses: QwerMike/xpath-action@v1
-        with:
-          filename: ${{steps.fasmg-download.outputs.file-path}}
-          expression: //a[starts-with(text(),"flat assembler g ")]/@href
-      - name: Extract Fasmg Url
-        run: cmake -E echo >> $${{matrix.env}}GITHUB_ENV ${{steps.fasmg-url.outputs.result}}
-      - name: Download Fasmg
-        id: fasmg
-        uses: carlosperate/download-file-action@v2.0.3
-        with:
-          file-url: ${{env.FASMG_DOMAIN}}/${{env.href}}
-      - name: Extract Fasmg
-        uses: DuckSoft/extract-7z-action@v1.0
-        with:
-          pathSource: ${{steps.fasmg.outputs.file-path}}
-          pathTarget: ${{env.FASMG_PATH}}
-      - name: Setup Fasmg
-        run: cmake -E copy fasmg${{matrix.fasmg}} ${{env.CEDEV_BIN}}/fasmg${{matrix.exe}}
-
       - name: Checkout CEmu
         uses: actions/checkout@v7
         with:
@@ -143,10 +105,15 @@ jobs:
         run: |
           ez80-clang --version
           ez80-link --version
-          fasmg ${{matrix.nul}} ${{matrix.nul}}
+          z80-none-elf-as --version
 
       - name: Checkout Toolchain
         uses: actions/checkout@v7
+        env:
+          # Convbin uses checked-in helper bytes in the normal build.
+          GIT_CONFIG_COUNT: '1'
+          GIT_CONFIG_KEY_0: submodule.src/deps/fasmg-ez80.update
+          GIT_CONFIG_VALUE_0: none
         with:
           path: ${{env.TOOLCHAIN_PATH}}
           submodules: recursive
@@ -163,9 +130,6 @@ jobs:
         env:
           PREFIX: ${{github.workspace}}
         run: make -j4 -C ${{env.TOOLCHAIN_PATH}} install V=1 DESTDIR=${{github.workspace}}
-
-      - name: Remove Fasmg
-        run: cmake -E rm -f ${{env.CEDEV_BIN}}/fasmg${{matrix.exe}}
 
       - name: Make Binaries Executable
         if: runner.os != 'Windows'
