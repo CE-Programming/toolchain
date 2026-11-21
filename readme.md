@@ -1,4 +1,4 @@
-# CE C/C++ Toolchain  [![Build Status](https://github.com/CE-Programming/toolchain/workflows/Win/Mac/Linux/badge.svg?branch=llvm&event=push)](https://github.com/CE-Programming/toolchain/workflows/Win/Mac/Linux/badge.svg?event=push) [![Discord Chat Link](https://img.shields.io/discord/432891584451706892?logo=discord)](https://discord.gg/TRkN5UcUzs)
+# CE C/C++ Toolchain [![Win/Mac/Linux](https://github.com/CE-Programming/toolchain/actions/workflows/make.yml/badge.svg)](https://github.com/CE-Programming/toolchain/actions/workflows/make.yml) [![Discord Chat Link](https://img.shields.io/discord/432891584451706892?logo=discord)](https://discord.gg/TRkN5UcUzs)
 
 The CE Toolchain incorporates a variety of tools in order to build programs in C/C++ natively for the TI-84 Plus CE calculator series.
 
