@@ -87,161 +87,106 @@ extern "C" {
 long double drem_libcall(long double x, long double y);
 }
 
+// Share the comparison code across cases so the test fits in one program.
+// Volatile operands keep each operator check as a separate comparison.
+[[gnu::noinline]] static bool check_equal(const volatile long double& lhs,
+                                          const volatile long double& rhs) {
+    return lhs == rhs && lhs <= rhs && lhs >= rhs;
+}
+
+[[gnu::noinline]] static bool check_less(const volatile long double& lhs,
+                                         const volatile long double& rhs) {
+    return lhs != rhs && lhs < rhs && lhs <= rhs;
+}
+
+[[gnu::noinline]] static bool check_greater(const volatile long double& lhs,
+                                            const volatile long double& rhs) {
+    return lhs != rhs && lhs > rhs && lhs >= rhs;
+}
+
 int comparison_test(void) {
 
     /* equal values */
 
-    C((f64_pos_zero == f64_pos_zero));
-    C((f64_pos_zero <= f64_pos_zero));
-    C((f64_pos_zero >= f64_pos_zero));
+    C(check_equal(f64_pos_zero, f64_pos_zero));
 
-    C((f64_neg_zero == f64_neg_zero));
-    C((f64_neg_zero <= f64_neg_zero));
-    C((f64_neg_zero >= f64_neg_zero));
+    C(check_equal(f64_neg_zero, f64_neg_zero));
 
-    C((f64_pos_one == f64_pos_one));
-    C((f64_pos_one <= f64_pos_one));
-    C((f64_pos_one >= f64_pos_one));
+    C(check_equal(f64_pos_one, f64_pos_one));
 
-    C((f64_neg_one == f64_neg_one));
-    C((f64_neg_one <= f64_neg_one));
-    C((f64_neg_one >= f64_neg_one));
+    C(check_equal(f64_neg_one, f64_neg_one));
 
-    C((f64_pos_pi == f64_pos_pi));
-    C((f64_pos_pi <= f64_pos_pi));
-    C((f64_pos_pi >= f64_pos_pi));
+    C(check_equal(f64_pos_pi, f64_pos_pi));
 
-    C((f64_neg_pi == f64_neg_pi));
-    C((f64_neg_pi <= f64_neg_pi));
-    C((f64_neg_pi >= f64_neg_pi));
+    C(check_equal(f64_neg_pi, f64_neg_pi));
 
     /* negated values */
 
-    C((f64_pos_zero == f64_neg_zero));
-    C((f64_pos_zero <= f64_neg_zero));
-    C((f64_pos_zero >= f64_neg_zero));
+    C(check_equal(f64_pos_zero, f64_neg_zero));
 
-    C((f64_neg_zero == f64_pos_zero));
-    C((f64_neg_zero <= f64_pos_zero));
-    C((f64_neg_zero >= f64_pos_zero));
+    C(check_equal(f64_neg_zero, f64_pos_zero));
 
-    C((f64_pos_one != f64_neg_one));
-    C((f64_pos_one >  f64_neg_one));
-    C((f64_pos_one >= f64_neg_one));
+    C(check_greater(f64_pos_one, f64_neg_one));
 
-    C((f64_neg_one != f64_pos_one));
-    C((f64_neg_one <  f64_pos_one));
-    C((f64_neg_one <= f64_pos_one));
+    C(check_less(f64_neg_one, f64_pos_one));
 
-    C((f64_pos_pi  != f64_neg_pi ));
-    C((f64_pos_pi  >  f64_neg_pi ));
-    C((f64_pos_pi  >= f64_neg_pi ));
+    C(check_greater(f64_pos_pi, f64_neg_pi));
 
-    C((f64_neg_pi  != f64_pos_pi ));
-    C((f64_neg_pi  <  f64_pos_pi ));
-    C((f64_neg_pi  <= f64_pos_pi ));
+    C(check_less(f64_neg_pi, f64_pos_pi));
 
     /* compare to zero */
 
-    C((f64_pos_zero != f64_pos_one));
-    C((f64_pos_zero <  f64_pos_one));
-    C((f64_pos_zero <= f64_pos_one));
+    C(check_less(f64_pos_zero, f64_pos_one));
 
-    C((f64_pos_zero != f64_pos_pi ));
-    C((f64_pos_zero <  f64_pos_pi ));
-    C((f64_pos_zero <= f64_pos_pi ));
+    C(check_less(f64_pos_zero, f64_pos_pi));
 
-    C((f64_neg_zero != f64_pos_one));
-    C((f64_neg_zero <  f64_pos_one));
-    C((f64_neg_zero <= f64_pos_one));
+    C(check_less(f64_neg_zero, f64_pos_one));
 
-    C((f64_neg_zero != f64_pos_pi ));
-    C((f64_neg_zero <  f64_pos_pi ));
-    C((f64_neg_zero <= f64_pos_pi ));
+    C(check_less(f64_neg_zero, f64_pos_pi));
 
-    C((f64_pos_zero != f64_neg_one));
-    C((f64_pos_zero >  f64_neg_one));
-    C((f64_pos_zero >= f64_neg_one));
+    C(check_greater(f64_pos_zero, f64_neg_one));
 
-    C((f64_pos_zero != f64_neg_pi ));
-    C((f64_pos_zero >  f64_neg_pi ));
-    C((f64_pos_zero >= f64_neg_pi ));
+    C(check_greater(f64_pos_zero, f64_neg_pi));
 
-    C((f64_neg_zero != f64_neg_one));
-    C((f64_neg_zero >  f64_neg_one));
-    C((f64_neg_zero >= f64_neg_one));
+    C(check_greater(f64_neg_zero, f64_neg_one));
 
-    C((f64_neg_zero != f64_neg_pi ));
-    C((f64_neg_zero >  f64_neg_pi ));
-    C((f64_neg_zero >= f64_neg_pi ));
+    C(check_greater(f64_neg_zero, f64_neg_pi));
 
     /* compare to one */
 
-    C((f64_pos_one != f64_pos_zero));
-    C((f64_pos_one >  f64_pos_zero));
-    C((f64_pos_one >= f64_pos_zero));
+    C(check_greater(f64_pos_one, f64_pos_zero));
 
-    C((f64_pos_one != f64_pos_pi  ));
-    C((f64_pos_one <  f64_pos_pi  ));
-    C((f64_pos_one <= f64_pos_pi  ));
+    C(check_less(f64_pos_one, f64_pos_pi));
 
-    C((f64_neg_one != f64_pos_zero));
-    C((f64_neg_one <  f64_pos_zero));
-    C((f64_neg_one <= f64_pos_zero));
+    C(check_less(f64_neg_one, f64_pos_zero));
 
-    C((f64_neg_one != f64_pos_pi  ));
-    C((f64_neg_one <  f64_pos_pi  ));
-    C((f64_neg_one <= f64_pos_pi  ));
+    C(check_less(f64_neg_one, f64_pos_pi));
 
-    C((f64_pos_one != f64_neg_zero));
-    C((f64_pos_one >  f64_neg_zero));
-    C((f64_pos_one >= f64_neg_zero));
+    C(check_greater(f64_pos_one, f64_neg_zero));
 
-    C((f64_pos_one != f64_neg_pi  ));
-    C((f64_pos_one >  f64_neg_pi  ));
-    C((f64_pos_one >= f64_neg_pi  ));
+    C(check_greater(f64_pos_one, f64_neg_pi));
 
-    C((f64_neg_one != f64_neg_zero));
-    C((f64_neg_one <  f64_neg_zero));
-    C((f64_neg_one <= f64_neg_zero));
+    C(check_less(f64_neg_one, f64_neg_zero));
 
-    C((f64_neg_one != f64_neg_pi  ));
-    C((f64_neg_one >  f64_neg_pi  ));
-    C((f64_neg_one >= f64_neg_pi  ));
+    C(check_greater(f64_neg_one, f64_neg_pi));
 
     /* compare to pi */
 
-    C((f64_pos_pi != f64_pos_zero));
-    C((f64_pos_pi >  f64_pos_zero));
-    C((f64_pos_pi >= f64_pos_zero));
+    C(check_greater(f64_pos_pi, f64_pos_zero));
 
-    C((f64_pos_pi != f64_pos_one ));
-    C((f64_pos_pi >  f64_pos_one ));
-    C((f64_pos_pi >= f64_pos_one ));
+    C(check_greater(f64_pos_pi, f64_pos_one));
 
-    C((f64_neg_pi != f64_pos_zero));
-    C((f64_neg_pi <  f64_pos_zero));
-    C((f64_neg_pi <= f64_pos_zero));
+    C(check_less(f64_neg_pi, f64_pos_zero));
 
-    C((f64_neg_pi != f64_pos_one ));
-    C((f64_neg_pi <  f64_pos_one ));
-    C((f64_neg_pi <= f64_pos_one ));
+    C(check_less(f64_neg_pi, f64_pos_one));
 
-    C((f64_pos_pi != f64_neg_zero));
-    C((f64_pos_pi >  f64_neg_zero));
-    C((f64_pos_pi >= f64_neg_zero));
+    C(check_greater(f64_pos_pi, f64_neg_zero));
 
-    C((f64_pos_pi != f64_neg_one ));
-    C((f64_pos_pi >  f64_neg_one ));
-    C((f64_pos_pi >= f64_neg_one ));
+    C(check_greater(f64_pos_pi, f64_neg_one));
 
-    C((f64_neg_pi != f64_neg_zero));
-    C((f64_neg_pi <  f64_neg_zero));
-    C((f64_neg_pi <= f64_neg_zero));
+    C(check_less(f64_neg_pi, f64_neg_zero));
 
-    C((f64_neg_pi != f64_neg_one ));
-    C((f64_neg_pi <  f64_neg_one ));
-    C((f64_neg_pi <= f64_neg_one ));
+    C(check_less(f64_neg_pi, f64_neg_one));
 
     return 0;
 }
