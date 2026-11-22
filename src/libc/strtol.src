@@ -7,9 +7,6 @@
 	.err
 .endif
 
-	; Keep the shared overflow path in this section until the linker can retain it separately.
-	.equ	HAVE_WE_FIGURED_OUT_BINUTILS_YET, 0
-
 ;-------------------------------------------------------------------------------
 
 	.section	.text.___strtoi
@@ -105,22 +102,21 @@ ___strtoui:
 	dec	e
 	ret	z
 
-.if HAVE_WE_FIGURED_OUT_BINUTILS_YET
-; REQUIRE	require	_strtoul.out_of_range
-
 ;-------------------------------------------------------------------------------
 
+	; Let either unsigned conversion retain the overflow handler independently.
 	.section	.text._strtoul.out_of_range
 
 	.local	_strtoul.out_of_range
 _strtoul.out_of_range:
-.endif
 	ld	hl, ERANGE
 	ld	(_errno), hl
 	ld	l, h		; ld hl, 0
 	dec	hl
 	ld	e, l
 	ret
+
+;-------------------------------------------------------------------------------
 
 	.section	.text._strtoul
 
@@ -132,17 +128,6 @@ _strtoul:
 	djnz	_strtoul.out_of_range
 	ret	nz
 	jp	__lneg
-
-.if HAVE_WE_FIGURED_OUT_BINUTILS_YET
-.else
-_strtoul.out_of_range:
-	ld	hl, ERANGE
-	ld	(_errno), hl
-	ld	l, h		; ld hl, 0
-	dec	hl
-	ld	e, l
-	ret
-.endif
 
 ;-------------------------------------------------------------------------------
 
