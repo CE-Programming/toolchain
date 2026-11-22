@@ -15,14 +15,10 @@ __land:
 	push	af
 	and	a, e
 	ld	e, a
-	; jr	.L.hijack_land
-	.db	0x3E			; ld a, *
-
-; REQUIRE	require	__iand
+	.db	0x3E			; ld a, imm8 consumes the push af at __iand
 
 .endif
 
-; REQUIRE	.section	.text
 	.global	__iand
 	.type	__iand, @function
 

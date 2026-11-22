@@ -9,7 +9,7 @@
 
 ;-------------------------------------------------------------------------------
 
-	.section	.text
+	.section	.text._strtoll
 
 	.global	_strtoll
 	.type	_strtoll, @function
@@ -58,7 +58,7 @@ _strtoll.overflow:
 
 ;-------------------------------------------------------------------------------
 
-	.section	.text
+	.section	.text._strtoull
 
 	.global	_strtoull
 	.type	_strtoull, @function
@@ -87,7 +87,7 @@ _strtoull.out_of_range:
 
 ;-------------------------------------------------------------------------------
 
-	.section	.text
+	.section	.text.__strtoll_common
 
 	.local	__strtoll_common
 

@@ -8,9 +8,8 @@ __lor_fast:
 ; CC: 24*r(PC)+8*r(SPL)+7*w(SPL)+1
 	or	a, e
 	ld	e, a
-; REQUIRE	require	__ior_fast
+	; Fall through to __ior_fast.
 
-; REQUIRE	.section	.text
 	.global	__ior_fast
 	.type	__ior_fast, @function
 
@@ -29,9 +28,8 @@ __ior_fast:
 	or	a, (hl)
 	ld	(hl), a
 	pop	hl
-; REQUIRE	require	__sor_fast
+	; Fall through to __sor_fast.
 
-; REQUIRE	.section	.text
 	.global	__sor_fast
 	.type	__sor_fast, @function
 

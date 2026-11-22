@@ -15,9 +15,8 @@ __i48shrs:
 	ret	z
 	cp	a, a	; Set Z flag
 	db	$C2	; inc c \ dec c \ ret z -> jp nz, *
-; REQUIRE	require	__i48shru
+	; The first three bytes of __i48shru are the jump operand.
 
-; REQUIRE	.section	.text
 	.global	__i48shru
 	.type	__i48shru, @function
 __i48shru:

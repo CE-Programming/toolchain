@@ -2,7 +2,7 @@
 
 ;-------------------------------------------------------------------------------
 
-	.section	.text
+	.section	.text._strtok
 
 	.global	_strtok
 	.type	_strtok, @function
@@ -37,7 +37,7 @@ _strtok:
 
 ;-------------------------------------------------------------------------------
 
-	.section	.text
+	.section	.text._strtok_r
 
 	.global	_strtok_r
 	.type	_strtok_r, @function

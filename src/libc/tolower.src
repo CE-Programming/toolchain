@@ -8,9 +8,8 @@ _tolower:
 	pop	de
 	ex	(sp), hl
 	push	de
-; REQUIRE	require	_tolower.internal
+	; Fall through to _tolower.internal.
 
-; REQUIRE	.section	.text
 	.global	_tolower.internal
 	.type	_tolower.internal, @function
 _tolower.internal:

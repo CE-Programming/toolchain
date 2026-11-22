@@ -1,6 +1,6 @@
 	.assume	adl=1
 
-	.section	.text
+	.section	.text._strcspn
 	.global	_strcspn
 	.type	_strcspn, @function
 _strcspn:
@@ -8,7 +8,7 @@ _strcspn:
 	sbc	hl, de		; Calculate number of mismatching characters
 	ret
 
-	.section	.text
+	.section	.text._strpbrk
 	.global	_strpbrk
 	.type	_strpbrk, @function
 _strpbrk:
@@ -17,7 +17,7 @@ _strpbrk:
 	sbc	hl, hl		; Return NULL
 	ret
 
-	.section	.text
+	.section	.text.__strcspn_strpbrk_common
 	.local	__strcspn_strpbrk_common
 __strcspn_strpbrk_common:
 	ld	hl, 6

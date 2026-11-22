@@ -15,14 +15,10 @@ __lxor:
 	push	af
 	xor	a, e
 	ld	e, a
-	; jr	.L.hijack_lxor
-	.db	0x3E			; ld a, *
-
-; REQUIRE	require	__ixor
+	.db	0x3E			; ld a, imm8 consumes the push af at __ixor
 
 .endif
 
-; REQUIRE	.section	.text
 	.global	__ixor
 	.type	__ixor, @function
 

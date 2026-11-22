@@ -8,9 +8,8 @@ _toupper:
 	pop	de
 	ex	(sp), hl
 	push	de
-; REQUIRE	require	_toupper.internal
+	; Fall through to _toupper.internal.
 
-; REQUIRE	.section	.text
 	.global	_toupper.internal
 	.type	_toupper.internal, @function
 _toupper.internal:

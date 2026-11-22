@@ -8,9 +8,8 @@ __lxor_fast:
 ; CC: 24*r(PC)+8*r(SPL)+7*w(SPL)+1
 	xor	a, e
 	ld	e, a
-; REQUIRE	require	__ixor_fast
+	; Fall through to __ixor_fast.
 
-; REQUIRE	.section	.text
 	.global	__ixor_fast
 	.type	__ixor_fast, @function
 
@@ -29,9 +28,8 @@ __ixor_fast:
 	xor	a, (hl)
 	ld	(hl), a
 	pop	hl
-; REQUIRE	require	__sxor_fast
+	; Fall through to __sxor_fast.
 
-; REQUIRE	.section	.text
 	.global	__sxor_fast
 	.type	__sxor_fast, @function
 
