@@ -26,10 +26,20 @@
 /* ELF format definitions (from ELF specification) */
 #define EI_NIDENT 16
 #define EI_CLASS  4
+#define EI_DATA   5
 #define ELFCLASS32 1
+#define ELFDATA2LSB 1
 
+#define ET_REL 1
+#define EM_Z80 220
+#define SHT_PROGBITS 1
 #define SHT_SYMTAB 2
 #define SHT_STRTAB 3
+#define SHT_RELA 4
+#define SHT_REL 9
+#define SHF_ALLOC 2
+#define SHN_UNDEF 0
+#define R_Z80_24 5
 
 /* ELF32 structures */
 struct elf32_ehdr
@@ -74,6 +84,13 @@ struct elf32_sym
     uint16_t st_shndx;
 };
 
+struct elf32_rela
+{
+    uint32_t r_offset;
+    uint32_t r_info;
+    int32_t r_addend;
+};
+
 /* Internal ELF file structure */
 struct elf_file
 {
@@ -96,6 +113,7 @@ struct elf_file
     /* Symbol table */
     struct elf32_sym *symtab;
     size_t symtab_count;
+    uint16_t symtab_index;
 };
 
 static void set_error(struct elf_file *elf, const char *msg)
@@ -261,6 +279,7 @@ static bool load_symbol_table(struct elf_file *elf)
         if (elf->section_headers[i].sh_type == SHT_SYMTAB)
         {
             symtab_shdr = &elf->section_headers[i];
+            elf->symtab_index = i;
             break;
         }
     }
@@ -530,4 +549,187 @@ bool elf_has_section_prefix(struct elf_file *elf, const char *section_prefix)
 const char *elf_get_error(struct elf_file *elf)
 {
     return elf ? elf->error : "Invalid ELF handle";
+}
+
+static uint16_t find_section(struct elf_file *elf, const char *name)
+{
+    size_t length = strlen(name) + 1;
+    for (uint16_t i = 1; i < elf->ehdr.e_shnum; i++)
+    {
+        size_t offset = elf->section_headers[i].sh_name;
+        if (offset < elf->shstrtab_size && length <= elf->shstrtab_size - offset &&
+            memcmp(elf->shstrtab + offset, name, length) == 0)
+            return i;
+    }
+    return 0;
+}
+
+bool elf_read_section(struct elf_file *elf, const char *name,
+                      uint8_t **data, size_t *size)
+{
+    uint16_t index = find_section(elf, name);
+    *data = NULL;
+    *size = 0;
+    if (!index)
+        return true;
+
+    const struct elf32_shdr *section = &elf->section_headers[index];
+    if (section->sh_type != SHT_PROGBITS ||
+        !check_range(elf, section->sh_offset, section->sh_size))
+    {
+        snprintf(elf->error, sizeof(elf->error), "Invalid %s section", name);
+        return false;
+    }
+    if (!section->sh_size)
+        return true;
+
+    uint8_t *buffer = malloc(section->sh_size);
+    if (!buffer || !read_at(elf->fp, buffer, section->sh_size, section->sh_offset))
+    {
+        free(buffer);
+        snprintf(elf->error, sizeof(elf->error), "Could not read %s section", name);
+        return false;
+    }
+    *data = buffer;
+    *size = section->sh_size;
+    return true;
+}
+
+static int compare_offsets(const void *a, const void *b)
+{
+    uint16_t first = *(const uint16_t *)a;
+    uint16_t second = *(const uint16_t *)b;
+    return (first > second) - (first < second);
+}
+
+bool elf_relocate_library(struct elf_file *elf, uint8_t *text, size_t text_size,
+                          uint16_t **offsets, size_t *count)
+{
+    *offsets = NULL;
+    *count = 0;
+    uint16_t text_index = find_section(elf, ".text");
+    uint16_t header_index = find_section(elf, ".libload.header");
+    uint16_t exports_index = find_section(elf, ".libload.exports");
+    if (elf->ehdr.e_ident[EI_DATA] != ELFDATA2LSB || elf->ehdr.e_type != ET_REL ||
+        elf->ehdr.e_machine != EM_Z80 || !text_index)
+    {
+        set_error(elf, "Expected a relocatable eZ80 library object");
+        return false;
+    }
+    if (text_size > UINT16_MAX)
+    {
+        snprintf(elf->error, sizeof(elf->error),
+                 "Library is too large for an AppVar (.text alone is %zu bytes)", text_size);
+        return false;
+    }
+
+    const struct elf32_shdr *relocations = NULL;
+    for (uint16_t i = 1; i < elf->ehdr.e_shnum; i++)
+    {
+        const struct elf32_shdr *section = &elf->section_headers[i];
+        if (!section->sh_size)
+            continue;
+        if (section->sh_type == SHT_RELA || section->sh_type == SHT_REL)
+        {
+            if (section->sh_info == text_index && !relocations && section->sh_type == SHT_RELA)
+            {
+                relocations = section;
+                continue;
+            }
+            if (section->sh_info != text_index && section->sh_info != header_index &&
+                section->sh_info != exports_index && section->sh_info < elf->ehdr.e_shnum &&
+                !(elf->section_headers[section->sh_info].sh_flags & SHF_ALLOC))
+                continue;
+
+            set_error(elf, "Unexpected relocation section in library object");
+            return false;
+        }
+        if (i != text_index && (section->sh_flags & SHF_ALLOC))
+        {
+            set_error(elf, "Library code and data must be in .text");
+            return false;
+        }
+    }
+    if (!relocations)
+        return true;
+
+    size_t entries = relocations->sh_size / sizeof(struct elf32_rela);
+    if (relocations->sh_link != elf->symtab_index ||
+        relocations->sh_entsize != sizeof(struct elf32_rela) ||
+        relocations->sh_size % sizeof(struct elf32_rela) != 0 ||
+        entries > text_size / 3 ||
+        !check_range(elf, relocations->sh_offset, relocations->sh_size) ||
+        fseek(elf->fp, relocations->sh_offset, SEEK_SET) != 0)
+    {
+        set_error(elf, "Invalid .text relocation table");
+        return false;
+    }
+
+    uint16_t *table = malloc(entries * sizeof(*table));
+    if (!table)
+    {
+        set_error(elf, "Could not allocate library relocation table");
+        return false;
+    }
+    for (size_t i = 0; i < entries; i++)
+    {
+        struct elf32_rela relocation;
+        if (fread(&relocation, sizeof(relocation), 1, elf->fp) != 1)
+        {
+            set_error(elf, "Could not read library relocation");
+            free(table);
+            return false;
+        }
+        uint32_t offset = relocation.r_offset;
+        uint32_t symbol_index = relocation.r_info >> 8;
+        if ((relocation.r_info & 0xff) != R_Z80_24 || symbol_index >= elf->symtab_count ||
+            offset > text_size || text_size - offset < 3)
+        {
+            snprintf(elf->error, sizeof(elf->error), "Unsupported .text relocation at 0x%x", offset);
+            free(table);
+            return false;
+        }
+
+        const struct elf32_sym *symbol = &elf->symtab[symbol_index];
+        if (symbol->st_shndx == SHN_UNDEF)
+        {
+            const char *name = "?";
+            int name_length = 1;
+            if (symbol->st_name < elf->strtab_size)
+            {
+                size_t remaining = elf->strtab_size - symbol->st_name;
+                name = elf->strtab + symbol->st_name;
+                name_length = remaining < 64 ? (int)remaining : 64;
+            }
+            snprintf(elf->error, sizeof(elf->error),
+                     "Undefined symbol '%.*s' referenced at 0x%x (missing import_%.*s?)",
+                     name_length, name, offset, name_length, name);
+            free(table);
+            return false;
+        }
+        int64_t value = (int64_t)symbol->st_value + relocation.r_addend;
+        if (symbol->st_shndx != text_index || value < 0 || value > 0xffffff)
+        {
+            snprintf(elf->error, sizeof(elf->error), "Invalid .text relocation target at 0x%x", offset);
+            free(table);
+            return false;
+        }
+        text[offset] = value & 0xff;
+        text[offset + 1] = (value >> 8) & 0xff;
+        text[offset + 2] = (value >> 16) & 0xff;
+        table[i] = offset;
+    }
+    qsort(table, entries, sizeof(*table), compare_offsets);
+    for (size_t i = 1; i < entries; i++)
+    {
+        if (table[i] < table[i - 1] + 3)
+        {
+            set_error(elf, "Overlapping library relocations");
+            free(table);
+            return false;
+        }
+    }
+    *offsets = table;
+    *count = entries;
+    return true;
 }

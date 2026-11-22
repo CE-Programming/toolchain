@@ -7,7 +7,7 @@
 	.err
 .endif
 
-	; until we figure out how to get FASMG require or etc working correctly
+	; Keep the shared overflow path in this section until the linker can retain it separately.
 	.equ	HAVE_WE_FIGURED_OUT_BINUTILS_YET, 0
 
 ;-------------------------------------------------------------------------------

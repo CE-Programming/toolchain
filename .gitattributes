@@ -1,6 +1,8 @@
 *.c	text eol=lf
 *.h	text eol=lf
 *.asm	text eol=lf
+*.s	text eol=lf
+*.src	text eol=lf
 *.inc	text eol=lf
 *.ini	text eol=lf
 *.log	text eol=lf

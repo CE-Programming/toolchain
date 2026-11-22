@@ -44,7 +44,8 @@ SRCDIR = ./src
 DEPDIR = ./src/deps
 SOURCES = \
 	$(SRCDIR)/main.c \
-	$(SRCDIR)/elf_inspect.c
+	$(SRCDIR)/elf_inspect.c \
+	$(SRCDIR)/libload_pack.c
 
 OBJECTS = $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
@@ -57,7 +58,7 @@ $(BINDIR)/$(TARGET): $(OBJECTS)
 	$(Q)$(CC) $(LDFLAGS) $(call NATIVEPATH,$^) -o $(call NATIVEPATH,$@) $(addprefix -l, $(LIBRARIES))
 	$(Q)$(call STRIP,$@)
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.c
+$(OBJDIR)/%.o: $(SRCDIR)/%.c $(SRCDIR)/elf_inspect.h
 	$(Q)$(call MKDIR,$(call NATIVEPATH,$(@D)))
 	$(Q)$(CC) -c $(call NATIVEPATH,$<) $(CFLAGS) -o $(call NATIVEPATH,$@)
 

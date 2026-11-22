@@ -1,5 +1,5 @@
 ;-------------------------------------------------------------------------------
-include '../include/library.inc'
+.include "library.inc"
 ;-------------------------------------------------------------------------------
 
 library LCDDRVCE, 0
@@ -11,29 +11,29 @@ library LCDDRVCE, 0
 ;-------------------------------------------------------------------------------
 ; v1 functions
 ;-------------------------------------------------------------------------------
-	export lcd_Init
-	export lcd_Cleanup
-	export lcd_Wait
-	export lcd_SendSizedCommandRaw
-	export lcd_SendParamsRaw
-	export lcd_SendCommand
-	export lcd_SendCommand1
-	export lcd_SendCommand2
-	export lcd_SendSizedCommandBytes
-	export lcd_SendSizedCommandWords
-	export lcd_SetUniformGamma
-	export lcd_SetDefaultGamma
+	lib_export lcd_Init
+	lib_export lcd_Cleanup
+	lib_export lcd_Wait
+	lib_export lcd_SendSizedCommandRaw
+	lib_export lcd_SendParamsRaw
+	lib_export lcd_SendCommand
+	lib_export lcd_SendCommand1
+	lib_export lcd_SendCommand2
+	lib_export lcd_SendSizedCommandBytes
+	lib_export lcd_SendSizedCommandWords
+	lib_export lcd_SetUniformGamma
+	lib_export lcd_SetDefaultGamma
 
-macro checked_param param, limit
-	assert (param) >= 0 & (param) <= (limit)
-	db param
-end macro
+.macro checked_param param, limit
+	assert ((\param) >= 0 && (\param) <= (\limit))
+	.db	\param
+.endm
 
-macro checked_param2 param1, limit1, param2, limit2
-	assert (param1) >= 0 & (param1) <= (limit1)
-	assert (param2) >= 0 & (param2) <= (limit2)
-	db ((param2) shl 4) or (param1)
-end macro
+.macro checked_param2 param1, limit1, param2, limit2
+	assert ((\param1) >= 0 && (\param1) <= (\limit1))
+	assert ((\param2) >= 0 && (\param2) <= (\limit2))
+	.db	((\param2) << 4) | (\param1)
+.endm
 
 ; Gamma voltage levels are specified here.
 ; V0-V2, V20, V43, V61-V63 are the main points, ranging from 129 to 0.
@@ -41,77 +41,77 @@ end macro
 ; V27, V36 are interpolated between V20 and V43, ranging from 25 to 0.
 ; V50, V57, V59 are interpolated between V43 and V61, ranging from 60 to 0.
 ; J0 and J1 are values between 0 and 3 affecting interpolations for remaining voltages.
-macro gamma_params V0, V1, V2, V20, V43, V61, V62, V63, V4, V6, V13, V27, V36, V50, V57, V59, J0, J1
-	checked_param2 129-(V0),  $0F, 23-(V63), $0F
-	checked_param  128-(V1),  $3F
-	checked_param  128-(V2),  $3F
-	checked_param   57-(V4),  $1F
-	checked_param   47-(V6),  $1F
-	checked_param2  21-(V13), $0F, J0, $03
-	checked_param  128-(V20), $7F
-	checked_param2  20-(V27), $07, 11-(V36), $07
-	checked_param  128-(V43), $7F
-	checked_param2  54-(V50), $0F, J1, $03
-	checked_param   44-(V57), $1F
-	checked_param   34-(V59), $1F
-	checked_param   64-(V61), $3F
-	checked_param   64-(V62), $3F
-end macro
+.macro gamma_params V0, V1, V2, V20, V43, V61, V62, V63, V4, V6, V13, V27, V36, V50, V57, V59, J0, J1
+	checked_param2	129-(\V0), 0x0F, 23-(\V63), 0x0F
+	checked_param	128-(\V1), 0x3F
+	checked_param	128-(\V2), 0x3F
+	checked_param	57-(\V4), 0x1F
+	checked_param	47-(\V6), 0x1F
+	checked_param2	21-(\V13), 0x0F, \J0, 0x03
+	checked_param	128-(\V20), 0x7F
+	checked_param2	20-(\V27), 0x07, 11-(\V36), 0x07
+	checked_param	128-(\V43), 0x7F
+	checked_param2	54-(\V50), 0x0F, \J1, 0x03
+	checked_param	44-(\V57), 0x1F
+	checked_param	34-(\V59), 0x1F
+	checked_param	64-(\V61), 0x3F
+	checked_param	64-(\V62), 0x3F
+.endm
 
 lcd_Init:
 	; Increase the refcount
 	scf
 	sbc	hl, hl
 	ld	de, 0
-.refcount := $-3
+.equ lcd_Init.refcount, .-3
 	add	hl, de
-	ld	(.refcount), hl
+	ld	(lcd_Init.refcount), hl
 	ret	c
 	; Initialize if the old refcount was 0
 	; Always fully initialize on the first call per program invocation
-	ld	hl, .fullinit
+	ld	hl, lcd_Init.fullinit
 	srl	(hl)
-	jr	c, .checkPython
+	jr	c, lcd_Init.checkPython
 	; Additionally, fully initialize if an APD reset the SPI state to something other than LCD
 	ld	a, (ti.mpSpiCtrl0)
-	cp	a, ti.bmSpiMasterMono or ti.bmSpiClkPhase or ti.bmSpiClkPolarity
-	jr	z, .fastinit
-.checkPython:
+	cp	a, ti.bmSpiMasterMono | ti.bmSpiClkPhase | ti.bmSpiClkPolarity
+	jr	z, lcd_Init.fastinit
+lcd_Init.checkPython:
 	; Check certificate for Python model
-	ld	de, $0330
+	ld	de, 0x0330
 	call	ti.FindFirstCertField
-	jr	nz, .notPython
+	jr	nz, lcd_Init.notPython
 	call	ti.GetFieldSizeFromType
-	ld	de, $0430
+	ld	de, 0x0430
 	call	ti.FindField
-	jr	nz, .notPython
+	jr	nz, lcd_Init.notPython
 	; Reinitializes Python hardware, probably (routine available on rev M+ boot code)
 	; Without this, LCD SPI transfers start failing a short time after init
-	call	$000654
+	call	0x000654
 	; Magic SPI initialization sequence to work on Python models
-	ld	de, ti.spiSpiFrFmt or ti.bmSpiFlash or ti.bmSpiFsPolarity or ti.bmSpiMasterMono
-.loop:
+	ld	de, ti.spiSpiFrFmt | ti.bmSpiFlash | ti.bmSpiFsPolarity | ti.bmSpiMasterMono
+lcd_Init.loop:
 	ld	(ti.mpSpiCtrl0), de
-	ld	hl, ti.bmSpiTxClr or ti.bmSpiRxClr
+	ld	hl, ti.bmSpiTxClr | ti.bmSpiRxClr
 	ld	(ti.mpSpiCtrl2), hl
-.fullinit:
+lcd_Init.fullinit:
 	; Becomes a nop after being shifted
-	db	1
+	.db	1
 	ld	hl, ti.bmSpiChipReset
 	ld	(ti.mpSpiCtrl2), hl
 	call	ti.Delay10ms
 	bit	ti.bSpiClkPolarity, e
-	ld	e, ti.bmSpiFsPolarity or ti.bmSpiMasterMono or ti.bmSpiClkPhase or ti.bmSpiClkPolarity
-	jr	z, .loop
-	ld	hl, $21
+	ld	e, ti.bmSpiFsPolarity | ti.bmSpiMasterMono | ti.bmSpiClkPhase | ti.bmSpiClkPolarity
+	jr	z, lcd_Init.loop
+	ld	hl, 0x21
 	ld	(ti.mpSpiIntCtrl), hl
-.notPython:
-	ld	a, ti.bmSpiMasterMono or ti.bmSpiClkPhase or ti.bmSpiClkPolarity
+lcd_Init.notPython:
+	ld	a, ti.bmSpiMasterMono | ti.bmSpiClkPhase | ti.bmSpiClkPolarity
 	ld	(ti.mpSpiCtrl0), a
-.fastinit:
-	ld	hl, ((9-1) shl 16) or (2-1)
+lcd_Init.fastinit:
+	ld	hl, ((9-1) << 16) | (2-1)
 	ld	(ti.mpSpiCtrl1), hl
-	ld	hl, ti.bmSpiTxEn or ti.bmSpiTxClr or ti.bmSpiRxClr or ti.bmSpiChipEn
+	ld	hl, ti.bmSpiTxEn | ti.bmSpiTxClr | ti.bmSpiRxClr | ti.bmSpiChipEn
 	ld	(ti.mpSpiCtrl2), hl
 	ret
 
@@ -124,22 +124,22 @@ lcd_Cleanup:
 	ret	nc
 	; Deinitialize if the new refcount is 0
 	call	lcd_Wait
-	ld	hl, ((3-1) shl 16) or (12-1)
+	ld	hl, ((3-1) << 16) | (12-1)
 	ld	(ti.mpSpiCtrl1), hl
-	ld	hl, ti.bmSpiTxEn or ti.bmSpiTxClr or ti.bmSpiRxClr
+	ld	hl, ti.bmSpiTxEn | ti.bmSpiTxClr | ti.bmSpiRxClr
 	ld	(ti.mpSpiCtrl2), hl
 	ret
 
 lcd_Wait:
 	ld	hl, ti.mpSpiStatus + 1
-	ld	a, (1 shl (ti.bSpiTxFifoBytes - 8)) - 1
-.waitEmpty:
+	ld	a, (1 << (ti.bSpiTxFifoBytes - 8)) - 1
+lcd_Wait.waitEmpty:
 	cp	a, (hl)
-	jr	c, .waitEmpty
+	jr	c, lcd_Wait.waitEmpty
 	dec	hl
-.waitBusy:
+lcd_Wait.waitBusy:
 	bit	ti.bSpiChipBusy, (hl)
-	jr	nz, .waitBusy
+	jr	nz, lcd_Wait.waitBusy
 	ret
 
 lcd_SetUniformGamma:
@@ -149,7 +149,7 @@ lcd_SetDefaultGamma:
 	ld	de, defaultGammaParams
 _Gamma:
 	; Set positive gamma
-	ld	bc, (14 shl 8) or $E0
+	ld	bc, (14 << 8) | 0xE0
 	push	bc
 	call	lcd_SendSizedCommandRaw.entry
 	; Set negative gamma
@@ -166,12 +166,12 @@ lcd_SendSizedCommandRaw:
 	push	bc
 	push	hl
 
-.entry:
+lcd_SendSizedCommandRaw.entry:
 	ld	hl, ti.mpSpiStatus + 1
-	ld	a, ((ti.bmSpiTxFifoBytes shr 8) and $FF) - 1
-.waitNotFull:
+	ld	a, ((ti.bmSpiTxFifoBytes >> 8) & 0xFF) - 1
+lcd_SendSizedCommandRaw.waitNotFull:
 	cp	a, (hl)
-	jr	c, .waitNotFull
+	jr	c, lcd_SendSizedCommandRaw.waitNotFull
 	ld	l, ti.spiData + 1
 	ld	(hl), h
 	dec	hl
@@ -200,36 +200,36 @@ lcd_SendParamsRaw:
 	ld	de, ti.mpSpiRange
 	xor	a, a
 	sub	a, c
-.entry:
+lcd_SendParamsRaw.entry:
 	and	a, 7
 	add	a, a
 	add	a, a
-	ld	(.sendParamsOffsetSMC), a
-.sendParamsLoop:
+	ld	(lcd_SendParamsRaw.sendParamsOffsetSMC), a
+lcd_SendParamsRaw.sendParamsLoop:
 	ld	e, ti.spiStatus + 1
 	scf
-.waitForEight:
+lcd_SendParamsRaw.waitForEight:
 	ld	a, (de)
 	rla
-	jr	c, .waitForEight
+	jr	c, lcd_SendParamsRaw.waitForEight
 	ld	e, ti.spiData + 1
-	jr	nz, $
-.sendParamsOffsetSMC = $-1
-	repeat 8
+	jr	nz, .
+.set lcd_SendParamsRaw.sendParamsOffsetSMC, .-1
+	.rept 8
 	ld	(de), a
 	dec	de
 	ldi
-	end repeat
+	.endr
 	ret	po
 	cp	a, a
-	jr	.sendParamsLoop
+	jr	lcd_SendParamsRaw.sendParamsLoop
 
 _sendSingleByte:
 	ld	l, ti.spiStatus + 1
-	ld	a, ((ti.bmSpiTxFifoBytes shr 8) and $FF) - 1
-.waitNotFull:
+	ld	a, ((ti.bmSpiTxFifoBytes >> 8) & 0xFF) - 1
+_sendSingleByte.waitNotFull:
 	cp	a, (hl)
-	jr	c, .waitNotFull
+	jr	c, _sendSingleByte.waitNotFull
 	ld	l, ti.spiData
 	ld	a, (de)
 	ld	(hl), a
@@ -255,18 +255,18 @@ lcd_SendSizedCommandBytes:
 	push	bc
 	push	hl
 	inc	b
-.entry:
+lcd_SendSizedCommandBytes.entry:
 	ld	hl, 3
 	add	hl, sp
 	ex	de, hl
 	ld	hl, ti.mpSpiData + 1
 	ld	(hl), h
-.loop:
+lcd_SendSizedCommandBytes.loop:
 	call	_sendSingleByte
 	inc	de
 	inc	de
 	inc	de
-	djnz	.loop
+	djnz	lcd_SendSizedCommandBytes.loop
 	ret
 
 lcd_SendSizedCommandWords:
@@ -277,7 +277,7 @@ lcd_SendSizedCommandWords:
 	ex	de, hl
 	ld	hl, ti.mpSpiData + 1
 	ld	(hl), h
-.loop:
+lcd_SendSizedCommandWords.loop:
 	dec	de
 	call	_sendSingleByte
 	dec	b
@@ -287,16 +287,16 @@ lcd_SendSizedCommandWords:
 	inc	de
 	inc	de
 	call	_sendSingleByte
-	jr	.loop
+	jr	lcd_SendSizedCommandWords.loop
 
 defaultGammaParams:
 	; Positive gamma
-	gamma_params 129, 128, 128, 83, 65, 45, 41, 10,  41, 32, 11,  16, 6,  43, 20, 11,  1, 3
+	gamma_params	129, 128, 128, 83, 65, 45, 41, 10, 41, 32, 11, 16, 6, 43, 20, 11, 1, 3
 	; Negative gamma
-	gamma_params 129, 128, 128, 85, 64, 45, 41, 10,  41, 32, 12,  17, 7,  43, 20, 11,  0, 3
+	gamma_params	129, 128, 128, 85, 64, 45, 41, 10, 41, 32, 12, 17, 7, 43, 20, 11, 0, 3
 
 uniformGammaParams:
 	; Positive gamma
-	gamma_params 129, 125, 121, 83, 65, 45, 41, 10,  49, 38, 13,  16, 6,  43, 20, 11,  1, 3
+	gamma_params	129, 125, 121, 83, 65, 45, 41, 10, 49, 38, 13, 16, 6, 43, 20, 11, 1, 3
 	; Negative gamma
-	gamma_params 129, 125, 121, 85, 64, 45, 41, 10,  49, 38, 14,  17, 7,  43, 20, 11,  0, 3
+	gamma_params	129, 125, 121, 85, 64, 45, 41, 10, 49, 38, 14, 17, 7, 43, 20, 11, 0, 3

@@ -20,6 +20,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+bool pack_libload(const char *input, const char *appvar, const char *descriptor);
+
 #define MAX_WORD_LEN 1024
 #define MAX_FMT "1023"
 
@@ -36,6 +38,7 @@ static void print_usage(const char *prog)
 {
     fprintf(stderr, "Usage: %s --elf <elf_file> -o|--output <output_file> "
                     "[--libs lib_file1 lib_file2 ...] [--optional-libs LIB1 LIB2 ...]\n", prog);
+    fprintf(stderr, "       %s --pack-libload <object> <appvar> <descriptor>\n", prog);
 }
 
 static bool is_flag(const char *arg)
@@ -239,6 +242,15 @@ static bool process_libraries(FILE *out, struct elf_file *elf, char **argv,
 
 int main(int argc, char **argv)
 {
+    if (argc > 1 && strcmp(argv[1], "--pack-libload") == 0)
+    {
+        if (argc == 5)
+            return pack_libload(argv[2], argv[3], argv[4]) ? 0 : 1;
+
+        print_usage(argv[0]);
+        return 1;
+    }
+
     options_t opts;
 
     if (!parse_arguments(argc, argv, &opts))

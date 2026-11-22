@@ -21,7 +21,7 @@ include $(CURDIR)/src/common.mk
 
 LIBS := libload graphx fontlibc keypadc fileioc usbdrvce srldrvce msddrvce fatdrvce lcddrvce
 SRCS := ce crt libc libcxx softfloat
-TOOLS := fasmg convbin convimg convfont cedev-config cedev-obj
+TOOLS := convbin convimg convfont cedev-config cedev-obj
 
 
 ifeq ($(OS),Windows_NT)
@@ -41,7 +41,7 @@ $(TOOLS): check
 $(SRCS):
 	$(Q)$(MAKE) -C $(call SRCDIR,$@)
 
-$(LIBS): fasmg
+$(LIBS): cedev-obj
 	$(Q)$(MAKE) -C $(call SRCDIR,$@)
 
 install: all $(addprefix install-,$(SRCS)) $(addprefix install-,$(LIBS))
@@ -67,14 +67,14 @@ install: all $(addprefix install-,$(SRCS)) $(addprefix install-,$(LIBS))
 $(addprefix install-,$(SRCS)): $(TOOLS)
 	$(Q)$(MAKE) -C $(call SRCDIR,$(patsubst install-%,%,$@)) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 
-$(addprefix install-,$(LIBS)): $(TOOLS)
+$(addprefix install-,$(LIBS)): install-%: %
 	$(Q)$(MAKE) -C $(call SRCDIR,$(patsubst install-%,%,$@)) install PREFIX=$(PREFIX) DESTDIR=$(DESTDIR)
 
 libs: $(LIBS) $(TOOLS)
 	$(Q)$(call NATIVEEXE,tools/convbin/bin/convbin) --oformat 8xg-auto-extract --iformat 8x \
 		$(foreach library,$(LIBS),$(addprefix --input ,$(call SRCDIR,$(library))/$(library).8xv)) --output clibs.8xg
 
-libs-zip:
+libs-zip: $(LIBS)
 	$(Q)$(call MKDIR,clibs)
 	$(Q)$(foreach library,$(LIBS),$(call COPY,$(call NATIVEPATH,$(call SRCDIR,$(library))/$(library).8xv),clibs) &&) $(call NATIVEEXE,7z) a clibs_separately_in_zip.zip clibs
 
@@ -94,7 +94,7 @@ $(addprefix clean-,$(TOOLS)):
 
 check:
 	$(Q)$(EZCC) --version || ( echo Please install ez80-clang && exit 1 )
-	$(Q)$(FASMG) $(NULL) $(NULL) || ( echo Please install fasmg && exit 1 )
+	$(Q)$(EZAS) --version || ( echo Please install eZ80 GNU binutils && exit 1 )
 
 docs:
 	$(Q)$(MAKE) -C docs html
@@ -105,4 +105,4 @@ local-docs:
 .PHONY: $(LIBS) $(SRCS)
 .PHONY: $(addprefix install-,$(SRCS)) $(addprefix install-,$(LIBS))
 .PHONY: $(addprefix clean-,$(SRCS)) $(addprefix clean-,$(LIBS))
-.PHONY: all check clean install libs docs local-docs
+.PHONY: all check clean install libs libs-zip docs local-docs
