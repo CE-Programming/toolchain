@@ -1,0 +1,54 @@
+	.assume	adl=1
+
+;-------------------------------------------------------------------------------
+
+	.section	.text
+	.global	__ltest
+	.type	__ltest, @function
+
+__ltest:
+	; Z flag = ((E:UHL & A:UBC) == 0)
+	; all other flags are destroyed
+	tst	a, e
+	ret	nz
+
+; REQUIRE	require	__itest
+
+;-------------------------------------------------------------------------------
+
+; REQUIRE	.section	.text
+	.global	__itest
+	.type	__itest, @function
+
+__itest:
+	; Z flag = ((UHL & UBC) == 0)
+	; all other flags are destroyed
+	push	de
+	ld	e, a
+	; test low 8 bits
+	ld	a, l
+	and	a, c
+	jr	nz, .L.non_zero
+	; test high 8 bits
+	ld	a, h
+	and	a, b
+	jr	nz, .L.non_zero
+	; test upper 8 bits
+	push	hl
+	scf
+	sbc	hl, hl
+	add	hl, sp
+	push	bc
+	ld	a, (hl)
+	inc	hl
+	ld	sp, hl
+	inc	hl
+	inc	hl
+	and	a, (hl)
+	pop	hl
+.L.non_zero:
+	ld	a, e
+	pop	de
+	ret
+
+;-------------------------------------------------------------------------------
