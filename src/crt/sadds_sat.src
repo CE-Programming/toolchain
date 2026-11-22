@@ -1,0 +1,18 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__sadds_sat
+	.type	__sadds_sat, @function
+
+__sadds_sat:
+	; signed saturated addition
+	; HL = HL + BC
+	or	a, a
+	adc.s	hl, bc
+	ret	po
+	ld.sis	hl, $7FFF
+	ret	m		; positive overflow
+	; negative underflow
+	inc	hl
+	ret

@@ -1,0 +1,21 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__llsubu_sat
+	.type	__llsubu_sat, @function
+
+__llsubu_sat:
+	; unsigned saturated subtraction
+	; BC:UDE:UHL = BC:UDE:UHL - (SP)
+	call	__llsubu_overflow
+	ret	nc
+	or	a, a
+	sbc	hl, hl
+	ex	de, hl
+	sbc	hl, hl
+	ld	b, l
+	ld	c, l
+	ret
+
+	.extern	__llsubu_overflow

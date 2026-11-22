@@ -1,0 +1,18 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__i48addu_sat
+	.type	__i48addu_sat, @function
+
+__i48addu_sat:
+	; unsigned saturated addition
+	; UDE:UHL = UDE:UHL + UIY:UBC
+	call	__i48addu_overflow
+	ret	nc
+	sbc	hl, hl
+	ex	de, hl
+	sbc	hl, hl
+	ret
+
+	.extern	__i48addu_overflow

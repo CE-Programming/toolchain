@@ -1,0 +1,21 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__ladds_sat
+	.type	__ladds_sat, @function
+
+__ladds_sat:
+	; signed saturated addition
+	; E:UHL = E:UHL + A:UBC
+	call	__ladds_overflow
+	ret	po
+	sla	e
+	sbc	hl, hl
+	ld	e, $80
+	ret	nc		; negative underflow
+	; positive overflow
+	dec	e
+	ret
+
+	.extern	__ladds_overflow

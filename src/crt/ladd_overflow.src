@@ -1,0 +1,24 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__laddu_overflow
+	.type	__laddu_overflow, @function
+
+	.global	__ladds_overflow
+	.type	__ladds_overflow, @function
+
+__laddu_overflow:
+	; NC : no unsigned overflow
+	; C  : unsigned overflow occured
+__ladds_overflow:
+	; PO : no signed overflow
+	; PE : signed overflow occured
+	push	bc
+	add	hl, bc
+	ld	c, a
+	adc	a, e
+	ld	e, a
+	ld	a, c
+	pop	bc
+	ret

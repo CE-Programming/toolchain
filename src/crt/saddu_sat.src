@@ -1,0 +1,14 @@
+	.assume	adl=1
+
+	.section	.text
+
+	.global	__saddu_sat
+	.type	__saddu_sat, @function
+
+__saddu_sat:
+	; unsigned saturated addition
+	; HL = HL + BC
+	add.s	hl, bc
+	ret	nc
+	sbc	hl, hl
+	ret
