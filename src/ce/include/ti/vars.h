@@ -516,6 +516,7 @@ typedef int (*os_runprgm_callback_t)(void *data, int retval);
  * a C program. Other types of programs may have an undefined \p retval. This
  * argument may be left \c NULL if execution should not return to the calling
  * program.
+ * A Flash App can launch a program and exit by passing \c NULL for the callback.
  *
  * @return This function should not return, but if it does, a value < 0 is
  * returned. \c OS_RUN_PRGM_NOT_FOUND (-1) indicates the program could not be

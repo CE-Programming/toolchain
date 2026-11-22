@@ -1,7 +1,15 @@
+PHDRS
+{
+    flash     PT_LOAD FLAGS(5);
+    init_data PT_LOAD FLAGS(6);
+    runprgm   PT_LOAD FLAGS(7);
+}
+
 MEMORY
 {
     prgm : ORIGIN = LOAD_ADDR, LENGTH = 0x400000
     bss  : ORIGIN = BSSHEAP_LOW, LENGTH = BSSHEAP_HIGH - BSSHEAP_LOW
+    cursor : ORIGIN = 0xE30800, LENGTH = 0x400
 }
 
 SECTIONS
@@ -13,12 +21,12 @@ SECTIONS
         KEEP (*(.header))
         PROVIDE_HIDDEN (___icon_optional = .);
         KEEP (*(.header.icon))
-    } >prgm
+    } >prgm :flash
 
     .init :
     {
         *(.init)
-    } >prgm
+    } >prgm :flash
 
     .text :
     {
@@ -29,12 +37,12 @@ SECTIONS
         *(SORT(.text.sorted.*))
         *(.text .stub .text.* .gnu.linkonce.t.*)
         *(.gnu.warning)
-    } >prgm
+    } >prgm :flash
 
     .rodata :
     {
         *(.rodata .rodata.* .gnu.linkonce.r.*)
-    } >prgm
+    } >prgm :flash
 
     .init_array :
     {
@@ -43,7 +51,7 @@ SECTIONS
         KEEP (*(SORT_BY_INIT_PRIORITY(.init_array.*)))
         KEEP (*(.init_array))
         PROVIDE_HIDDEN (__init_array_end = .);
-    } >prgm
+    } >prgm :flash
 
     .fini_array :
     {
@@ -51,7 +59,16 @@ SECTIONS
         KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*)))
         KEEP (*(.fini_array))
         PROVIDE_HIDDEN (__fini_array_end = .);
-    } >prgm
+    } >prgm :flash
+
+    /* Place the on-demand image before the contiguous startup copy range. */
+    .runprgm ORIGIN(cursor) :
+    {
+        /* Keep the Flash source section-relative so Convbin can relocate it. */
+        PROVIDE(___runprgm_reloc_start = . + (LOADADDR(.runprgm) - ADDR(.runprgm)));
+        *(.runprgm.reloc)
+    } >cursor AT>prgm :runprgm
+    PROVIDE(___runprgm_reloc_len = SIZEOF(.runprgm));
 
     .data :
     {
@@ -61,7 +78,7 @@ SECTIONS
         SORT(CONSTRUCTORS)
         *(.data1)
         ___data_vma_end = .;
-    } >bss AT>prgm
+    } >bss AT>prgm :init_data
     ___data_len = ___data_vma_end - ___data_vma;
 
     .bss (NOLOAD) :
@@ -71,7 +88,7 @@ SECTIONS
         *(.bss .bss.* .gnu.linkonce.b.*)
         *(COMMON)
         ___bss_high = .;
-    } >bss :NONE
+    } >bss :init_data
     ___bss_len = ___bss_high - ___bss_low;
 
     ASSERT(. <= BSSHEAP_HIGH, "Error: BSS exceed BSSHEAP_HIGH limit")
@@ -121,7 +138,6 @@ SECTIONS
 
     /DISCARD/ :
     {
-        *(.runprgm.reloc)
         *(.comment)
     }
 }

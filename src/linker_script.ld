@@ -2,6 +2,7 @@ MEMORY
 {
     prgm : ORIGIN = LOAD_ADDR, LENGTH = 0x400000
     bss  : ORIGIN = BSSHEAP_LOW, LENGTH = BSSHEAP_HIGH - BSSHEAP_LOW
+    cursor : ORIGIN = 0xE30800, LENGTH = 0x400
 }
 
 SECTIONS
@@ -56,14 +57,17 @@ SECTIONS
         *(.data .data.* .gnu.linkonce.d.*)
         SORT(CONSTRUCTORS)
         *(.data1)
-
-        /* For running programs */
-        ___runprgm_reloc_start = .;
-        *(.runprgm.reloc)
-        ___runprgm_reloc_end = .;
     } >prgm
     ___data_high = .;
     ___data_len = ___data_high - ___data_low;
+
+    /* os_RunPrgm copies the helper from the program image to cursor RAM. */
+    .runprgm ORIGIN(cursor) :
+    {
+        *(.runprgm.reloc)
+    } >cursor AT>prgm
+    PROVIDE(___runprgm_reloc_start = LOADADDR(.runprgm));
+    PROVIDE(___runprgm_reloc_len = SIZEOF(.runprgm));
 
     . = BSSHEAP_LOW;
     ___bss_low = .;
@@ -82,13 +86,7 @@ SECTIONS
     . = BSSHEAP_HIGH;
     ___heap_high = .;
 
-    /* For running programs */
-    .runprgm 0xE30800 : AT(___runprgm_reloc_start) {
-        KEEP(*(.runprgm.reloc))
-    }
-
-
-        /* Debug info (kept out of loadable memory) */
+    /* Debug info (kept out of loadable memory) */
     .debug_info 0 : { KEEP(*(.debug_info .debug_info.*)) }
     .debug_abbrev 0 : { KEEP(*(.debug_abbrev .debug_abbrev.*)) }
     .debug_line 0 : { KEEP(*(.debug_line .debug_line.*)) }
@@ -131,5 +129,3 @@ SECTIONS
         *(.comment)
     }
 }
-
-PROVIDE(___runprgm_reloc_len = ___runprgm_reloc_end - ___runprgm_reloc_start);
