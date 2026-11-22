@@ -4,9 +4,11 @@
 
 	.global	__dtof
 	.type	__dtof, @function
+	.global	__dtofp
+	.type	__dtofp, @function
 
-	.local	__dtof_helper
-__dtof_helper:
+	.local	__dtofp_helper
+__dtofp_helper:
 	; Moving this block of code to be behind __dtof ensures that
 	; .L.ret_copysign can always be reached by jr in all paths.
 .L.overflow:
@@ -54,6 +56,7 @@ __dtof_helper:
 ;  Quiet NaN: Quiet bit preserved. No signals raised.
 ;  NaN Payloads: Copies the most significant payload bits. The LSB of mantissa is set if payload bits were discarded/truncated out.
 __dtof:
+__dtofp:
 	bit	7, b
 	push	af	; preserve A and signbit
 	push	bc

@@ -1,0 +1,31 @@
+	.assume	adl=1
+
+	.section	.text
+	.global	_floorf
+	.type	_floorf, @function
+	.global	_floor
+	.type	_floor, @function
+
+.ifdef PREFER_OS_LIBC
+
+	.set	_floorf, 0x0220F4
+	.set	_floor, _floorf
+
+.else
+
+_floor:
+_floorf:
+	pop	de
+	pop	bc
+	ex	(sp), hl
+	ld	a, l
+	call	__fpfloor
+	push	bc
+	ex	(sp), hl
+	push	de
+	ld	e, a
+	ret
+
+	.extern	__fpfloor
+
+.endif

@@ -4,11 +4,14 @@
 
 	.global	__ftod
 	.type	__ftod, @function
+	.global	__fptod
+	.type	__fptod, @function
 
 ; input E:UHL (float)
 ; ouput BC:UDE:UHL (long double)
 ; NaN payloads are bitshifted
 __ftod:
+__fptod:
 	sla	e	; extract signbit
 	push	af
 	srl	e
